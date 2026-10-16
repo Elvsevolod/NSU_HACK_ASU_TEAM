@@ -1,0 +1,76 @@
+{
+  "solution_number": 5,
+  "status": "supported_by_site_on_current_suite_not_universal_contract",
+  "confirmed_source_findings": [
+    "The requested first insurance type is enum index 1.",
+    "The create service checks duplicate order and valid type before its explicit constructor call.",
+    "Source-model checks found no failed precondition in S1/S3/S4.",
+    "The handwritten Assurance constructor assigns three parameters to three fields and has no method calls or conditions.",
+    "Organizer documentation excludes library/reflection-only constructors, but does not explicitly exclude direct handwritten field-only constructors."
+  ],
+  "website_evidence": {
+    "parent_3_scores": {
+      "S1": 0.913,
+      "S3": 0.885
+    },
+    "parent_4_scores": {
+      "S1": 0.911,
+      "S3": 0.883
+    },
+    "only_graph_difference_3_to_4_in_S1_S3": "Assurance constructor executes and calls pair",
+    "limitation": "Observed regression localizes the graph difference; it does not establish a general exclusion rule for all field-only constructors."
+  },
+  "experiment": "Interpret all constructor bodies and keep their state effects. At output, omit constructor executes/calls only when AST proves a nonempty parameter-to-instance-field assignment-only body, no explicit superclass or instance initializers, and no outgoing graph edges. Apply to all classes/scenarios.",
+  "also_affected": [
+    "Ticket(int,String,String)",
+    "TrainType(String,int,int)"
+  ],
+  "tests": [
+    "Invalid type 0 or 999 does not construct insurance",
+    "Duplicate insurance does not construct a second record",
+    "Explicit control gives identical bytes to solution 4",
+    "All 8 source-model step records match solution 4",
+    "62 tests passed; network/gold reading prohibited in integration analysis"
+  ],
+  "source_evidence": {
+    "service": {
+      "path": "ts-assurance-service/src/main/java/assurance/service/AssuranceServiceImpl.java",
+      "sha256": "7c97c67992a55848f4154597a34031037239192b480e24e5ebbe02a9fbb060bd"
+    },
+    "entity": {
+      "path": "ts-assurance-service/src/main/java/assurance/entity/Assurance.java",
+      "sha256": "d1d2b58c966002a66c5173d3255e209773c9bb85dc84cc939cddf6793c709f46"
+    },
+    "enum": {
+      "path": "ts-assurance-service/src/main/java/assurance/entity/AssuranceType.java",
+      "sha256": "dd81315707fb20b3f9e531a06240be575095337824feaa9d020e10af038bb62f"
+    },
+    "preserve": {
+      "path": "ts-preserve-service/src/main/java/preserve/service/PreserveServiceImpl.java",
+      "sha256": "f5309d8470f44399e9824d68414e5581427cc922ba9a2268e032cf0b368eb1a4"
+    },
+    "controller": {
+      "path": "ts-assurance-service/src/main/java/assurance/controller/AssuranceController.java",
+      "sha256": "6f02749db1e94471e560d764f08790e8520351a337ab30ff770ea0310eaa14d8"
+    }
+  },
+  "pre_submission_risk": "The rule is a scoring hypothesis, not a confirmed correction under the written graph contract. S5/S6/S7 can regress if their pure constructors belong to hidden gold. Keep solution 4 as a baseline.",
+  "risk": "All affected supplied scenarios improved; whether other field-only constructors should be excluded under other projects or scenarios remains unverified.",
+  "site_validation": {
+    "source": "benchmark/site-score.json",
+    "score": "0.909870",
+    "delta_vs_solution_4": "+0.002820",
+    "scenario_deltas": {
+      "S1": "+0.004",
+      "S2": "+0.000",
+      "S3": "+0.005",
+      "S4": "+0.004",
+      "S5": "+0.001",
+      "S6": "+0.003",
+      "S7": "+0.002"
+    },
+    "all_affected_scenarios_improved": true,
+    "S4_S7_regressed": false,
+    "limits": "No direct access to hidden reference edges; unchanged source-model behavior and exact output differences localize this evaluation to the constructor projection."
+  }
+}
