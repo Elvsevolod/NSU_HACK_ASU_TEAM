@@ -1,0 +1,1992 @@
+{
+  "results": [
+    {
+      "project": "inventory",
+      "passed": true,
+      "basic_passed": true,
+      "behavior_passed": true,
+      "answer": {
+        "edges": [
+          {
+            "source": "scenario:independent-inventory",
+            "relation": "executes",
+            "target": "method:inventory:Reservation#<init>(String)"
+          },
+          {
+            "source": "scenario:independent-inventory",
+            "relation": "executes",
+            "target": "method:inventory:StockController#reserve(StockRequest)"
+          },
+          {
+            "source": "scenario:independent-inventory",
+            "relation": "executes",
+            "target": "method:inventory:StockWorker#accept(String)"
+          },
+          {
+            "source": "method:inventory:StockController#reserve(StockRequest)",
+            "relation": "calls",
+            "target": "method:inventory:StockWorker#accept(String)"
+          },
+          {
+            "source": "method:inventory:StockWorker#accept(String)",
+            "relation": "calls",
+            "target": "method:inventory:Reservation#<init>(String)"
+          },
+          {
+            "source": "method:inventory:StockWorker#accept(String)",
+            "relation": "data",
+            "target": "res:table:inventory.reservations"
+          }
+        ]
+      },
+      "report": {
+        "analysis_status": "partial",
+        "certainty_scope": "relative to supplied inputs, proposed bindings and supported semantics; not a runtime trace",
+        "confirmed": [
+          {
+            "source": "scenario:independent-inventory",
+            "relation": "executes",
+            "target": "method:inventory:Reservation#<init>(String)"
+          },
+          {
+            "source": "scenario:independent-inventory",
+            "relation": "executes",
+            "target": "method:inventory:StockController#reserve(StockRequest)"
+          },
+          {
+            "source": "scenario:independent-inventory",
+            "relation": "executes",
+            "target": "method:inventory:StockWorker#accept(String)"
+          },
+          {
+            "source": "method:inventory:StockController#reserve(StockRequest)",
+            "relation": "calls",
+            "target": "method:inventory:StockWorker#accept(String)"
+          },
+          {
+            "source": "method:inventory:StockWorker#accept(String)",
+            "relation": "calls",
+            "target": "method:inventory:Reservation#<init>(String)"
+          },
+          {
+            "source": "method:inventory:StockWorker#accept(String)",
+            "relation": "data",
+            "target": "res:table:inventory.reservations"
+          }
+        ],
+        "possible": [],
+        "unresolved": [
+          "X2",
+          "X3",
+          "X4",
+          "X5\u201d, "
+        ],
+        "steps": [
+          {
+            "n": 1,
+            "action": "Reserve item1 with reservation enabled",
+            "alternatives": [
+              {
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "parameters": {
+                  "key": "item1",
+                  "enabled": true
+                },
+                "grounding_reason": "The action 'Reserve item1 with reservation enabled' explicitly sets the key to 'item1' and enables reservation, so the parameter 'enabled' must be bound as a literal boolean true.",
+                "grounding_repairs": [
+                  {
+                    "previous_proposal": {
+                      "hypotheses": [
+                        {
+                          "handler": "H0",
+                          "ui_site": "",
+                          "reason": "The action 'Reserve item1 with reservation enabled' matches the handler H0 which accepts a key and an enabled boolean, and the enabled parameter is explicitly set to true in the action.",
+                          "bindings": [
+                            {
+                              "parameter": "key",
+                              "source": "literal",
+                              "reference": "",
+                              "value": "item1",
+                              "quote": "item1"
+                            },
+                            {
+                              "parameter": "enabled",
+                              "source": "context",
+                              "reference": "F0",
+                              "value": null,
+                              "quote": ""
+                            }
+                          ]
+                        }
+                      ],
+                      "unresolved": []
+                    },
+                    "validation_errors": [
+                      "Unsupported parameter binding: enabled from context",
+                      "Unknown input: enabled"
+                    ]
+                  }
+                ],
+                "retrieval_candidates": [
+                  "method:inventory:StockController#reserve(StockRequest)",
+                  "method:inventory:StockController#release(StockRequest)",
+                  "method:inventory:StockController#inspect(String)"
+                ],
+                "ui_site": null,
+                "bindings": {
+                  "key": {
+                    "parameter": "key",
+                    "source": "literal",
+                    "reference": "",
+                    "value": "item1",
+                    "quote": "item1",
+                    "resolved": true
+                  },
+                  "enabled": {
+                    "parameter": "enabled",
+                    "source": "literal",
+                    "reference": "",
+                    "value": "true",
+                    "quote": "enabled",
+                    "model_quote": "true",
+                    "normalization": "canonical boolean grounded in an exact input phrase",
+                    "resolved": true
+                  }
+                },
+                "result": {
+                  "__type__": "Reservation",
+                  "key": "item1"
+                },
+                "path_conditions": [
+                  {
+                    "method": "method:inventory:StockController#reserve(StockRequest)",
+                    "line": 6,
+                    "condition": "(input.enabled)",
+                    "value": true
+                  }
+                ],
+                "decisions": {},
+                "outcome": "returned",
+                "unresolved": [],
+                "data_operations": [
+                  {
+                    "method": "method:inventory:StockWorker#accept(String)",
+                    "resource": "res:table:inventory.reservations",
+                    "operation": "save",
+                    "arguments": [
+                      {
+                        "__type__": "Reservation",
+                        "key": "item1"
+                      }
+                    ],
+                    "source_site": "call:method:inventory:StockWorker#accept(String)@5:92",
+                    "uncertain_write": false
+                  }
+                ],
+                "state_after": {
+                  "browser": {
+                    "storage": {},
+                    "form": {},
+                    "dom": {},
+                    "url": {}
+                  },
+                  "history": [
+                    {
+                      "step": 1,
+                      "entry": "method:inventory:StockController#reserve(StockRequest)",
+                      "action": "Reserve item1 with reservation enabled"
+                    }
+                  ],
+                  "clock": "2030-02-03T00:00:00",
+                  "database_rows": {
+                    "inventory.reservations": 1
+                  },
+                  "limitations": []
+                },
+                "edges": [
+                  {
+                    "source": "scenario:independent-inventory",
+                    "relation": "executes",
+                    "target": "method:inventory:Reservation#<init>(String)"
+                  },
+                  {
+                    "source": "scenario:independent-inventory",
+                    "relation": "executes",
+                    "target": "method:inventory:StockController#reserve(StockRequest)"
+                  },
+                  {
+                    "source": "scenario:independent-inventory",
+                    "relation": "executes",
+                    "target": "method:inventory:StockWorker#accept(String)"
+                  },
+                  {
+                    "source": "method:inventory:StockController#reserve(StockRequest)",
+                    "relation": "calls",
+                    "target": "method:inventory:StockWorker#accept(String)"
+                  },
+                  {
+                    "source": "method:inventory:StockWorker#accept(String)",
+                    "relation": "calls",
+                    "target": "method:inventory:Reservation#<init>(String)"
+                  },
+                  {
+                    "source": "method:inventory:StockWorker#accept(String)",
+                    "relation": "data",
+                    "target": "res:table:inventory.reservations"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "edge": {
+              "source": "scenario:independent-inventory",
+              "relation": "executes",
+              "target": "method:inventory:Reservation#<init>(String)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:inventory:StockWorker#accept(String)@5:59"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockWorker.java",
+                    "line": 5,
+                    "call_site": "call:method:inventory:StockWorker#accept(String)@5:59"
+                  },
+                  {
+                    "file": "Reservation.java",
+                    "line": 1,
+                    "method": "method:inventory:Reservation#<init>(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "scenario:independent-inventory",
+              "relation": "executes",
+              "target": "method:inventory:StockController#reserve(StockRequest)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "scenario request"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockController.java",
+                    "line": 5,
+                    "method": "method:inventory:StockController#reserve(StockRequest)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "scenario:independent-inventory",
+              "relation": "executes",
+              "target": "method:inventory:StockWorker#accept(String)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:inventory:StockController#reserve(StockRequest)@6:44"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockController.java",
+                    "line": 6,
+                    "call_site": "call:method:inventory:StockController#reserve(StockRequest)@6:44"
+                  },
+                  {
+                    "file": "StockWorker.java",
+                    "line": 5,
+                    "method": "method:inventory:StockWorker#accept(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:inventory:StockController#reserve(StockRequest)",
+              "relation": "calls",
+              "target": "method:inventory:StockWorker#accept(String)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:inventory:StockController#reserve(StockRequest)@6:44"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockController.java",
+                    "line": 6,
+                    "call_site": "call:method:inventory:StockController#reserve(StockRequest)@6:44"
+                  },
+                  {
+                    "file": "StockController.java",
+                    "line": 5,
+                    "method": "method:inventory:StockController#reserve(StockRequest)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:inventory:StockWorker#accept(String)",
+              "relation": "calls",
+              "target": "method:inventory:Reservation#<init>(String)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:inventory:StockWorker#accept(String)@5:59"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockWorker.java",
+                    "line": 5,
+                    "call_site": "call:method:inventory:StockWorker#accept(String)@5:59"
+                  },
+                  {
+                    "file": "StockWorker.java",
+                    "line": 5,
+                    "method": "method:inventory:StockWorker#accept(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:inventory:StockWorker#accept(String)",
+              "relation": "data",
+              "target": "res:table:inventory.reservations"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:inventory:StockWorker#accept(String)@5:92"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockWorker.java",
+                    "line": 5,
+                    "call_site": "call:method:inventory:StockWorker#accept(String)@5:92"
+                  },
+                  {
+                    "file": "StockWorker.java",
+                    "line": 5,
+                    "method": "method:inventory:StockWorker#accept(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Spring Data repository operation with source entity and primary-key mapping"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "behavior_answer": {
+        "edges": [
+          {
+            "source": "scenario:behavior-inventory",
+            "relation": "executes",
+            "target": "method:inventory:StockController#reserve(StockRequest)"
+          },
+          {
+            "source": "scenario:behavior-inventory",
+            "relation": "executes",
+            "target": "method:inventory:StockWorker#reject(String)"
+          },
+          {
+            "source": "method:inventory:StockController#reserve(StockRequest)",
+            "relation": "calls",
+            "target": "method:inventory:StockWorker#reject(String)"
+          }
+        ]
+      },
+      "behavior_report": {
+        "analysis_status": "partial",
+        "certainty_scope": "relative to supplied inputs, proposed bindings and supported semantics; not a runtime trace",
+        "confirmed": [
+          {
+            "source": "scenario:behavior-inventory",
+            "relation": "executes",
+            "target": "method:inventory:StockController#reserve(StockRequest)"
+          },
+          {
+            "source": "scenario:behavior-inventory",
+            "relation": "executes",
+            "target": "method:inventory:StockWorker#reject(String)"
+          },
+          {
+            "source": "method:inventory:StockController#reserve(StockRequest)",
+            "relation": "calls",
+            "target": "method:inventory:StockWorker#reject(String)"
+          }
+        ],
+        "possible": [],
+        "unresolved": [
+          "X2",
+          "X3",
+          "X4",
+          "X5\u201d, "
+        ],
+        "steps": [
+          {
+            "n": 1,
+            "action": "Reserve item1 with reservation disabled",
+            "alternatives": [
+              {
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "parameters": {
+                  "key": "item1",
+                  "enabled": false
+                },
+                "grounding_reason": "The action specifies reserving an item with reservation disabled, which corresponds to the 'enabled' parameter being false in the reserve handler.",
+                "grounding_repairs": [
+                  {
+                    "previous_proposal": {
+                      "hypotheses": [
+                        {
+                          "handler": "H0",
+                          "ui_site": "",
+                          "reason": "The action specifies reserving an item with reservation disabled, which corresponds to the 'enabled' parameter being false in the reserve handler.",
+                          "bindings": [
+                            {
+                              "parameter": "key",
+                              "source": "literal",
+                              "reference": "",
+                              "value": "item1",
+                              "quote": "item1"
+                            },
+                            {
+                              "parameter": "enabled",
+                              "source": "context",
+                              "reference": "F0",
+                              "value": null,
+                              "quote": "reservation disabled"
+                            }
+                          ]
+                        }
+                      ],
+                      "unresolved": []
+                    },
+                    "validation_errors": [
+                      "Unsupported parameter binding: enabled from context",
+                      "Unknown input: enabled"
+                    ]
+                  }
+                ],
+                "retrieval_candidates": [
+                  "method:inventory:StockController#reserve(StockRequest)",
+                  "method:inventory:StockController#release(StockRequest)",
+                  "method:inventory:StockController#inspect(String)"
+                ],
+                "ui_site": null,
+                "bindings": {
+                  "key": {
+                    "parameter": "key",
+                    "source": "literal",
+                    "reference": "",
+                    "value": "item1",
+                    "quote": "item1",
+                    "resolved": true
+                  },
+                  "enabled": {
+                    "parameter": "enabled",
+                    "source": "literal",
+                    "reference": "",
+                    "value": "false",
+                    "quote": "disabled",
+                    "resolved": true
+                  }
+                },
+                "result": null,
+                "path_conditions": [
+                  {
+                    "method": "method:inventory:StockController#reserve(StockRequest)",
+                    "line": 6,
+                    "condition": "(input.enabled)",
+                    "value": false
+                  }
+                ],
+                "decisions": {},
+                "outcome": "returned",
+                "unresolved": [],
+                "data_operations": [],
+                "state_after": {
+                  "browser": {
+                    "storage": {},
+                    "form": {},
+                    "dom": {},
+                    "url": {}
+                  },
+                  "history": [
+                    {
+                      "step": 1,
+                      "entry": "method:inventory:StockController#reserve(StockRequest)",
+                      "action": "Reserve item1 with reservation disabled"
+                    }
+                  ],
+                  "clock": "2030-02-03T00:00:00",
+                  "database_rows": {
+                    "inventory.reservations": 0
+                  },
+                  "limitations": []
+                },
+                "edges": [
+                  {
+                    "source": "scenario:behavior-inventory",
+                    "relation": "executes",
+                    "target": "method:inventory:StockController#reserve(StockRequest)"
+                  },
+                  {
+                    "source": "scenario:behavior-inventory",
+                    "relation": "executes",
+                    "target": "method:inventory:StockWorker#reject(String)"
+                  },
+                  {
+                    "source": "method:inventory:StockController#reserve(StockRequest)",
+                    "relation": "calls",
+                    "target": "method:inventory:StockWorker#reject(String)"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "edge": {
+              "source": "scenario:behavior-inventory",
+              "relation": "executes",
+              "target": "method:inventory:StockController#reserve(StockRequest)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "scenario request"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockController.java",
+                    "line": 5,
+                    "method": "method:inventory:StockController#reserve(StockRequest)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "scenario:behavior-inventory",
+              "relation": "executes",
+              "target": "method:inventory:StockWorker#reject(String)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:inventory:StockController#reserve(StockRequest)@7:23"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockController.java",
+                    "line": 7,
+                    "call_site": "call:method:inventory:StockController#reserve(StockRequest)@7:23"
+                  },
+                  {
+                    "file": "StockWorker.java",
+                    "line": 6,
+                    "method": "method:inventory:StockWorker#reject(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:inventory:StockController#reserve(StockRequest)",
+              "relation": "calls",
+              "target": "method:inventory:StockWorker#reject(String)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:inventory:StockController#reserve(StockRequest)@7:23"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockController.java",
+                    "line": 7,
+                    "call_site": "call:method:inventory:StockController#reserve(StockRequest)@7:23"
+                  },
+                  {
+                    "file": "StockController.java",
+                    "line": 5,
+                    "method": "method:inventory:StockController#reserve(StockRequest)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "missing_dependency_report": null
+    },
+    {
+      "project": "library",
+      "passed": true,
+      "basic_passed": true,
+      "behavior_passed": true,
+      "answer": {
+        "edges": [
+          {
+            "source": "scenario:independent-library",
+            "relation": "executes",
+            "target": "method:library:BookController#available(Book)"
+          },
+          {
+            "source": "scenario:independent-library",
+            "relation": "executes",
+            "target": "method:library:BookController#lookup(String)"
+          },
+          {
+            "source": "method:library:BookController#lookup(String)",
+            "relation": "calls",
+            "target": "method:library:BookController#available(Book)"
+          },
+          {
+            "source": "method:library:BookController#lookup(String)",
+            "relation": "data",
+            "target": "res:table:library.books"
+          }
+        ]
+      },
+      "report": {
+        "analysis_status": "partial",
+        "certainty_scope": "relative to supplied inputs, proposed bindings and supported semantics; not a runtime trace",
+        "confirmed": [
+          {
+            "source": "scenario:independent-library",
+            "relation": "executes",
+            "target": "method:library:BookController#available(Book)"
+          },
+          {
+            "source": "scenario:independent-library",
+            "relation": "executes",
+            "target": "method:library:BookController#lookup(String)"
+          },
+          {
+            "source": "method:library:BookController#lookup(String)",
+            "relation": "calls",
+            "target": "method:library:BookController#available(Book)"
+          },
+          {
+            "source": "method:library:BookController#lookup(String)",
+            "relation": "data",
+            "target": "res:table:library.books"
+          }
+        ],
+        "possible": [],
+        "unresolved": [
+          "X2",
+          "X3",
+          "X4",
+          "X5\u201d, "
+        ],
+        "steps": [
+          {
+            "n": 1,
+            "action": "Look up the book with key b1",
+            "alternatives": [
+              {
+                "entry": "method:library:BookController#lookup(String)",
+                "parameters": {
+                  "key": "b1"
+                },
+                "grounding_reason": "The action explicitly requests looking up a book by key 'b1', and H0 is the only handler that accepts a string key parameter for book lookup.",
+                "grounding_repairs": [],
+                "retrieval_candidates": [
+                  "method:library:BookController#lookup(String)",
+                  "method:library:BookController#add(Book)",
+                  "method:library:BookController#search(String)"
+                ],
+                "ui_site": null,
+                "bindings": {
+                  "key": {
+                    "parameter": "key",
+                    "source": "literal",
+                    "reference": "",
+                    "value": "b1",
+                    "quote": "b1",
+                    "resolved": true
+                  }
+                },
+                "result": "A book",
+                "path_conditions": [
+                  {
+                    "method": "method:library:BookController#lookup(String)",
+                    "line": 7,
+                    "condition": "(found == null)",
+                    "value": false
+                  }
+                ],
+                "decisions": {},
+                "outcome": "returned",
+                "unresolved": [],
+                "data_operations": [
+                  {
+                    "method": "method:library:BookController#lookup(String)",
+                    "resource": "res:table:library.books",
+                    "operation": "findByKey",
+                    "arguments": [
+                      "b1"
+                    ],
+                    "source_site": "call:method:library:BookController#lookup(String)@6:33",
+                    "uncertain_write": false
+                  }
+                ],
+                "state_after": {
+                  "browser": {
+                    "storage": {},
+                    "form": {},
+                    "dom": {},
+                    "url": {}
+                  },
+                  "history": [
+                    {
+                      "step": 1,
+                      "entry": "method:library:BookController#lookup(String)",
+                      "action": "Look up the book with key b1"
+                    }
+                  ],
+                  "clock": "2030-02-03T00:00:00",
+                  "database_rows": {
+                    "library.books": 1
+                  },
+                  "limitations": []
+                },
+                "edges": [
+                  {
+                    "source": "scenario:independent-library",
+                    "relation": "executes",
+                    "target": "method:library:BookController#available(Book)"
+                  },
+                  {
+                    "source": "scenario:independent-library",
+                    "relation": "executes",
+                    "target": "method:library:BookController#lookup(String)"
+                  },
+                  {
+                    "source": "method:library:BookController#lookup(String)",
+                    "relation": "calls",
+                    "target": "method:library:BookController#available(Book)"
+                  },
+                  {
+                    "source": "method:library:BookController#lookup(String)",
+                    "relation": "data",
+                    "target": "res:table:library.books"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "edge": {
+              "source": "scenario:independent-library",
+              "relation": "executes",
+              "target": "method:library:BookController#available(Book)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:library:BookController#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:library:BookController#lookup(String)@8:16"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 8,
+                    "call_site": "call:method:library:BookController#lookup(String)@8:16"
+                  },
+                  {
+                    "file": "BookController.java",
+                    "line": 11,
+                    "method": "method:library:BookController#available(Book)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "scenario:independent-library",
+              "relation": "executes",
+              "target": "method:library:BookController#lookup(String)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:library:BookController#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "scenario request"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 5,
+                    "method": "method:library:BookController#lookup(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:library:BookController#lookup(String)",
+              "relation": "calls",
+              "target": "method:library:BookController#available(Book)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:library:BookController#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:library:BookController#lookup(String)@8:16"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 8,
+                    "call_site": "call:method:library:BookController#lookup(String)@8:16"
+                  },
+                  {
+                    "file": "BookController.java",
+                    "line": 5,
+                    "method": "method:library:BookController#lookup(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:library:BookController#lookup(String)",
+              "relation": "data",
+              "target": "res:table:library.books"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:library:BookController#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:library:BookController#lookup(String)@6:33"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 6,
+                    "call_site": "call:method:library:BookController#lookup(String)@6:33"
+                  },
+                  {
+                    "file": "BookController.java",
+                    "line": 5,
+                    "method": "method:library:BookController#lookup(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Spring Data repository operation with source entity and primary-key mapping"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "behavior_answer": {
+        "edges": [
+          {
+            "source": "scenario:behavior-library",
+            "relation": "executes",
+            "target": "method:library:BookController#add(Book)"
+          },
+          {
+            "source": "scenario:behavior-library",
+            "relation": "executes",
+            "target": "method:library:BookController#available(Book)"
+          },
+          {
+            "source": "scenario:behavior-library",
+            "relation": "executes",
+            "target": "method:library:BookController#lookup(String)"
+          },
+          {
+            "source": "method:library:BookController#add(Book)",
+            "relation": "data",
+            "target": "res:table:library.books"
+          },
+          {
+            "source": "method:library:BookController#lookup(String)",
+            "relation": "calls",
+            "target": "method:library:BookController#available(Book)"
+          },
+          {
+            "source": "method:library:BookController#lookup(String)",
+            "relation": "data",
+            "target": "res:table:library.books"
+          }
+        ]
+      },
+      "behavior_report": {
+        "analysis_status": "partial",
+        "certainty_scope": "relative to supplied inputs, proposed bindings and supported semantics; not a runtime trace",
+        "confirmed": [
+          {
+            "source": "scenario:behavior-library",
+            "relation": "executes",
+            "target": "method:library:BookController#add(Book)"
+          },
+          {
+            "source": "scenario:behavior-library",
+            "relation": "executes",
+            "target": "method:library:BookController#available(Book)"
+          },
+          {
+            "source": "scenario:behavior-library",
+            "relation": "executes",
+            "target": "method:library:BookController#lookup(String)"
+          },
+          {
+            "source": "method:library:BookController#add(Book)",
+            "relation": "data",
+            "target": "res:table:library.books"
+          },
+          {
+            "source": "method:library:BookController#lookup(String)",
+            "relation": "calls",
+            "target": "method:library:BookController#available(Book)"
+          },
+          {
+            "source": "method:library:BookController#lookup(String)",
+            "relation": "data",
+            "target": "res:table:library.books"
+          }
+        ],
+        "possible": [],
+        "unresolved": [
+          "X2",
+          "X3",
+          "X4",
+          "X5\u201d, "
+        ],
+        "steps": [
+          {
+            "n": 1,
+            "action": "Add a new book with key b2 and title Atlas",
+            "alternatives": [
+              {
+                "entry": "method:library:BookController#add(Book)",
+                "parameters": {
+                  "key": "b2",
+                  "title": "Atlas"
+                },
+                "grounding_reason": "The action specifies adding a new book with key 'b2' and title 'Atlas', which matches the input parameters of the POST /books endpoint.",
+                "grounding_repairs": [],
+                "retrieval_candidates": [
+                  "method:library:BookController#add(Book)",
+                  "method:library:BookController#lookup(String)",
+                  "method:library:BookController#search(String)"
+                ],
+                "ui_site": null,
+                "bindings": {
+                  "key": {
+                    "parameter": "key",
+                    "source": "literal",
+                    "reference": "",
+                    "value": "b2",
+                    "quote": "b2",
+                    "resolved": true
+                  },
+                  "title": {
+                    "parameter": "title",
+                    "source": "literal",
+                    "reference": "",
+                    "value": "Atlas",
+                    "quote": "Atlas",
+                    "resolved": true
+                  }
+                },
+                "result": {
+                  "__type__": "Book",
+                  "key": "b2",
+                  "title": "Atlas"
+                },
+                "path_conditions": [],
+                "decisions": {},
+                "outcome": "returned",
+                "unresolved": [],
+                "data_operations": [
+                  {
+                    "method": "method:library:BookController#add(Book)",
+                    "resource": "res:table:library.books",
+                    "operation": "save",
+                    "arguments": [
+                      {
+                        "__type__": "Book",
+                        "key": "b2",
+                        "title": "Atlas"
+                      }
+                    ],
+                    "source_site": "call:method:library:BookController#add(Book)@13:77",
+                    "uncertain_write": false
+                  }
+                ],
+                "state_after": {
+                  "browser": {
+                    "storage": {},
+                    "form": {},
+                    "dom": {},
+                    "url": {}
+                  },
+                  "history": [
+                    {
+                      "step": 1,
+                      "entry": "method:library:BookController#add(Book)",
+                      "action": "Add a new book with key b2 and title Atlas"
+                    }
+                  ],
+                  "clock": "2030-02-03T00:00:00",
+                  "database_rows": {
+                    "library.books": 2
+                  },
+                  "limitations": []
+                },
+                "edges": [
+                  {
+                    "source": "scenario:behavior-library",
+                    "relation": "executes",
+                    "target": "method:library:BookController#add(Book)"
+                  },
+                  {
+                    "source": "method:library:BookController#add(Book)",
+                    "relation": "data",
+                    "target": "res:table:library.books"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "n": 2,
+            "action": "Add a new book with key b3 and title Ocean",
+            "alternatives": [
+              {
+                "entry": "method:library:BookController#add(Book)",
+                "parameters": {
+                  "key": "b3",
+                  "title": "Ocean"
+                },
+                "grounding_reason": "The action specifies adding a new book with key 'b3' and title 'Ocean', which matches the input parameters of the POST /books endpoint.",
+                "grounding_repairs": [],
+                "retrieval_candidates": [
+                  "method:library:BookController#add(Book)",
+                  "method:library:BookController#lookup(String)",
+                  "method:library:BookController#search(String)"
+                ],
+                "ui_site": null,
+                "bindings": {
+                  "key": {
+                    "parameter": "key",
+                    "source": "literal",
+                    "reference": "",
+                    "value": "b3",
+                    "quote": "b3",
+                    "resolved": true
+                  },
+                  "title": {
+                    "parameter": "title",
+                    "source": "literal",
+                    "reference": "",
+                    "value": "Ocean",
+                    "quote": "Ocean",
+                    "resolved": true
+                  }
+                },
+                "result": {
+                  "__type__": "Book",
+                  "key": "b3",
+                  "title": "Ocean"
+                },
+                "path_conditions": [],
+                "decisions": {},
+                "outcome": "returned",
+                "unresolved": [],
+                "data_operations": [
+                  {
+                    "method": "method:library:BookController#add(Book)",
+                    "resource": "res:table:library.books",
+                    "operation": "save",
+                    "arguments": [
+                      {
+                        "__type__": "Book",
+                        "key": "b3",
+                        "title": "Ocean"
+                      }
+                    ],
+                    "source_site": "call:method:library:BookController#add(Book)@13:77",
+                    "uncertain_write": false
+                  }
+                ],
+                "state_after": {
+                  "browser": {
+                    "storage": {},
+                    "form": {},
+                    "dom": {},
+                    "url": {}
+                  },
+                  "history": [
+                    {
+                      "step": 1,
+                      "entry": "method:library:BookController#add(Book)",
+                      "action": "Add a new book with key b2 and title Atlas"
+                    },
+                    {
+                      "step": 2,
+                      "entry": "method:library:BookController#add(Book)",
+                      "action": "Add a new book with key b3 and title Ocean"
+                    }
+                  ],
+                  "clock": "2030-02-03T00:00:00",
+                  "database_rows": {
+                    "library.books": 3
+                  },
+                  "limitations": []
+                },
+                "edges": [
+                  {
+                    "source": "scenario:behavior-library",
+                    "relation": "executes",
+                    "target": "method:library:BookController#add(Book)"
+                  },
+                  {
+                    "source": "method:library:BookController#add(Book)",
+                    "relation": "data",
+                    "target": "res:table:library.books"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "n": 3,
+            "action": "Look up the second book just created",
+            "alternatives": [
+              {
+                "entry": "method:library:BookController#lookup(String)",
+                "parameters": {
+                  "key": "b3"
+                },
+                "grounding_reason": "The action requires looking up a book by key, and the second book created (b3) is stored in the database with key 'b3'. The lookup handler accepts a key parameter and matches the required action.",
+                "grounding_repairs": [],
+                "retrieval_candidates": [
+                  "method:library:BookController#add(Book)",
+                  "method:library:BookController#lookup(String)",
+                  "method:library:BookController#search(String)"
+                ],
+                "ui_site": null,
+                "bindings": {
+                  "key": {
+                    "parameter": "key",
+                    "source": "history",
+                    "reference": "history[1].result.key",
+                    "value": null,
+                    "quote": "b3",
+                    "resolved": true
+                  }
+                },
+                "result": "Ocean",
+                "path_conditions": [
+                  {
+                    "method": "method:library:BookController#lookup(String)",
+                    "line": 7,
+                    "condition": "(found == null)",
+                    "value": false
+                  }
+                ],
+                "decisions": {},
+                "outcome": "returned",
+                "unresolved": [],
+                "data_operations": [
+                  {
+                    "method": "method:library:BookController#lookup(String)",
+                    "resource": "res:table:library.books",
+                    "operation": "findByKey",
+                    "arguments": [
+                      "b3"
+                    ],
+                    "source_site": "call:method:library:BookController#lookup(String)@6:33",
+                    "uncertain_write": false
+                  }
+                ],
+                "state_after": {
+                  "browser": {
+                    "storage": {},
+                    "form": {},
+                    "dom": {},
+                    "url": {}
+                  },
+                  "history": [
+                    {
+                      "step": 1,
+                      "entry": "method:library:BookController#add(Book)",
+                      "action": "Add a new book with key b2 and title Atlas"
+                    },
+                    {
+                      "step": 2,
+                      "entry": "method:library:BookController#add(Book)",
+                      "action": "Add a new book with key b3 and title Ocean"
+                    },
+                    {
+                      "step": 3,
+                      "entry": "method:library:BookController#lookup(String)",
+                      "action": "Look up the second book just created"
+                    }
+                  ],
+                  "clock": "2030-02-03T00:00:00",
+                  "database_rows": {
+                    "library.books": 3
+                  },
+                  "limitations": []
+                },
+                "edges": [
+                  {
+                    "source": "scenario:behavior-library",
+                    "relation": "executes",
+                    "target": "method:library:BookController#available(Book)"
+                  },
+                  {
+                    "source": "scenario:behavior-library",
+                    "relation": "executes",
+                    "target": "method:library:BookController#lookup(String)"
+                  },
+                  {
+                    "source": "method:library:BookController#lookup(String)",
+                    "relation": "calls",
+                    "target": "method:library:BookController#available(Book)"
+                  },
+                  {
+                    "source": "method:library:BookController#lookup(String)",
+                    "relation": "data",
+                    "target": "res:table:library.books"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "edge": {
+              "source": "scenario:behavior-library",
+              "relation": "executes",
+              "target": "method:library:BookController#add(Book)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:library:BookController#add(Book)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "scenario request"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 13,
+                    "method": "method:library:BookController#add(Book)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              },
+              {
+                "step": 2,
+                "entry": "method:library:BookController#add(Book)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "scenario request"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 13,
+                    "method": "method:library:BookController#add(Book)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "scenario:behavior-library",
+              "relation": "executes",
+              "target": "method:library:BookController#available(Book)"
+            },
+            "grounds": [
+              {
+                "step": 3,
+                "entry": "method:library:BookController#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:library:BookController#lookup(String)@8:16"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 8,
+                    "call_site": "call:method:library:BookController#lookup(String)@8:16"
+                  },
+                  {
+                    "file": "BookController.java",
+                    "line": 11,
+                    "method": "method:library:BookController#available(Book)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "scenario:behavior-library",
+              "relation": "executes",
+              "target": "method:library:BookController#lookup(String)"
+            },
+            "grounds": [
+              {
+                "step": 3,
+                "entry": "method:library:BookController#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "scenario request"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 5,
+                    "method": "method:library:BookController#lookup(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:library:BookController#add(Book)",
+              "relation": "data",
+              "target": "res:table:library.books"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:library:BookController#add(Book)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:library:BookController#add(Book)@13:77"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 13,
+                    "call_site": "call:method:library:BookController#add(Book)@13:77"
+                  },
+                  {
+                    "file": "BookController.java",
+                    "line": 13,
+                    "method": "method:library:BookController#add(Book)"
+                  }
+                ],
+                "applied_rules": [
+                  "Spring Data repository operation with source entity and primary-key mapping"
+                ]
+              },
+              {
+                "step": 2,
+                "entry": "method:library:BookController#add(Book)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:library:BookController#add(Book)@13:77"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 13,
+                    "call_site": "call:method:library:BookController#add(Book)@13:77"
+                  },
+                  {
+                    "file": "BookController.java",
+                    "line": 13,
+                    "method": "method:library:BookController#add(Book)"
+                  }
+                ],
+                "applied_rules": [
+                  "Spring Data repository operation with source entity and primary-key mapping"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:library:BookController#lookup(String)",
+              "relation": "calls",
+              "target": "method:library:BookController#available(Book)"
+            },
+            "grounds": [
+              {
+                "step": 3,
+                "entry": "method:library:BookController#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:library:BookController#lookup(String)@8:16"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 8,
+                    "call_site": "call:method:library:BookController#lookup(String)@8:16"
+                  },
+                  {
+                    "file": "BookController.java",
+                    "line": 5,
+                    "method": "method:library:BookController#lookup(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:library:BookController#lookup(String)",
+              "relation": "data",
+              "target": "res:table:library.books"
+            },
+            "grounds": [
+              {
+                "step": 3,
+                "entry": "method:library:BookController#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:library:BookController#lookup(String)@6:33"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 6,
+                    "call_site": "call:method:library:BookController#lookup(String)@6:33"
+                  },
+                  {
+                    "file": "BookController.java",
+                    "line": 5,
+                    "method": "method:library:BookController#lookup(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Spring Data repository operation with source entity and primary-key mapping"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "missing_dependency_report": {
+        "analysis_status": "partial",
+        "certainty_scope": "relative to supplied inputs, proposed bindings and supported semantics; not a runtime trace",
+        "confirmed": [],
+        "possible": [],
+        "unresolved": [
+          "No supported request for step 1",
+          "Referenced prior creation is absent from the scenario history",
+          "X2",
+          "X3",
+          "X4",
+          "X5\u201d, "
+        ],
+        "steps": [
+          {
+            "n": 1,
+            "action": "Look up the second book just created",
+            "alternatives": []
+          }
+        ],
+        "evidence": []
+      }
+    }
+  ],
+  "model_calls": [
+    {
+      "seconds": 1.9762832499691285,
+      "task_sha256": "f4bafe6376f2ddc2e399f189d8fe798ff974624dc699bcf577dfdd3cf2d0df43",
+      "input_sha256": "a61b6b09079d0cfe6a5d61425fd84ef20cf186e3e1a88b6fa6461cce8bd7ad62",
+      "schema_sha256": "72c4c80088364ef9a6fb3626123da69c8ee5642593c9ca69c1a54cfa77a67374",
+      "input_token_estimate": 462,
+      "generation_budget": 1800,
+      "usage": {
+        "prompt_tokens": 379,
+        "completion_tokens": 46,
+        "total_tokens": 425
+      },
+      "finish_reason": "stop",
+      "response": {
+        "clock": "X1",
+        "credentials": [],
+        "defaults": [],
+        "rules": [
+          "X0"
+        ],
+        "unresolved": [
+          "X2",
+          "X3",
+          "X4",
+          "X5\u201d, "
+        ]
+      }
+    },
+    {
+      "seconds": 5.7129395410302095,
+      "task_sha256": "3dac8118e37407788f2679d971007ed3eac5d49242e5a0580c5fd2ae7b052cc0",
+      "input_sha256": "12a64f44f7dbd6cef315c974965688d310847555e0c73dd6ee6eb3557c270101",
+      "schema_sha256": "bec1730ee74efd26d322ef5c6533a704a6011d8d6c8f6a640386cbf917b3a5ff",
+      "input_token_estimate": 976,
+      "generation_budget": 1800,
+      "usage": {
+        "prompt_tokens": 893,
+        "completion_tokens": 133,
+        "total_tokens": 1026
+      },
+      "finish_reason": "stop",
+      "response": {
+        "hypotheses": [
+          {
+            "handler": "H0",
+            "ui_site": "",
+            "reason": "The action 'Reserve item1 with reservation enabled' matches the handler H0 which accepts a key and an enabled boolean, and the enabled parameter is explicitly set to true in the action.",
+            "bindings": [
+              {
+                "parameter": "key",
+                "source": "literal",
+                "reference": "",
+                "value": "item1",
+                "quote": "item1"
+              },
+              {
+                "parameter": "enabled",
+                "source": "context",
+                "reference": "F0",
+                "value": null,
+                "quote": ""
+              }
+            ]
+          }
+        ],
+        "unresolved": []
+      }
+    },
+    {
+      "seconds": 5.647920374991372,
+      "task_sha256": "72e36ab5ab4335babbcc909ef898ea4e102ccaec172e3f999b6b951a9870292f",
+      "input_sha256": "633ff8249b5e8e2bd813077f61e8bfeef04535b54f996843a6fe966eb3a46a1c",
+      "schema_sha256": "bec1730ee74efd26d322ef5c6533a704a6011d8d6c8f6a640386cbf917b3a5ff",
+      "input_token_estimate": 1155,
+      "generation_budget": 1800,
+      "usage": {
+        "prompt_tokens": 1072,
+        "completion_tokens": 129,
+        "total_tokens": 1201
+      },
+      "finish_reason": "stop",
+      "response": {
+        "hypotheses": [
+          {
+            "handler": "H0",
+            "ui_site": "",
+            "reason": "The action 'Reserve item1 with reservation enabled' explicitly sets the key to 'item1' and enables reservation, so the parameter 'enabled' must be bound as a literal boolean true.",
+            "bindings": [
+              {
+                "parameter": "key",
+                "source": "literal",
+                "reference": "",
+                "value": "item1",
+                "quote": "item1"
+              },
+              {
+                "parameter": "enabled",
+                "source": "literal",
+                "reference": "",
+                "value": "true",
+                "quote": "true"
+              }
+            ]
+          }
+        ],
+        "unresolved": []
+      }
+    },
+    {
+      "seconds": 4.980165374989156,
+      "task_sha256": "3dac8118e37407788f2679d971007ed3eac5d49242e5a0580c5fd2ae7b052cc0",
+      "input_sha256": "b8a25cf13514280e4b8e56df77c101be9d760738a7d8d602bc8f293e628b619a",
+      "schema_sha256": "bec1730ee74efd26d322ef5c6533a704a6011d8d6c8f6a640386cbf917b3a5ff",
+      "input_token_estimate": 976,
+      "generation_budget": 1800,
+      "usage": {
+        "prompt_tokens": 893,
+        "completion_tokens": 123,
+        "total_tokens": 1016
+      },
+      "finish_reason": "stop",
+      "response": {
+        "hypotheses": [
+          {
+            "handler": "H0",
+            "ui_site": "",
+            "reason": "The action specifies reserving an item with reservation disabled, which corresponds to the 'enabled' parameter being false in the reserve handler.",
+            "bindings": [
+              {
+                "parameter": "key",
+                "source": "literal",
+                "reference": "",
+                "value": "item1",
+                "quote": "item1"
+              },
+              {
+                "parameter": "enabled",
+                "source": "context",
+                "reference": "F0",
+                "value": null,
+                "quote": "reservation disabled"
+              }
+            ]
+          }
+        ],
+        "unresolved": []
+      }
+    },
+    {
+      "seconds": 5.164084917050786,
+      "task_sha256": "72e36ab5ab4335babbcc909ef898ea4e102ccaec172e3f999b6b951a9870292f",
+      "input_sha256": "b39ddcd43cd5492a9ac2a4b20bc0c61c7252244a5980a2deb5382c6d9258af83",
+      "schema_sha256": "bec1730ee74efd26d322ef5c6533a704a6011d8d6c8f6a640386cbf917b3a5ff",
+      "input_token_estimate": 1145,
+      "generation_budget": 1800,
+      "usage": {
+        "prompt_tokens": 1062,
+        "completion_tokens": 116,
+        "total_tokens": 1178
+      },
+      "finish_reason": "stop",
+      "response": {
+        "hypotheses": [
+          {
+            "handler": "H0",
+            "ui_site": "",
+            "reason": "The action specifies reserving an item with reservation disabled, which corresponds to the 'enabled' parameter being false in the reserve handler.",
+            "bindings": [
+              {
+                "parameter": "key",
+                "source": "literal",
+                "reference": "",
+                "value": "item1",
+                "quote": "item1"
+              },
+              {
+                "parameter": "enabled",
+                "source": "literal",
+                "reference": "",
+                "value": "false",
+                "quote": "disabled"
+              }
+            ]
+          }
+        ],
+        "unresolved": []
+      }
+    },
+    {
+      "seconds": 4.462417958013248,
+      "task_sha256": "3dac8118e37407788f2679d971007ed3eac5d49242e5a0580c5fd2ae7b052cc0",
+      "input_sha256": "b77171023916ec65a067b4e3f12070b78e4598c6cbe91852777c9c19fb3d1c18",
+      "schema_sha256": "5a984969ca6cd16e7b53a199cebc90bdac488dd387c31d1bd2e96acbb25b11f5",
+      "input_token_estimate": 1117,
+      "generation_budget": 1800,
+      "usage": {
+        "prompt_tokens": 1034,
+        "completion_tokens": 97,
+        "total_tokens": 1131
+      },
+      "finish_reason": "stop",
+      "response": {
+        "hypotheses": [
+          {
+            "handler": "H0",
+            "ui_site": "",
+            "reason": "The action explicitly requests looking up a book by key 'b1', and H0 is the only handler that accepts a string key parameter for book lookup.",
+            "bindings": [
+              {
+                "parameter": "key",
+                "source": "literal",
+                "reference": "",
+                "value": "b1",
+                "quote": "b1"
+              }
+            ]
+          }
+        ],
+        "unresolved": []
+      }
+    },
+    {
+      "seconds": 5.4238842919585295,
+      "task_sha256": "3dac8118e37407788f2679d971007ed3eac5d49242e5a0580c5fd2ae7b052cc0",
+      "input_sha256": "500c6344d320249d99c3fd31756da83c2ff850c693c988a3e0f4a23c525f750b",
+      "schema_sha256": "5a984969ca6cd16e7b53a199cebc90bdac488dd387c31d1bd2e96acbb25b11f5",
+      "input_token_estimate": 1120,
+      "generation_budget": 1800,
+      "usage": {
+        "prompt_tokens": 1037,
+        "completion_tokens": 124,
+        "total_tokens": 1161
+      },
+      "finish_reason": "stop",
+      "response": {
+        "hypotheses": [
+          {
+            "handler": "H0",
+            "ui_site": "",
+            "reason": "The action specifies adding a new book with key 'b2' and title 'Atlas', which matches the input parameters of the POST /books endpoint.",
+            "bindings": [
+              {
+                "parameter": "key",
+                "source": "literal",
+                "reference": "",
+                "value": "b2",
+                "quote": "b2"
+              },
+              {
+                "parameter": "title",
+                "source": "literal",
+                "reference": "",
+                "value": "Atlas",
+                "quote": "Atlas"
+              }
+            ]
+          }
+        ],
+        "unresolved": []
+      }
+    },
+    {
+      "seconds": 6.158630499965511,
+      "task_sha256": "3dac8118e37407788f2679d971007ed3eac5d49242e5a0580c5fd2ae7b052cc0",
+      "input_sha256": "10d602ec6fd266a346c3b04950ab55137b64764ec57059675f3df8b293fe3985",
+      "schema_sha256": "34c7dee4154c2cfa85665bff08b4c179f5fac7de59a97bfef48646eccb267172",
+      "input_token_estimate": 1433,
+      "generation_budget": 1800,
+      "usage": {
+        "prompt_tokens": 1350,
+        "completion_tokens": 124,
+        "total_tokens": 1474
+      },
+      "finish_reason": "stop",
+      "response": {
+        "hypotheses": [
+          {
+            "handler": "H0",
+            "ui_site": "",
+            "reason": "The action specifies adding a new book with key 'b3' and title 'Ocean', which matches the input parameters of the POST /books endpoint.",
+            "bindings": [
+              {
+                "parameter": "key",
+                "source": "literal",
+                "reference": "",
+                "value": "b3",
+                "quote": "b3"
+              },
+              {
+                "parameter": "title",
+                "source": "literal",
+                "reference": "",
+                "value": "Ocean",
+                "quote": "Ocean"
+              }
+            ]
+          }
+        ],
+        "unresolved": []
+      }
+    },
+    {
+      "seconds": 6.3713509169756435,
+      "task_sha256": "3dac8118e37407788f2679d971007ed3eac5d49242e5a0580c5fd2ae7b052cc0",
+      "input_sha256": "e359694bfeb2025df8d1692806941192e361322bbf597f7a9cab96fccd449db1",
+      "schema_sha256": "4462b113dee9346d8197eec782382578998858b3644261deb99541b1c2a93f8a",
+      "input_token_estimate": 1747,
+      "generation_budget": 1800,
+      "usage": {
+        "prompt_tokens": 1664,
+        "completion_tokens": 111,
+        "total_tokens": 1775
+      },
+      "finish_reason": "stop",
+      "response": {
+        "hypotheses": [
+          {
+            "handler": "H1",
+            "ui_site": "",
+            "reason": "The action requires looking up a book by key, and the second book created (b3) is stored in the database with key 'b3'. The lookup handler accepts a key parameter and matches the required action.",
+            "bindings": [
+              {
+                "parameter": "key",
+                "source": "history",
+                "reference": "R18",
+                "value": null,
+                "quote": "b3"
+              }
+            ]
+          }
+        ],
+        "unresolved": []
+      }
+    }
+  ]
+}

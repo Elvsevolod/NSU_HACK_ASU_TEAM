@@ -1,0 +1,63 @@
+{
+  "python": "3.11.9 (v3.11.9:de54cf5be3, Apr  2 2024, 07:12:50) [Clang 13.0.0 (clang-1300.0.29.30)]",
+  "macos": [
+    "15.7.3",
+    [
+      "",
+      "",
+      ""
+    ],
+    "arm64"
+  ],
+  "machine": "arm64",
+  "memory_bytes": 25769803776,
+  "environment": {
+    "PYTHONHASHSEED": "0",
+    "HF_HUB_OFFLINE": "1",
+    "TRANSFORMERS_OFFLINE": "1",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "argv": [
+    "code/offline_run.py",
+    "--source",
+    "../../tt-challenge/targets/trainticket",
+    "--skeleton",
+    "../../tt-challenge/skeleton/trainticket.json.gz",
+    "--context",
+    "../../tt-challenge/context",
+    "--scenarios",
+    "../../tt-challenge/scenarios",
+    "--model-manifest",
+    "../../models/source-derived-v1/models.json",
+    "--index",
+    "cache/project-index.json",
+    "--output",
+    "submission.json",
+    "--report",
+    "benchmark/analysis-report.json"
+  ],
+  "source_and_skeleton_fingerprint": "ce0ea888d0dd691ff410a9957d935530c288edf6dfc799556443a80b45283fa0",
+  "index_recipe": "BM25+BGE-M3-dense/RRF60/windows280-overlap60/max_seq512",
+  "index_sha256": "09b38fac484ad7317faa78dbe7fa7b82d077f7d358d9125bf528b1d1fe8bb4fc",
+  "generation": {
+    "temperature": 0,
+    "seed": 0,
+    "n_ctx": 8192,
+    "max_tokens": 1800
+  },
+  "notes": [
+    "BGE and Qwen loaded sequentially; process RSS is not a separate total Metal allocation measurement.",
+    "Full inference and cold replay run under the saved OS isolation policies."
+  ],
+  "isolation": "macOS sandbox-exec deny network* and deny file-read-data for reference materials, old variants and benchmarks; Python audit hook also active",
+  "launcher": [
+    "/usr/bin/sandbox-exec",
+    "-f",
+    "cache/analysis.sb"
+  ],
+  "workload": {
+    "scenarios": 8,
+    "steps": 103,
+    "unique_queries": 69
+  }
+}

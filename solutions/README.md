@@ -9,10 +9,13 @@
 | 3 | stateful-response-propagation | 0,886660 | 0,9260149573 | [README](0.886660_stateful-response-propagation/README.md) |
 | 4 | identity-contact-payment | **0,907050** | 0,9260149573 | [README](0.907050_identity-contact-payment/README.md) |
 | 5 | field-constructor-projection | **0,909870** | 0,9260149573 | [README](0.909870_field-constructor-projection/README.md) |
+| 6 | source-derived-analysis | — | 0,3514858424 | [README](—_source-derived-analysis/README.md) |
 
 В каждом варианте находятся код, `submission.json`, бенчмарк и архив `solution.zip` для загрузки. В архиве `submission.json` лежит в корне.
 
 Правила создания вариантов и записи оценок: [solution-versions](../skills/solution-versions/SKILL.md). Номер решения постоянный; при переименовании папки нужно обновить ссылки в этой таблице.
+
+Решение № 6 выводит запросы из исходников, фронтенда, сценария и контекста с локальными BM25+BGE-M3 и Qwen. Именной адаптер Train Ticket и исключение простых конструкторов удалены. Приоритет этой версии — переносимость и проверяемые основания рёбер; оценки № 5 к ней не относятся. Результаты локального прогона и ограничения — в [README № 6](—_source-derived-analysis/README.md), разбор ошибок и план следующей итерации — в [DIAGNOSTICS_AND_PLAN.md](—_source-derived-analysis/DIAGNOSTICS_AND_PLAN.md).
 
 Оценки S0 измерены локально на открытом эталоне. Они не являются оценками скрытых S1–S7. Второй вариант — первая итерация анализатора; ограничения переноса состояния описаны в его README.
 
