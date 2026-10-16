@@ -1,0 +1,525 @@
+мест вызова API во фронтенде 91 (обработчиков с контекстом 71)
+   1. Log in with username and password
+        -> 1.00 auth.controller.UserController#getToken
+           0.68 auth.controller.AuthController#createDefaultUser
+           0.67 route.controller.RouteController#queryByStartAndTerminal
+           0.67 price.controller.PriceController#query
+   2. Open the contact book
+        -> 2.00 contacts.controller.ContactsController#findContactsByAccountId
+           1.76 contacts.controller.ContactsController#getContactsByContactsId
+           0.96 contacts.controller.ContactsController#createNewContacts
+           0.95 consign.controller.ConsignController#findByConsignee
+   3. Refresh the list of orders for high-speed (GaoTie/DongChe) trains
+        -> 2.00 order.controller.OrderController#queryOrdersForRefresh
+        -> 1.96 other.controller.OrderOtherController#queryOrdersForRefresh
+           0.90 contacts.controller.ContactsController#getContactsByContactsId
+           0.90 contacts.controller.ContactsController#findContactsByAccountId
+   4. Refresh the list of orders for regular ('Other' type) trains
+        -> 2.00 other.controller.OrderOtherController#queryOrdersForRefresh
+           1.78 order.controller.OrderController#queryOrdersForRefresh
+           0.90 preserveOther.controller.PreserveOtherController#preserve
+           0.72 other.controller.OrderOtherController#getTicketListByDateAndTripId
+   5. Refresh the list of orders filtered by the 'Paid' status
+        -> 2.00 order.controller.OrderController#queryOrdersForRefresh
+        -> 1.97 other.controller.OrderOtherController#queryOrdersForRefresh
+           0.89 contacts.controller.ContactsController#getContactsByContactsId
+           0.89 contacts.controller.ContactsController#findContactsByAccountId
+   6. Look up the luggage consignments registered on the account
+        -> 2.00 contacts.controller.ContactsController#findContactsByAccountId
+           1.85 consign.controller.ConsignController#findByAccountId
+           1.39 consign.controller.ConsignController#findByConsignee
+           1.25 contacts.controller.ContactsController#getContactsByContactsId
+S0: входов 4, методов 25, calls 22, remote 1, data 5
+   1. Log in with username and password
+        -> 1.00 auth.controller.UserController#getToken
+           0.68 auth.controller.AuthController#createDefaultUser
+           0.67 route.controller.RouteController#queryByStartAndTerminal
+           0.67 price.controller.PriceController#query
+   2. Search high-speed (GaoTie/DongChe) trains from Shanghai to Suzhou departing 
+        -> 1.39 consign.controller.ConsignController#findByAccountId
+        -> 1.39 consign.controller.ConsignController#findByConsignee
+        -> 1.35 travel2.controller.Travel2Controller#queryInfo
+        -> 1.34 travel.controller.TravelController#queryInfo
+   3. Open the details of the first trip found
+        -> 1.23 fdse.microservice.controller.StationController#queryById
+           1.08 contacts.controller.ContactsController#findContactsByAccountId
+           1.00 consign.controller.ConsignController#findByConsignee
+           1.00 travel.controller.TravelController#getTripAllDetailInfo
+   4. View the food menu offered on this trip
+        -> 1.90 foodsearch.controller.FoodController#getAllFood
+           1.50 preserve.controller.PreserveController#preserve
+           1.47 preserveOther.controller.PreserveOtherController#preserve
+           1.25 contacts.controller.ContactsController#findContactsByAccountId
+   5. Open the contact book and take the first contact
+        -> 2.00 contacts.controller.ContactsController#findContactsByAccountId
+           1.86 contacts.controller.ContactsController#getContactsByContactsId
+           1.24 contacts.controller.ContactsController#createNewContacts
+           0.84 contacts.controller.ContactsController#getAllContacts
+   6. Book one first-class seat on the trip for this contact, with food on the tra
+        -> 1.85 preserve.controller.PreserveController#preserve
+           1.69 preserveOther.controller.PreserveOtherController#preserve
+           1.45 contacts.controller.ContactsController#createNewContacts
+           1.28 assurance.controller.AssuranceController#getAllAssuranceType
+   7. Refresh the list of orders
+        -> 2.00 order.controller.OrderController#queryOrdersForRefresh
+        -> 1.97 other.controller.OrderOtherController#queryOrdersForRefresh
+           0.89 contacts.controller.ContactsController#getContactsByContactsId
+           0.89 contacts.controller.ContactsController#findContactsByAccountId
+   8. Open the new order
+        -> 1.75 consign.controller.ConsignController#findByOrderId
+           1.55 other.controller.OrderOtherController#queryOrdersForRefresh
+           1.54 order.controller.OrderController#queryOrdersForRefresh
+           1.46 consign.controller.ConsignController#findByConsignee
+   9. Check the price of the order
+        -> 1.44 consign.controller.ConsignController#findByOrderId
+           1.28 other.controller.OrderOtherController#queryOrdersForRefresh
+           1.28 order.controller.OrderController#queryOrdersForRefresh
+           1.26 inside_payment.controller.InsidePaymentController#pay
+  10. Pay for the order from the internal account balance
+        -> 1.77 inside_payment.controller.InsidePaymentController#pay
+           1.46 rebook.controller.RebookController#payDifference
+           1.45 consign.controller.ConsignController#updateConsign
+           1.07 consign.controller.ConsignController#findByAccountId
+  11. Collect the ticket for the order
+        -> 2.00 execute.controller.ExecuteControlller#collectTicket
+           0.97 inside_payment.controller.InsidePaymentController#pay
+           0.95 order.controller.OrderController#queryOrdersForRefresh
+           0.93 other.controller.OrderOtherController#queryOrdersForRefresh
+  12. Enter the station (board the train) with the order
+        -> 1.29 execute.controller.ExecuteControlller#executeTicket
+           1.13 preserve.controller.PreserveController#preserve
+           1.12 preserveOther.controller.PreserveOtherController#preserve
+           1.00 order.controller.OrderController#getTicketListByDateAndTripId
+  13. Look up the luggage consignment record of the order
+        -> 1.59 consign.controller.ConsignController#findByOrderId
+           1.38 other.controller.OrderOtherController#queryOrdersForRefresh
+           1.38 order.controller.OrderController#queryOrdersForRefresh
+           1.30 consign.controller.ConsignController#findByConsignee
+  14. Look up the assurance (insurance) record of the order
+        -> 1.60 assurance.controller.AssuranceController#getAllAssuranceType
+           1.17 consign.controller.ConsignController#findByOrderId
+           1.09 preserve.controller.PreserveController#preserve
+           1.08 preserveOther.controller.PreserveOtherController#preserve
+S1: входов 16, методов 211, calls 237, remote 49, data 49
+   1. Log in with username and password
+        -> 1.00 auth.controller.UserController#getToken
+           0.68 auth.controller.AuthController#createDefaultUser
+           0.67 route.controller.RouteController#queryByStartAndTerminal
+           0.67 price.controller.PriceController#query
+   2. Search regular trains (the 'Other' train type, not high-speed) from Shanghai
+        -> 1.40 preserveOther.controller.PreserveOtherController#preserve
+           1.28 other.controller.OrderOtherController#queryOrdersForRefresh
+           1.13 assurance.controller.AssuranceController#getAllAssuranceType
+           1.09 preserve.controller.PreserveController#preserve
+   3. Open the details of the first trip found
+        -> 1.23 fdse.microservice.controller.StationController#queryById
+           1.08 contacts.controller.ContactsController#findContactsByAccountId
+           1.00 consign.controller.ConsignController#findByConsignee
+           1.00 travel.controller.TravelController#getTripAllDetailInfo
+   4. Browse the food stores at Suzhou station
+        -> 1.49 preserve.controller.PreserveController#preserve
+        -> 1.46 preserveOther.controller.PreserveOtherController#preserve
+           1.28 foodsearch.controller.FoodController#getAllFood
+           1.00 food.controller.StationFoodController#getFoodListByStationFoodStoreId
+   5. Open the contact book and take the first contact
+        -> 2.00 contacts.controller.ContactsController#findContactsByAccountId
+           1.86 contacts.controller.ContactsController#getContactsByContactsId
+           1.24 contacts.controller.ContactsController#createNewContacts
+           0.84 contacts.controller.ContactsController#getAllContacts
+   6. Book one first-class seat on the regular train for this contact, with food f
+        -> 1.83 preserve.controller.PreserveController#preserve
+           1.67 preserveOther.controller.PreserveOtherController#preserve
+           1.41 contacts.controller.ContactsController#createNewContacts
+           1.03 foodsearch.controller.FoodController#getAllFood
+   7. Refresh the list of orders
+        -> 2.00 order.controller.OrderController#queryOrdersForRefresh
+        -> 1.97 other.controller.OrderOtherController#queryOrdersForRefresh
+           0.89 contacts.controller.ContactsController#getContactsByContactsId
+           0.89 contacts.controller.ContactsController#findContactsByAccountId
+   8. Pay for the order from the internal account balance
+        -> 1.77 inside_payment.controller.InsidePaymentController#pay
+           1.46 rebook.controller.RebookController#payDifference
+           1.45 consign.controller.ConsignController#updateConsign
+           1.07 consign.controller.ConsignController#findByAccountId
+   9. Ask how much would be refunded if the order were cancelled
+        -> 1.97 cancel.controller.CancelController#calculate
+        -> 1.92 cancel.controller.CancelController#cancelTicket
+           1.26 consign.controller.ConsignController#findByOrderId
+           1.11 other.controller.OrderOtherController#queryOrdersForRefresh
+  10. Cancel the order
+        -> 1.97 cancel.controller.CancelController#cancelTicket
+        -> 1.96 cancel.controller.CancelController#calculate
+           0.79 notification.controller.NotificationController#order_cancel_success
+           0.76 cancel.controller.CancelController#home
+  11. Book another first-class seat on the same regular train for the same contact
+        -> 1.76 contacts.controller.ContactsController#createNewContacts
+           1.41 preserve.controller.PreserveController#preserve
+           1.23 preserveOther.controller.PreserveOtherController#preserve
+           1.15 foodsearch.controller.FoodController#getAllFood
+  12. Refresh the list of orders
+        -> 2.00 order.controller.OrderController#queryOrdersForRefresh
+        -> 1.97 other.controller.OrderOtherController#queryOrdersForRefresh
+           0.89 contacts.controller.ContactsController#getContactsByContactsId
+           0.89 contacts.controller.ContactsController#findContactsByAccountId
+  13. Pay for the new order from the internal account balance
+        -> 1.54 inside_payment.controller.InsidePaymentController#pay
+           1.26 rebook.controller.RebookController#payDifference
+           1.22 contacts.controller.ContactsController#createNewContacts
+           1.16 consign.controller.ConsignController#updateConsign
+  14. Rebook the paid ticket to a second-class seat on the same regular train (the
+        -> 1.95 rebook.controller.RebookController#payDifference
+           1.36 rebook.controller.RebookController#rebook
+           1.25 preserve.controller.PreserveController#preserve
+           1.17 cancel.controller.CancelController#cancelTicket
+S2: входов 12, методов 220, calls 282, remote 74, data 45
+   1. Log in with username and password
+        -> 1.00 auth.controller.UserController#getToken
+           0.68 auth.controller.AuthController#createDefaultUser
+           0.67 route.controller.RouteController#queryByStartAndTerminal
+           0.67 price.controller.PriceController#query
+   2. Search high-speed (GaoTie/DongChe) trains from Shanghai to Suzhou departing 
+        -> 1.39 consign.controller.ConsignController#findByAccountId
+        -> 1.39 consign.controller.ConsignController#findByConsignee
+        -> 1.35 travel2.controller.Travel2Controller#queryInfo
+        -> 1.34 travel.controller.TravelController#queryInfo
+   3. Open the details of the first trip found
+        -> 1.23 fdse.microservice.controller.StationController#queryById
+           1.08 contacts.controller.ContactsController#findContactsByAccountId
+           1.00 consign.controller.ConsignController#findByConsignee
+           1.00 travel.controller.TravelController#getTripAllDetailInfo
+   4. Browse the food stores at Suzhou station
+        -> 1.49 preserve.controller.PreserveController#preserve
+        -> 1.46 preserveOther.controller.PreserveOtherController#preserve
+           1.28 foodsearch.controller.FoodController#getAllFood
+           1.00 food.controller.StationFoodController#getFoodListByStationFoodStoreId
+   5. Open the contact book and take the first contact
+        -> 2.00 contacts.controller.ContactsController#findContactsByAccountId
+           1.86 contacts.controller.ContactsController#getContactsByContactsId
+           1.24 contacts.controller.ContactsController#createNewContacts
+           0.84 contacts.controller.ContactsController#getAllContacts
+   6. Add a new contact (a companion with an ID card) to the contact book
+        -> 2.00 contacts.controller.ContactsController#createNewContacts
+           0.97 contacts.controller.ContactsController#createNewContactsAdmin
+           0.94 contacts.controller.ContactsController#getContactsByContactsId
+           0.92 contacts.controller.ContactsController#findContactsByAccountId
+   7. Book a first-class seat on the trip for the first contact, with food from a 
+        -> 2.00 preserve.controller.PreserveController#preserve
+           1.86 preserveOther.controller.PreserveOtherController#preserve
+           1.20 contacts.controller.ContactsController#createNewContacts
+           1.04 assurance.controller.AssuranceController#getAllAssuranceType
+   8. Book a second-class seat on the same trip for the new contact, without food,
+        -> 1.86 contacts.controller.ContactsController#createNewContacts
+           1.00 assurance.controller.AssuranceController#createNewAssurance
+           0.99 preserve.controller.PreserveController#preserve
+           0.97 waitorder.controller.WaitListOrderController#createNewOrder
+   9. Refresh the list of orders
+        -> 2.00 order.controller.OrderController#queryOrdersForRefresh
+        -> 1.97 other.controller.OrderOtherController#queryOrdersForRefresh
+           0.89 contacts.controller.ContactsController#getContactsByContactsId
+           0.89 contacts.controller.ContactsController#findContactsByAccountId
+  10. Open the first new order
+        -> 1.68 consign.controller.ConsignController#findByOrderId
+           1.47 other.controller.OrderOtherController#queryOrdersForRefresh
+           1.47 order.controller.OrderController#queryOrdersForRefresh
+           1.42 fdse.microservice.controller.StationController#queryById
+  11. Open the second new order
+        -> 1.75 consign.controller.ConsignController#findByOrderId
+           1.55 other.controller.OrderOtherController#queryOrdersForRefresh
+           1.54 order.controller.OrderController#queryOrdersForRefresh
+           1.46 consign.controller.ConsignController#findByConsignee
+  12. Pay for the first order from the internal account balance
+        -> 1.77 inside_payment.controller.InsidePaymentController#pay
+           1.46 rebook.controller.RebookController#payDifference
+           1.45 consign.controller.ConsignController#updateConsign
+           1.08 fdse.microservice.controller.StationController#queryById
+  13. Pay for the second order from the internal account balance
+        -> 1.77 inside_payment.controller.InsidePaymentController#pay
+           1.46 rebook.controller.RebookController#payDifference
+           1.45 consign.controller.ConsignController#updateConsign
+           1.07 consign.controller.ConsignController#findByAccountId
+  14. Check what a 0.5 kg consignment within the region costs
+        -> 1.19 preserve.controller.PreserveController#preserve
+        -> 1.18 preserveOther.controller.PreserveOtherController#preserve
+           1.00 consignprice.controller.ConsignPriceController#getPriceByWeightAndRegion
+           0.99 contacts.controller.ContactsController#findContactsByAccountId
+  15. Look at the list of assurance types
+        -> 2.00 assurance.controller.AssuranceController#getAllAssuranceType
+           0.96 assurance.controller.AssuranceController#findAssuranceByOrderId
+           0.81 contacts.controller.ContactsController#findContactsByAccountId
+           0.81 preserve.controller.PreserveController#preserve
+S3: входов 15, методов 208, calls 255, remote 53, data 47
+   1. Register a new passenger account (username, password, gender, ID document, e
+        -> 1.80 contacts.controller.ContactsController#createNewContacts
+           1.00 user.controller.UserController#registerUser
+           0.90 adminuser.controller.AdminUserController#addUser
+           0.85 contacts.controller.ContactsController#createNewContactsAdmin
+   2. Log in with the new username and password
+        -> 1.00 auth.controller.UserController#getToken
+           0.88 contacts.controller.ContactsController#createNewContacts
+           0.68 auth.controller.AuthController#createDefaultUser
+           0.67 route.controller.RouteController#queryByStartAndTerminal
+   3. Add a contact (the passenger themselves) to the empty contact book
+        -> 2.00 contacts.controller.ContactsController#createNewContacts
+           1.31 contacts.controller.ContactsController#getContactsByContactsId
+           1.28 contacts.controller.ContactsController#findContactsByAccountId
+           0.98 contacts.controller.ContactsController#createNewContactsAdmin
+   4. Search high-speed (GaoTie/DongChe) trains from Shanghai to Suzhou departing 
+        -> 1.39 consign.controller.ConsignController#findByAccountId
+        -> 1.39 consign.controller.ConsignController#findByConsignee
+        -> 1.35 travel2.controller.Travel2Controller#queryInfo
+        -> 1.34 travel.controller.TravelController#queryInfo
+   5. Open the details of the first trip found
+        -> 1.23 fdse.microservice.controller.StationController#queryById
+           1.08 contacts.controller.ContactsController#findContactsByAccountId
+           1.00 consign.controller.ConsignController#findByConsignee
+           1.00 travel.controller.TravelController#getTripAllDetailInfo
+   6. View the food menu offered on this trip
+        -> 1.90 foodsearch.controller.FoodController#getAllFood
+           1.50 preserve.controller.PreserveController#preserve
+           1.47 preserveOther.controller.PreserveOtherController#preserve
+           1.25 contacts.controller.ContactsController#findContactsByAccountId
+   7. Book a first-class seat on the trip for the new contact, with food on the tr
+        -> 1.87 contacts.controller.ContactsController#createNewContacts
+           1.46 preserve.controller.PreserveController#preserve
+           1.31 preserveOther.controller.PreserveOtherController#preserve
+           1.28 assurance.controller.AssuranceController#getAllAssuranceType
+   8. Refresh the list of orders
+        -> 2.00 order.controller.OrderController#queryOrdersForRefresh
+        -> 1.97 other.controller.OrderOtherController#queryOrdersForRefresh
+           0.89 contacts.controller.ContactsController#getContactsByContactsId
+           0.89 contacts.controller.ContactsController#findContactsByAccountId
+   9. Open the new order
+        -> 1.75 consign.controller.ConsignController#findByOrderId
+           1.55 other.controller.OrderOtherController#queryOrdersForRefresh
+           1.54 order.controller.OrderController#queryOrdersForRefresh
+           1.46 consign.controller.ConsignController#findByConsignee
+  10. Check the price of the order
+        -> 1.44 consign.controller.ConsignController#findByOrderId
+           1.28 other.controller.OrderOtherController#queryOrdersForRefresh
+           1.28 order.controller.OrderController#queryOrdersForRefresh
+           1.26 inside_payment.controller.InsidePaymentController#pay
+  11. Pay for the order: the internal balance is empty, so the payment is complete
+        -> 1.99 inside_payment.controller.InsidePaymentController#pay
+           1.13 rebook.controller.RebookController#payDifference
+           1.00 com.trainticket.controller.PaymentController#pay
+           0.96 inside_payment.controller.InsidePaymentController#payDifference
+  12. Ask how much would be refunded if the paid order were cancelled
+        -> 1.97 cancel.controller.CancelController#calculate
+        -> 1.92 cancel.controller.CancelController#cancelTicket
+           1.26 consign.controller.ConsignController#findByOrderId
+           1.11 other.controller.OrderOtherController#queryOrdersForRefresh
+  13. Cancel the paid order (the refund goes back to the internal balance)
+        -> 1.96 cancel.controller.CancelController#calculate
+        -> 1.94 cancel.controller.CancelController#cancelTicket
+           0.79 notification.controller.NotificationController#order_cancel_success
+           0.76 cancel.controller.CancelController#home
+  14. Refresh the list of orders filtered by the 'Cancel' status
+        -> 1.97 cancel.controller.CancelController#cancelTicket
+        -> 1.95 cancel.controller.CancelController#calculate
+           1.72 order.controller.OrderController#queryOrdersForRefresh
+           1.69 other.controller.OrderOtherController#queryOrdersForRefresh
+S4: входов 14, методов 146, calls 153, remote 28, data 37
+   1. Log in with username and password
+        -> 1.00 auth.controller.UserController#getToken
+           0.68 auth.controller.AuthController#createDefaultUser
+           0.67 route.controller.RouteController#queryByStartAndTerminal
+           0.67 price.controller.PriceController#query
+   2. Advanced search: the cheapest trips from Shanghai to Nanjing on 1 October 20
+        -> 2.00 travelplan.controller.TravelPlanController#getByCheapest
+           1.18 travelplan.controller.TravelPlanController#getByQuickest
+           1.17 travelplan.controller.TravelPlanController#getByMinStation
+           1.12 travel.controller.TravelController#deleteTrip
+   3. Advanced search: the quickest trips from Shanghai to Nanjing on 1 October 20
+        -> 2.00 travelplan.controller.TravelPlanController#getByQuickest
+           1.18 travelplan.controller.TravelPlanController#getByCheapest
+           1.17 travelplan.controller.TravelPlanController#getByMinStation
+           1.12 travel.controller.TravelController#deleteTrip
+   4. Advanced search: the trips with the fewest stops from Shanghai to Nanjing on
+        -> 1.21 travelplan.controller.TravelPlanController#getByQuickest
+        -> 1.21 travelplan.controller.TravelPlanController#getByCheapest
+        -> 1.20 travelplan.controller.TravelPlanController#getByMinStation
+        -> 1.19 travel.controller.TravelController#deleteTrip
+   5. Ask for trips with a transfer at Suzhou (Shanghai — Suzhou — Nanjing) on 1 O
+        -> 1.57 order.controller.OrderController#queryOrdersForRefresh
+        -> 1.55 other.controller.OrderOtherController#queryOrdersForRefresh
+           1.44 contacts.controller.ContactsController#findContactsByAccountId
+           1.32 consign.controller.ConsignController#findByConsignee
+   6. Open the details of the cheapest trip found (a regular, 'Other'-type train)
+        -> 1.42 travelplan.controller.TravelPlanController#getByCheapest
+           1.33 preserveOther.controller.PreserveOtherController#preserve
+           1.30 other.controller.OrderOtherController#queryOrdersForRefresh
+           1.20 assurance.controller.AssuranceController#getAllAssuranceType
+   7. Open the contact book and take the first contact
+        -> 2.00 contacts.controller.ContactsController#findContactsByAccountId
+           1.86 contacts.controller.ContactsController#getContactsByContactsId
+           1.24 contacts.controller.ContactsController#createNewContacts
+           0.84 contacts.controller.ContactsController#getAllContacts
+   8. Book a first-class seat on the cheapest (regular) trip for this contact, wit
+        -> 1.84 contacts.controller.ContactsController#createNewContacts
+           1.23 travelplan.controller.TravelPlanController#getByCheapest
+           1.22 preserve.controller.PreserveController#preserve
+           1.14 assurance.controller.AssuranceController#getAllAssuranceType
+   9. Refresh the list of orders
+        -> 2.00 order.controller.OrderController#queryOrdersForRefresh
+        -> 1.97 other.controller.OrderOtherController#queryOrdersForRefresh
+           0.89 contacts.controller.ContactsController#getContactsByContactsId
+           0.89 contacts.controller.ContactsController#findContactsByAccountId
+  10. Pay for the order from the internal account balance
+        -> 1.77 inside_payment.controller.InsidePaymentController#pay
+           1.46 rebook.controller.RebookController#payDifference
+           1.45 consign.controller.ConsignController#updateConsign
+           1.07 consign.controller.ConsignController#findByAccountId
+  11. Collect the ticket for the order
+        -> 2.00 execute.controller.ExecuteControlller#collectTicket
+           0.97 inside_payment.controller.InsidePaymentController#pay
+           0.95 order.controller.OrderController#queryOrdersForRefresh
+           0.93 other.controller.OrderOtherController#queryOrdersForRefresh
+  12. Enter the station (board the train) with the order
+        -> 1.29 execute.controller.ExecuteControlller#executeTicket
+           1.13 preserve.controller.PreserveController#preserve
+           1.12 preserveOther.controller.PreserveOtherController#preserve
+           1.00 order.controller.OrderController#getTicketListByDateAndTripId
+S5: входов 15, методов 181, calls 249, remote 44, data 41
+   1. Log in to the admin console with the administrator's username and password
+        -> 2.00 auth.controller.UserController#getToken
+           1.13 adminuser.controller.AdminUserController#updateUser
+           1.12 adminuser.controller.AdminUserController#addUser
+           0.68 auth.controller.AuthController#createDefaultUser
+   2. Add a new station Ning Bo with a stay time of 5 minutes
+        -> 1.68 adminbasic.controller.AdminBasicInfoController#addStation
+        -> 1.65 admintravel.controller.AdminTravelController#addTravel
+           1.59 contacts.controller.ContactsController#createNewContacts
+           1.36 adminroute.controller.AdminRouteController#addRoute
+   3. Add a new train type GaoTieSix with 100 second-class and 30 first-class seat
+        -> 1.75 adminbasic.controller.AdminBasicInfoController#addTrain
+           1.56 adminorder.controller.AdminOrderController#addOrder
+           1.39 contacts.controller.ContactsController#createNewContacts
+           1.31 adminbasic.controller.AdminBasicInfoController#modifyTrain
+   4. Add a new route Shanghai — Suzhou — Ning Bo with distances 0, 100 and 250
+        -> 1.99 adminroute.controller.AdminRouteController#addRoute
+           1.48 contacts.controller.ContactsController#createNewContacts
+           1.26 admintravel.controller.AdminTravelController#addTravel
+           1.15 adminuser.controller.AdminUserController#addUser
+   5. Add a price configuration for train type GaoTieSix on the new route: basic r
+        -> 1.96 adminbasic.controller.AdminBasicInfoController#addPrice
+           1.61 adminbasic.controller.AdminBasicInfoController#modifyPrice
+           1.03 contacts.controller.ContactsController#createNewContacts
+           1.00 price.controller.PriceController#create
+   6. Add a new high-speed trip G9101 of type GaoTieSix on the new route from Shan
+        -> 1.80 contacts.controller.ContactsController#createNewContacts
+           1.55 admintravel.controller.AdminTravelController#addTravel
+           1.38 adminroute.controller.AdminRouteController#addRoute
+           1.34 adminuser.controller.AdminUserController#addUser
+   7. Log in as a passenger with username and password
+        -> 2.00 auth.controller.UserController#getToken
+           0.82 adminuser.controller.AdminUserController#updateUser
+           0.81 adminuser.controller.AdminUserController#addUser
+           0.68 auth.controller.AuthController#createDefaultUser
+   8. Search high-speed (GaoTie/DongChe) trains from Shanghai to Ning Bo departing
+        -> 1.62 adminbasic.controller.AdminBasicInfoController#modifyTrain
+        -> 1.62 adminbasic.controller.AdminBasicInfoController#addTrain
+           1.47 train.controller.TrainController#query
+           1.39 consign.controller.ConsignController#findByAccountId
+   9. Open the details of the new trip found
+        -> 1.12 admintravel.controller.AdminTravelController#addTravel
+           1.03 contacts.controller.ContactsController#findContactsByAccountId
+           1.00 travel.controller.TravelController#getTripAllDetailInfo
+           0.99 travel2.controller.Travel2Controller#getTripAllDetailInfo
+  10. Open the contact book and take the first contact
+        -> 2.00 contacts.controller.ContactsController#findContactsByAccountId
+           1.86 contacts.controller.ContactsController#getContactsByContactsId
+           1.35 adminbasic.controller.AdminBasicInfoController#getAllContacts
+           1.24 contacts.controller.ContactsController#createNewContacts
+  11. Book a first-class seat on the new trip for this contact, without food, assu
+        -> 1.86 contacts.controller.ContactsController#createNewContacts
+           1.41 adminorder.controller.AdminOrderController#addOrder
+           1.00 assurance.controller.AssuranceController#createNewAssurance
+           0.97 waitorder.controller.WaitListOrderController#createNewOrder
+  12. Refresh the list of orders
+        -> 2.00 order.controller.OrderController#queryOrdersForRefresh
+        -> 1.97 other.controller.OrderOtherController#queryOrdersForRefresh
+           0.89 contacts.controller.ContactsController#getContactsByContactsId
+           0.89 contacts.controller.ContactsController#findContactsByAccountId
+  13. Pay for the order from the internal account balance
+        -> 1.77 inside_payment.controller.InsidePaymentController#pay
+           1.46 rebook.controller.RebookController#payDifference
+           1.45 consign.controller.ConsignController#updateConsign
+           1.36 adminorder.controller.AdminOrderController#updateOrder
+  14. As the administrator, open the list of all orders in the system
+        -> 1.62 adminorder.controller.AdminOrderController#getAllOrders
+           1.35 adminroute.controller.AdminRouteController#getAllRoutes
+           1.27 adminorder.controller.AdminOrderController#deleteOrder
+           1.24 adminbasic.controller.AdminBasicInfoController#getAllContacts
+S6: входов 13, методов 104, calls 87, remote 19, data 29
+   1. Log in with username and password
+        -> 1.00 auth.controller.UserController#getToken
+           0.68 auth.controller.AuthController#createDefaultUser
+           0.67 route.controller.RouteController#queryByStartAndTerminal
+           0.67 price.controller.PriceController#query
+   2. Search high-speed (GaoTie/DongChe) trains from Shanghai to Suzhou departing 
+        -> 1.39 consign.controller.ConsignController#findByAccountId
+        -> 1.39 consign.controller.ConsignController#findByConsignee
+        -> 1.35 travel2.controller.Travel2Controller#queryInfo
+        -> 1.34 travel.controller.TravelController#queryInfo
+   3. Open the contact book and take the first contact
+        -> 2.00 contacts.controller.ContactsController#findContactsByAccountId
+           1.86 contacts.controller.ContactsController#getContactsByContactsId
+           1.24 contacts.controller.ContactsController#createNewContacts
+           0.84 contacts.controller.ContactsController#getAllContacts
+   4. Book a first-class seat on the first trip found for this contact, with a lug
+        -> 1.71 contacts.controller.ContactsController#createNewContacts
+           1.63 preserve.controller.PreserveController#preserve
+           1.44 preserveOther.controller.PreserveOtherController#preserve
+           1.08 assurance.controller.AssuranceController#getAllAssuranceType
+   5. Refresh the list of orders
+        -> 2.00 order.controller.OrderController#queryOrdersForRefresh
+        -> 1.97 other.controller.OrderOtherController#queryOrdersForRefresh
+           0.89 contacts.controller.ContactsController#getContactsByContactsId
+           0.89 contacts.controller.ContactsController#findContactsByAccountId
+   6. Pay for the order from the internal account balance
+        -> 1.77 inside_payment.controller.InsidePaymentController#pay
+           1.46 rebook.controller.RebookController#payDifference
+           1.45 consign.controller.ConsignController#updateConsign
+           1.07 consign.controller.ConsignController#findByAccountId
+   7. Collect the ticket for the order
+        -> 2.00 execute.controller.ExecuteControlller#collectTicket
+           0.97 inside_payment.controller.InsidePaymentController#pay
+           0.95 order.controller.OrderController#queryOrdersForRefresh
+           0.93 other.controller.OrderOtherController#queryOrdersForRefresh
+   8. Ask how much would be refunded for the collected order
+        -> 1.84 order.controller.OrderController#queryOrdersForRefresh
+        -> 1.83 other.controller.OrderOtherController#queryOrdersForRefresh
+           1.63 execute.controller.ExecuteControlller#collectTicket
+           1.25 consign.controller.ConsignController#findByOrderId
+   9. Try to cancel the collected order (the system refuses)
+        -> 1.54 execute.controller.ExecuteControlller#collectTicket
+        -> 1.48 cancel.controller.CancelController#cancelTicket
+        -> 1.46 cancel.controller.CancelController#calculate
+           1.11 inside_payment.controller.InsidePaymentController#pay
+  10. Try to rebook the collected order onto the second high-speed trip found (the
+        -> 1.59 rebook.controller.RebookController#payDifference
+           1.38 rebook.controller.RebookController#rebook
+           1.34 execute.controller.ExecuteControlller#collectTicket
+           1.24 inside_payment.controller.InsidePaymentController#pay
+  11. Look up the luggage consignment of the order
+        -> 1.94 consign.controller.ConsignController#findByOrderId
+           1.74 other.controller.OrderOtherController#queryOrdersForRefresh
+           1.73 order.controller.OrderController#queryOrdersForRefresh
+           1.66 consign.controller.ConsignController#findByConsignee
+  12. Change the consignee's name and phone number in the consignment
+        -> 1.74 consign.controller.ConsignController#updateConsign
+           1.60 preserve.controller.PreserveController#preserve
+           1.58 preserveOther.controller.PreserveOtherController#preserve
+           1.39 consign.controller.ConsignController#findByConsignee
+  13. Refresh the list of orders filtered by travel date (September — December 202
+        -> 2.00 order.controller.OrderController#queryOrdersForRefresh
+        -> 1.97 other.controller.OrderOtherController#queryOrdersForRefresh
+           0.74 travel.controller.TravelController#retrieve
+           0.73 travel.controller.TravelController#deleteTrip
+  14. Refresh the list of orders filtered by purchase date (today)
+        -> 2.00 order.controller.OrderController#queryOrdersForRefresh
+        -> 1.97 other.controller.OrderOtherController#queryOrdersForRefresh
+           1.09 rebook.controller.RebookController#payDifference
+           1.03 rebook.controller.RebookController#rebook
+S7: входов 16, методов 199, calls 244, remote 58, data 46
+сценариев 8 -> /Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/runs/baseline_nlp_2026-10-16/submission.json

@@ -1,0 +1,478 @@
+"""Bounded abstract interpretation of Java source, with explicit unknown values.
+
+Only source text is interpreted. This module never loads JVM classes or contacts
+the application's services. Unresolved branches retain both possible paths.
+"""
+from collections import defaultdict
+from copy import deepcopy
+import json
+import operator
+import re
+from urllib.parse import urlsplit
+
+from .project import text
+from .state import U
+
+
+def member(obj, key):
+    if not isinstance(obj, dict):
+        return U
+    if key in obj:
+        return obj[key]
+    normalized = re.sub(r'[^a-z0-9]', '', key.lower())
+    return next((v for k, v in obj.items() if re.sub(r'[^a-z0-9]', '', k.lower()) == normalized), U)
+
+
+def merge(a, b):
+    if a == b:
+        return a
+    if isinstance(a, dict) and isinstance(b, dict):
+        return {key: merge(a.get(key, U), b.get(key, U)) for key in a.keys() | b.keys()}
+    return U
+
+
+class Engine:
+    def __init__(self, project, state):
+        self.p, self.state = project, state
+        self.edges = set()
+        self.evidence = defaultdict(set)
+        self.conditions, self.warnings = [], set()
+        self.active = set()
+        self.calls = 0
+        self.method = None
+        self.params = {}
+        self.uncertain = 0
+
+    def add(self, source, relation, target, reason):
+        self.edges.add((source, relation, target))
+        self.evidence[(source, relation, target)].add(reason)
+
+    def executed(self, mid, reason):
+        self.add('', 'executes', mid, reason)
+
+    def run(self, entry, params):
+        self.params = params
+        for mid in self.p.by_name.get('doFilterInternal', []):
+            if 'OncePerRequestFilter' in (self.p.root / self.p.methods[mid]['file']).read_text():
+                self.invoke(mid, [], reason='project request filter')
+        args = [self.input_value(name, typ, params) for name, typ in self.p.parameters(entry)]
+        result = self.invoke(entry, args, reason='scenario request')
+        return result
+
+    def input_value(self, name, typ, params):
+        if name.lower() in ('headers', 'httpheaders'):
+            return {'__type__': 'HttpHeaders'}
+        if name in params:
+            return params[name]
+        if typ in ('String', 'UUID', 'int', 'double', 'boolean', 'Date', 'Long'):
+            return U
+        return {'__type__': typ, **deepcopy(params)}
+
+    def invoke(self, mid, args, receiver=None, reason='source call'):
+        self.executed(mid, reason)
+        signature = (mid, json.dumps(args, sort_keys=True, default=str))
+        if signature in self.active or self.calls >= 12000:
+            self.warnings.add('recursion or context budget: conservative closure used')
+            self.fallback(mid)
+            return U
+        node = self.p.ast.get(mid)
+        if node is None:
+            self.warnings.add('no source body: ' + mid)
+            self.fallback(mid)
+            return U
+        self.calls += 1
+        self.active.add(signature)
+        previous = self.method
+        self.method = mid
+        env = {name: args[i] if i < len(args) else U for i, (name, _) in enumerate(self.p.parameters(mid))}
+        env['this'] = receiver if isinstance(receiver, dict) else {}
+        body = node.child_by_field_name('body')
+        result, _ = self.execute(body, env)
+        self.method = previous
+        self.active.remove(signature)
+        return result
+
+    def fallback(self, mid):
+        methods, calls, remote, data = self.p.ix.closure({mid})
+        for method in methods:
+            self.executed(method, 'unresolved source: may-call closure')
+        for relation, pairs in [('calls', calls), ('remote', remote), ('data', data)]:
+            for source, target in pairs:
+                self.add(source, relation, target, 'unresolved source: may-call closure')
+
+    def execute(self, node, env):
+        if node is None:
+            return U, None
+        typ = node.type
+        if typ in ('block', 'constructor_body'):
+            for child in node.named_children:
+                value, control = self.execute(child, env)
+                if control:
+                    return value, control
+            return U, None
+        if typ in ('return_statement', 'throw_statement'):
+            value = self.value(node.named_children[0], env) if node.named_children else None
+            return value, 'return' if typ == 'return_statement' else 'throw'
+        if typ == 'if_statement':
+            cond = self.value(node.child_by_field_name('condition'), env)
+            self.conditions.append({'method': self.method, 'line': node.start_point.row + 1,
+                                    'condition': text(node.child_by_field_name('condition')),
+                                    'value': cond if isinstance(cond, bool) else 'unknown'})
+            if isinstance(cond, bool):
+                return self.execute(node.child_by_field_name('consequence' if cond else 'alternative'), env)
+            left, right = deepcopy(env), deepcopy(env)
+            self.uncertain += 1
+            a, ac = self.execute(node.child_by_field_name('consequence'), left)
+            b, bc = self.execute(node.child_by_field_name('alternative'), right)
+            self.uncertain -= 1
+            env.update(merge(left, right))
+            return (merge(a, b), ac) if ac == bc and ac else (U, None)
+        if typ == 'enhanced_for_statement':
+            values = self.value(node.child_by_field_name('value'), env)
+            name = text(node.child_by_field_name('name'))
+            items = values if isinstance(values, list) else [U]
+            if len(items) > 64:
+                self.warnings.add('loop collection widened after 64 elements')
+                items = items[:64] + [U]
+            for item in items:
+                env[name] = item
+                result, control = self.execute(node.child_by_field_name('body'), env)
+                if control in ('return', 'throw') and isinstance(values, list) and len(values) == 1:
+                    return result, control
+            return U, None
+        if typ in ('for_statement', 'while_statement', 'do_statement'):
+            init = node.child_by_field_name('init')
+            if init:
+                self.execute(init, env)
+            condnode = node.child_by_field_name('condition')
+            cond = self.value(condnode, env) if condnode else U
+            if cond is not False:
+                self.execute(node.child_by_field_name('body'), env)
+                self.warnings.add('loop approximated with one body pass: ' + self.method)
+            return U, None
+        if typ == 'try_statement' or typ == 'try_with_resources_statement':
+            resources = node.child_by_field_name('resources')
+            if resources:
+                self.value(resources, env)
+            result, control = self.execute(node.child_by_field_name('body'), env)
+            if control == 'throw':
+                for child in node.named_children:
+                    if child.type == 'catch_clause':
+                        result, control = self.execute(child.child_by_field_name('body'), env)
+                        break
+            for child in node.named_children:
+                if child.type == 'finally_clause':
+                    final, fc = self.execute(child.named_children[-1], env)
+                    if fc:
+                        return final, fc
+            return result, control
+        if typ == 'local_variable_declaration':
+            for child in node.named_children:
+                if child.type == 'variable_declarator':
+                    env[text(child.child_by_field_name('name'))] = self.value(child.child_by_field_name('value'), env)
+            return U, None
+        if typ in ('break_statement', 'continue_statement'):
+            return U, 'break'
+        if typ in ('line_comment', 'block_comment'):
+            return U, None
+        return self.value(node, env), None
+
+    def value(self, node, env):
+        if node is None:
+            return U
+        typ, raw = node.type, text(node)
+        if typ == 'identifier':
+            return env.get(raw, member(env.get('this'), raw))
+        if typ in ('true', 'false'):
+            return typ == 'true'
+        if typ == 'null_literal':
+            return None
+        if typ == 'string_literal':
+            try:
+                return json.loads(raw)
+            except ValueError:
+                return raw[1:-1]
+        if typ in ('decimal_integer_literal', 'decimal_floating_point_literal'):
+            try:
+                return float(raw.rstrip('fFdD')) if '.' in raw else int(raw.rstrip('lL'))
+            except ValueError:
+                return U
+        if typ == 'this':
+            return env.get('this', U)
+        if typ in ('parenthesized_expression', 'cast_expression'):
+            return self.value(node.named_children[-1], env)
+        if typ == 'field_access':
+            if raw in self.p.enums:
+                return {'__enum__': raw, 'code': self.p.enums[raw]}
+            return member(self.value(node.child_by_field_name('object'), env), text(node.child_by_field_name('field')))
+        if typ == 'unary_expression':
+            arg = self.value(node.child_by_field_name('operand') or node.named_children[-1], env)
+            if arg is U:
+                return U
+            if raw.startswith('!') and isinstance(arg, bool):
+                return not arg
+            if raw.startswith('-') and isinstance(arg, (int, float)):
+                return -arg
+            return U
+        if typ == 'binary_expression':
+            op = text(node.child_by_field_name('operator'))
+            a = self.value(node.child_by_field_name('left'), env)
+            if (op == '&&' and a is False) or (op == '||' and a is True):
+                return a
+            b = self.value(node.child_by_field_name('right'), env)
+            if op == '&&' and b is False:
+                return False
+            if op == '||' and b is True:
+                return True
+            if a is U or b is U:
+                return U
+            ops = {'==': operator.eq, '!=': operator.ne, '<': operator.lt, '>': operator.gt,
+                   '<=': operator.le, '>=': operator.ge, '+': operator.add, '-': operator.sub,
+                   '*': operator.mul, '/': operator.truediv, '&&': lambda x, y: x and y,
+                   '||': lambda x, y: x or y}
+            if op == '+' and (isinstance(a, str) or isinstance(b, str)):
+                return str(a) + str(b)
+            try:
+                return ops[op](a, b) if op in ops else U
+            except (TypeError, ValueError, ZeroDivisionError):
+                return U
+        if typ == 'assignment_expression':
+            lhs, rhs = node.child_by_field_name('left'), node.child_by_field_name('right')
+            result = self.value(rhs, env)
+            if lhs.type == 'identifier':
+                env[text(lhs)] = result
+            elif lhs.type == 'field_access':
+                obj = self.value(lhs.child_by_field_name('object'), env)
+                if isinstance(obj, dict):
+                    obj[text(lhs.child_by_field_name('field'))] = result
+            return result
+        if typ == 'ternary_expression':
+            c = self.value(node.child_by_field_name('condition'), env)
+            if isinstance(c, bool):
+                return self.value(node.child_by_field_name('consequence' if c else 'alternative'), env)
+            return merge(self.value(node.child_by_field_name('consequence'), deepcopy(env)),
+                         self.value(node.child_by_field_name('alternative'), deepcopy(env)))
+        if typ == 'lambda_expression':
+            return ('lambda', node, env)
+        if typ in ('method_invocation', 'object_creation_expression'):
+            return self.call(node, env)
+        if typ == 'array_initializer':
+            return [self.value(child, env) for child in node.named_children]
+        if typ == 'array_access':
+            arr = self.value(node.child_by_field_name('array'), env)
+            idx = self.value(node.child_by_field_name('index'), env)
+            return arr[idx] if isinstance(arr, list) and isinstance(idx, int) and 0 <= idx < len(arr) else U
+        if typ == 'expression_statement':
+            return self.value(node.named_children[0], env)
+        if typ in ('type_identifier', 'scoped_type_identifier', 'generic_type', 'class_literal', 'line_comment', 'block_comment'):
+            return U
+        for child in node.named_children:
+            if child.type.endswith('statement') or child.type in ('block', 'local_variable_declaration'):
+                self.execute(child, env)
+            else:
+                self.value(child, env)
+        if typ in ('switch_expression', 'switch_statement'):
+            self.warnings.add('switch alternatives conservatively retained: ' + self.method)
+        return U
+
+    def call(self, node, env):
+        mid = self.method
+        site = self.p.site(mid, node)
+        cs = self.p.nodes.get(site, {})
+        name = '<init>' if node.type == 'object_creation_expression' else text(node.child_by_field_name('name'))
+        objnode = node.child_by_field_name('object')
+        obj = self.value(objnode, env) if objnode else env.get('this', U)
+        argnode = node.child_by_field_name('arguments')
+        args = [self.value(child, env) for child in argnode.named_children] if argnode else []
+        reason = site or f"{self.p.methods[mid]['file']}:{node.start_point.row + 1}"
+        wiring = self.p.edges.get(site, {})
+        targets = self.p.targets(mid, site)
+        if name == '<init>':
+            typ = text(node.child_by_field_name('type'))
+            obj = {'__type__': typ}
+            if typ.startswith('Response') and len(args) >= 3:
+                obj.update(status=args[0], msg=args[1], data=args[2])
+            elif typ.startswith('HttpEntity'):
+                obj['body'] = args[0] if len(args) > 1 else U
+            elif re.match(r'(ArrayList|LinkedList|List|HashSet|Set)', typ):
+                obj = []
+        result = U
+        for target in targets:
+            self.add(mid, 'calls', target, reason)
+            value = self.invoke(target, args, obj, reason)
+            result = value if len(targets) == 1 else merge(result, value)
+        if wiring.get('data_access'):
+            return self.repository(mid, cs, args, sorted(wiring['data_access']), reason)
+        remote = sorted(wiring.get('remote_call', set()) | wiring.get('message_delivery', set()))
+        if remote:
+            url = args[0] if args and isinstance(args[0], str) else None
+            if url and url.startswith('http'):
+                matched = set(self.p.ix.handlers_for(None, urlsplit(url).path))
+                if matched:
+                    remote = [t for t in remote if t in matched]
+            results = []
+            body = next((a.get('body', U) for a in args if isinstance(a, dict) and 'body' in a), U)
+            for target in remote:
+                self.add(mid, 'remote', target, reason)
+                values = []
+                route_values = self.path_parameters(target, url)
+                for par, typ in self.p.parameters(target):
+                    if par in route_values:
+                        values.append(route_values[par])
+                    elif 'Header' in typ:
+                        values.append({})
+                    else:
+                        values.append(body)
+                results.append(self.invoke(target, values, reason=reason))
+            value = results[0] if len(results) == 1 else U
+            return {'body': value} if name in ('exchange', 'getForEntity', 'postForEntity') else value
+        if name == 'authenticate' and 'AuthenticationManager' in (cs.get('receiver_type') or ''):
+            self.authentication(mid, reason)
+        if name == '<init>':
+            return obj
+        if name.startswith(('get', 'is')) and not args:
+            prop = name[3:] if name.startswith('get') else name[2:]
+            prop = prop[:1].lower() + prop[1:]
+            if isinstance(obj, dict):
+                value = member(obj, prop)
+                if value is not U:
+                    return value
+        if name.startswith('set') and len(args) == 1 and isinstance(obj, dict):
+            prop = name[3:4].lower() + name[4:]
+            obj[prop] = args[0]
+            return None
+        if result is not U:
+            return result
+        if name == 'orElseThrow':
+            value = member(obj, 'optional')
+            if value is not U and value is not None:
+                return value
+            for arg in args:
+                if isinstance(arg, tuple) and arg[0] == 'lambda':
+                    self.value(arg[1].child_by_field_name('body'), arg[2])
+            return U
+        if name == 'isPresent':
+            val = member(obj, 'optional')
+            return val is not None if val is not U else U
+        if name == 'get' and not args and isinstance(obj, dict) and 'optional' in obj:
+            return obj['optional']
+        if name in ('isEmpty', 'isBlank'):
+            value = args[0] if args else obj
+            return value is None or value == '' or value == [] if value is not U else U
+        if name in ('equals', 'equalsIgnoreCase') and args and obj is not U and args[0] is not U:
+            return obj == args[0] if name == 'equals' else str(obj).lower() == str(args[0]).lower()
+        if name == 'startsWith' and args and isinstance(obj, str) and isinstance(args[0], str):
+            return obj.startswith(args[0])
+        if name == 'toString':
+            return str(obj) if isinstance(obj, (str, int, float)) else U
+        if name in ('valueOf', 'fromString', 'parseInt', 'parseDouble') and args and args[0] is not U:
+            try:
+                return int(args[0]) if name == 'parseInt' else float(args[0]) if name == 'parseDouble' else args[0]
+            except (ValueError, TypeError):
+                return U
+        if name == 'size' and isinstance(obj, list):
+            return len(obj)
+        if name == 'get' and isinstance(obj, list) and args and isinstance(args[0], int):
+            return obj[args[0]] if 0 <= args[0] < len(obj) else U
+        if name in ('add', 'addAll') and isinstance(obj, list) and args:
+            obj.extend(args[0] if name == 'addAll' and isinstance(args[0], list) else [args[0]])
+            return True
+        if name == 'randomUUID':
+            # Symbolic IDs are stable within a run and never refer to runtime data.
+            self.state.symbol_sequence += 1
+            return 'symbolic-' + str(self.state.symbol_sequence)
+        return U
+
+    def path_parameters(self, target, url):
+        if not url:
+            return {}
+        segments = urlsplit(url).path.strip('/').split('/')
+        for mid, _, template in self.p.ix.handlers:
+            if mid == target and len(template) == len(segments):
+                return {key[1:-1]: value for key, value in zip(template, segments) if key.startswith('{')}
+        return {}
+
+    def authentication(self, mid, reason):
+        module = self.p.methods[mid]['module']
+        for callback in self.p.by_name.get('loadUserByUsername', []):
+            if self.p.methods[callback]['module'] == module and not self.p.methods[callback].get('abstract'):
+                self.invoke(callback, [self.state.user], reason='Spring authentication callback at ' + reason)
+        for name in ('getPassword', 'getAuthorities', 'isAccountNonExpired', 'isAccountNonLocked', 'isCredentialsNonExpired', 'isEnabled'):
+            for callback in self.p.by_name.get(name, []):
+                meta = self.p.methods[callback]
+                if meta['module'] == module and '/entity/' in meta['file']:
+                    self.invoke(callback, [], reason='UserDetails authentication callback at ' + reason)
+
+    def repository(self, mid, cs, args, resources, reason):
+        result = U
+        for rid in resources:
+            self.add(mid, 'data', rid, reason)
+            resource = self.p.nodes[rid]
+            rows = self.state.database.rows(resource)
+            if rows is None or resource.get('collection_of'):
+                continue
+            name = cs.get('callee', '')
+            entity = self.p.entities.get(rid)
+            if name.startswith(('save', 'insert')) and args and isinstance(args[0], dict):
+                record = deepcopy(args[0])
+                if self.uncertain:
+                    self.warnings.add('possible database write not committed: ' + reason)
+                else:
+                    key = record.get('id', record.get('userId', U))
+                    existing = next((r for r in rows if key is not U and r.get('id', r.get('userId')) == key), None)
+                    if existing is None:
+                        rows.append(record)
+                    else:
+                        existing.update(record)
+                    if resource['name'] in ('orders', 'orders_other'):
+                        order = next((o for o in self.state.orders if o.get('id') == record.get('id')), None)
+                        if order is None:
+                            self.state.orders.append(record)
+                        else:
+                            order.update(record)
+                        self.state.last_order = record.get('id', U)
+                result = record
+                continue
+            selected = list(rows)
+            find = re.search(r'(?:find|query|get|delete|exists).*?By(.+)', name)
+            unknown_query = False
+            if find:
+                fields = re.split('And', find[1])
+                for field, value in zip(fields, args):
+                    prop = field[:1].lower() + field[1:]
+                    if value is U:
+                        unknown_query = True
+                    else:
+                        selected = [r for r in selected if member(r, prop) == value]
+            elif name not in ('findAll', 'count'):
+                unknown_query = True
+            if name.startswith('delete'):
+                if not self.uncertain and not unknown_query:
+                    rows[:] = [r for r in rows if r not in selected]
+                else:
+                    self.warnings.add('possible deletion not committed: ' + reason)
+                result = None
+                continue
+            if name.startswith('exists'):
+                result = U if unknown_query else bool(selected)
+                continue
+            materialized = []
+            for row in selected[:64]:
+                record = {'__type__': self.p.nodes[entity]['fqn'] if entity else '', **deepcopy(row)}
+                if entity:
+                    for ctor in self.p.methods_of(entity, '<init>'):
+                        if not self.p.methods[ctor].get('params_as_written'):
+                            # Constructor is reached through materialization, not a direct project call.
+                            if any(self.p.targets(ctor, site) for site in self.p.sites.get(ctor, [])):
+                                self.invoke(ctor, [], deepcopy(record), 'entity materialization with project calls at ' + reason)
+                materialized.append(record)
+            if unknown_query:
+                result = U
+                continue
+            # Repository declarations are indexed even though their bodies are abstract.
+            declared = [m.get('return_raw', '') for m in self.p.methods.values()
+                        if m['name'] == name and self.p.nodes[m['owner']]['fqn'] == cs.get('receiver_type')]
+            return_type = declared[0] if declared else ''
+            first = materialized[0] if materialized else None
+            result = {'optional': first} if 'Optional' in return_type else materialized if any(t in return_type for t in ('List', 'Set', 'Collection')) or name == 'findAll' else first
+        return result
