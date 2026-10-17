@@ -1,0 +1,311 @@
+{
+  "scenario": {
+    "project": "public-java",
+    "id": "stateful-account-statistics-chain",
+    "steps": [
+      {
+        "action": "Explicit conditional public-source HTTP request",
+        "request": {
+          "module": "account-service",
+          "path": "/accounts/current"
+        }
+      },
+      {
+        "action": "Explicit conditional public-source HTTP request",
+        "request": {
+          "module": "account-service",
+          "path": "/accounts/current",
+          "method": "PUT",
+          "body": {
+            "incomes": [
+              {
+                "title": "Salary",
+                "amount": "20",
+                "currency": "USD",
+                "period": "DAY"
+              }
+            ],
+            "expenses": [
+              {
+                "title": "Rent",
+                "amount": "8",
+                "currency": "EUR",
+                "period": "DAY"
+              }
+            ],
+            "saving": {
+              "amount": "100",
+              "currency": "USD",
+              "interest": "0",
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "Changed"
+          }
+        }
+      },
+      {
+        "action": "Explicit conditional public-source HTTP request",
+        "request": {
+          "module": "account-service",
+          "path": "/accounts/current"
+        }
+      },
+      {
+        "action": "Explicit conditional public-source HTTP request",
+        "request": {
+          "module": "statistics-service",
+          "path": "/statistics/current"
+        }
+      }
+    ]
+  },
+  "context": {
+    "clock": "2026-01-02T10:00:00Z",
+    "timezone": "UTC",
+    "principal": {
+      "name": "reader"
+    },
+    "configuration": {
+      "account-service": {
+        "name": "account-service",
+        "profiles": [
+          "default"
+        ],
+        "propertySources": [
+          {
+            "name": "config/src/main/resources/shared/account-service.yml",
+            "source": {
+              "security.oauth2.client.clientId": "account-service",
+              "security.oauth2.client.clientSecret": "${ACCOUNT_SERVICE_PASSWORD}",
+              "security.oauth2.client.accessTokenUri": "http://auth-service:5000/uaa/oauth/token",
+              "security.oauth2.client.grant-type": "client_credentials",
+              "security.oauth2.client.scope": "server",
+              "spring.data.mongodb.host": "account-mongodb",
+              "spring.data.mongodb.username": "user",
+              "spring.data.mongodb.password": "${MONGODB_PASSWORD}",
+              "spring.data.mongodb.database": "piggymetrics",
+              "spring.data.mongodb.port": 27017,
+              "server.servlet.context-path": "/accounts",
+              "server.port": 6000,
+              "feign.hystrix.enabled": true
+            }
+          },
+          {
+            "name": "config/src/main/resources/shared/application.yml",
+            "source": {
+              "logging.level.org.springframework.security": "INFO",
+              "hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds": 10000,
+              "eureka.instance.prefer-ip-address": true,
+              "eureka.client.serviceUrl.defaultZone": "http://registry:8761/eureka/",
+              "security.oauth2.resource.user-info-uri": "http://auth-service:5000/uaa/users/current",
+              "spring.rabbitmq.host": "rabbitmq"
+            }
+          },
+          {
+            "name": "account-service/src/main/resources/bootstrap.yml",
+            "source": {
+              "spring.application.name": "account-service",
+              "spring.cloud.config.uri": "http://config:8888",
+              "spring.cloud.config.fail-fast": true,
+              "spring.cloud.config.password": "${CONFIG_SERVICE_PASSWORD}",
+              "spring.cloud.config.username": "user"
+            }
+          }
+        ]
+      },
+      "statistics-service": {
+        "name": "statistics-service",
+        "profiles": [
+          "default"
+        ],
+        "propertySources": [
+          {
+            "name": "config/src/main/resources/shared/statistics-service.yml",
+            "source": {
+              "security.oauth2.client.clientId": "statistics-service",
+              "security.oauth2.client.clientSecret": "${STATISTICS_SERVICE_PASSWORD}",
+              "security.oauth2.client.accessTokenUri": "http://auth-service:5000/uaa/oauth/token",
+              "security.oauth2.client.grant-type": "client_credentials",
+              "security.oauth2.client.scope": "server",
+              "spring.data.mongodb.host": "statistics-mongodb",
+              "spring.data.mongodb.username": "user",
+              "spring.data.mongodb.password": "${MONGODB_PASSWORD}",
+              "spring.data.mongodb.database": "piggymetrics",
+              "spring.data.mongodb.port": 27017,
+              "server.servlet.context-path": "/statistics",
+              "server.port": 7000,
+              "rates.url": "https://api.exchangeratesapi.io"
+            }
+          },
+          {
+            "name": "config/src/main/resources/shared/application.yml",
+            "source": {
+              "logging.level.org.springframework.security": "INFO",
+              "hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds": 10000,
+              "eureka.instance.prefer-ip-address": true,
+              "eureka.client.serviceUrl.defaultZone": "http://registry:8761/eureka/",
+              "security.oauth2.resource.user-info-uri": "http://auth-service:5000/uaa/users/current",
+              "spring.rabbitmq.host": "rabbitmq"
+            }
+          },
+          {
+            "name": "statistics-service/src/main/resources/bootstrap.yml",
+            "source": {
+              "spring.application.name": "statistics-service",
+              "spring.cloud.config.uri": "http://config:8888",
+              "spring.cloud.config.fail-fast": true,
+              "spring.cloud.config.password": "${CONFIG_SERVICE_PASSWORD}",
+              "spring.cloud.config.username": "user"
+            }
+          }
+        ]
+      },
+      "auth-service": {
+        "name": "auth-service",
+        "profiles": [
+          "default"
+        ],
+        "propertySources": [
+          {
+            "name": "config/src/main/resources/shared/auth-service.yml",
+            "source": {
+              "spring.data.mongodb.host": "auth-mongodb",
+              "spring.data.mongodb.username": "user",
+              "spring.data.mongodb.password": "${MONGODB_PASSWORD}",
+              "spring.data.mongodb.database": "piggymetrics",
+              "spring.data.mongodb.port": 27017,
+              "server.servlet.context-path": "/uaa",
+              "server.port": 5000
+            }
+          },
+          {
+            "name": "config/src/main/resources/shared/application.yml",
+            "source": {
+              "logging.level.org.springframework.security": "INFO",
+              "hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds": 10000,
+              "eureka.instance.prefer-ip-address": true,
+              "eureka.client.serviceUrl.defaultZone": "http://registry:8761/eureka/",
+              "security.oauth2.resource.user-info-uri": "http://auth-service:5000/uaa/users/current",
+              "spring.rabbitmq.host": "rabbitmq"
+            }
+          },
+          {
+            "name": "auth-service/src/main/resources/bootstrap.yml",
+            "source": {
+              "spring.application.name": "auth-service",
+              "spring.cloud.config.uri": "http://config:8888",
+              "spring.cloud.config.fail-fast": true,
+              "spring.cloud.config.password": "${CONFIG_SERVICE_PASSWORD}",
+              "spring.cloud.config.username": "user"
+            }
+          }
+        ]
+      },
+      "notification-service": {
+        "name": "notification-service",
+        "profiles": [
+          "default"
+        ],
+        "propertySources": [
+          {
+            "name": "config/src/main/resources/shared/notification-service.yml",
+            "source": {
+              "security.oauth2.client.clientId": "notification-service",
+              "security.oauth2.client.clientSecret": "${NOTIFICATION_SERVICE_PASSWORD}",
+              "security.oauth2.client.accessTokenUri": "http://auth-service:5000/uaa/oauth/token",
+              "security.oauth2.client.grant-type": "client_credentials",
+              "security.oauth2.client.scope": "server",
+              "server.servlet.context-path": "/notifications",
+              "server.port": 8000,
+              "remind.cron": "0 0 0 * * *",
+              "remind.email.text": "Hey, {0}! We''ve missed you here on PiggyMetrics. It''s time to check your budget statistics.\r\n\r\nCheers,\r\nPiggyMetrics team",
+              "remind.email.subject": "PiggyMetrics reminder",
+              "backup.cron": "0 0 12 * * *",
+              "backup.email.text": "Howdy, {0}. Your account backup is ready.\r\n\r\nCheers,\r\nPiggyMetrics team",
+              "backup.email.subject": "PiggyMetrics account backup",
+              "backup.email.attachment": "backup.json",
+              "spring.data.mongodb.host": "notification-mongodb",
+              "spring.data.mongodb.username": "user",
+              "spring.data.mongodb.password": "${MONGODB_PASSWORD}",
+              "spring.data.mongodb.database": "piggymetrics",
+              "spring.data.mongodb.port": 27017,
+              "spring.mail.host": "smtp.gmail.com",
+              "spring.mail.port": 465,
+              "spring.mail.username": "dev-user",
+              "spring.mail.password": "dev-password",
+              "spring.mail.properties.mail.smtp.auth": true,
+              "spring.mail.properties.mail.smtp.socketFactory.port": 465,
+              "spring.mail.properties.mail.smtp.socketFactory.class": "javax.net.ssl.SSLSocketFactory",
+              "spring.mail.properties.mail.smtp.socketFactory.fallback": false,
+              "spring.mail.properties.mail.smtp.ssl.enable": true
+            }
+          },
+          {
+            "name": "config/src/main/resources/shared/application.yml",
+            "source": {
+              "logging.level.org.springframework.security": "INFO",
+              "hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds": 10000,
+              "eureka.instance.prefer-ip-address": true,
+              "eureka.client.serviceUrl.defaultZone": "http://registry:8761/eureka/",
+              "security.oauth2.resource.user-info-uri": "http://auth-service:5000/uaa/users/current",
+              "spring.rabbitmq.host": "rabbitmq"
+            }
+          },
+          {
+            "name": "notification-service/src/main/resources/bootstrap.yml",
+            "source": {
+              "spring.application.name": "notification-service",
+              "spring.cloud.config.uri": "http://config:8888",
+              "spring.cloud.config.fail-fast": true,
+              "spring.cloud.config.password": "${CONFIG_SERVICE_PASSWORD}",
+              "spring.cloud.config.username": "user"
+            }
+          }
+        ]
+      }
+    },
+    "assumptions": {
+      "framework_entry": true,
+      "authorization_passed": true
+    },
+    "external_http": [
+      {
+        "method": "GET",
+        "url": "https://api.exchangeratesapi.io/latest?base=USD",
+        "response": {
+          "status": 200,
+          "body": {
+            "date": "2026-01-02",
+            "base": "USD",
+            "rates": {
+              "EUR": "0.8",
+              "RUB": "60"
+            }
+          }
+        }
+      }
+    ],
+    "tables": {
+      "resource:accounts": [
+        {
+          "name": "reader",
+          "lastSeen": null,
+          "incomes": [],
+          "expenses": [],
+          "saving": {
+            "amount": "100",
+            "currency": "USD",
+            "interest": "0",
+            "deposit": false,
+            "capitalization": false
+          },
+          "note": "Before"
+        }
+      ],
+      "resource:datapoints": [],
+      "resource:users": [],
+      "resource:recipients": []
+    }
+  }
+}

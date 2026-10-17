@@ -1,0 +1,200 @@
+.F.F..F......FF......FFF                                                 [100%]
+=================================== FAILURES ===================================
+_ test_numeric_values_of_distinct_wrapper_classes_do_not_merge[return Arrays.asList(1,1L).stream().collect(Collectors.toSet()).size();] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-630/test_numeric_values_of_distinc1')
+body = 'return Arrays.asList(1,1L).stream().collect(Collectors.toSet()).size();'
+
+    @pytest.mark.parametrize('body',[
+        'java.util.Set<Object> items=new java.util.HashSet<Object>();items.add(1);items.add(1L);return items.size();',
+        'return Arrays.asList(1,1L).stream().collect(Collectors.toSet()).size();',
+    ])
+    def test_numeric_values_of_distinct_wrapper_classes_do_not_merge(tmp_path,body):
+        _,detail,_=probe(tmp_path,body)
+>       assert response(detail)==2
+               ^^^^^^^^^^^^^^^^
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+detail = {'evidence': {'scenario:arbitrary | executes | opaque-method-1': [{'file': 'Endpoint.java', 'line': 7, 'reason': 'sour...False, 'may': [{'relation': 'executes', 'source': 'scenario:arbitrary', 'target': 'opaque-method-1'}], 'must': [], ...}
+
+>   def response(detail):return detail['paths'][0]['steps'][0]['response']['body']
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   IndexError: list index out of range
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:21: IndexError
+_ test_boxing_unboxing_and_result_types[Integer left=new Integer(1);Integer right=new Integer(1);return Arrays.asList(left==right,left.equals(right));-expected0] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-630/test_boxing_unboxing_and_resul0')
+body = 'Integer left=new Integer(1);Integer right=new Integer(1);return Arrays.asList(left==right,left.equals(right));'
+expected = [False, True]
+
+    @pytest.mark.parametrize('body,expected',[
+        ('Integer left=new Integer(1);Integer right=new Integer(1);return Arrays.asList(left==right,left.equals(right));',[False,True]),
+        ('Integer left=127;Integer right=127;return left==right;',True),
+        ('Integer left=1000;Integer alias=left;return left==alias;',True),
+        ('Integer left=1;Long right=1L;return left.equals(right);',False),
+        ('Integer left=1;return left==1;',True),
+        ('Long value=2147483647L;return value+1;',2147483648),
+        ('Long value=1L;return value<<32L;',4294967296),
+        ('int value=2;return Arrays.asList(value>1,value==2,!(value<0),value>0&&value<3);',[True,True,True,True]),
+        ('Boolean flag=true;return flag;',True),
+        ('return Boolean.valueOf((String)null);',False),
+        ('return new Boolean((String)null);',False),
+    ])
+    def test_boxing_unboxing_and_result_types(tmp_path,body,expected):
+        _,detail,_=probe(tmp_path,body)
+>       assert response(detail)==expected
+               ^^^^^^^^^^^^^^^^
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+detail = {'evidence': {'scenario:arbitrary | executes | opaque-method-1': [{'file': 'Endpoint.java', 'line': 7, 'reason': 'sour...False, 'may': [{'relation': 'executes', 'source': 'scenario:arbitrary', 'target': 'opaque-method-1'}], 'must': [], ...}
+
+>   def response(detail):return detail['paths'][0]['steps'][0]['response']['body']
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   IndexError: list index out of range
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:21: IndexError
+_ test_boxing_unboxing_and_result_types[Integer left=1;Long right=1L;return left.equals(right);-False] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-630/test_boxing_unboxing_and_resul3')
+body = 'Integer left=1;Long right=1L;return left.equals(right);'
+expected = False
+
+    @pytest.mark.parametrize('body,expected',[
+        ('Integer left=new Integer(1);Integer right=new Integer(1);return Arrays.asList(left==right,left.equals(right));',[False,True]),
+        ('Integer left=127;Integer right=127;return left==right;',True),
+        ('Integer left=1000;Integer alias=left;return left==alias;',True),
+        ('Integer left=1;Long right=1L;return left.equals(right);',False),
+        ('Integer left=1;return left==1;',True),
+        ('Long value=2147483647L;return value+1;',2147483648),
+        ('Long value=1L;return value<<32L;',4294967296),
+        ('int value=2;return Arrays.asList(value>1,value==2,!(value<0),value>0&&value<3);',[True,True,True,True]),
+        ('Boolean flag=true;return flag;',True),
+        ('return Boolean.valueOf((String)null);',False),
+        ('return new Boolean((String)null);',False),
+    ])
+    def test_boxing_unboxing_and_result_types(tmp_path,body,expected):
+        _,detail,_=probe(tmp_path,body)
+>       assert response(detail)==expected
+               ^^^^^^^^^^^^^^^^
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+detail = {'evidence': {'scenario:arbitrary | executes | opaque-method-1': [{'file': 'Endpoint.java', 'line': 7, 'reason': 'sour...False, 'may': [{'relation': 'executes', 'source': 'scenario:arbitrary', 'target': 'opaque-method-1'}], 'must': [], ...}
+
+>   def response(detail):return detail['paths'][0]['steps'][0]['response']['body']
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   IndexError: list index out of range
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:21: IndexError
+_ test_boxing_unboxing_and_result_types[return new Boolean((String)null);-False] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-630/test_boxing_unboxing_and_resul10')
+body = 'return new Boolean((String)null);', expected = False
+
+    @pytest.mark.parametrize('body,expected',[
+        ('Integer left=new Integer(1);Integer right=new Integer(1);return Arrays.asList(left==right,left.equals(right));',[False,True]),
+        ('Integer left=127;Integer right=127;return left==right;',True),
+        ('Integer left=1000;Integer alias=left;return left==alias;',True),
+        ('Integer left=1;Long right=1L;return left.equals(right);',False),
+        ('Integer left=1;return left==1;',True),
+        ('Long value=2147483647L;return value+1;',2147483648),
+        ('Long value=1L;return value<<32L;',4294967296),
+        ('int value=2;return Arrays.asList(value>1,value==2,!(value<0),value>0&&value<3);',[True,True,True,True]),
+        ('Boolean flag=true;return flag;',True),
+        ('return Boolean.valueOf((String)null);',False),
+        ('return new Boolean((String)null);',False),
+    ])
+    def test_boxing_unboxing_and_result_types(tmp_path,body,expected):
+        _,detail,_=probe(tmp_path,body)
+>       assert response(detail)==expected
+E       AssertionError: assert {'kind': 'Unknown', 'origin': '', 'reason': 'unhandled server exception', 'typ': ''} == False
+E        +  where {'kind': 'Unknown', 'origin': '', 'reason': 'unhandled server exception', 'typ': ''} = response({'evidence': {'scenario:arbitrary | executes | opaque-method-1': [{'file': 'Endpoint.java', 'line': 7, 'reason': 'sour...aque-method-1'}], 'must': [{'relation': 'executes', 'source': 'scenario:arbitrary', 'target': 'opaque-method-1'}], ...})
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py:37: AssertionError
+________________ test_extended_cache_identity_remains_undecided ________________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-630/test_extended_cache_identity_r0')
+
+    def test_extended_cache_identity_remains_undecided(tmp_path):
+        _,detail,_=probe(tmp_path,'Integer left=1000;Integer right=1000;return left==right;')
+>       assert {step['response']['body'] for path in detail['paths'] for step in path['steps']}=={False,True}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x10428fc10>
+
+>   assert {step['response']['body'] for path in detail['paths'] for step in path['steps']}=={False,True}
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: unhashable type: 'dict'
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py:42: TypeError
+_ test_scalar_library_boundaries_keep_wrapper_semantics[Integer value=1;return Arrays.asList(value instanceof Number,value instanceof Object,value.getClass()==Integer.class);-expected1] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-630/test_scalar_library_boundaries1')
+body = 'Integer value=1;return Arrays.asList(value instanceof Number,value instanceof Object,value.getClass()==Integer.class);'
+expected = [True, True, True]
+
+    @pytest.mark.parametrize('body,expected',[
+        ('return Long.parseLong("9223372036854775807");',9223372036854775807),
+        ('Integer value=1;return Arrays.asList(value instanceof Number,value instanceof Object,value.getClass()==Integer.class);',[True,True,True]),
+        ('Integer value=1;return String.valueOf(value);','1'),
+    ])
+    def test_scalar_library_boundaries_keep_wrapper_semantics(tmp_path,body,expected):
+        _,detail,_=probe(tmp_path,body)
+>       assert response(detail)==expected
+E       AssertionError: assert [False, False...ng.Integer'}}] == [True, True, True]
+E         
+E         At index 0 diff: False != True
+E         Use -v to get more diff
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py:69: AssertionError
+_ test_scalar_library_boundaries_keep_wrapper_semantics[Integer value=1;return String.valueOf(value);-1] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-630/test_scalar_library_boundaries2')
+body = 'Integer value=1;return String.valueOf(value);', expected = '1'
+
+    @pytest.mark.parametrize('body,expected',[
+        ('return Long.parseLong("9223372036854775807");',9223372036854775807),
+        ('Integer value=1;return Arrays.asList(value instanceof Number,value instanceof Object,value.getClass()==Integer.class);',[True,True,True]),
+        ('Integer value=1;return String.valueOf(value);','1'),
+    ])
+    def test_scalar_library_boundaries_keep_wrapper_semantics(tmp_path,body,expected):
+        _,detail,_=probe(tmp_path,body)
+>       assert response(detail)==expected
+E       AssertionError: assert 'Object(ident...rovided=None)' == '1'
+E         
+E         - 1
+E         + Object(identity='o2', typ='java.lang.Integer', fields={'value': 1, 'fresh': False, 'cache_guaranteed': True}, provided=None)
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py:69: AssertionError
+____________ test_source_type_named_number_is_not_java_lang_number _____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-630/test_source_type_named_number_0')
+
+    def test_source_type_named_number_is_not_java_lang_number(tmp_path):
+        _,detail,_=probe(tmp_path,'Object value=Integer.valueOf(1);return Arrays.asList(value instanceof Number,value instanceof java.lang.Number);',classes='class Number {}')
+>       assert response(detail)==[False,True]
+E       assert [False, False] == [False, True]
+E         
+E         At index 1 diff: False != True
+E         Use -v to get more diff
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py:74: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py::test_numeric_values_of_distinct_wrapper_classes_do_not_merge[return Arrays.asList(1,1L).stream().collect(Collectors.toSet()).size();]
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py::test_boxing_unboxing_and_result_types[Integer left=new Integer(1);Integer right=new Integer(1);return Arrays.asList(left==right,left.equals(right));-expected0]
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py::test_boxing_unboxing_and_result_types[Integer left=1;Long right=1L;return left.equals(right);-False]
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py::test_boxing_unboxing_and_result_types[return new Boolean((String)null);-False]
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py::test_extended_cache_identity_remains_undecided
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py::test_scalar_library_boundaries_keep_wrapper_semantics[Integer value=1;return Arrays.asList(value instanceof Number,value instanceof Object,value.getClass()==Integer.class);-expected1]
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py::test_scalar_library_boundaries_keep_wrapper_semantics[Integer value=1;return String.valueOf(value);-1]
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py::test_source_type_named_number_is_not_java_lang_number
+8 failed, 16 passed in 0.59s

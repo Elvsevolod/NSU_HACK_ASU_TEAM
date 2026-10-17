@@ -1,0 +1,146 @@
+{
+  "project": "public-python",
+  "id": "login-create-update-read-delete-missing",
+  "steps": [
+    {
+      "action": "Explicit public source HTTP contract",
+      "request": {
+        "method": "POST",
+        "path": "/api/v1/login/access-token",
+        "form": {
+          "username": "reader@example.com",
+          "password": "fixture-password-39"
+        }
+      }
+    },
+    {
+      "action": "Explicit public source HTTP contract",
+      "request": {
+        "method": "POST",
+        "path": "/api/v1/login/test-token",
+        "headers": {
+          "Authorization": {
+            "$concat": [
+              "Bearer ",
+              {
+                "$ref": "steps.1.body.access_token"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "action": "Explicit public source HTTP contract",
+      "request": {
+        "method": "POST",
+        "path": "/api/v1/items/",
+        "headers": {
+          "Authorization": {
+            "$concat": [
+              "Bearer ",
+              {
+                "$ref": "steps.1.body.access_token"
+              }
+            ]
+          }
+        },
+        "body": {
+          "title": "Before",
+          "description": "keep"
+        }
+      }
+    },
+    {
+      "action": "Explicit public source HTTP contract",
+      "request": {
+        "method": "PUT",
+        "path": "/api/v1/items/{id}",
+        "path_params": {
+          "id": {
+            "$ref": "steps.3.body.id"
+          }
+        },
+        "headers": {
+          "Authorization": {
+            "$concat": [
+              "Bearer ",
+              {
+                "$ref": "steps.1.body.access_token"
+              }
+            ]
+          }
+        },
+        "body": {
+          "title": "Changed"
+        }
+      }
+    },
+    {
+      "action": "Explicit public source HTTP contract",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/items/{id}",
+        "path_params": {
+          "id": {
+            "$ref": "steps.3.body.id"
+          }
+        },
+        "headers": {
+          "Authorization": {
+            "$concat": [
+              "Bearer ",
+              {
+                "$ref": "steps.1.body.access_token"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "action": "Explicit public source HTTP contract",
+      "request": {
+        "method": "DELETE",
+        "path": "/api/v1/items/{id}",
+        "path_params": {
+          "id": {
+            "$ref": "steps.3.body.id"
+          }
+        },
+        "headers": {
+          "Authorization": {
+            "$concat": [
+              "Bearer ",
+              {
+                "$ref": "steps.1.body.access_token"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "action": "Explicit public source HTTP contract",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/items/{id}",
+        "path_params": {
+          "id": {
+            "$ref": "steps.3.body.id"
+          }
+        },
+        "headers": {
+          "Authorization": {
+            "$concat": [
+              "Bearer ",
+              {
+                "$ref": "steps.1.body.access_token"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

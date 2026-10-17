@@ -1,0 +1,239 @@
+FFFFFF.FFFFFFFFFF                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_view_size_tracks_later_map_updates[keySet] ________________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-559/test_view_size_tracks_later_ma0')
+view = 'keySet'
+
+    @pytest.mark.parametrize('view',['keySet','values','entrySet'])
+    def test_view_size_tracks_later_map_updates(tmp_path,view):
+        result,_=run(tmp_path,'Map map=new HashMap();Collection view=map.'+view+'();map.put("key","value");return view.size();')
+>       assert result==1
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 1
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:16: AssertionError
+_______________ test_view_size_tracks_later_map_updates[values] ________________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-559/test_view_size_tracks_later_ma1')
+view = 'values'
+
+    @pytest.mark.parametrize('view',['keySet','values','entrySet'])
+    def test_view_size_tracks_later_map_updates(tmp_path,view):
+        result,_=run(tmp_path,'Map map=new HashMap();Collection view=map.'+view+'();map.put("key","value");return view.size();')
+>       assert result==1
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 1
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:16: AssertionError
+______________ test_view_size_tracks_later_map_updates[entrySet] _______________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-559/test_view_size_tracks_later_ma2')
+view = 'entrySet'
+
+    @pytest.mark.parametrize('view',['keySet','values','entrySet'])
+    def test_view_size_tracks_later_map_updates(tmp_path,view):
+        result,_=run(tmp_path,'Map map=new HashMap();Collection view=map.'+view+'();map.put("key","value");return view.size();')
+>       assert result==1
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 1
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:16: AssertionError
+____________ test_clear_through_view_clears_the_backing_map[keySet] ____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-559/test_clear_through_view_clears0')
+view = 'keySet'
+
+    @pytest.mark.parametrize('view',['keySet','values','entrySet'])
+    def test_clear_through_view_clears_the_backing_map(tmp_path,view):
+        result,_=run(tmp_path,'Map map=new HashMap();map.put("key","value");map.'+view+'().clear();return map.isEmpty();')
+>       assert result is True
+E       assert False is True
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:22: AssertionError
+____________ test_clear_through_view_clears_the_backing_map[values] ____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-559/test_clear_through_view_clears1')
+view = 'values'
+
+    @pytest.mark.parametrize('view',['keySet','values','entrySet'])
+    def test_clear_through_view_clears_the_backing_map(tmp_path,view):
+        result,_=run(tmp_path,'Map map=new HashMap();map.put("key","value");map.'+view+'().clear();return map.isEmpty();')
+>       assert result is True
+E       assert False is True
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:22: AssertionError
+___________ test_clear_through_view_clears_the_backing_map[entrySet] ___________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-559/test_clear_through_view_clears2')
+view = 'entrySet'
+
+    @pytest.mark.parametrize('view',['keySet','values','entrySet'])
+    def test_clear_through_view_clears_the_backing_map(tmp_path,view):
+        result,_=run(tmp_path,'Map map=new HashMap();map.put("key","value");map.'+view+'().clear();return map.isEmpty();')
+>       assert result is True
+E       assert False is True
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:22: AssertionError
+____________ test_view_add_fails_without_modifying_the_map[keySet] _____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-559/test_view_add_fails_without_mo0')
+view = 'keySet'
+
+    @pytest.mark.parametrize('view',['keySet','values','entrySet'])
+    def test_view_add_fails_without_modifying_the_map(tmp_path,view):
+        result,_=run(tmp_path,'Map map=new HashMap();try{map.'+view+'().add("bad");return "wrong";}catch(UnsupportedOperationException failure){return map.isEmpty();}')
+>       assert result is True
+E       AssertionError: assert 'wrong' is True
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:33: AssertionError
+____________ test_view_add_fails_without_modifying_the_map[values] _____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-559/test_view_add_fails_without_mo1')
+view = 'values'
+
+    @pytest.mark.parametrize('view',['keySet','values','entrySet'])
+    def test_view_add_fails_without_modifying_the_map(tmp_path,view):
+        result,_=run(tmp_path,'Map map=new HashMap();try{map.'+view+'().add("bad");return "wrong";}catch(UnsupportedOperationException failure){return map.isEmpty();}')
+>       assert result is True
+E       AssertionError: assert 'wrong' is True
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:33: AssertionError
+___________ test_view_add_fails_without_modifying_the_map[entrySet] ____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-559/test_view_add_fails_without_mo2')
+view = 'entrySet'
+
+    @pytest.mark.parametrize('view',['keySet','values','entrySet'])
+    def test_view_add_fails_without_modifying_the_map(tmp_path,view):
+        result,_=run(tmp_path,'Map map=new HashMap();try{map.'+view+'().add("bad");return "wrong";}catch(UnsupportedOperationException failure){return map.isEmpty();}')
+>       assert result is True
+E       AssertionError: assert 'wrong' is True
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:33: AssertionError
+__________ test_entry_obtained_from_view_updates_the_backing_mapping ___________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-559/test_entry_obtained_from_view_0')
+
+    def test_entry_obtained_from_view_updates_the_backing_mapping(tmp_path):
+        result,_=run(tmp_path,'Map map=new HashMap();map.put("key","old");Map.Entry entry=(Map.Entry)map.entrySet().iterator().next();entry.setValue("new");return map.get("key");')
+>       assert result=='new'
+E       AssertionError: assert 'old' == 'new'
+E         
+E         - new
+E         + old
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:38: AssertionError
+____________ test_iterator_remove_is_reflected_in_an_existing_view _____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-559/test_iterator_remove_is_reflec0')
+
+    def test_iterator_remove_is_reflected_in_an_existing_view(tmp_path):
+        result,_=run(tmp_path,'Map map=new HashMap();map.put("key","value");Set keys=map.keySet();Iterator iterator=keys.iterator();iterator.next();iterator.remove();return keys.isEmpty();')
+>       assert result is True
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> is True
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:43: AssertionError
+_______________ test_iterating_one_entry_preserves_key_and_value _______________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-559/test_iterating_one_entry_prese0')
+
+    def test_iterating_one_entry_preserves_key_and_value(tmp_path):
+        result,_=run(tmp_path,'Map<String,String> map=new HashMap();map.put("key","value");for(Map.Entry<String,String> entry:map.entrySet()){return entry.getKey()+entry.getValue();}return "missing";')
+>       assert result=='keyvalue'
+E       AssertionError: assert 'missing' == 'keyvalue'
+E         
+E         - keyvalue
+E         + missing
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:48: AssertionError
+__________ test_values_contains_does_not_confuse_character_and_string __________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-559/test_values_contains_does_not_0')
+
+    def test_values_contains_does_not_confuse_character_and_string(tmp_path):
+        result,_=run(tmp_path,'Map map=new HashMap();map.put("key",\'x\');return map.values().contains("x");')
+>       assert result is False
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> is False
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:53: AssertionError
+____________ test_values_contains_does_not_confuse_integer_and_long ____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-559/test_values_contains_does_not_1')
+
+    def test_values_contains_does_not_confuse_integer_and_long(tmp_path):
+        result,_=run(tmp_path,'Map map=new HashMap();map.put("key",1L);return map.values().contains(1);')
+>       assert result is False
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> is False
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:58: AssertionError
+___ test_existing_map_equality_does_not_confuse_character_and_string_values ____
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-559/test_existing_map_equality_doe0')
+
+    def test_existing_map_equality_does_not_confuse_character_and_string_values(tmp_path):
+        result,_=run(tmp_path,'Map left=new HashMap();Map right=new HashMap();left.put("key",\'x\');right.put("key","x");return left.equals(right);')
+>       assert result is False
+E       assert True is False
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:63: AssertionError
+_____________ test_unknown_branch_join_preserves_a_known_map_alias _____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-559/test_unknown_branch_join_prese0')
+
+    def test_unknown_branch_join_preserves_a_known_map_alias(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{Object entry(boolean flag){
+          Map map=new HashMap();Map alias=map;if(flag){map.put("key","same");}else{map.put("key","same");}
+          alias.put("later","visible");return map.get("later");}}'''})
+>       engine=Engine(project,ScenarioState(db));assert engine.run(ids['Api.entry'],{'flag':U})=='visible'
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_backed-collection-views/code/analyzer/engine.py:155: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:208: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+solutions/—_backed-collection-views/code/analyzer/engine.py:244: in continue_filter
+    frame['result']=self.invoke(frame['entry'],frame['args'],reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:382: in invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:466: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:488: in execute
+    decision = self.choose(self.method + ':' + str(node.start_point.row + 1), [True, False])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x10415da90>
+label = 'method:service:Api#entry(boolean):2', choices = [True, False]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:method:service:Api#entry(boolean):2', [True, False])
+
+solutions/—_backed-collection-views/code/analyzer/engine.py:130: AlternativeRequired
+=========================== short test summary info ============================
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_view_size_tracks_later_map_updates[keySet]
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_view_size_tracks_later_map_updates[values]
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_view_size_tracks_later_map_updates[entrySet]
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_clear_through_view_clears_the_backing_map[keySet]
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_clear_through_view_clears_the_backing_map[values]
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_clear_through_view_clears_the_backing_map[entrySet]
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_view_add_fails_without_modifying_the_map[keySet]
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_view_add_fails_without_modifying_the_map[values]
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_view_add_fails_without_modifying_the_map[entrySet]
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_entry_obtained_from_view_updates_the_backing_mapping
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_iterator_remove_is_reflected_in_an_existing_view
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_iterating_one_entry_preserves_key_and_value
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_values_contains_does_not_confuse_character_and_string
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_values_contains_does_not_confuse_integer_and_long
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_existing_map_equality_does_not_confuse_character_and_string_values
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_unknown_branch_join_preserves_a_known_map_alias
+16 failed, 1 passed in 0.16s

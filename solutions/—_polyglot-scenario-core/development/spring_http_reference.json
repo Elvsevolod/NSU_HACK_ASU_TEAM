@@ -1,0 +1,378 @@
+{
+  "author": "Codex, manual source-derived targets fixed before the first Spring HTTP prediction; not independently authored",
+  "project": "sqshq/piggymetrics",
+  "commit": "6bb2cf9ddbca980b664d3edbb6ff775d75369278",
+  "scope": "Conditional source handler/callsite graph after verified framework entry. Known principal and successful method authorization are explicit preconditions in this component corpus. Framework authentication, Jackson accessors and persistence converters remain separate unverified obligations; this corpus cannot establish complete Spring HTTP/runtime support.",
+  "input_configuration": "Ordered resolved Spring Environment propertySources prepared from the public supplied configuration after bootstrap. The analyzer must not infer business routes from the oracle. Config Server and target applications are never started.",
+  "cases": [
+    {
+      "id": "configured-current-read",
+      "kind": "read",
+      "methods": [
+        "com.piggymetrics.account.controller.AccountController.getCurrentAccount",
+        "com.piggymetrics.account.service.AccountServiceImpl.findByName"
+      ],
+      "calls": [
+        [
+          "com.piggymetrics.account.controller.AccountController.getCurrentAccount",
+          "com.piggymetrics.account.service.AccountServiceImpl.findByName"
+        ]
+      ],
+      "data": [
+        [
+          "com.piggymetrics.account.service.AccountServiceImpl.findByName",
+          "accounts"
+        ]
+      ],
+      "statuses": [
+        200
+      ],
+      "expected_note": "Before"
+    },
+    {
+      "id": "configured-missing-record",
+      "kind": "missing-record",
+      "methods": [
+        "com.piggymetrics.account.controller.AccountController.getAccountByName",
+        "com.piggymetrics.account.service.AccountServiceImpl.findByName"
+      ],
+      "calls": [
+        [
+          "com.piggymetrics.account.controller.AccountController.getAccountByName",
+          "com.piggymetrics.account.service.AccountServiceImpl.findByName"
+        ]
+      ],
+      "data": [
+        [
+          "com.piggymetrics.account.service.AccountServiceImpl.findByName",
+          "accounts"
+        ]
+      ],
+      "statuses": [
+        200
+      ],
+      "expected_null": true
+    },
+    {
+      "id": "wrong-servlet-prefix",
+      "kind": "wrong-prefix",
+      "methods": [],
+      "calls": [],
+      "data": [],
+      "statuses": [
+        404
+      ]
+    },
+    {
+      "id": "unsupported-method",
+      "kind": "wrong-method",
+      "methods": [],
+      "calls": [],
+      "data": [],
+      "statuses": [
+        405
+      ]
+    },
+    {
+      "id": "save-missing-record",
+      "kind": "save-missing",
+      "methods": [
+        "com.piggymetrics.account.controller.AccountController.saveCurrentAccount",
+        "com.piggymetrics.account.service.AccountServiceImpl.saveChanges",
+        "com.piggymetrics.account.controller.ErrorHandler.processValidationError"
+      ],
+      "calls": [
+        [
+          "com.piggymetrics.account.controller.AccountController.saveCurrentAccount",
+          "com.piggymetrics.account.service.AccountServiceImpl.saveChanges"
+        ]
+      ],
+      "data": [
+        [
+          "com.piggymetrics.account.service.AccountServiceImpl.saveChanges",
+          "accounts"
+        ]
+      ],
+      "statuses": [
+        400
+      ]
+    },
+    {
+      "id": "invalid-body-before-handler",
+      "kind": "invalid-body",
+      "methods": [],
+      "calls": [],
+      "data": [],
+      "statuses": [
+        400
+      ]
+    },
+    {
+      "id": "stateful-account-statistics-chain",
+      "kind": "update-chain",
+      "methods": [
+        "com.piggymetrics.account.controller.AccountController.getCurrentAccount",
+        "com.piggymetrics.account.controller.AccountController.saveCurrentAccount",
+        "com.piggymetrics.account.service.AccountServiceImpl.findByName",
+        "com.piggymetrics.account.service.AccountServiceImpl.saveChanges",
+        "com.piggymetrics.account.domain.Account.getIncomes",
+        "com.piggymetrics.account.domain.Account.getExpenses",
+        "com.piggymetrics.account.domain.Account.getSaving",
+        "com.piggymetrics.account.domain.Account.getNote",
+        "com.piggymetrics.account.domain.Account.setIncomes",
+        "com.piggymetrics.account.domain.Account.setExpenses",
+        "com.piggymetrics.account.domain.Account.setSaving",
+        "com.piggymetrics.account.domain.Account.setNote",
+        "com.piggymetrics.account.domain.Account.setLastSeen",
+        "com.piggymetrics.statistics.controller.StatisticsController.saveAccountStatistics",
+        "com.piggymetrics.statistics.controller.StatisticsController.getCurrentAccountStatistics",
+        "com.piggymetrics.statistics.service.StatisticsServiceImpl.save",
+        "com.piggymetrics.statistics.service.StatisticsServiceImpl.createItemMetric",
+        "com.piggymetrics.statistics.service.StatisticsServiceImpl.createStatisticMetrics",
+        "com.piggymetrics.statistics.service.StatisticsServiceImpl.findByAccountName",
+        "com.piggymetrics.statistics.domain.Account.getIncomes",
+        "com.piggymetrics.statistics.domain.Account.getExpenses",
+        "com.piggymetrics.statistics.domain.Account.getSaving",
+        "com.piggymetrics.statistics.domain.Item.getCurrency",
+        "com.piggymetrics.statistics.domain.Item.getAmount",
+        "com.piggymetrics.statistics.domain.Item.getPeriod",
+        "com.piggymetrics.statistics.domain.Item.getTitle",
+        "com.piggymetrics.statistics.domain.Saving.getCurrency",
+        "com.piggymetrics.statistics.domain.Saving.getAmount",
+        "com.piggymetrics.statistics.domain.Currency.getBase",
+        "com.piggymetrics.statistics.domain.TimePeriod.getBaseRatio",
+        "com.piggymetrics.statistics.domain.timeseries.DataPointId.<init>",
+        "com.piggymetrics.statistics.domain.timeseries.ItemMetric.<init>",
+        "com.piggymetrics.statistics.domain.timeseries.ItemMetric.hashCode",
+        "com.piggymetrics.statistics.domain.timeseries.ItemMetric.getAmount",
+        "com.piggymetrics.statistics.domain.timeseries.DataPoint.setId",
+        "com.piggymetrics.statistics.domain.timeseries.DataPoint.setIncomes",
+        "com.piggymetrics.statistics.domain.timeseries.DataPoint.setExpenses",
+        "com.piggymetrics.statistics.domain.timeseries.DataPoint.setStatistics",
+        "com.piggymetrics.statistics.domain.timeseries.DataPoint.setRates",
+        "com.piggymetrics.statistics.service.ExchangeRatesServiceImpl.convert",
+        "com.piggymetrics.statistics.service.ExchangeRatesServiceImpl.getCurrentRates",
+        "com.piggymetrics.statistics.domain.ExchangeRatesContainer.getDate",
+        "com.piggymetrics.statistics.domain.ExchangeRatesContainer.getRates"
+      ],
+      "calls": [
+        [
+          "com.piggymetrics.account.controller.AccountController.getCurrentAccount",
+          "com.piggymetrics.account.service.AccountServiceImpl.findByName"
+        ],
+        [
+          "com.piggymetrics.account.controller.AccountController.saveCurrentAccount",
+          "com.piggymetrics.account.service.AccountServiceImpl.saveChanges"
+        ],
+        [
+          "com.piggymetrics.account.service.AccountServiceImpl.saveChanges",
+          "com.piggymetrics.account.domain.Account.getIncomes"
+        ],
+        [
+          "com.piggymetrics.account.service.AccountServiceImpl.saveChanges",
+          "com.piggymetrics.account.domain.Account.getExpenses"
+        ],
+        [
+          "com.piggymetrics.account.service.AccountServiceImpl.saveChanges",
+          "com.piggymetrics.account.domain.Account.getSaving"
+        ],
+        [
+          "com.piggymetrics.account.service.AccountServiceImpl.saveChanges",
+          "com.piggymetrics.account.domain.Account.getNote"
+        ],
+        [
+          "com.piggymetrics.account.service.AccountServiceImpl.saveChanges",
+          "com.piggymetrics.account.domain.Account.setIncomes"
+        ],
+        [
+          "com.piggymetrics.account.service.AccountServiceImpl.saveChanges",
+          "com.piggymetrics.account.domain.Account.setExpenses"
+        ],
+        [
+          "com.piggymetrics.account.service.AccountServiceImpl.saveChanges",
+          "com.piggymetrics.account.domain.Account.setSaving"
+        ],
+        [
+          "com.piggymetrics.account.service.AccountServiceImpl.saveChanges",
+          "com.piggymetrics.account.domain.Account.setNote"
+        ],
+        [
+          "com.piggymetrics.account.service.AccountServiceImpl.saveChanges",
+          "com.piggymetrics.account.domain.Account.setLastSeen"
+        ],
+        [
+          "com.piggymetrics.statistics.controller.StatisticsController.saveAccountStatistics",
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.save"
+        ],
+        [
+          "com.piggymetrics.statistics.controller.StatisticsController.getCurrentAccountStatistics",
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.findByAccountName"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.save",
+          "com.piggymetrics.statistics.domain.timeseries.DataPointId.<init>"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.save",
+          "com.piggymetrics.statistics.domain.Account.getIncomes"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.save",
+          "com.piggymetrics.statistics.domain.Account.getExpenses"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.save",
+          "com.piggymetrics.statistics.domain.Account.getSaving"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.save",
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.createItemMetric"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.save",
+          "com.piggymetrics.statistics.domain.timeseries.ItemMetric.hashCode"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.save",
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.createStatisticMetrics"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.save",
+          "com.piggymetrics.statistics.domain.timeseries.DataPoint.setId"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.save",
+          "com.piggymetrics.statistics.domain.timeseries.DataPoint.setIncomes"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.save",
+          "com.piggymetrics.statistics.domain.timeseries.DataPoint.setExpenses"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.save",
+          "com.piggymetrics.statistics.domain.timeseries.DataPoint.setStatistics"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.save",
+          "com.piggymetrics.statistics.domain.timeseries.DataPoint.setRates"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.save",
+          "com.piggymetrics.statistics.service.ExchangeRatesServiceImpl.getCurrentRates"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.createItemMetric",
+          "com.piggymetrics.statistics.domain.Item.getCurrency"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.createItemMetric",
+          "com.piggymetrics.statistics.domain.Item.getAmount"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.createItemMetric",
+          "com.piggymetrics.statistics.domain.Item.getPeriod"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.createItemMetric",
+          "com.piggymetrics.statistics.domain.Item.getTitle"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.createItemMetric",
+          "com.piggymetrics.statistics.domain.Currency.getBase"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.createItemMetric",
+          "com.piggymetrics.statistics.domain.TimePeriod.getBaseRatio"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.createItemMetric",
+          "com.piggymetrics.statistics.service.ExchangeRatesServiceImpl.convert"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.createItemMetric",
+          "com.piggymetrics.statistics.domain.timeseries.ItemMetric.<init>"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.createStatisticMetrics",
+          "com.piggymetrics.statistics.domain.Saving.getCurrency"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.createStatisticMetrics",
+          "com.piggymetrics.statistics.domain.Saving.getAmount"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.createStatisticMetrics",
+          "com.piggymetrics.statistics.domain.Currency.getBase"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.createStatisticMetrics",
+          "com.piggymetrics.statistics.service.ExchangeRatesServiceImpl.convert"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.createStatisticMetrics",
+          "com.piggymetrics.statistics.domain.timeseries.ItemMetric.getAmount"
+        ],
+        [
+          "com.piggymetrics.statistics.service.ExchangeRatesServiceImpl.convert",
+          "com.piggymetrics.statistics.service.ExchangeRatesServiceImpl.getCurrentRates"
+        ],
+        [
+          "com.piggymetrics.statistics.service.ExchangeRatesServiceImpl.getCurrentRates",
+          "com.piggymetrics.statistics.domain.ExchangeRatesContainer.getDate"
+        ],
+        [
+          "com.piggymetrics.statistics.service.ExchangeRatesServiceImpl.getCurrentRates",
+          "com.piggymetrics.statistics.domain.ExchangeRatesContainer.getRates"
+        ],
+        [
+          "com.piggymetrics.statistics.service.ExchangeRatesServiceImpl.getCurrentRates",
+          "com.piggymetrics.statistics.domain.Currency.getBase"
+        ]
+      ],
+      "remote": [
+        [
+          "com.piggymetrics.account.service.AccountServiceImpl.saveChanges",
+          "com.piggymetrics.statistics.controller.StatisticsController.saveAccountStatistics"
+        ]
+      ],
+      "data": [
+        [
+          "com.piggymetrics.account.service.AccountServiceImpl.findByName",
+          "accounts"
+        ],
+        [
+          "com.piggymetrics.account.service.AccountServiceImpl.saveChanges",
+          "accounts"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.save",
+          "datapoints"
+        ],
+        [
+          "com.piggymetrics.statistics.service.StatisticsServiceImpl.findByAccountName",
+          "datapoints"
+        ]
+      ],
+      "statuses": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "expected_note": "Changed",
+      "expected_statistics": {
+        "INCOMES_AMOUNT": "20.0000",
+        "EXPENSES_AMOUNT": "10.0000",
+        "SAVING_AMOUNT": "100.0000"
+      }
+    }
+  ],
+  "oracle_revisions": [
+    {
+      "previous_sha256": "e82ff8375845b94d02d099cfa447de4e4fffd3576f78ced3f3f510cf655acbd6",
+      "reason": "Source review found account controller ErrorHandler: @ExceptionHandler(IllegalArgumentException.class), @ResponseStatus(BAD_REQUEST). The target is corrected to 400 and requires the source advice method, making the previous analyzer result fail.",
+      "source": "account-service/src/main/java/com/piggymetrics/account/controller/ErrorHandler.java:17-21"
+    }
+  ],
+  "input_review": "The valid update body includes icon on both items, as required by account.domain.Item @NotNull. It is not weakened into an empty-list case; both Java stream callbacks and currency conversion remain mandatory targets."
+}

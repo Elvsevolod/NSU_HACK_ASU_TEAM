@@ -1,0 +1,85 @@
+{
+  "project": "public-python",
+  "scenarios": {
+    "foreign-owner": {
+      "method": "polyglot-ir-may",
+      "edges": [
+        {
+          "source": "method:backend:app/api/deps.py#get_current_user:30",
+          "relation": "data",
+          "target": "resource:user"
+        },
+        {
+          "source": "method:backend:app/api/routes/items.py#read_item:49",
+          "relation": "data",
+          "target": "resource:item"
+        },
+        {
+          "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+          "relation": "calls",
+          "target": "method:backend:app/core/security.py#create_access_token:22"
+        },
+        {
+          "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+          "relation": "calls",
+          "target": "method:backend:app/crud.py#authenticate:45"
+        },
+        {
+          "source": "method:backend:app/crud.py#authenticate:45",
+          "relation": "calls",
+          "target": "method:backend:app/core/security.py#verify_password:29"
+        },
+        {
+          "source": "method:backend:app/crud.py#authenticate:45",
+          "relation": "calls",
+          "target": "method:backend:app/crud.py#get_user_by_email:34"
+        },
+        {
+          "source": "method:backend:app/crud.py#get_user_by_email:34",
+          "relation": "data",
+          "target": "resource:user"
+        },
+        {
+          "source": "scenario:foreign-owner",
+          "relation": "executes",
+          "target": "method:backend:app/api/deps.py#get_current_user:30"
+        },
+        {
+          "source": "scenario:foreign-owner",
+          "relation": "executes",
+          "target": "method:backend:app/api/deps.py#get_db:21"
+        },
+        {
+          "source": "scenario:foreign-owner",
+          "relation": "executes",
+          "target": "method:backend:app/api/routes/items.py#read_item:49"
+        },
+        {
+          "source": "scenario:foreign-owner",
+          "relation": "executes",
+          "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+        },
+        {
+          "source": "scenario:foreign-owner",
+          "relation": "executes",
+          "target": "method:backend:app/core/security.py#create_access_token:22"
+        },
+        {
+          "source": "scenario:foreign-owner",
+          "relation": "executes",
+          "target": "method:backend:app/core/security.py#verify_password:29"
+        },
+        {
+          "source": "scenario:foreign-owner",
+          "relation": "executes",
+          "target": "method:backend:app/crud.py#authenticate:45"
+        },
+        {
+          "source": "scenario:foreign-owner",
+          "relation": "executes",
+          "target": "method:backend:app/crud.py#get_user_by_email:34"
+        }
+      ]
+    }
+  }
+}

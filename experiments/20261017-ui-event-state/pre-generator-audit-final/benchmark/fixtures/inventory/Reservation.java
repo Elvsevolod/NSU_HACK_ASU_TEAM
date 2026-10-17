@@ -1,0 +1,1 @@
+import jakarta.persistence.*; @Entity @Table(name="reservations") class Reservation { @Id String key; protected Reservation() {} Reservation(String key) { this.key = key; } }

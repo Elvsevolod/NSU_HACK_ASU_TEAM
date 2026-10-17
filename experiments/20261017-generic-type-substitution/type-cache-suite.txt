@@ -1,0 +1,59 @@
+........................................................................ [  7%]
+........................................................................ [ 14%]
+........................................................................ [ 21%]
+........................................................................ [ 28%]
+........................................................................ [ 35%]
+........................................................................ [ 43%]
+............................................................FF.......... [ 50%]
+........................................................................ [ 57%]
+........................................................................ [ 64%]
+........................................................................ [ 71%]
+........................................................................ [ 78%]
+........................................................................ [ 86%]
+........................................................................ [ 93%]
+....................................................................     [100%]
+=================================== FAILURES ===================================
+_ test_source_path_cache_does_not_share_bindings_between_instantiations[False] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-615/test_source_path_cache_does_no0')
+reverse = False
+
+    @pytest.mark.parametrize('reverse',[False,True])
+    def test_source_path_cache_does_not_share_bindings_between_instantiations(tmp_path,reverse):
+        decode,warnings,_=decoder(tmp_path,{'Schema.java':'''import java.util.*;class Item{public String code;}
+          class Base<T>{public T payload;}class Child<T> extends Base<T>{}'''})
+        cases=[('Child<String>','text'),('Child<Item>',{'code':'record'}),
+               ('Child<Map<String,String>>',{'key':'map'})]
+        if reverse:cases.reverse()
+        observed={written:decode({'payload':value},written)['payload'] for written,value in cases}
+        assert observed['Child<String>']=='text'
+        assert observed['Child<Item>']['code']=='record'
+>       assert observed['Child<Map<String,String>>'].mapping=={'key':'map'}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'Unknown' object has no attribute 'mapping'
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:227: AttributeError
+_ test_source_path_cache_does_not_share_bindings_between_instantiations[True] __
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-615/test_source_path_cache_does_no1')
+reverse = True
+
+    @pytest.mark.parametrize('reverse',[False,True])
+    def test_source_path_cache_does_not_share_bindings_between_instantiations(tmp_path,reverse):
+        decode,warnings,_=decoder(tmp_path,{'Schema.java':'''import java.util.*;class Item{public String code;}
+          class Base<T>{public T payload;}class Child<T> extends Base<T>{}'''})
+        cases=[('Child<String>','text'),('Child<Item>',{'code':'record'}),
+               ('Child<Map<String,String>>',{'key':'map'})]
+        if reverse:cases.reverse()
+        observed={written:decode({'payload':value},written)['payload'] for written,value in cases}
+        assert observed['Child<String>']=='text'
+        assert observed['Child<Item>']['code']=='record'
+>       assert observed['Child<Map<String,String>>'].mapping=={'key':'map'}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'Unknown' object has no attribute 'mapping'
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:227: AttributeError
+=========================== short test summary info ============================
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_source_path_cache_does_not_share_bindings_between_instantiations[False]
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_source_path_cache_does_not_share_bindings_between_instantiations[True]
+2 failed, 1002 passed in 2.31s

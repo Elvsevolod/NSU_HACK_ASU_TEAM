@@ -1,0 +1,1 @@
+import org.springframework.data.jpa.repository.JpaRepository; interface BookStore extends JpaRepository<Book, String> { Book findByKey(String key); Book save(Book input); }

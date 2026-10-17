@@ -1,0 +1,70 @@
+{
+  "scenario": {
+    "project": "public-python",
+    "id": "empty-title-validation",
+    "steps": [
+      {
+        "action": "Explicit public source HTTP contract",
+        "request": {
+          "method": "POST",
+          "path": "/api/v1/login/access-token",
+          "form": {
+            "username": "reader@example.com",
+            "password": "fixture-password-39"
+          }
+        }
+      },
+      {
+        "action": "Explicit public source HTTP contract",
+        "request": {
+          "method": "POST",
+          "path": "/api/v1/items/",
+          "headers": {
+            "Authorization": {
+              "$concat": [
+                "Bearer ",
+                {
+                  "$ref": "steps.1.body.access_token"
+                }
+              ]
+            }
+          },
+          "body": {
+            "title": ""
+          }
+        }
+      }
+    ]
+  },
+  "context": {
+    "clock": "2026-01-02T10:00:00Z",
+    "globals": {
+      "app.core.config.settings": {
+        "API_V1_STR": "/api/v1",
+        "SECRET_KEY": "public-fixture-only-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "ACCESS_TOKEN_EXPIRE_MINUTES": 15,
+        "DATABASE_URL": "postgresql://fixture:fixture@database/portable",
+        "PROJECT_NAME": "Public source probe",
+        "FRONTEND_HOST": "http://localhost:5173",
+        "SENTRY_DSN": null,
+        "FASTAPI_ENV": null
+      }
+    },
+    "sql_dialect": "postgres"
+  },
+  "tables": {
+    "resource:user": [
+      {
+        "id": "10000000-0000-4000-8000-000000000001",
+        "email": "reader@example.com",
+        "is_active": true,
+        "is_superuser": false,
+        "full_name": "Reader",
+        "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FdbMgASTkRIWFC4AOqAgFg$E/nL3n15vcIhN0tik1CwrUNAuIh7Usqx0vlUswhOylM",
+        "created_at": null,
+        "items": []
+      }
+    ],
+    "resource:item": []
+  }
+}

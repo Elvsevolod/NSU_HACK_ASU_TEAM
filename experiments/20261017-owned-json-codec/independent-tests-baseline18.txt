@@ -1,0 +1,470 @@
+F..FFFFFFFFF..FFF.FFFFFFFFFFFF.FF...FF.F.F.F...                          [100%]
+=================================== FAILURES ===================================
+________ test_owned_default_mapper_uses_a_proven_primitive_null_default ________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_owned_default_mapper_uses0')
+
+    def test_owned_default_mapper_uses_a_proven_primitive_null_default(tmp_path):
+        result,engine,_=run(tmp_path,INPUT+'Item item=new ObjectMapper().convertValue(input,Item.class);return item.value;')
+>       assert result==0 and not engine.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 0)
+
+solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py:25: AssertionError
+_______ test_convert_value_wraps_a_known_null_failure_and_stops_the_body _______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_convert_value_wraps_a_kno0')
+
+    def test_convert_value_wraps_a_known_null_failure_and_stops_the_body(tmp_path):
+        result,engine,ids=run(tmp_path,INPUT+'''ObjectMapper mapper=new ObjectMapper();
+          mapper.enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES);
+          try{mapper.convertValue(input,Item.class);return after();}catch(IllegalArgumentException failure){return caught();}''')
+>       assert result=='caught'
+E       AssertionError: assert 'wrong' == 'caught'
+E         
+E         - caught
+E         + wrong
+
+solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py:39: AssertionError
+_______________ test_read_value_exposes_the_checked_json_failure _______________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_read_value_exposes_the_ch0')
+
+    def test_read_value_exposes_the_checked_json_failure(tmp_path):
+        result,engine,ids=run(tmp_path,INPUT+'''String text=new ObjectMapper().writeValueAsString(input);
+          ObjectMapper mapper=new ObjectMapper();mapper.enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES);
+          try{mapper.readValue(text,Item.class);return after();}catch(JsonProcessingException failure){return caught();}''')
+>       assert result=='caught'
+E       AssertionError: assert 'wrong' == 'caught'
+E         
+E         - caught
+E         + wrong
+
+solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py:47: AssertionError
+______ test_default_unknown_property_failure_is_wrapped_by_convert_value _______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_default_unknown_property_0')
+
+    def test_default_unknown_property_failure_is_wrapped_by_convert_value(tmp_path):
+        result,_,_=run(tmp_path,EXTRA+'''ObjectMapper mapper=new ObjectMapper();
+          try{mapper.convertValue(input,Item.class);return after();}catch(IllegalArgumentException failure){return caught();}''',STRING)
+>       assert result=='caught'
+E       AssertionError: assert 'wrong' == 'caught'
+E         
+E         - caught
+E         + wrong
+
+solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py:54: AssertionError
+_______ test_unknown_property_read_failure_selects_a_native_parent_catch _______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_unknown_property_read_fai0')
+
+    def test_unknown_property_read_failure_selects_a_native_parent_catch(tmp_path):
+        result,_,_=run(tmp_path,EXTRA+'''String text=new ObjectMapper().writeValueAsString(input);
+          try{new ObjectMapper().readValue(text,Item.class);return after();}
+          catch(JsonMappingException failure){return caught();}''',STRING)
+>       assert result=='caught'
+E       AssertionError: assert 'wrong' == 'caught'
+E         
+E         - caught
+E         + wrong
+
+solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py:61: AssertionError
+_ test_explicit_unknown_property_policy_preserves_known_fields[mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_explicit_unknown_property0')
+setting = 'mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);'
+
+    @pytest.mark.parametrize('setting',[
+        'mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);',
+        'mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);',
+    ])
+    def test_explicit_unknown_property_policy_preserves_known_fields(tmp_path,setting):
+        result,engine,_=run(tmp_path,EXTRA+'ObjectMapper mapper=new ObjectMapper();'+setting+
+          'Item item=mapper.convertValue(input,Item.class);return item.value;',STRING)
+>       assert result=='ready' and not engine.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'ready')
+
+solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py:71: AssertionError
+_ test_explicit_unknown_property_policy_preserves_known_fields[mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_explicit_unknown_property1')
+setting = 'mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);'
+
+    @pytest.mark.parametrize('setting',[
+        'mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);',
+        'mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);',
+    ])
+    def test_explicit_unknown_property_policy_preserves_known_fields(tmp_path,setting):
+        result,engine,_=run(tmp_path,EXTRA+'ObjectMapper mapper=new ObjectMapper();'+setting+
+          'Item item=mapper.convertValue(input,Item.class);return item.value;',STRING)
+>       assert result=='ready' and not engine.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'ready')
+
+solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py:71: AssertionError
+______________ test_copy_has_independent_settings_and_allocation _______________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_copy_has_independent_sett0')
+
+    def test_copy_has_independent_settings_and_allocation(tmp_path):
+        result,engine,_=run(tmp_path,'''ObjectMapper original=new ObjectMapper();ObjectMapper copy=original.copy();
+          copy.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+          return original!=copy && original.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+             && !copy.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);''')
+>       assert result is True and not engine.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> is True)
+
+solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py:79: AssertionError
+____________ test_alias_configuration_updates_the_same_owned_mapper ____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_alias_configuration_updat0')
+
+    def test_alias_configuration_updates_the_same_owned_mapper(tmp_path):
+        result,_,_=run(tmp_path,'''ObjectMapper original=new ObjectMapper();ObjectMapper alias=original;
+          alias.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+          return original.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);''')
+>       assert result is False
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> is False
+
+solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py:86: AssertionError
+_______ test_unknown_flag_value_does_not_destroy_an_independent_feature ________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_unknown_flag_value_does_n0')
+
+    def test_unknown_flag_value_does_not_destroy_an_independent_feature(tmp_path):
+        result,engine,_=run(tmp_path,'''ObjectMapper mapper=new ObjectMapper();
+          mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES,flag);
+          return mapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);''',params={'flag':U})
+>       assert result is True and engine.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> is True)
+
+solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py:93: AssertionError
+______ test_declared_injected_mapper_does_not_prove_default_configuration ______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_declared_injected_mapper_0')
+
+    def test_declared_injected_mapper_does_not_prove_default_configuration(tmp_path):
+        result,engine,_=run(tmp_path,'Map input=new HashMap();input.put("value","ready");Item item=mapper.convertValue(input,Item.class);return item.value;',schema=STRING,extra='ObjectMapper mapper;')
+>       assert result is U and engine.approximate
+E       AssertionError: assert ('ready' is <Unknown.VALUE: 'unknown'>)
+
+solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py:112: AssertionError
+___ test_source_subclass_cannot_be_mistaken_for_the_exact_native_constructor ___
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_source_subclass_cannot_be0')
+
+    def test_source_subclass_cannot_be_mistaken_for_the_exact_native_constructor(tmp_path):
+        result,engine,_=run(tmp_path,'''Map input=new HashMap();input.put("value","ready");ObjectMapper mapper=new Custom();
+          Item item=mapper.convertValue(input,Item.class);return item.value;''',schema=STRING+'class Custom extends ObjectMapper{}')
+>       assert result is U and engine.approximate
+E       AssertionError: assert ('ready' is <Unknown.VALUE: 'unknown'>)
+
+solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py:118: AssertionError
+________ test_agreed_caller_configuration_survives_a_conservative_join _________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_agreed_caller_configurati0')
+
+    def test_agreed_caller_configuration_survives_a_conservative_join(tmp_path):
+        result,_,_=run(tmp_path,'''ObjectMapper mapper=new ObjectMapper();setup(mapper,flag);
+          return mapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);''',params={'flag':U},conservative=True,
+          extra='''void setup(ObjectMapper input,boolean flag){if(flag){input.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);}
+          else{input.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);}}''')
+>       assert result is False
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> is False
+
+solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py:126: AssertionError
+________ test_a_source_exception_namesake_is_not_the_native_json_parent ________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_a_source_exception_namesa0')
+
+    def test_a_source_exception_namesake_is_not_the_native_json_parent(tmp_path):
+        result,_,_=run(tmp_path,EXTRA+'''String text=new ObjectMapper().writeValueAsString(input);
+          try{new ObjectMapper().readValue(text,Item.class);return after();}
+          catch(JsonMappingException failure){return "wrong-catch";}catch(java.io.IOException failure){return caught();}''',
+          STRING+'class JsonMappingException extends RuntimeException{}')
+>       assert result=='caught'
+E       AssertionError: assert 'wrong' == 'caught'
+E         
+E         - caught
+E         + wrong
+
+solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py:141: AssertionError
+_ test_supported_feature_reference_through_a_null_native_enum_variable_is_static _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_supported_feature_referen0')
+
+    def test_supported_feature_reference_through_a_null_native_enum_variable_is_static(tmp_path):
+        result,engine,_=run(tmp_path,'''ObjectMapper mapper=new ObjectMapper();DeserializationFeature feature=null;
+          mapper.disable(feature.FAIL_ON_UNKNOWN_PROPERTIES);
+          return mapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);''')
+>       assert result is False and not engine.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> is False)
+
+solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py:148: AssertionError
+________________ test_literal_json_uses_the_owned_default_codec ________________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_literal_json_uses_the_own0')
+
+    def test_literal_json_uses_the_owned_default_codec(tmp_path):
+        result,engine,_=run(tmp_path,'''Item item=new ObjectMapper().readValue("{\\"value\\":null}",Item.class);return item.value;''')
+>       assert result==0 and not engine.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 0)
+
+solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py:153: AssertionError
+______ test_default_null_uses_the_declared_primitive_kind[boolean-False] _______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_default_null_uses_the_dec0')
+declaration = 'boolean', expected = False
+
+    @pytest.mark.parametrize('declaration,expected',[('boolean',False),('char','\0'),('float',0.0),('long',0)])
+    def test_default_null_uses_the_declared_primitive_kind(tmp_path,declaration,expected):
+        result,engine,_=run(tmp_path,'return new ObjectMapper().readValue("{\\"value\\":null}",Item.class).value;',
+                           schema='class Item{public '+declaration+' value;}')
+>       assert type(result) is type(expected) and result==expected and not engine.approximate
+E       AssertionError: assert (<enum 'Unknown'> is <class 'bool'>)
+E        +  where <enum 'Unknown'> = type(<Unknown.VALUE: 'unknown'>)
+E        +  and   <class 'bool'> = type(False)
+
+solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py:11: AssertionError
+________ test_default_null_uses_the_declared_primitive_kind[char-\x00] _________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_default_null_uses_the_dec1')
+declaration = 'char', expected = '\x00'
+
+    @pytest.mark.parametrize('declaration,expected',[('boolean',False),('char','\0'),('float',0.0),('long',0)])
+    def test_default_null_uses_the_declared_primitive_kind(tmp_path,declaration,expected):
+        result,engine,_=run(tmp_path,'return new ObjectMapper().readValue("{\\"value\\":null}",Item.class).value;',
+                           schema='class Item{public '+declaration+' value;}')
+>       assert type(result) is type(expected) and result==expected and not engine.approximate
+E       AssertionError: assert (<enum 'Unknown'> is <class 'str'>)
+E        +  where <enum 'Unknown'> = type(<Unknown.VALUE: 'unknown'>)
+E        +  and   <class 'str'> = type('\x00')
+
+solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py:11: AssertionError
+________ test_default_null_uses_the_declared_primitive_kind[float-0.0] _________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_default_null_uses_the_dec2')
+declaration = 'float', expected = 0.0
+
+    @pytest.mark.parametrize('declaration,expected',[('boolean',False),('char','\0'),('float',0.0),('long',0)])
+    def test_default_null_uses_the_declared_primitive_kind(tmp_path,declaration,expected):
+        result,engine,_=run(tmp_path,'return new ObjectMapper().readValue("{\\"value\\":null}",Item.class).value;',
+                           schema='class Item{public '+declaration+' value;}')
+>       assert type(result) is type(expected) and result==expected and not engine.approximate
+E       AssertionError: assert (<enum 'Unknown'> is <class 'float'>)
+E        +  where <enum 'Unknown'> = type(<Unknown.VALUE: 'unknown'>)
+E        +  and   <class 'float'> = type(0.0)
+
+solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py:11: AssertionError
+__________ test_default_null_uses_the_declared_primitive_kind[long-0] __________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_default_null_uses_the_dec3')
+declaration = 'long', expected = 0
+
+    @pytest.mark.parametrize('declaration,expected',[('boolean',False),('char','\0'),('float',0.0),('long',0)])
+    def test_default_null_uses_the_declared_primitive_kind(tmp_path,declaration,expected):
+        result,engine,_=run(tmp_path,'return new ObjectMapper().readValue("{\\"value\\":null}",Item.class).value;',
+                           schema='class Item{public '+declaration+' value;}')
+>       assert type(result) is type(expected) and result==expected and not engine.approximate
+E       AssertionError: assert (<enum 'Unknown'> is <class 'int'>)
+E        +  where <enum 'Unknown'> = type(<Unknown.VALUE: 'unknown'>)
+E        +  and   <class 'int'> = type(0)
+
+solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py:11: AssertionError
+____ test_omitted_property_and_explicit_null_have_different_defaults[{}-7] _____
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_omitted_property_and_expl0')
+text = '{}', expected = 7
+
+    @pytest.mark.parametrize('text,expected',[('{}',7),('{\\"value\\":null}',0)])
+    def test_omitted_property_and_explicit_null_have_different_defaults(tmp_path,text,expected):
+        result,engine,_=run(tmp_path,'return new ObjectMapper().readValue("'+text+'",Item.class).value;',
+                           schema='class Item{public int value=7;}')
+>       assert result==expected and not engine.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 7)
+
+solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py:18: AssertionError
+_ test_omitted_property_and_explicit_null_have_different_defaults[{\\"value\\":null}-0] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_omitted_property_and_expl1')
+text = '{\\"value\\":null}', expected = 0
+
+    @pytest.mark.parametrize('text,expected',[('{}',7),('{\\"value\\":null}',0)])
+    def test_omitted_property_and_explicit_null_have_different_defaults(tmp_path,text,expected):
+        result,engine,_=run(tmp_path,'return new ObjectMapper().readValue("'+text+'",Item.class).value;',
+                           schema='class Item{public int value=7;}')
+>       assert result==expected and not engine.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 0)
+
+solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py:18: AssertionError
+___________ test_a_null_mapper_throws_before_the_next_project_method ___________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_a_null_mapper_throws_befo0')
+
+    def test_a_null_mapper_throws_before_the_next_project_method(tmp_path):
+        result,engine,ids=run(tmp_path,'''ObjectMapper mapper=null;try{
+          mapper.convertValue(null,Item.class);return after();}catch(NullPointerException failure){return caught();}''')
+>       assert result=='caught' and not engine.approximate
+E       AssertionError: assert ('wrong' == 'caught'
+E         
+E         - caught
+E         + wrong)
+
+solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py:24: AssertionError
+_____________ test_enum_constant_value_qualifier_is_evaluated_once _____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_enum_constant_value_quali0')
+
+    def test_enum_constant_value_qualifier_is_evaluated_once(tmp_path):
+        result,engine,ids=run(tmp_path,'''ObjectMapper mapper=new ObjectMapper();
+          mapper.disable(feature().FAIL_ON_UNKNOWN_PROPERTIES);
+          return mapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);''',
+          extra='DeserializationFeature feature(){return null;}')
+>       assert result is False and not engine.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> is False)
+
+solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py:33: AssertionError
+_____________ test_native_enum_constant_equals_preserves_identity ______________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_native_enum_constant_equa0')
+
+    def test_native_enum_constant_equals_preserves_identity(tmp_path):
+        result,engine,_=run(tmp_path,'''return DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES.equals(
+          DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES);''')
+>       assert result is True and not engine.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> is True)
+
+solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py:40: AssertionError
+_ test_version_dependent_same_type_alias_does_not_leave_known_mutable_values[Item item=new Item();item.value="ready";new ObjectMapper().convertValue(item,Item.class);return item.value;] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_version_dependent_same_ty0')
+body = 'Item item=new Item();item.value="ready";new ObjectMapper().convertValue(item,Item.class);return item.value;'
+
+    @pytest.mark.parametrize('body',[
+        '''Item item=new Item();item.value="ready";new ObjectMapper().convertValue(item,Item.class);return item.value;''',
+        '''Map input=new HashMap();input.put("value","ready");new ObjectMapper().convertValue(input,Map.class);return input.get("value");''',
+    ])
+    def test_version_dependent_same_type_alias_does_not_leave_known_mutable_values(tmp_path,body):
+        result,engine,_=run(tmp_path,body,STRING)
+>       assert result is U and engine.approximate
+E       AssertionError: assert ('ready' is <Unknown.VALUE: 'unknown'>)
+
+solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py:55: AssertionError
+_ test_version_dependent_same_type_alias_does_not_leave_known_mutable_values[Map input=new HashMap();input.put("value","ready");new ObjectMapper().convertValue(input,Map.class);return input.get("value");] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_version_dependent_same_ty1')
+body = 'Map input=new HashMap();input.put("value","ready");new ObjectMapper().convertValue(input,Map.class);return input.get("value");'
+
+    @pytest.mark.parametrize('body',[
+        '''Item item=new Item();item.value="ready";new ObjectMapper().convertValue(item,Item.class);return item.value;''',
+        '''Map input=new HashMap();input.put("value","ready");new ObjectMapper().convertValue(input,Map.class);return input.get("value");''',
+    ])
+    def test_version_dependent_same_type_alias_does_not_leave_known_mutable_values(tmp_path,body):
+        result,engine,_=run(tmp_path,body,STRING)
+>       assert result is U and engine.approximate
+E       AssertionError: assert ('ready' is <Unknown.VALUE: 'unknown'>)
+
+solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py:55: AssertionError
+____ test_source_native_exception_namesake_does_not_catch_a_library_failure ____
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_source_native_exception_n0')
+
+    def test_source_native_exception_namesake_does_not_catch_a_library_failure(tmp_path):
+        result,_,_=run(tmp_path,'''try{Integer.parseInt("invalid");return after();}
+          catch(NumberFormatException failure){return "wrong-catch";}catch(java.lang.RuntimeException failure){return caught();}''',
+          STRING+'class NumberFormatException extends RuntimeException{}')
+>       assert result=='caught'
+E       AssertionError: assert 'wrong-catch' == 'caught'
+E         
+E         - caught
+E         + wrong-catch
+
+solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py:79: AssertionError
+_______ test_foreign_exception_import_does_not_catch_a_library_namesake ________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_foreign_exception_import_0')
+
+    def test_foreign_exception_import_does_not_catch_a_library_namesake(tmp_path):
+        result,_,_=run(tmp_path,'''try{Integer.parseInt("invalid");return after();}
+          catch(NumberFormatException failure){return "wrong-catch";}catch(java.lang.RuntimeException failure){return caught();}''',
+          'import external.errors.NumberFormatException;'+STRING)
+>       assert result=='caught'
+E       AssertionError: assert 'wrong-catch' == 'caught'
+E         
+E         - caught
+E         + wrong-catch
+
+solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py:86: AssertionError
+______ test_native_mapper_cannot_execute_a_source_method_after_a_bad_cast ______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_native_mapper_cannot_exec0')
+
+    def test_native_mapper_cannot_execute_a_source_method_after_a_bad_cast(tmp_path):
+        result,engine,ids=run(tmp_path,'''try{Fake value=(Fake)(Object)new ObjectMapper();return value.call();}
+          catch(ClassCastException failure){return caught();}''',STRING+'class Fake{String call(){return "wrong";}}')
+>       assert result=='caught'
+E       AssertionError: assert 'wrong' == 'caught'
+E         
+E         - caught
+E         + wrong
+
+solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py:98: AssertionError
+__ test_failure_subclass_is_not_invented_when_another_property_is_unresolved ___
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_failure_subclass_is_not_i0')
+
+    def test_failure_subclass_is_not_invented_when_another_property_is_unresolved(tmp_path):
+        result,engine,_=run(tmp_path,'''Map input=new LinkedHashMap();input.put("value",unknown());input.put("extra","x");
+          try{new ObjectMapper().readValue(new ObjectMapper().writeValueAsString(input),Item.class);return after();}
+          catch(com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException failure){return "over-specific";}
+          catch(com.fasterxml.jackson.databind.JsonMappingException failure){return caught();}''',conservative=True)
+>       assert result is U and engine.approximate
+E       AssertionError: assert ('wrong' is <Unknown.VALUE: 'unknown'>)
+
+solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py:115: AssertionError
+___________ test_copy_can_be_configured_after_the_original_was_used ____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-644/test_copy_can_be_configured_af0')
+
+    def test_copy_can_be_configured_after_the_original_was_used(tmp_path):
+        result,engine,_=run(tmp_path,'''ObjectMapper original=new ObjectMapper();original.writeValueAsString("used");
+          ObjectMapper copy=original.copy();copy.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+          return !copy.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            && original.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);''')
+>       assert result is True and not engine.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> is True)
+
+solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py:133: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py::test_owned_default_mapper_uses_a_proven_primitive_null_default
+FAILED solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py::test_convert_value_wraps_a_known_null_failure_and_stops_the_body
+FAILED solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py::test_read_value_exposes_the_checked_json_failure
+FAILED solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py::test_default_unknown_property_failure_is_wrapped_by_convert_value
+FAILED solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py::test_unknown_property_read_failure_selects_a_native_parent_catch
+FAILED solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py::test_explicit_unknown_property_policy_preserves_known_fields[mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);]
+FAILED solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py::test_explicit_unknown_property_policy_preserves_known_fields[mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);]
+FAILED solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py::test_copy_has_independent_settings_and_allocation
+FAILED solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py::test_alias_configuration_updates_the_same_owned_mapper
+FAILED solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py::test_unknown_flag_value_does_not_destroy_an_independent_feature
+FAILED solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py::test_declared_injected_mapper_does_not_prove_default_configuration
+FAILED solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py::test_source_subclass_cannot_be_mistaken_for_the_exact_native_constructor
+FAILED solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py::test_agreed_caller_configuration_survives_a_conservative_join
+FAILED solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py::test_a_source_exception_namesake_is_not_the_native_json_parent
+FAILED solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py::test_supported_feature_reference_through_a_null_native_enum_variable_is_static
+FAILED solutions/—_owned-json-codec/code/tests/test_owned_json_codec.py::test_literal_json_uses_the_owned_default_codec
+FAILED solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py::test_default_null_uses_the_declared_primitive_kind[boolean-False]
+FAILED solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py::test_default_null_uses_the_declared_primitive_kind[char-\x00]
+FAILED solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py::test_default_null_uses_the_declared_primitive_kind[float-0.0]
+FAILED solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py::test_default_null_uses_the_declared_primitive_kind[long-0]
+FAILED solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py::test_omitted_property_and_explicit_null_have_different_defaults[{}-7]
+FAILED solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py::test_omitted_property_and_explicit_null_have_different_defaults[{\\"value\\":null}-0]
+FAILED solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py::test_a_null_mapper_throws_before_the_next_project_method
+FAILED solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py::test_enum_constant_value_qualifier_is_evaluated_once
+FAILED solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py::test_native_enum_constant_equals_preserves_identity
+FAILED solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py::test_version_dependent_same_type_alias_does_not_leave_known_mutable_values[Item item=new Item();item.value="ready";new ObjectMapper().convertValue(item,Item.class);return item.value;]
+FAILED solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py::test_version_dependent_same_type_alias_does_not_leave_known_mutable_values[Map input=new HashMap();input.put("value","ready");new ObjectMapper().convertValue(input,Map.class);return input.get("value");]
+FAILED solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py::test_source_native_exception_namesake_does_not_catch_a_library_failure
+FAILED solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py::test_foreign_exception_import_does_not_catch_a_library_namesake
+FAILED solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py::test_native_mapper_cannot_execute_a_source_method_after_a_bad_cast
+FAILED solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py::test_failure_subclass_is_not_invented_when_another_property_is_unresolved
+FAILED solutions/—_owned-json-codec/code/tests/test_json_codec_boundaries.py::test_copy_can_be_configured_after_the_original_was_used
+32 failed, 15 passed in 0.19s

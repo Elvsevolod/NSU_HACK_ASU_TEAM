@@ -1,0 +1,63 @@
+............F..........................F................................ [  7%]
+........................................................................ [ 15%]
+........................................................................ [ 23%]
+........................................................................ [ 31%]
+........................................................................ [ 39%]
+........................................................................ [ 47%]
+........................................................................ [ 55%]
+...........................................................F............ [ 62%]
+........................................................................ [ 70%]
+........................................................................ [ 78%]
+........................................................................ [ 86%]
+........................................................................ [ 94%]
+....................................................                     [100%]
+=================================== FAILURES ===================================
+_______________ test_iterating_one_entry_preserves_key_and_value _______________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-574/test_iterating_one_entry_prese0')
+
+    def test_iterating_one_entry_preserves_key_and_value(tmp_path):
+        result,_=run(tmp_path,'Map<String,String> map=new HashMap();map.put("key","value");for(Map.Entry<String,String> entry:map.entrySet()){return entry.getKey()+entry.getValue();}return "missing";')
+>       assert result=='keyvalue'
+E       AssertionError: assert 'missing' == 'keyvalue'
+E         
+E         - keyvalue
+E         + missing
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:48: AssertionError
+____ test_unsupported_map_view_does_not_create_a_confirmed_iteration_order _____
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-574/test_unsupported_map_view_does0')
+
+    def test_unsupported_map_view_does_not_create_a_confirmed_iteration_order(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;
+          class Api {String entry(){Map map=new HashMap();map.put("second","b");map.put("first","a");
+            Object key=map.keySet().iterator().next();
+            if("first".equals(key)){return first();}return other();}
+            String first(){return "first";}String other(){return "other";}}'''})
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{})
+        assert {outcome['result'] for outcome in outcomes}=={'first','other'}
+>       assert all(any('Map' in warning for warning in outcome['engine'].warnings) for outcome in outcomes)
+E       assert False
+E        +  where False = all(<generator object test_unsupported_map_view_does_not_create_a_confirmed_iteration_order.<locals>.<genexpr> at 0x102b426b0>)
+
+solutions/—_backed-collection-views/code/tests/test_collection_state_boundaries.py:57: AssertionError
+__________ test_known_native_map_view_has_a_separate_support_boundary __________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-574/test_known_native_map_view_has0')
+
+    def test_known_native_map_view_has_a_separate_support_boundary(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;
+          class Api {Object entry(){Map map=new HashMap();map.put("key","value");return map.keySet();}}'''})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{}) is U
+E       AssertionError: assert {'__map_view__': 'keys'} is <Unknown.VALUE: 'unknown'>
+E        +  where {'__map_view__': 'keys'} = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1033eda90>.run
+
+solutions/—_backed-collection-views/code/tests/test_operation_diagnostics.py:18: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_iterating_one_entry_preserves_key_and_value
+FAILED solutions/—_backed-collection-views/code/tests/test_collection_state_boundaries.py::test_unsupported_map_view_does_not_create_a_confirmed_iteration_order
+FAILED solutions/—_backed-collection-views/code/tests/test_operation_diagnostics.py::test_known_native_map_view_has_a_separate_support_boundary
+3 failed, 913 passed in 2.07s

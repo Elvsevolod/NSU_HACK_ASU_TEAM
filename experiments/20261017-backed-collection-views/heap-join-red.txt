@@ -1,0 +1,290 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+__________________ test_joined_map_aliases_share_later_writes __________________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-564/test_joined_map_aliases_share_0')
+
+    def test_joined_map_aliases_share_later_writes(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{Object entry(boolean flag){
+          Map map=new HashMap();Map alias=map;if(flag){map.put("key","same");}else{map.put("key","same");}
+          alias.put("later","visible");return map.get("later");}}'''})
+>       assert Engine(project,ScenarioState(db)).run(ids['Api.entry'],{'flag':U})=='visible'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_backed-collection-views/code/analyzer/engine.py:157: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:210: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+solutions/—_backed-collection-views/code/analyzer/engine.py:246: in continue_filter
+    frame['result']=self.invoke(frame['entry'],frame['args'],reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:384: in invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:468: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:490: in execute
+    decision = self.choose(self.method + ':' + str(node.start_point.row + 1), [True, False])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x104a3b990>
+label = 'method:service:Api#entry(boolean):2', choices = [True, False]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:method:service:Api#entry(boolean):2', [True, False])
+
+solutions/—_backed-collection-views/code/analyzer/engine.py:132: AlternativeRequired
+_______________ test_joined_map_writes_are_visible_to_the_caller _______________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-564/test_joined_map_writes_are_vis0')
+
+    def test_joined_map_writes_are_visible_to_the_caller(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{Object entry(boolean flag){
+          Map map=new HashMap();update(map,flag);return map.get("key");}
+          void update(Map input,boolean flag){if(flag){input.put("key","same");}else{input.put("key","same");}}}'''})
+>       assert Engine(project,ScenarioState(db)).run(ids['Api.entry'],{'flag':U})=='same'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_backed-collection-views/code/analyzer/engine.py:157: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:210: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+solutions/—_backed-collection-views/code/analyzer/engine.py:246: in continue_filter
+    frame['result']=self.invoke(frame['entry'],frame['args'],reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:384: in invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:468: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:616: in execute
+    return self.value(node, env), None
+           ^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:938: in value
+    return self.value(node.named_children[0], env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:927: in value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:1398: in call
+    value = self.invoke(target, args, obj, reason)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:384: in invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:468: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:490: in execute
+    decision = self.choose(self.method + ':' + str(node.start_point.row + 1), [True, False])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x103d8a790>
+label = 'method:service:Api#update(Map,boolean):3', choices = [True, False]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:method:service:Api#update(Map,boolean):3', [True, False])
+
+solutions/—_backed-collection-views/code/analyzer/engine.py:132: AlternativeRequired
+______ test_original_map_mutation_survives_reassigning_a_local_parameter _______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-564/test_original_map_mutation_sur0')
+
+    def test_original_map_mutation_survives_reassigning_a_local_parameter(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{Object entry(boolean flag){
+          Map map=new HashMap();update(map,flag);return map.get("key");}
+          void update(Map input,boolean flag){if(flag){input.put("key","same");input=new HashMap();}
+          else{input.put("key","same");input=new HashMap();}}}'''})
+>       assert Engine(project,ScenarioState(db)).run(ids['Api.entry'],{'flag':U})=='same'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_backed-collection-views/code/analyzer/engine.py:157: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:210: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+solutions/—_backed-collection-views/code/analyzer/engine.py:246: in continue_filter
+    frame['result']=self.invoke(frame['entry'],frame['args'],reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:384: in invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:468: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:616: in execute
+    return self.value(node, env), None
+           ^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:938: in value
+    return self.value(node.named_children[0], env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:927: in value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:1398: in call
+    value = self.invoke(target, args, obj, reason)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:384: in invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:468: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:490: in execute
+    decision = self.choose(self.method + ':' + str(node.start_point.row + 1), [True, False])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x103ba3550>
+label = 'method:service:Api#update(Map,boolean):3', choices = [True, False]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:method:service:Api#update(Map,boolean):3', [True, False])
+
+solutions/—_backed-collection-views/code/analyzer/engine.py:132: AlternativeRequired
+____________ test_caller_observes_agreed_source_object_field_writes ____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-564/test_caller_observes_agreed_so0')
+
+    def test_caller_observes_agreed_source_object_field_writes(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''class Item{String value="old";}
+          class Api{Object entry(boolean flag){Item item=new Item();update(item,flag);return item.value;}
+          void update(Item item,boolean flag){if(flag){item.value="same";}else{item.value="same";}}}'''})
+>       assert Engine(project,ScenarioState(db)).run(ids['Api.entry'],{'flag':U})=='same'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_backed-collection-views/code/analyzer/engine.py:157: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:210: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+solutions/—_backed-collection-views/code/analyzer/engine.py:246: in continue_filter
+    frame['result']=self.invoke(frame['entry'],frame['args'],reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:384: in invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:468: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:616: in execute
+    return self.value(node, env), None
+           ^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:938: in value
+    return self.value(node.named_children[0], env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:927: in value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:1398: in call
+    value = self.invoke(target, args, obj, reason)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:384: in invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:468: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:490: in execute
+    decision = self.choose(self.method + ':' + str(node.start_point.row + 1), [True, False])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x103edb350>
+label = 'method:service:Api#update(Item,boolean):3', choices = [True, False]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:method:service:Api#update(Item,boolean):3', [True, False])
+
+solutions/—_backed-collection-views/code/analyzer/engine.py:132: AlternativeRequired
+__________ test_conditional_alias_is_widened_before_a_later_mutation ___________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-564/test_conditional_alias_is_wide0')
+
+    def test_conditional_alias_is_widened_before_a_later_mutation(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{Object entry(boolean flag){
+          Map original=new HashMap();original.put("key","same");Map chosen=original;
+          if(flag){chosen=new HashMap();chosen.put("key","same");}chosen.clear();return original.isEmpty();}}'''})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{'flag':U}) is U
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_backed-collection-views/code/analyzer/engine.py:157: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:210: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+solutions/—_backed-collection-views/code/analyzer/engine.py:246: in continue_filter
+    frame['result']=self.invoke(frame['entry'],frame['args'],reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:384: in invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:468: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:490: in execute
+    decision = self.choose(self.method + ':' + str(node.start_point.row + 1), [True, False])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x104979f90>
+label = 'method:service:Api#entry(boolean):3', choices = [True, False]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:method:service:Api#entry(boolean):3', [True, False])
+
+solutions/—_backed-collection-views/code/analyzer/engine.py:132: AlternativeRequired
+=========================== short test summary info ============================
+FAILED solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py::test_joined_map_aliases_share_later_writes
+FAILED solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py::test_joined_map_writes_are_visible_to_the_caller
+FAILED solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py::test_original_map_mutation_survives_reassigning_a_local_parameter
+FAILED solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py::test_caller_observes_agreed_source_object_field_writes
+FAILED solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py::test_conditional_alias_is_widened_before_a_later_mutation
+5 failed in 0.63s

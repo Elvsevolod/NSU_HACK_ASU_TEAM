@@ -1,0 +1,24 @@
+{
+  "status": "Manual source reference fixed before the first corpus prediction; Codex author, no independent DeepSeek reference (HTTP403)",
+  "scope": "Bounded bodies with supplied framework objects; auth, validation, middleware, serializers, SQL constraints and transport are not part of this oracle",
+  "java": {
+    "project": "sqshq/piggymetrics",
+    "commit": "6bb2cf9ddbca980b664d3edbb6ff775d75369278",
+    "cases": [
+      {"id":"account-read","entry":"AccountController.getAccountByName","methods":["AccountController.getAccountByName","AccountServiceImpl.findByName"],"calls":[["AccountController.getAccountByName","AccountServiceImpl.findByName"]],"data":[["AccountServiceImpl.findByName","accounts"]],"expected_note":"Before","account_name":"alex"},
+      {"id":"account-empty-refusal","entry":"AccountController.getAccountByName","methods":["AccountController.getAccountByName","AccountServiceImpl.findByName"],"calls":[["AccountController.getAccountByName","AccountServiceImpl.findByName"]],"data":[],"exception":"IllegalArgumentException","account_name":""}
+    ]
+  },
+  "python": {
+    "project": "fastapi/full-stack-fastapi-template",
+    "commit": "b1125d8839482cb7bbae603ddc6d0081bf87532e",
+    "cases": [
+      {"id":"item-read","sequence":["read_item"],"methods":["read_item"],"data":[["read_item","item"]],"owner":"u1","status":200},
+      {"id":"item-foreign-owner","sequence":["read_item"],"methods":["read_item"],"data":[["read_item","item"]],"owner":"u2","status":403},
+      {"id":"item-missing","sequence":["read_item"],"methods":["read_item"],"data":[["read_item","item"]],"empty":true,"status":404},
+      {"id":"item-title-update-read","sequence":["update_item","read_item"],"methods":["update_item","read_item"],"data":[["update_item","item"],["read_item","item"]],"owner":"u1","status":200,"expected_title":"After","expected_description":"keep"},
+      {"id":"item-delete-read","sequence":["delete_item","read_item"],"methods":["delete_item","read_item"],"data":[["delete_item","item"],["read_item","item"]],"owner":"u1","status":404,"expected_empty":true}
+    ]
+  },
+  "preconditions": ["Python Session, authenticated User and ItemUpdate are supplied as typed arguments, not guessed from text", "Java repository data and account name supplied explicitly", "Public sources remain unchanged", "Empty remote/calls sets shown as empty; mixed HTTP tests are separate evidence"]
+}

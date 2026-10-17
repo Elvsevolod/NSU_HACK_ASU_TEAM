@@ -1,0 +1,90 @@
+{
+  "variant": 9,
+  "verdict": "No direct Train Ticket/S0 answer hardcoding found in inspected inference paths; universality is not established and independent counterexamples reproduce transfer failures.",
+  "S0": {
+    "score": 0.9509803921568627,
+    "iou": {
+      "executes": 0.9705882352941176,
+      "calls": 0.9583333333333334,
+      "remote": 1.0,
+      "data": 0.875
+    },
+    "same_as_saved_submission": true,
+    "renamed_id_and_hash_seed_invariance": true,
+    "runtime_model_calls": 0,
+    "offline_audit": {
+      "blocked_network": 0,
+      "blocked_processes": 2,
+      "blocked_reference_reads": 0,
+      "python_file_reads": 589
+    }
+  },
+  "unit_tests": [
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "129",
+      "time": "0.317",
+      "timestamp": "2026-10-17T07:56:04.173754+07:00",
+      "hostname": "Mac-mini-Nina.local"
+    }
+  ],
+  "existing_generalization_microprojects": [
+    "inventory",
+    "library",
+    "remote"
+  ],
+  "petclinic_original_probes": {
+    "same_source_hashes_as_saved": true,
+    "entry_selection_accuracy": 1.0,
+    "parameter_accuracy": 1.0,
+    "full_graph_precision_measured": false
+  },
+  "counterexamples": [
+    {
+      "id": "request-mapping-http-method",
+      "source": "code/baseline_closure.py:28",
+      "observed": "Petclinic GET, PUT and DELETE /api/pets/12 each match getPet, updatePet and deletePet. The method option on RequestMapping is discarded.",
+      "probes_passed": 0,
+      "probes_total": 3
+    },
+    {
+      "id": "lexical-handler-selection",
+      "source": "code/analyzer/contracts.py:110",
+      "observed": "List all pets and Show all pets choose PetTypeRestController.getAllPetTypes instead of PetRestController.getPets. Natural identifier wording also leaves petId unknown."
+    },
+    {
+      "id": "repository-result-truncation",
+      "source": "code/analyzer/engine.py:800",
+      "observed": "A 65-row findAll result is silently reduced to 64. The wrong small() branch is confirmed with complete_in_supported_model and no unresolved diagnostics. A 64-row control is correct."
+    },
+    {
+      "id": "body-field-unwrapping",
+      "source": "code/analyzer/models.py:29",
+      "observed": "Renaming a Memo field text to body erases the typed response and loses memoId on the next step. The text control resolves the ID."
+    }
+  ],
+  "scope_limits": [
+    "Counterexamples disprove unrestricted transfer but do not measure aggregate accuracy on other repositories.",
+    "Petclinic skeleton comes from the existing source-only test harness; original source HTTP annotations were preserved.",
+    "S1-S7 have no available reference labels; their graph correctness was not measured.",
+    "No original application or service was started."
+  ],
+  "variant_integrity": {
+    "unchanged_files": 101,
+    "changed_files": [],
+    "archive_code_and_submission_mismatches": [],
+    "submission_sha256": "544fdb2d97dbe0109b734fe561071a9ed61e0971b19e127bcab52dbb6c094b28"
+  },
+  "deepseek": {
+    "status": "consultation_not_executed",
+    "reason": "Automatic approval review rejected potential repository disclosure to an external model; the audit continued locally."
+  },
+  "reproduce_probes": [
+    "Run the variant checks/check_petclinic.py with the pinned local Petclinic source and a fresh work directory as recorded in petclinic.stdout.txt.",
+    "/private/tmp/nsu-alternatives-venv/bin/python -B experiments/20261017-variant9-universality-audit/probe_universality.py"
+  ],
+  "evidence": "independent-probes.json"
+}

@@ -1,0 +1,89 @@
+FFFFF.                                                                   [100%]
+=================================== FAILURES ===================================
+_ test_class_type_parameter_named_string_is_not_the_jdk_string_class[box.getValue()] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-549/test_class_type_parameter_name0')
+key = 'box.getValue()'
+
+    @pytest.mark.parametrize('key',['box.getValue()','box.value'])
+    def test_class_type_parameter_named_string_is_not_the_jdk_string_class(tmp_path,key):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Box<String>{String value;String getValue(){return value;}}
+          class Api{Object entry(){Box box=new Box();box.value='x';Map map=new HashMap();map.put('''+key+''',"found");return map.get("x");}}'''})
+>       engine=Engine(project,ScenarioState(db));assert engine.run(ids['Api.entry'],{}) is U
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 'found' is <Unknown.VALUE: 'unknown'>
+E        +  where 'found' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1013dfd10>.run
+
+solutions/—_value-type-flow/code/tests/test_type_parameter_shadowing.py:11: AssertionError
+_ test_class_type_parameter_named_string_is_not_the_jdk_string_class[box.value] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-549/test_class_type_parameter_name1')
+key = 'box.value'
+
+    @pytest.mark.parametrize('key',['box.getValue()','box.value'])
+    def test_class_type_parameter_named_string_is_not_the_jdk_string_class(tmp_path,key):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Box<String>{String value;String getValue(){return value;}}
+          class Api{Object entry(){Box box=new Box();box.value='x';Map map=new HashMap();map.put('''+key+''',"found");return map.get("x");}}'''})
+>       engine=Engine(project,ScenarioState(db));assert engine.run(ids['Api.entry'],{}) is U
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 'found' is <Unknown.VALUE: 'unknown'>
+E        +  where 'found' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x101c884d0>.run
+
+solutions/—_value-type-flow/code/tests/test_type_parameter_shadowing.py:11: AssertionError
+_ test_method_type_parameter_does_not_supply_a_fabricated_native_boxed_class[String-'x'-"x"] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-549/test_method_type_parameter_doe0')
+type_name = 'String', value = "'x'", lookup = '"x"'
+
+    @pytest.mark.parametrize('type_name,value,lookup',[('String',"'x'",'"x"'),('Integer','1L','1')])
+    def test_method_type_parameter_does_not_supply_a_fabricated_native_boxed_class(tmp_path,type_name,value,lookup):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{<'''+type_name+'''>'''+type_name+''' identity('''+type_name+''' value){return value;}
+          Object entry(){Map map=new HashMap();map.put(identity('''+value+'''),"found");return map.get('''+lookup+''');}}'''})
+>       engine=Engine(project,ScenarioState(db));assert engine.run(ids['Api.entry'],{}) is U
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 'found' is <Unknown.VALUE: 'unknown'>
+E        +  where 'found' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1028857d0>.run
+
+solutions/—_value-type-flow/code/tests/test_type_parameter_shadowing.py:19: AssertionError
+_ test_method_type_parameter_does_not_supply_a_fabricated_native_boxed_class[Integer-1L-1] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-549/test_method_type_parameter_doe1')
+type_name = 'Integer', value = '1L', lookup = '1'
+
+    @pytest.mark.parametrize('type_name,value,lookup',[('String',"'x'",'"x"'),('Integer','1L','1')])
+    def test_method_type_parameter_does_not_supply_a_fabricated_native_boxed_class(tmp_path,type_name,value,lookup):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{<'''+type_name+'''>'''+type_name+''' identity('''+type_name+''' value){return value;}
+          Object entry(){Map map=new HashMap();map.put(identity('''+value+'''),"found");return map.get('''+lookup+''');}}'''})
+>       engine=Engine(project,ScenarioState(db));assert engine.run(ids['Api.entry'],{}) is U
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 'found' is <Unknown.VALUE: 'unknown'>
+E        +  where 'found' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x102a2ea10>.run
+
+solutions/—_value-type-flow/code/tests/test_type_parameter_shadowing.py:19: AssertionError
+__ test_type_parameter_in_a_generic_return_does_not_leak_into_stream_contract __
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-549/test_type_parameter_in_a_gener0')
+
+    def test_type_parameter_in_a_generic_return_does_not_leak_into_stream_contract(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import java.util.stream.Collectors;
+          class Api{<String>List<String> values(String value){return Arrays.asList(value);}
+          Object entry(){Map map=new HashMap();values('x').stream().map(key->{map.put(key,"found");return key;})
+          .collect(Collectors.toList());return map.get("x");}}'''})
+>       engine=Engine(project,ScenarioState(db));assert engine.run(ids['Api.entry'],{}) is U
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 'found' is <Unknown.VALUE: 'unknown'>
+E        +  where 'found' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x102aaf9d0>.run
+
+solutions/—_value-type-flow/code/tests/test_type_parameter_shadowing.py:28: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_value-type-flow/code/tests/test_type_parameter_shadowing.py::test_class_type_parameter_named_string_is_not_the_jdk_string_class[box.getValue()]
+FAILED solutions/—_value-type-flow/code/tests/test_type_parameter_shadowing.py::test_class_type_parameter_named_string_is_not_the_jdk_string_class[box.value]
+FAILED solutions/—_value-type-flow/code/tests/test_type_parameter_shadowing.py::test_method_type_parameter_does_not_supply_a_fabricated_native_boxed_class[String-'x'-"x"]
+FAILED solutions/—_value-type-flow/code/tests/test_type_parameter_shadowing.py::test_method_type_parameter_does_not_supply_a_fabricated_native_boxed_class[Integer-1L-1]
+FAILED solutions/—_value-type-flow/code/tests/test_type_parameter_shadowing.py::test_type_parameter_in_a_generic_return_does_not_leak_into_stream_contract
+5 failed, 1 passed in 0.05s

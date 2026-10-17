@@ -1,0 +1,1733 @@
+--- phase5/code/polygraph/callbacks.py
++++ phase6/code/polygraph/callbacks.py
+@@ -0,0 +1,76 @@
++"""Deferred source/library calls. References capture receivers, never run them.
++
++An invocation uses the declaration's lexical owner for skeleton callsite IDs,
++even when a stream escapes and another method later consumes it.
++"""
++from .values import FunctionRef,MethodRef,Object,Raised,TypeRef,unknown
++
++# Bounded native instance signatures, not a short-name heuristic for any class.
++INSTANCES={'String':{'length':0,'isEmpty':0,'trim':0,'hashCode':0,'equals':1},
++           'java.lang.String':{'length':0,'isEmpty':0,'trim':0,'hashCode':0,'equals':1},
++           'java.math.BigDecimal':{'add':1,'multiply':1,'subtract':1,'compareTo':1}}
++
++
++def compatible(project,actual,expected,seen=frozenset()):
++    if actual==expected:return True
++    if actual in seen or actual not in project.types:return False
++    info=project.types[actual]
++    return any(compatible(project,project.resolve_type(parent,info.module,info.span.file),expected,seen|{actual}) for parent in info.parents)
++
++
++def reference(engine,expr,receiver):
++    name,owner,qualifier_type=expr.value
++    if not owner:engine.unsupported('Method reference outside a source method requires an initialization contract',expr.span)
++    if receiver is None:raise Raised('NullPointerException')
++    if unknown(receiver):engine.unsupported('Method reference has an unresolved/null receiver',expr.span)
++    result_type=expr.typ
++    native=receiver.name if isinstance(receiver,TypeRef) else receiver.typ if isinstance(receiver,Object) else 'java.lang.String' if isinstance(receiver,str) else ''
++    if not result_type and native in {'String','java.lang.String'}:result_type={'length':'int','hashCode':'int','isEmpty':'boolean','equals':'boolean','trim':'String'}.get(name,'')
++    if not result_type and native.startswith('java.lang.'):
++        result_type={'intValue':'int','longValue':'long','shortValue':'short','byteValue':'byte','booleanValue':'boolean','hashCode':'int','compareTo':'int','equals':'boolean','toString':'String','sum':'int' if native.endswith('.Integer') else 'long'}.get(name,'')
++    return MethodRef(receiver,name,owner,expr.span,qualifier_type,result_type)
++
++
++def invoke(engine,callback,args,span):
++    if isinstance(callback,FunctionRef):return engine.source_call(callback.name,args,span=span)
++    if not isinstance(callback,MethodRef):engine.unsupported('Unmodeled functional-interface callback',span)
++    if len(engine.frames)>=engine.depth_limit:engine.unsupported('Callback nesting budget',span)
++    origin=engine.p.methods[callback.owner];receiver=callback.receiver
++    if id(receiver) in engine.state.tainted_containers:engine.unsupported('Captured callable receiver may have been mutated by opaque code',callback.span)
++    engine.events.append({'kind':'callback-invoked','owner':origin.skeleton_id,'reference':callback.span,'consumer':span,'name':callback.name})
++    engine.frames.append((origin,{}))
++    try:
++        if callback.name=='new':
++            if not isinstance(receiver,TypeRef):engine.unsupported('Constructor reference qualifier is not a type',callback.span)
++            return engine.create(receiver.name,args,span=callback.span)
++        if isinstance(receiver,TypeRef):
++            if receiver.name in engine.p.types:
++                methods=engine.p.methods_of(receiver.name,callback.name)
++                static=[m for m in methods if m.annotations.get('static') and len(m.params)==len(args)]
++                instance=[m for m in methods if not m.annotations.get('static') and len(m.params)+1==len(args)]
++                if len(static)+len(instance)!=1:engine.unsupported('Ambiguous method reference dispatch',callback.span)
++                if static:return engine.source_call(static[0].key,args,span=callback.span)
++                if args[0] is None:raise Raised('NullPointerException')
++                if not isinstance(args[0],Object):engine.unsupported('Unbound source method reference needs a typed receiver',callback.span)
++                if not compatible(engine.p,args[0].typ,receiver.name):raise Raised('ClassCastException')
++                if instance[0].annotations.get('private'):
++                    return engine.source_call(instance[0].key,args[1:],receiver=args[0],span=callback.span)
++                return engine.call(args[0],callback.name,args[1:],{},callback.span,{})
++            count=INSTANCES.get(receiver.name,{}).get(callback.name)
++            from .java_boxing import CLASSES
++            if receiver.name in CLASSES and callback.name in {'sum','compare','valueOf','parseInt','parseLong'}:
++                return engine.call(receiver,callback.name,args,{},callback.span,{})
++            if receiver.name in CLASSES:count={'intValue':0,'longValue':0,'shortValue':0,'byteValue':0,'booleanValue':0,'hashCode':0,'equals':1,'compareTo':1}.get(callback.name)
++            if count is None or len(args)!=count+1:engine.unsupported('Native static/unbound method reference requires a signature contract',callback.span)
++            if receiver.name in CLASSES and args[0] is not None:
++                from .java_boxing import boxed
++                if not boxed(args[0]) or args[0].typ!=receiver.name:raise Raised('ClassCastException')
++            if receiver.name in {'String','java.lang.String'} and args[0] is not None and not isinstance(args[0],str):
++                if unknown(args[0]):engine.unsupported('Unknown receiver for String method reference',callback.span)
++                raise Raised('ClassCastException')
++            return engine.call(args[0],callback.name,args[1:],{},callback.span,{})
++        if callback.qualifier_type in engine.p.types:
++            targets=[m for m in engine.p.methods_of(callback.qualifier_type,callback.name,len(args)) if m.annotations.get('private')]
++            if len(targets)==1:return engine.source_call(targets[0].key,args,receiver=receiver,span=callback.span)
++        return engine.call(receiver,callback.name,args,{},callback.span,{})
++    finally:engine.frames.pop()
+--- phase5/code/polygraph/ir.py
++++ phase6/code/polygraph/ir.py
+@@ -18,6 +18,7 @@
+     span: Span = Span()
+     typ: str = ""
+     bindings: tuple = ()
++    operand_type: str = ""
+ 
+ 
+ @dataclass(frozen=True)
+--- phase5/code/polygraph/java.py
++++ phase6/code/polygraph/java.py
+@@ -62,6 +62,7 @@
+         self.trees, self.raw_types = {}, {}
+         self.file, self.local_types = "", {}
+         self.owner = ""
++        self.callback_owner=''
+         self.package_names={};self.custom_constraints=set()
+ 
+     def span(self, node):
+@@ -180,6 +181,9 @@
+         key = owner.key + "#" + name + "(" + ",".join(p.typ for p in params) + ")"
+         ann = annotations(node)
+         ann['validation_annotations']=full_annotations(node)
++        modifiers=next((c for c in node.named_children if c.type=='modifiers'),None)
++        for flag in ['static','private']:
++            ann[flag]=bool(modifiers is not None and any(c.type==flag for c in modifiers.children))
+         method = Method(key, name, owner.key, owner.module, "java", self.span(node), params,
+                         text(node.child_by_field_name("type")), abstract=node.child_by_field_name("body") is None,
+                         transaction="Transactional" in ann or "Transactional" in owner.annotations, annotations=ann)
+@@ -241,6 +245,10 @@
+         if node is None:
+             return Expr("const", value=None)
+         kind, raw, s = node.type, text(node), self.span(node)
++        if kind in {'field_access','scoped_type_identifier'} and raw.split('.')[0] not in self.local_types:
++            from .java_contracts import TYPES
++            resolved=self.p.resolve_type(raw,self.p.module(self.file),self.file)
++            if raw in TYPES or resolved and resolved.split(':',1)[-1]==raw:return Expr('type',value=raw,span=s)
+         if kind in {"string_literal", "character_literal", "decimal_integer_literal", "hex_integer_literal", "octal_integer_literal", "binary_integer_literal", "decimal_floating_point_literal", "hex_floating_point_literal", "true", "false", "null_literal"}:
+             try:
+                 if kind == "string_literal":
+@@ -259,6 +267,9 @@
+             except ValueError:
+                 return Expr("unsupported", value="Java literal " + kind, span=s)
+         if kind in {"identifier", "this", "super", "type_identifier", "scoped_type_identifier"}:
++            if '.' in raw:
++                from .java_contracts import TYPES
++                if raw in TYPES:return Expr('type',value=raw,span=s)
+             return Expr("var", value=raw, span=s, typ=self.local_types.get(raw, ""))
+         if kind == "field_access":
+             owner, field = node.child_by_field_name("object"), text(node.child_by_field_name("field"))
+@@ -267,6 +278,15 @@
+             resolved = self.p.resolve_type(receiver.typ or (self.owner if receiver.value == "this" else text(owner)), self.p.module(self.file), self.file)
+             typ = self.p.type_fields(resolved).get(field, (typ, None))[0]
+             return Expr("field", (receiver,), field, s, typ)
++        if kind=='method_reference':
++            if any(c.type in {'type_arguments','super'} for c in node.named_children):return Expr('unsupported',value='Generic/super method reference',span=s)
++            qualifier=node.named_children[0];name='new' if node.children[-1].type=='new' else text(node.named_children[-1])
++            receiver=self.expr(qualifier)
++            owner=self.owner if text(qualifier)=='this' else self.p.resolve_type(receiver.typ or text(qualifier),self.p.module(self.file),self.file)
++            returns={m.return_type for m in self.p.methods_of(owner,name)}
++            result=next(iter(returns)) if len(returns)==1 else ''
++            if name=='new':result=owner
++            return Expr('method_ref',(receiver,),(name,self.callback_owner,owner),s,result)
+         if kind == "method_invocation":
+             obj = node.child_by_field_name("object")
+             args = node.child_by_field_name("arguments")
+@@ -281,6 +301,20 @@
+                 canonical = raw_type if '.' in raw_type else self.p.resolve_import(raw_type, self.file) or 'java.lang.' + raw_type
+                 if name in RETURNS.get(canonical, {}):
+                     returns.add(RETURNS[canonical][name])
++                canonical=self.p.resolve_import(text(obj),self.file) or (text(obj) if '.' in text(obj) else 'java.lang.'+text(obj))
++                if name in RETURNS.get(canonical,{}):returns.add(RETURNS[canonical][name])
++                if name=='stream':returns.add('java.util.stream.Stream<'+(re.search(r'<(.+)>',receiver.typ)[1] if re.search(r'<(.+)>',receiver.typ) else 'Object')+'>')
++                if name=='collect' and raw_type=='java.util.stream.Stream' and len(arguments)==1:
++                    collector=arguments[0]
++                    if collector.op=='call' and collector.value in {'toList','toSet'}:
++                        qualifier=collector.args[0]
++                        if qualifier is not None and qualifier.op=='var' and (self.p.resolve_import(qualifier.value,self.file) or qualifier.value)=='java.util.stream.Collectors':
++                            returns.add('java.util.List' if collector.value=='toList' else 'java.util.Set')
++                if name=='get':
++                    generic=re.fullmatch(r'(?:[\w.]+)<\s*([\w.]+)\s*>',receiver.typ)
++                    mapping=re.fullmatch(r'(?:[\w.]+)<\s*[\w.]+\s*,\s*([\w.]+)\s*>',receiver.typ)
++                    if generic and raw_type.split('.')[-1] in {'List','ArrayList','LinkedList','Optional'}:returns.add(generic[1])
++                    if mapping and raw_type.split('.')[-1] in {'Map','HashMap','LinkedHashMap'}:returns.add(mapping[1])
+             if not owner and receiver is not None and receiver.op == "var":
+                 canonical = self.p.imports.get(self.file, {}).get(receiver.value, "java.lang." + receiver.value)
+                 primitive_returns = {("java.lang.Long", "parseLong"): "long", ("java.lang.Long", "valueOf"): "Long",
+@@ -305,10 +339,12 @@
+             typ = "long" if operand_types & {"long", "Long"} else "int" if operand_types & {"int", "Integer", "byte", "Byte", "short", "Short", "char", "Character"} else ""
+             if op in {"<<", ">>", ">>>"}:
+                 typ = "long" if left_expr.typ.split(".")[-1] in {"long", "Long"} else "int"
+-            return Expr("bool" if op in {"&&", "||"} else "bin", (left_expr, right_expr), {"&&": "and", "||": "or"}.get(op, op), s, typ)
++            result_type = "boolean" if op in {"&&", "||", "==", "!=", "<", ">", "<=", ">="} else typ
++            return Expr("bool" if op in {"&&", "||"} else "bin", (left_expr, right_expr), {"&&": "and", "||": "or"}.get(op, op), s, result_type, operand_type=typ)
+         if kind == "unary_expression":
+             operand = self.expr(node.child_by_field_name("operand") or node.named_children[-1])
+-            return Expr("unary", (operand,), text(node.child_by_field_name("operator")) or raw[0], s, operand.typ)
++            operator = text(node.child_by_field_name("operator")) or raw[0]
++            return Expr("unary", (operand,), operator, s, "boolean" if operator == "!" else operand.typ)
+         if kind == "parenthesized_expression":
+             return self.expr(node.named_children[0])
+         if kind == "ternary_expression":
+@@ -333,7 +369,7 @@
+             operation = "++" if "++" in raw else "--"
+             return Expr("update", (target,), ("pre" if raw.startswith(operation) else "post") + operation, s, target.typ)
+         if kind == "instanceof_expression":
+-            return Expr("instanceof", (self.expr(node.child_by_field_name("left")),), text(node.child_by_field_name("right")), s)
++            return Expr("instanceof", (self.expr(node.child_by_field_name("left")),), text(node.child_by_field_name("right")), s, "boolean")
+         return Expr("unsupported", value=kind, span=s)
+ 
+     def block(self, node):
+@@ -408,6 +444,7 @@
+     def lower(self, method, node):
+         self.file = method.span.file
+         self.owner = method.owner
++        self.callback_owner=method.key
+         self.local_types = {p.name: p.typ for p in method.params}
+         info = self.p.types.get(method.owner)
+         if info:
+--- phase5/code/polygraph/java_boxing.py
++++ phase6/code/polygraph/java_boxing.py
+@@ -0,0 +1,217 @@
++"""JDK scalar wrappers preserve runtime class and reference identity.
++
++Only guaranteed cache identities are concretized. Equal values outside that
++range do not prove reference inequality: a VM may extend its wrapper cache.
++"""
++from dataclasses import dataclass
++import re
++
++from .values import Object,TypeRef,Unknown,Raised,unknown,equal,integer,symbolic,binary
++
++WRAPPERS={'Integer':'int','Long':'long','Byte':'byte','Short':'short','Boolean':'boolean'}
++CLASSES={'java.lang.'+name:primitive for name,primitive in WRAPPERS.items()}
++PRIMITIVES=set(WRAPPERS.values())|{'float','double','char'}
++
++
++def short(typ):return typ.removeprefix('java.lang.')
++
++
++def boxed(value):return isinstance(value,Object) and value.typ in CLASSES
++
++
++def unbox(value):
++    if value is None:raise Raised('NullPointerException')
++    return value.fields.get('value',Unknown('Unknown boxed value')) if boxed(value) else value
++
++
++def box(engine,value,origin,span,fresh=False):
++    if value is None or boxed(value):return value
++    raw=short(origin)
++    primitive=WRAPPERS.get(raw,raw)
++    name=next((name for name,kind in WRAPPERS.items() if kind==primitive),None)
++    if name is None:engine.unsupported('Java boxing type is unresolved or unsupported: '+origin,span)
++    if unknown(value):
++        cache=primitive=='boolean' and symbolic(value)
++        if not fresh and symbolic(value) and primitive!='boolean':
++            cache=engine.condition(binary('>=',value,-128,'java',primitive),span) and engine.condition(binary('<=',value,127,'java',primitive),span)
++        key=('java.lang.'+name,value)
++        if cache and not fresh and key in engine.state.box_cache:return engine.state.box_cache[key]
++        result=engine.state.new('java.lang.'+name,{'value':value,'fresh':fresh,'cache_guaranteed':cache and not fresh})
++        if cache and not fresh:engine.state.box_cache[key]=result
++        return result
++    if primitive=='boolean':
++        if type(value) is not bool:raise Raised('ClassCastException')
++    else:
++        if type(value) is not int:engine.unsupported('Non-integral Java boxing conversion',span)
++        value=integer(value,primitive)
++    typ='java.lang.'+name;cache=primitive=='boolean' or -128<=value<=127
++    key=(typ,value)
++    if not fresh and cache and key in engine.state.box_cache:return engine.state.box_cache[key]
++    result=engine.state.new(typ,{'value':value,'fresh':fresh,'cache_guaranteed':cache and not fresh})
++    if not fresh and cache:engine.state.box_cache[key]=result
++    return result
++
++
++def adapt(engine,value,typ,span,origin=''):
++    raw=short(typ)
++    if raw not in PRIMITIVES and engine.p.resolve_type(typ,engine.method.module if engine.method else '',span.file):return value
++    if raw in WRAPPERS:
++        if value is None or unknown(value):return value
++        if boxed(value):
++            if value.typ!='java.lang.'+raw:raise Raised('ClassCastException')
++            return value
++        return box(engine,value,raw,span)
++    if raw in {'Double','Float','Character'}:
++        if value is None or unknown(value):return value
++        engine.unsupported('Additional Java scalar wrapper contract required: '+raw,span)
++    if raw in PRIMITIVES:
++        value=unbox(value)
++        if unknown(value):return value
++        if raw=='boolean':
++            if type(value) is not bool:raise Raised('ClassCastException')
++            return value
++        if raw=='char':return value
++        if type(value) not in {int,float}:raise Raised('ClassCastException')
++        return integer(value,raw)
++    if raw in {'Object','Number','Serializable','Comparable'} and type(value) in {int,bool,float}:
++        return box(engine,value,origin,span)
++    if raw in {'Object','Number','Serializable','Comparable'} and unknown(value) and short(origin) in PRIMITIVES:
++        return box(engine,value,origin,span)
++    return value
++
++
++def argument(engine,value,typ,span):
++    # At a generic library Object parameter, primitives are boxed and existing
++    # references keep their class. Never infer Integer from the numeric value.
++    if type(value) in {int,bool,float}:return box(engine,value,typ,span)
++    return value
++
++
++def reference_cast(engine,value,typ,span):
++    if not typ or typ in {'Object','java.lang.Object'} or value is None:return value
++    if unknown(value):engine.unsupported('Unknown functional-interface input cast',span)
++    raw=short(typ)
++    if raw in PRIMITIVES:typ=next((name for name,primitive in WRAPPERS.items() if primitive==raw),typ)
++    source=engine.p.resolve_type(typ,engine.method.module if engine.method else '',span.file)
++    if source:
++        from .callbacks import compatible
++        if not isinstance(value,Object) or not compatible(engine.p,value.typ,source):raise Raised('ClassCastException')
++        return value
++    raw=short(typ)
++    if raw in WRAPPERS:
++        if not boxed(value) or value.typ!='java.lang.'+raw:raise Raised('ClassCastException')
++    elif raw=='String':
++        if not isinstance(value,str):raise Raised('ClassCastException')
++    elif raw in {'Number','Serializable','Comparable'}:
++        target=('java.io.' if raw=='Serializable' else 'java.lang.')+raw
++        if not isinstance(value,Object) or not engine.matches_type(value.typ,target):raise Raised('ClassCastException')
++    else:engine.unsupported('Functional-interface input type needs a reference-cast contract: '+typ,span)
++    return value
++
++
++def equals(left,right):
++    if not boxed(right) or left.typ!=right.typ:return False
++    return equal(unbox(left),unbox(right))
++
++
++@dataclass(frozen=True)
++class MapKey:
++    typ: str
++    value: object
++
++
++def map_key(engine,value,span):
++    if boxed(value):
++        scalar=unbox(value)
++        if unknown(scalar):engine.unsupported('Unknown boxed Java map key',span)
++        return MapKey(value.typ,scalar)
++    if isinstance(value,Object) or unknown(value):engine.unsupported('Java map key needs a source hash/equality contract',span)
++    return value
++
++
++def parse(engine,value,primitive,span):
++    if not isinstance(value,str):raise Raised('NumberFormatException')
++    engine.operations+=len(value);engine.tick(span)
++    if not re.fullmatch(r'[+-]?\d+',value):raise Raised('NumberFormatException')
++    digits=value.lstrip('+-').lstrip('0') or '0'
++    bits={'int':32,'long':64,'byte':8,'short':16}[primitive]
++    if len(digits)>20:raise Raised('NumberFormatException')
++    result=int(('-' if value.startswith('-') else '')+digits)
++    if not -(1<<(bits-1))<=result<(1<<(bits-1)):raise Raised('NumberFormatException')
++    return result
++
++
++def decode_json(engine,value,typ,span,depth=0):
++    name=short(typ)
++    if depth>128:engine.unsupported('Java JSON decoding depth',span)
++    if name in WRAPPERS or name in PRIMITIVES:
++        primitive=WRAPPERS.get(name,name)
++        if value is not None and not unknown(value):
++            bits={'int':32,'long':64,'byte':8,'short':16}.get(primitive)
++            if primitive=='boolean' and type(value) is not bool:engine.unsupported('Java JSON boolean coercion needs a codec contract',span)
++            if bits and (type(value) is not int or not -(1<<(bits-1))<=value<(1<<(bits-1))):engine.unsupported('Java JSON integer range/coercion needs a codec contract',span)
++        return adapt(engine,value,next((wrapper for wrapper,primitive in WRAPPERS.items() if primitive==name),name),span)
++    if name!='Object':return value
++    if type(value) is bool:return box(engine,value,'boolean',span)
++    if type(value) is int:
++        if -(1<<31)<=value<(1<<31):return box(engine,value,'int',span)
++        if -(1<<63)<=value<(1<<63):return box(engine,value,'long',span)
++        engine.unsupported('Untyped JSON number exceeds supported Java wrappers',span)
++    if type(value) is float:engine.unsupported('Untyped JSON floating wrapper is unsupported',span)
++    if isinstance(value,list):return [decode_json(engine,item,'Object',span,depth+1) for item in value]
++    if isinstance(value,dict):return {key:decode_json(engine,item,'Object',span,depth+1) for key,item in value.items()}
++    return value
++
++
++def construct(engine,typ,args,kwargs,span,argument_types=()):
++    from .models import NOT_HANDLED
++    resolved=engine.p.resolve_import(typ,span.file) or typ
++    name=short(resolved)
++    if name not in WRAPPERS:return NOT_HANDLED
++    if kwargs or len(args)!=1:engine.unsupported('Boxed constructor overload',span)
++    value=args[0];primitive=WRAPPERS[name]
++    if isinstance(value,str) and primitive!='boolean':value=parse(engine,value,primitive,span)
++    elif primitive=='boolean' and isinstance(value,str):value=value.lower()=='true'
++    elif value is None:
++        hint=argument_types[0] if argument_types else ''
++        if primitive=='boolean' and hint in {'String','java.lang.String','null'}:return box(engine,False,primitive,span,fresh=True)
++        if hint in {'String','java.lang.String','null'}:raise Raised('NumberFormatException')
++        if not hint:engine.unsupported('Null boxed constructor overload is ambiguous',span)
++        raise Raised('NullPointerException')
++    else:value=unbox(value)
++    return box(engine,value,primitive,span,fresh=True)
++
++
++def call(engine,receiver,name,args,kwargs,span,argument_types=()):
++    from .models import NOT_HANDLED
++    if boxed(receiver):
++        value=unbox(receiver)
++        if name=='equals' and len(args)==1:return equals(receiver,argument(engine,args[0],argument_types[0] if argument_types else '',span))
++        if name=='toString' and not args:return Unknown('Unknown boxed string') if unknown(value) else str(value).lower() if type(value) is bool else str(value)
++        if name=='hashCode' and not args:
++            if unknown(value):return value
++            return 1231 if value is True else 1237 if value is False else integer(value^(value>>32),'int') if receiver.typ=='java.lang.Long' else integer(value,'int')
++        if name in {'intValue','longValue','shortValue','byteValue','booleanValue'} and not args:return adapt(engine,value,name.removesuffix('Value'),span)
++        if name=='compareTo' and len(args)==1:
++            other_box=argument(engine,args[0],argument_types[0] if argument_types else '',span)
++            if other_box is None:raise Raised('NullPointerException')
++            if not boxed(other_box) or receiver.typ!=other_box.typ:raise Raised('ClassCastException')
++            other=unbox(other_box)
++            if unknown(value) or unknown(other):return Unknown('Unknown boxed comparison','int')
++            return (value>other)-(value<other)
++        return NOT_HANDLED
++    if not isinstance(receiver,TypeRef) or short(receiver.name) not in WRAPPERS:return NOT_HANDLED
++    primitive=WRAPPERS[short(receiver.name)]
++    if name in {'valueOf','parseInt','parseLong','parseByte','parseShort','parseBoolean'}:
++        if kwargs or len(args)!=1:engine.unsupported('Boxed parse/valueOf overload',span)
++        value=args[0]
++        if primitive=='boolean':value=value is not None and isinstance(value,str) and value.lower()=='true' if isinstance(value,str) or value is None else unbox(value)
++        elif isinstance(value,str):value=parse(engine,value,primitive,span)
++        elif name!='valueOf':raise Raised('NumberFormatException')
++        else:value=unbox(value)
++        return box(engine,value,primitive,span) if name=='valueOf' else value
++    if name in {'sum','compare'} and len(args)==2:
++        left,right=(adapt(engine,value,primitive,span) for value in args)
++        if unknown(left) or unknown(right):return Unknown('Unknown boxed arithmetic',primitive)
++        return integer(left+right,primitive) if name=='sum' else (left>right)-(left<right)
++    return NOT_HANDLED
+--- phase5/code/polygraph/java_contracts.py
++++ phase6/code/polygraph/java_contracts.py
+@@ -6,9 +6,25 @@
+     'org.springframework.http.HttpHeaders': {'get': 'java.util.List<String>', 'getFirst': 'String', 'containsKey': 'boolean', 'isEmpty': 'boolean'},
+     'java.util.List': {'size': 'int', 'isEmpty': 'boolean', 'contains': 'boolean'},
+     'java.util.Collection': {'size': 'int', 'isEmpty': 'boolean', 'contains': 'boolean'},
++    'java.util.Set': {'size':'int','isEmpty':'boolean','contains':'boolean'},
++    'java.util.HashSet': {'size':'int','isEmpty':'boolean','contains':'boolean'},
+     'java.util.Map': {'size': 'int', 'isEmpty': 'boolean', 'containsKey': 'boolean'},
+-    'java.lang.String': {'length': 'int', 'isEmpty': 'boolean', 'equals': 'boolean'},
++    'java.lang.String': {'length': 'int', 'isEmpty': 'boolean', 'equals': 'boolean','valueOf':'String'},
++    'java.lang.Integer': {'intValue':'int','longValue':'long','sum':'int','compare':'int','parseInt':'int','valueOf':'Integer','hashCode':'int'},
++    'java.lang.Long': {'intValue':'int','longValue':'long','sum':'long','compare':'int','parseLong':'long','valueOf':'Long','hashCode':'int'},
++    'java.lang.Boolean': {'booleanValue':'boolean','valueOf':'Boolean','parseBoolean':'boolean','hashCode':'int'},
++    'java.util.stream.Stream': {'count':'long'},
++    'java.time.LocalDate': {'now':'java.time.LocalDate','of':'java.time.LocalDate','atStartOfDay':'java.time.LocalDateTime','toEpochDay':'long','toString':'String'},
++    'java.time.LocalDateTime': {'of':'java.time.LocalDateTime','atZone':'java.time.ZonedDateTime'},
++    'java.time.ZonedDateTime': {'toInstant':'java.time.Instant'},
++    'java.time.Instant': {'now':'java.time.Instant','ofEpochMilli':'java.time.Instant','toEpochMilli':'long'},
++    'java.time.ZoneId': {'of':'java.time.ZoneId','systemDefault':'java.time.ZoneId'},
++    'java.util.Date': {'from':'java.util.Date','getTime':'long','toInstant':'java.time.Instant'},
+ }
++for wrapper in ('Integer','Long','Byte','Short','Boolean'):
++    RETURNS.setdefault('java.lang.'+wrapper,{}).update({'equals':'boolean','compareTo':'int','toString':'String','hashCode':'int'})
++RETURNS['java.util.Arrays']={'asList':'java.util.List'}
++RETURNS['java.util.stream.Stream'].update({'of':'java.util.stream.Stream','empty':'java.util.stream.Stream','map':'java.util.stream.Stream','filter':'java.util.stream.Stream','peek':'java.util.stream.Stream','limit':'java.util.stream.Stream','skip':'java.util.stream.Stream'})
+ TYPES = set(RETURNS) | {
+     'org.springframework.http.HttpMethod', 'org.springframework.http.HttpStatus',
+     'org.springframework.http.HttpEntity', 'org.springframework.http.ResponseEntity',
+@@ -16,6 +32,9 @@
+     'org.springframework.util.StringUtils', 'org.slf4j.LoggerFactory', 'org.slf4j.Logger',
+     'java.util.ArrayList', 'java.util.HashMap', 'java.util.LinkedList', 'java.util.LinkedHashMap',
+     'java.util.Optional', 'java.util.UUID',
++    'java.util.stream.Collectors','java.util.stream.Stream','java.util.HashSet','java.util.LinkedHashSet',
++    'java.lang.String','java.math.BigDecimal',
++    'java.lang.Integer','java.lang.Long','java.lang.Byte','java.lang.Short','java.lang.Boolean','java.lang.Number','java.lang.Object',
+     'java.util.Date','java.time.LocalDate','java.time.LocalDateTime','java.time.Instant','java.time.ZonedDateTime','java.time.ZoneId',
+ }
+ 
+--- phase5/code/polygraph/java_sets.py
++++ phase6/code/polygraph/java_sets.py
+@@ -0,0 +1,83 @@
++"""Bounded Java HashSet contracts, including source hashCode/equals effects."""
++from functools import reduce
++import re
++
++from .values import Object,Raised,unknown,integer
++
++TYPES={'java.util.HashSet','java.util.LinkedHashSet'}
++
++
++def string_hash(text):
++    raw=text.encode('utf-16-be',errors='surrogatepass')
++    return reduce(lambda result,index:integer(31*result+int.from_bytes(raw[index:index+2],'big'),'int'),range(0,len(raw),2),0)
++
++
++def hash_string(engine,text,span):
++    engine.operations+=len(text);engine.tick(span)
++    return string_hash(text)
++
++
++def key(engine,item,element_type,span):
++    if unknown(item):engine.unsupported('Unknown Java set hash/equality',span)
++    if item is None:return 0
++    from .java_boxing import boxed,call
++    if boxed(item):
++        result=call(engine,item,'hashCode',(),{},span)
++        if type(result) is not int:engine.unsupported('Unknown boxed set hash',span)
++        return result
++    if isinstance(item,str):return hash_string(engine,item,span)
++    if type(item) is bool:return 1231 if item else 1237
++    if type(item) is int:
++        engine.unsupported('Java set numeric boxing type is unresolved',span)
++    if isinstance(item,Object) and item.typ in engine.p.types:
++        hashes=engine.p.methods_of(item.typ,'hashCode',0);equals=engine.p.methods_of(item.typ,'equals',1)
++        if len(hashes)==1:
++            result=engine.source_call(hashes[0].key,receiver=item,span=span)
++            if type(result) is not int:engine.unsupported('Source hashCode did not resolve to a concrete int',span)
++            return integer(result,'int')
++        if not hashes and not equals:return ('identity',item.identity)
++    engine.unsupported('Java set hash contract is unavailable',span)
++
++
++def equivalent(engine,left,right,span):
++    from .java_boxing import boxed,equals
++    if boxed(left):return engine.condition(equals(left,right),span)
++    if isinstance(left,Object):
++        if isinstance(right,Object) and left.identity==right.identity:return True
++        methods=engine.p.methods_of(left.typ,'equals',1)
++        if len(methods)==1:return engine.condition(engine.source_call(methods[0].key,(right,),receiver=left,span=span),span)
++        return False
++    return type(left) is type(right) and left==right
++
++
++def fields(engine,collection,span):
++    values=collection.fields.get('values');buckets=collection.fields.get('buckets')
++    if not isinstance(values,list) or not isinstance(buckets,dict) or id(values) in engine.state.tainted_containers or id(buckets) in engine.state.tainted_containers:
++        engine.unsupported('Java set state is unknown',span)
++    return values,buckets
++
++
++def put(engine,collection,item,span,contains=False):
++    values,buckets=fields(engine,collection,span);version=engine.state.mutation_version(values)
++    def check():
++        current,_=fields(engine,collection,span)
++        if current is not values or engine.state.mutation_version(values)!=version:engine.unsupported('Set interference during source hash/equality callback',span)
++    hashed=key(engine,item,collection.fields.get('element_type',''),span);check()
++    bucket=buckets.get(hashed,[])
++    if len(bucket)>=8:engine.unsupported('Java HashMap tree/collision traversal needs a runtime contract',span)
++    for previous in bucket:
++        same=equivalent(engine,item,previous,span);check()
++        if same:return True if contains else False
++    if contains:return False
++    buckets.setdefault(hashed,[]).append(item);values.append(item)
++    engine.state.mutated(values)
++    return True
++
++
++def create(engine,element_type='',ordered=False):
++    return engine.state.new('java.util.LinkedHashSet' if ordered else 'java.util.HashSet',{'values':[],'buckets':{},'element_type':element_type})
++
++
++def element(typ):
++    found=re.fullmatch(r'[\w.]+\s*<\s*([\w.]+)\s*>',typ)
++    return found[1] if found else ''
+--- phase5/code/polygraph/java_streams.py
++++ phase6/code/polygraph/java_streams.py
+@@ -0,0 +1,151 @@
++"""Lazy sequential Java streams built with native CPython iterator primitives.
++
++Source callbacks use the shared kernel. Unsupported collectors, interference,
++parallelism and unspecified encounter order remain visible boundaries.
++"""
++from functools import reduce,partial
++from itertools import islice
++import re
++
++from .values import FunctionRef,MethodRef,Object,Raised,TypeRef,unknown
++from .models import NOT_HANDLED
++from . import java_sets
++from .java_boxing import argument as box_argument,boxed,unbox,reference_cast
++
++STREAM='java.util.stream.Stream'
++
++
++def construct(engine,typ,args,kwargs,span):
++    base=re.sub(r'<.*>','',typ)
++    qualified=engine.p.resolve_import(base,span.file) or base
++    if qualified not in java_sets.TYPES:return NOT_HANDLED
++    if kwargs:engine.unsupported('Java set constructor keyword arguments',span)
++    result=java_sets.create(engine,java_sets.element(typ),qualified.endswith('.LinkedHashSet'))
++    if not args:return result
++    if len(args)==1 and boxed(args[0]):args=(unbox(args[0]),)
++    if len(args)==1 and type(args[0]) is int:
++        if args[0]<0:raise Raised('IllegalArgumentException')
++        return result
++    if len(args)!=1 or not isinstance(args[0],list):engine.unsupported('Java set constructor overload',span)
++    for index,item in enumerate(args[0]):
++        if index>=engine.loop_limit:engine.unsupported('Java set construction budget',span)
++        java_sets.put(engine,result,item,span)
++    return result
++
++
++def new(engine,source,element_type='',ordered=True,operations=()):
++    return engine.state.new(STREAM,{'source':source,'element_type':element_type,'ordered':ordered,'operations':operations,'used':False})
++
++
++def callable_argument(engine,value,span):
++    if value is None:raise Raised('NullPointerException')
++    if not isinstance(value,(MethodRef,FunctionRef)):engine.unsupported('Stream callback needs a supported functional value',span)
++    return value
++
++
++def pipeline(engine,stream,span):
++    source=stream.fields['source']
++    empty=any(operation=='limit' and argument==0 for operation,argument in stream.fields['operations'])
++    if not empty and not stream.fields['ordered'] and len(source)>1:engine.unsupported('Unordered Java stream needs an encounter-order/commutativity contract',span)
++    original=tuple(id(value) for value in source)
++    version=engine.state.mutation_version(source)
++    def check():
++        if id(source) in engine.state.tainted_containers or tuple(id(value) for value in source)!=original or version!=engine.state.mutation_version(source):
++            engine.unsupported('Interference with Java stream source',span)
++    def elements():
++        for index,item in enumerate(source):
++            check()
++            if index>=engine.loop_limit:engine.unsupported('Java stream iteration budget',span)
++            engine.tick(span)
++            yield item
++        check()
++    def apply(callback,input_type,item,predicate=False,peek=False):
++        item=reference_cast(engine,item,input_type,span)
++        result=engine.invoke_callable(callback,(item,),span);check()
++        return engine.condition(result,getattr(callback,'span',span)) if predicate else item if peek else box_argument(engine,result,getattr(callback,'return_type',''),span)
++    values=elements()
++    for operation,argument in stream.fields['operations']:
++        if operation=='map':values=map(partial(apply,*argument),values)
++        elif operation=='filter':values=filter(partial(apply,*argument,predicate=True),values)
++        elif operation=='peek':values=map(partial(apply,*argument,peek=True),values)
++        elif operation=='limit':values=islice(values,argument)
++        elif operation=='skip':values=islice(values,argument,None)
++    return values,check
++
++
++def call(engine,receiver,name,args,kwargs,span,receiver_type='',argument_types=()):
++    if kwargs:return NOT_HANDLED
++    if isinstance(receiver,TypeRef) and receiver.name=='java.util.stream.Collectors':
++        if name in {'toList','toSet'} and not args:return engine.state.new('java.util.stream.Collector',{'kind':name})
++        engine.unsupported('Java collector contract '+name,span)
++    if isinstance(receiver,TypeRef) and receiver.name==STREAM:
++        if name=='empty' and not args:return new(engine,[])
++        if name=='of':
++            if len(args)==1 and isinstance(args[0],list):engine.unsupported('Stream.of array/element overload is unresolved',span)
++            return new(engine,[box_argument(engine,value,argument_types[index] if index<len(argument_types) else '',span) for index,value in enumerate(args)])
++        engine.unsupported('Java stream factory '+name,span)
++    if isinstance(receiver,Object) and receiver.typ in java_sets.TYPES:
++        values,_=java_sets.fields(engine,receiver,span)
++        if name=='stream' and not args:return new(engine,values,receiver.fields.get('element_type',''),receiver.typ.endswith('.LinkedHashSet'))
++        if name in {'size','isEmpty'} and not args:return len(values) if name=='size' else not values
++        if name in {'add','contains'} and len(args)==1:return java_sets.put(engine,receiver,box_argument(engine,args[0],argument_types[0] if argument_types else '',span),span,name=='contains')
++        engine.unsupported('Java set operation '+name,span)
++    if isinstance(receiver,list) and name in {'stream','parallelStream'} and not args:
++        if name=='parallelStream':engine.unsupported('Parallel Java stream',span)
++        return new(engine,receiver,java_sets.element(receiver_type))
++    if not isinstance(receiver,Object) or receiver.typ!=STREAM:return NOT_HANDLED
++    fields=receiver.fields
++    if (type(fields.get('used')) is not bool or type(fields.get('ordered')) is not bool or
++        not isinstance(fields.get('source'),list) or not isinstance(fields.get('operations'),tuple)):
++        engine.unsupported('Java stream state is unknown',span)
++    if fields['used']:raise Raised('IllegalStateException')
++    if name in {'map','filter','peek'} and len(args)==1:
++        callback=callable_argument(engine,args[0],span);fields['used']=True
++        input_type=java_sets.element(receiver_type) or fields['element_type']
++        element_type=callback.return_type if name=='map' and isinstance(callback,MethodRef) else fields['element_type']
++        return new(engine,fields['source'],element_type,fields['ordered'],fields['operations']+((name,(callback,input_type)),))
++    if name in {'limit','skip'} and len(args)==1:
++        bound=unbox(args[0]) if boxed(args[0]) else args[0]
++        if type(bound) is not int:engine.unsupported('Unknown Java stream slice bound',span)
++        if bound<0:raise Raised('IllegalArgumentException')
++        fields['used']=True
++        return new(engine,fields['source'],fields['element_type'],fields['ordered'],fields['operations']+((name,bound),))
++    if name=='count' and not args:
++        if fields['operations']:engine.unsupported('Stream count may elide callbacks; JDK version-specific contract required',span)
++        fields['used']=True;return len(fields['source'])
++    terminal=name in {'collect','reduce','forEach','forEachOrdered','findFirst','anyMatch','allMatch','noneMatch'}
++    if not terminal:engine.unsupported('Java stream operation '+name,span)
++    if name=='collect' and not (len(args)==1 and isinstance(args[0],Object) and args[0].typ=='java.util.stream.Collector' and args[0].fields.get('kind') in {'toList','toSet'}):engine.unsupported('Java collector overload/state is unsupported',span)
++    callback=None
++    if name in {'forEach','forEachOrdered','anyMatch','allMatch','noneMatch'}:
++        if len(args)!=1:engine.unsupported('Java stream terminal arity',span)
++        callback=callable_argument(engine,args[0],span)
++    if name=='reduce':
++        if len(args)!=2:engine.unsupported('Java reduce overload',span)
++        callback=callable_argument(engine,args[1],span)
++    if name=='findFirst' and args:engine.unsupported('Java findFirst arity',span)
++    fields['used']=True;values,check=pipeline(engine,receiver,span)
++    if name=='collect':
++        if args[0].fields['kind']=='toList':return list(values)
++        result=java_sets.create(engine,fields['element_type'])
++        for item in values:java_sets.put(engine,result,item,span);check()
++        return result
++    if name=='reduce':
++        def accumulate(left,right):
++            left=reference_cast(engine,left,fields['element_type'],span)
++            right=reference_cast(engine,right,fields['element_type'],span)
++            result=engine.invoke_callable(callback,(left,right),span);check();return box_argument(engine,result,getattr(callback,'return_type',''),span)
++        initial=box_argument(engine,args[0],argument_types[0] if argument_types else '',span)
++        return reduce(accumulate,values,initial)
++    if name=='findFirst':
++        sentinel=object();result=next(values,sentinel)
++        if result is None:raise Raised('NullPointerException')
++        return engine.state.new('java.util.Optional',{'present':result is not sentinel,'value':None if result is sentinel else result})
++    for item in values:
++        item=reference_cast(engine,item,java_sets.element(receiver_type) or fields['element_type'],span)
++        result=engine.invoke_callable(callback,(item,),span);check()
++        if name in {'forEach','forEachOrdered'}:continue
++        matched=engine.condition(result,getattr(callback,'span',span))
++        if matched and name in {'anyMatch','noneMatch'}:return name=='anyMatch'
++        if not matched and name=='allMatch':return False
++    return None if name in {'forEach','forEachOrdered'} else name!='anyMatch'
+--- phase5/code/polygraph/java_time.py
++++ phase6/code/polygraph/java_time.py
+@@ -66,6 +66,8 @@
+ 
+ 
+ def date_construct(engine,typ,args,kwargs,span):
++    from .java_boxing import boxed,unbox
++    args=tuple(unbox(value) if boxed(value) else value for value in args)
+     qualified=engine.p.resolve_import(typ,span.file) or typ
+     if qualified!='java.util.Date':return NOT_HANDLED
+     if kwargs:return NOT_HANDLED
+@@ -80,6 +82,9 @@
+ def call(engine,receiver,name,args,kwargs,span):
+     typ=receiver.name if isinstance(receiver,TypeRef) else receiver.typ if isinstance(receiver,Object) else ''
+     if typ not in TYPES|{'java.time.ZoneId'}:return NOT_HANDLED
++    if name in {'of','ofEpochMilli'} and typ in {'java.time.LocalDate','java.time.LocalDateTime','java.time.Instant'}:
++        from .java_boxing import boxed,unbox
++        args=tuple(unbox(value) if boxed(value) else value for value in args)
+     if kwargs:return NOT_HANDLED
+     static=isinstance(receiver,TypeRef)
+     if static and typ=='java.time.ZoneId' and name in {'of','systemDefault'}:
+--- phase5/code/polygraph/java_validation.py
++++ phase6/code/polygraph/java_validation.py
+@@ -49,6 +49,8 @@
+ 
+ 
+ def constraint(engine,name,raw,value,typ,field,span):
++    from .java_boxing import boxed,unbox
++    if boxed(value):value=unbox(value)
+     if 'groups' in raw:engine.unsupported('Custom Bean Validation groups',span)
+     if name not in SUPPORTED:engine.unsupported('Bean Validation constraint '+name+' needs an additional contract',span)
+     if name=='NotNull':
+--- phase5/code/polygraph/kernel.py
++++ phase6/code/polygraph/kernel.py
+@@ -30,6 +30,7 @@
+ class Completion:
+     kind: str = "normal"
+     value: object = None
++    typ: str = ''
+ 
+ 
+ class Kernel:
+@@ -81,6 +82,10 @@
+         return selected
+ 
+     def condition(self, value, span):
++        if self.language=='java':
++            from .java_boxing import boxed,unbox
++            if value is None:raise Raised('NullPointerException')
++            if boxed(value) and value.typ=='java.lang.Boolean':value=unbox(value)
+         if isinstance(value, Predicate):
+             self.note("predicate-as-boolean", "A symbolic field predicate is not a concrete condition", span)
+             value = Unknown("symbolic predicate outside query evaluation", "boolean")
+@@ -121,7 +126,7 @@
+         if evidence not in self.edges[edge]:
+             self.edges[edge].append(evidence)
+ 
+-    def execute_method(self, key, args=(), kwargs=None, receiver=None, span=Span()):
++    def execute_method(self, key, args=(), kwargs=None, receiver=None, span=Span(),argument_types=()):
+         method = self.p.methods[key]
+         if method.abstract:
+             return self.opaque("abstract or external method " + key, span)
+@@ -142,9 +147,9 @@
+         if method.language == "python" and any(p.name in method.annotations.get("keyword_only", []) for p in method.params[:len(args)]):
+             raise Raised("TypeError", "positional argument supplied for keyword-only parameter")
+         self.frames.append((method, env))
+-        checkpoint = deepcopy(self.state.store) if method.transaction else None
++        checkpoint = None
+         try:
+-            for param in method.params:
++            for param_index,param in enumerate(method.params):
+                 if param.name in supplied:
+                     env[param.name] = supplied.pop(param.name)
+                 elif param.dependency:
+@@ -156,6 +161,9 @@
+                     if method.language == "python":
+                         raise Raised("TypeError", "missing required argument " + param.name)
+                     env[param.name] = Unknown("missing method argument", param.typ, param.name)
++                if method.language=='java':
++                    from .java_boxing import adapt
++                    env[param.name]=adapt(self,env[param.name],param.typ,span,argument_types[param_index] if param_index<len(argument_types) else '')
+                 value = env[param.name]
+                 raw = param.typ.split(".")[-1]
+                 sort = "bool" if raw in {"bool", "boolean"} else "int" if method.language == "python" and raw == "int" else "bv32" if method.language == "java" and raw == "int" else "bv64" if method.language == "java" and raw == "long" else ""
+@@ -164,11 +172,16 @@
+                     env[param.name] = self.state.symbol(param.typ, sort)
+             if supplied:
+                 raise Raised("TypeError", "unexpected keyword arguments")
++            checkpoint = deepcopy(self.state.store) if method.transaction else None
+             if caller:
+                 self.add(caller.skeleton_id, "calls", method.skeleton_id, span)
+             self.add("scenario:" + self.scenario_id, "executes", method.skeleton_id, method.span)
+             completion = self.block(self.p.lower(key), env)
+-            return completion.value if completion.kind in {"return", "yield"} else None
++            result=completion.value if completion.kind in {'return','yield'} else None
++            if method.language=='java':
++                from .java_boxing import adapt
++                result=adapt(self,result,method.return_type,method.span,completion.typ)
++            return result
+         except Raised:
+             if checkpoint is not None:
+                 self.state.store = checkpoint
+@@ -208,12 +221,16 @@
+         self.dependency_cache[key] = value
+         return value
+ 
+-    def source_call(self, key, args=(), kwargs=None, receiver=None, span=Span()):
++    def source_call(self, key, args=(), kwargs=None, receiver=None, span=Span(),argument_types=()):
+         if self.p.methods[key].annotations.get("generator"):
+             return self.state.new("python.Generator", {"method": key})
+         if self.p.methods[key].annotations.get("async"):
+             return Awaitable(key, tuple(args), dict(kwargs or {}), receiver, span)
+-        return self.execute_method(key, args, kwargs, receiver, span)
++        return self.execute_method(key, args, kwargs, receiver, span,argument_types)
++
++    def invoke_callable(self,callback,args=(),span=Span()):
++        from .callbacks import invoke
++        return invoke(self,callback,tuple(args),span)
+ 
+     def opaque(self, reason, span=Span()):
+         self.note("unknown-call", reason + "; reachable state and exceptional completion are unknown", span)
+@@ -227,14 +244,14 @@
+         self.state.havoc()
+         raise Incomplete()
+ 
+-    def create(self, typ, args=(), kwargs=None, span=Span(), bean=False, constructing=None):
++    def create(self, typ, args=(), kwargs=None, span=Span(), bean=False, constructing=None,argument_types=()):
+         from .models import construct, NOT_HANDLED
+         module = self.method.module if self.method else self.p.module(span.file)
+         resolved = self.p.resolve_type(typ, module, span.file)
+         if not resolved:
+             if bean:
+                 return self.state.new(self.p.imports.get(span.file, {}).get(typ, typ))
+-            modeled = construct(self, typ, args, kwargs or {}, span)
++            modeled = construct(self, typ, args, kwargs or {}, span,argument_types)
+             if modeled is not NOT_HANDLED:
+                 return modeled
+             return self.opaque("unmodeled constructor " + typ, span)
+@@ -259,6 +276,9 @@
+                     fields[field] = kwargs[field]
+                 elif default is not None:
+                     fields[field] = self.value(default, {"this": obj, "self": obj})
++                    if info.language=='java':
++                        from .java_boxing import adapt
++                        fields[field]=adapt(self,fields[field],field_type,info.span,default.typ)
+                 elif info.language == "java":
+                     fields[field] = False if field_type == "boolean" else 0 if field_type in {"byte", "short", "int", "long", "float", "double"} else None
+                 else:
+@@ -281,7 +301,7 @@
+         if constructors and not bean:
+             if len(constructors) != 1:
+                 return self.opaque("ambiguous constructor overload " + typ, span)
+-            self.execute_method(constructors[0].key, args, kwargs, obj, span)
++            self.execute_method(constructors[0].key, args, kwargs, obj, span,argument_types)
+         elif args and info.language == "python":
+             self.note("model-positional", "Positional model construction is not supported", span)
+             return Unknown("invalid model construction", resolved)
+@@ -362,6 +382,9 @@
+                 if imported not in self.state.globals:
+                     self.state.globals[imported] = self.definition_value(self.p.globals[imported], imported) if file.endswith(".py") else self.value(self.p.globals[imported], {})
+                 return self.state.globals[imported]
++            if file.endswith('.java'):
++                target=self.p.resolve_type(imported,method.module if method else self.p.module(file),file)
++                if target:return TypeRef(target)
+             return TypeRef(imported)
+         function = self.p.resolve_function(name, file, method.module if method else "")
+         if function:
+@@ -370,8 +393,10 @@
+         if resolved:
+             return TypeRef(resolved)
+         intrinsic = {"len", "str", "int", "float", "bool", "list", "dict", "set", "range", "enumerate", "isinstance",
+-                     "String", "Integer", "Long", "Boolean", "Double", "Object", "System", "Math"}
++                     "String", "Integer", "Long", "Byte", "Short", "Number", "Boolean", "Double", "Object", "System", "Math"}
+         if name in intrinsic or name.endswith(("Exception", "Error")):
++            from .java_boxing import WRAPPERS
++            if file.endswith('.java') and name in set(WRAPPERS)|{'String','Object','Number'}:return TypeRef('java.lang.'+name)
+             return TypeRef(name)
+         self.note("unresolved-name", "Name is not bound by source facts or supplied context", span, name=name)
+         return Unknown("unresolved source name", origin=name)
+@@ -419,10 +444,11 @@
+             return len(obj)
+         return Unknown("field on unknown receiver", origin=name)
+ 
+-    def assign(self, target, value, env, span):
++    def assign(self, target, value, env, span,origin=''):
+         if target.op == "var":
+             if self.language == "java" and target.typ:
+-                value = integer(value, target.typ)
++                from .java_boxing import adapt
++                value=adapt(self,value,target.typ,span,origin)
+             if target.value in env.get(GLOBAL_NAMES, set()):
+                 module = self.p.lexical_modules[self.method.span.file]
+                 self.state.globals[module + "." + target.value] = value
+@@ -431,6 +457,9 @@
+             else:
+                 env[target.value] = value
+         elif target.op == "field":
++            if self.language=='java' and target.typ:
++                from .java_boxing import adapt
++                value=adapt(self,value,target.typ,span,origin)
+             obj = self.value(target.args[0], env)
+             if obj is None:
+                 raise Raised("NullPointerException" if self.language == "java" else "AttributeError")
+@@ -469,7 +498,10 @@
+         if op == "var":
+             return self.resolve_name(expr.value, env, span, expr.bindings)
+         if op == "type":
+-            return TypeRef(self.p.resolve_type(expr.value, self.method.module if self.method else "", span.file) or expr.value)
++            typ=self.p.resolve_type(expr.value,self.method.module if self.method else '',span.file) or self.p.resolve_import(expr.value,span.file) or expr.value
++            from .java_boxing import WRAPPERS
++            if span.file.endswith('.java') and typ in set(WRAPPERS)|{'String','Object','Number'}:typ='java.lang.'+typ
++            return TypeRef(typ)
+         if op == "unknown":
+             self.note("unknown-value", expr.value, span)
+             return Unknown(expr.value, expr.typ)
+@@ -499,8 +531,23 @@
+                 raise Raised(type(exc).__name__) from None
+         if op == "bin":
+             left, right = (self.value(a, env) for a in args)
++            operand_type=expr.operand_type or expr.typ;left_box=right_box=False
++            if self.language=='java':
++                from .java_boxing import boxed,unbox,WRAPPERS,PRIMITIVES,short,adapt
++                left_box,right_box=boxed(left),boxed(right)
++                if expr.value in {'==','!='}:
++                    if any(short(arg.typ) in PRIMITIVES for arg in args):
++                        for index,arg in enumerate(args):
++                            if short(arg.typ) in WRAPPERS:
++                                if index==0:left=adapt(self,left,WRAPPERS[short(arg.typ)],span)
++                                else:right=adapt(self,right,WRAPPERS[short(arg.typ)],span)
++                else:
++                    if left_box or right_box:
++                        if (left_box and left.typ=='java.lang.Long' or right_box and right.typ=='java.lang.Long') and expr.value not in {'<<','>>','>>>'}:operand_type='long'
++                        if left_box:left=unbox(left)
++                        if right_box:right=unbox(right)
+             numeric = all(type(value) is int or symbolic(value) and value.sort != "bool" for value in (left, right))
+-            if self.language == "java" and numeric and any(arg.op in {"call", "field", "choose", "index"} and not arg.typ for arg in args):
++            if self.language == "java" and numeric and any(arg.op in {"call", "field", "choose", "index"} and not arg.typ and not was_box for arg,was_box in zip(args,(left_box,right_box))):
+                 self.note("unknown-numeric-promotion", "Unresolved Java operand type cannot justify numeric narrowing or branch pruning", span)
+                 return Unknown("unresolved Java numeric operand type", expr.typ)
+             if self.language == "java" and not (expr.value == "+" and "String" in {a.typ for a in args}):
+@@ -513,7 +560,7 @@
+                 # forked explicitly before constructing the arithmetic term.
+                 if self.condition(binary("==", right, 0, self.language), span):
+                     raise Raised("ArithmeticException" if self.language == "java" else "ZeroDivisionError")
+-            return binary(expr.value, left, right, self.language, expr.typ)
++            return binary(expr.value,left,right,self.language,operand_type)
+         if op == "compare":
+             previous = self.value(args[0], env)
+             for index, (operator, arg) in enumerate(zip(expr.value, args[1:])):
+@@ -543,6 +590,9 @@
+             value = self.value(args[0], env)
+             if expr.value in {"!", "not"}:
+                 return not self.condition(value, span)
++            if self.language=='java':
++                from .java_boxing import boxed,unbox
++                if boxed(value):value=unbox(value)
+             if symbolic(value):
+                 return binary("-", 0, value, self.language, expr.typ) if expr.value == "-" else value if expr.value == "+" else binary("^", value, -1, self.language, expr.typ)
+             if unknown(value):
+@@ -554,14 +604,17 @@
+         if op == "choose":
+             return self.value(args[1] if self.condition(self.value(args[0], env), span) else args[2], env)
+         if op == "assign":
+-            return self.assign(args[0], self.value(args[1], env), env, span)
++            return self.assign(args[0],self.value(args[1],env),env,span,args[1].typ)
+         if op == "update":
+             old = self.value(args[0], env)
+             new = binary("+", old, 1 if expr.value.endswith("++") else -1, self.language, expr.typ or "int")
+-            self.assign(args[0], new, env, span)
+-            return new if expr.value.startswith("pre") else old
++            assigned=self.assign(args[0],new,env,span)
++            return assigned if expr.value.startswith('pre') else old
+         if op == "cast":
+             value = self.value(args[0], env)
++            if self.language=='java':
++                from .java_boxing import adapt,WRAPPERS,PRIMITIVES,short
++                if short(expr.value) in set(WRAPPERS)|PRIMITIVES:return adapt(self,value,expr.value,span,args[0].typ)
+             return integer(value, expr.value)
+         if op == "instanceof":
+             value = self.value(args[0], env)
+@@ -584,7 +637,10 @@
+                 return self.execute_method(value.method, value.args, value.kwargs, value.receiver, value.span)
+             self.unsupported("await of an unmodeled awaitable", span)
+         if op == "new":
+-            return self.create(expr.value, tuple(self.value(a, env) for a in args), span=span)
++            return self.create(expr.value,tuple(self.value(a,env) for a in args),span=span,argument_types=tuple(a.typ for a in args))
++        if op=='method_ref':
++            from .callbacks import reference
++            return reference(self,expr,self.value(args[0],env))
+         if op == "call":
+             receiver_expr, positional, named = args
+             receiver = self.value(receiver_expr, env) if receiver_expr is not None else None
+@@ -614,10 +670,10 @@
+                 kwargs.update(group)
+             if any(not isinstance(name,str) for name in kwargs):
+                 raise Raised('TypeError', 'keyword names must be strings')
+-            return self.call(receiver, expr.value, values, kwargs, span, env, receiver_expr is not None, expr.bindings)
++            return self.call(receiver,expr.value,values,kwargs,span,env,receiver_expr is not None,expr.bindings,receiver_expr.typ if receiver_expr is not None else '',tuple(a.typ for a in positional))
+         self.unsupported(str(expr.value or op), span)
+ 
+-    def call(self, receiver, name, args, kwargs, span, env, explicit_receiver=True, bindings=()):
++    def call(self, receiver, name, args, kwargs, span, env, explicit_receiver=True, bindings=(),receiver_type='',argument_types=()):
+         from .models import call, NOT_HANDLED
+         if receiver is None and explicit_receiver:
+             raise Raised("NullPointerException" if self.language == "java" else "AttributeError")
+@@ -627,18 +683,18 @@
+                 owner = implicit.typ if isinstance(implicit, Object) else self.method.owner
+                 targets = self.p.methods_of(owner, name, len(args))
+                 if len(targets) == 1:
+-                    return self.source_call(targets[0].key, args, kwargs, implicit, span)
++                    return self.source_call(targets[0].key,args,kwargs,implicit,span,argument_types)
+                 if len(targets) > 1:
+                     return self.opaque('ambiguous source dispatch ' + name, span)
+                 if name == 'getClass' and isinstance(implicit, Object):
+                     return TypeRef(implicit.typ)
+             resolved = self.resolve_name(name, env, span, bindings)
+             if isinstance(resolved, FunctionRef):
+-                return self.source_call(resolved.name, args, kwargs, span=span)
++                return self.source_call(resolved.name,args,kwargs,span=span,argument_types=argument_types)
+             if isinstance(resolved, TypeRef):
+                 typ = self.p.resolve_type(resolved.name, self.method.module if self.method else "", span.file)
+                 if typ:
+-                    return self.create(typ, args, kwargs, span)
++                    return self.create(typ,args,kwargs,span,argument_types=argument_types)
+             if isinstance(resolved, Unknown):
+                 return self.opaque("unresolved callable " + name, span)
+             receiver, name = None, resolved.name if isinstance(resolved, TypeRef) else name
+@@ -647,25 +703,37 @@
+             if not info.repository_entity and "FeignClient" not in info.annotations:
+                 targets = self.p.methods_of(receiver.typ, name, len(args) if self.language == "java" else None)
+                 if len(targets) == 1:
+-                    return self.source_call(targets[0].key, args, kwargs, receiver, span)
++                    return self.source_call(targets[0].key,args,kwargs,receiver,span,argument_types)
+                 if len(targets) > 1:
+                     return self.opaque("ambiguous source dispatch " + name, span)
+         if isinstance(receiver, TypeRef):
+             key = receiver.name + "." + name
+             if key in self.p.methods:
+-                return self.source_call(key, args, kwargs, span=span)
++                return self.source_call(key,args,kwargs,span=span,argument_types=argument_types)
+             if key in self.p.types:
+-                return self.create(key, args, kwargs, span)
++                return self.create(key,args,kwargs,span,argument_types=argument_types)
+             if receiver.name in self.p.types:
+                 targets = self.p.methods_of(receiver.name, name, len(args) if self.language == "java" else None)
+                 if len(targets) == 1:
+-                    return self.source_call(targets[0].key, args, kwargs, span=span)
++                    return self.source_call(targets[0].key,args,kwargs,span=span,argument_types=argument_types)
+         if isinstance(receiver, Object) and receiver.typ == "httpx.AsyncClient" and name in {"get", "post", "put", "patch", "delete", "request"}:
+             return Awaitable(name, tuple(args), dict(kwargs), receiver, span, True)
+-        result = call(self, receiver, name, args, kwargs, span)
++        result=call(self,receiver,name,args,kwargs,span,receiver_type,argument_types)
+         return self.opaque("unmodeled call " + name, span) if result is NOT_HANDLED else result
+ 
+     def matches_type(self, actual, expected):
++        from .java_boxing import CLASSES
++        if actual in CLASSES:
++            parents={actual,'java.lang.Object','java.io.Serializable','java.lang.Comparable'}
++            if actual!='java.lang.Boolean':parents.add('java.lang.Number')
++            for candidate in re.split(r'[|,]',expected.strip('() ')):
++                candidate=candidate.strip()
++                if candidate=='*':return True
++                if self.method and self.p.resolve_type(candidate,self.method.module,self.method.span.file):continue
++                resolved=self.p.resolve_import(candidate,self.method.span.file) if self.method else ''
++                canonical=resolved or (candidate if '.' in candidate else 'java.lang.'+candidate)
++                if canonical in parents:return True
++            return False
+         if actual.startswith(('jwt.','pwdlib.','argon2.','pydantic.')):
+             from .security_models import exception_matches
+             for candidate in re.split(r'[|,]',expected.strip('() ')):
+@@ -687,7 +755,7 @@
+                 return True
+         if "Throwable" in names or "BaseException" in names or "Exception" in names:
+             return True
+-        runtime = {"ArithmeticException", "NullPointerException", "IllegalArgumentException", "IndexOutOfBoundsException", "NoSuchElementException", "HttpClientErrorException", "HttpServerErrorException"}
++        runtime = {"ArithmeticException", "NullPointerException", "IllegalArgumentException", "NumberFormatException", "ClassCastException", "IllegalStateException", "IndexOutOfBoundsException", "NoSuchElementException", "HttpClientErrorException", "HttpServerErrorException"}
+         return "RuntimeException" in names and short in runtime
+ 
+     def block(self, statements, env):
+@@ -709,7 +777,7 @@
+                     if env.get(SCOPES):
+                         env[SCOPES][-1].setdefault(target.value, (target.value in env, env.get(target.value)))
+                     env[target.value] = Unknown("uninitialized local", target.typ)
+-                self.assign(target, value, env, span)
++                self.assign(target,value,env,span,args[1].typ)
+         elif op == "scope":
+             scope = {}
+             env.setdefault(SCOPES, []).append(scope)
+@@ -728,7 +796,7 @@
+             if op == "yield" and self.method.key not in self.safe_generators:
+                 self.note("dependency-cleanup", "Generator dependency setup is modeled; teardown is not", span)
+                 self.unknown_teardown = True
+-            return Completion(op, self.value(args[0], env))
++            return Completion(op,self.value(args[0],env),args[0].typ)
+         elif op == "throw":
+             value = self.value(args[0], env)
+             if value is None:
+--- phase5/code/polygraph/models.py
++++ phase6/code/polygraph/models.py
+@@ -32,6 +32,8 @@
+ 
+ def static_field(engine, receiver, name):
+     typ = simple(receiver.name)
++    from .java_boxing import WRAPPERS
++    if typ in WRAPPERS and name=='TYPE':return TypeRef(WRAPPERS[typ])
+     if typ == "HttpStatus" and name in STATUSES:
+         return STATUSES[name]
+     if typ in {"Integer", "Long"} and name in {"MAX_VALUE", "MIN_VALUE"}:
+@@ -46,10 +48,18 @@
+     return NOT_HANDLED
+ 
+ 
+-def construct(engine, typ, args, kwargs, span):
++def construct(engine, typ, args, kwargs, span,argument_types=()):
++    if engine.language=='java':
++        from .java_boxing import construct as boxed_construct
++        modeled=boxed_construct(engine,typ,args,kwargs,span,argument_types)
++        if modeled is not NOT_HANDLED:return modeled
+     from .java_time import date_construct
+     modeled=date_construct(engine,typ,args,kwargs,span)
+     if modeled is not NOT_HANDLED:return modeled
++    if engine.language=='java':
++        from .java_streams import construct as collection_construct
++        modeled=collection_construct(engine,typ,args,kwargs,span)
++        if modeled is not NOT_HANDLED:return modeled
+     short = simple(typ)
+     if short in {"ResponseEntity", "HttpEntity"}:
+         status = args[-1] if args and type(args[-1]) is int and short == "ResponseEntity" else 200
+@@ -137,6 +147,8 @@
+     if info.generated_key and (obj.fields.get(info.primary_key) is None or isinstance(obj.fields.get(info.primary_key), Unknown)):
+         obj.fields[info.primary_key] = engine.state.symbol(engine.p.type_fields(info.key).get(info.primary_key, ("id", None))[0])
+     key = obj.fields.get(info.primary_key, Unknown("no entity key"))
++    from .java_boxing import boxed,unbox
++    if boxed(key):key=unbox(key)
+     column = info.columns.get(info.primary_key, info.primary_key)
+     new_rows, updated = [], False
+     for record in initial:
+@@ -217,6 +229,8 @@
+     info = engine.p.types[receiver.typ]
+     if not info.repository_entity:
+         return NOT_HANDLED
++    from .java_boxing import boxed,unbox
++    args=tuple(unbox(value) if boxed(value) else value for value in args)
+     entity = entity_info(engine, info.repository_entity, span)
+     if not entity:
+         return Unknown("repository entity is unresolved")
+@@ -326,11 +340,30 @@
+             raise Raised("HttpClientErrorException" if status < 500 else "HttpServerErrorException", response)
+         if unknown(status) and engine.choose((False, True), "RestTemplate unknown error status"):
+             raise Raised("HttpClientErrorException", response)
+-        return response.body if name.endswith("ForObject") else response
++        if name.endswith('ForObject'):
++            from .java_boxing import decode_json
++            target=args[-1].name if args and isinstance(args[-1],TypeRef) else ''
++            return decode_json(engine,response.body,target,span)
++        return response
+     return response
+ 
+ 
+-def call(engine, receiver, name, args, kwargs, span):
++def call(engine, receiver, name, args, kwargs, span,receiver_type='',argument_types=()):
++    from .values import MethodRef
++    if isinstance(receiver,MethodRef):
++        if name in {'apply','test','accept','get','run','compare','applyAsInt','applyAsLong','applyAsDouble','getAsInt','getAsLong','getAsDouble','getAsBoolean'}:
++            from .java_boxing import argument
++            values=tuple(argument(engine,value,argument_types[index] if index<len(argument_types) else '',span) for index,value in enumerate(args))
++            result=engine.invoke_callable(receiver,values,span)
++            return argument(engine,result,receiver.return_type,span) if name in {'apply','get'} else result
++        engine.unsupported('Unmodeled functional-interface operation '+name,span)
++    if engine.language=='java':
++        from .java_boxing import call as boxed_call
++        modeled=boxed_call(engine,receiver,name,args,kwargs,span,argument_types)
++        if modeled is not NOT_HANDLED:return modeled
++        from .java_streams import call as stream_call
++        modeled=stream_call(engine,receiver,name,args,kwargs,span,receiver_type,argument_types)
++        if modeled is not NOT_HANDLED:return modeled
+     from .java_time import call as time_call
+     modeled=time_call(engine,receiver,name,args,kwargs,span)
+     if modeled is not NOT_HANDLED:return modeled
+@@ -568,6 +601,9 @@
+                 status = args[0] if name == "status" and args else {"notFound": 404, "badRequest": 400, "noContent": 204}.get(name, 200)
+                 return engine.state.new("spring.ResponseBuilder", {"status": status})
+         if typ in {"List", "Arrays", "Collections", "Set"} and name in {"of", "asList", "singletonList", "emptyList", "singleton", "emptySet"}:
++            if engine.language=='java':
++                from .java_boxing import argument
++                return [argument(engine,value,argument_types[index] if index<len(argument_types) else '',span) for index,value in enumerate(args)]
+             return list(args)
+         if typ in {"Map"} and name == "of":
+             return dict(zip(args[::2], args[1::2]))
+@@ -594,6 +630,10 @@
+         if typ in {"Optional"} and name in {"empty", "of", "ofNullable"}:
+             return engine.state.new("java.util.Optional", {"value": args[0] if args else None})
+         if name in {"valueOf", "parseInt", "parseLong"} and typ in {"Integer", "Long", "String"}:
++            from .java_boxing import boxed,unbox
++            if typ=='String' and boxed(args[0]):
++                scalar=unbox(args[0])
++                return Unknown('Unknown boxed string','String') if unknown(scalar) else str(scalar).lower() if type(scalar) is bool else str(scalar)
+             if isinstance(args[0], TypeRef):
+                 return Unknown("unmodeled type/enum conversion", typ)
+             if isinstance(args[0], Symbol) and typ == "String":
+@@ -659,41 +699,72 @@
+         if name in {"isEmpty"}:
+             return not receiver
+         if name in {"contains", "containsKey"} and args:
++            if isinstance(receiver,dict) and engine.language=='java':
++                from .java_boxing import argument,map_key
++                return map_key(engine,argument(engine,args[0],argument_types[0] if argument_types else '',span),span) in receiver
+             if isinstance(receiver, list) and engine.language == "java":
++                from .java_boxing import argument
++                sought=argument(engine,args[0],argument_types[0] if argument_types else '',span)
+                 for item in receiver:
+-                    methods = engine.p.methods_of(item.typ, "equals", 1) if isinstance(item, Object) else []
+-                    value = engine.execute_method(methods[0].key, (args[0],), receiver=item, span=span) if len(methods) == 1 else equal(item, args[0])
++                    value=engine.call(sought,'equals',(item,),{},span,{}) if isinstance(sought,Object) else equal(sought,item)
+                     if engine.condition(value, span):
+                         return True
+                 return False
+             return args[0] in receiver if not unknown(args[0]) else Unknown("symbolic membership")
+         if name == "get" and args:
+             if isinstance(receiver, dict):
+-                return receiver.get(args[0], args[1] if len(args) > 1 else None)
++                key=args[0]
++                if engine.language=='java':
++                    from .java_boxing import argument,map_key
++                    key=map_key(engine,argument(engine,key,argument_types[0] if argument_types else '',span),span)
++                return receiver.get(key,args[1] if len(args)>1 else None)
+             if isinstance(receiver, list):
++                index=args[0]
++                if engine.language=='java':
++                    from .java_boxing import unbox
++                    index=unbox(index)
+                 try:
+-                    if type(args[0]) is int and args[0] < 0 and engine.language == "java":
++                    if type(index) is int and index < 0 and engine.language == "java":
+                         raise IndexError()
+-                    return receiver[args[0]]
++                    return receiver[index]
+                 except (IndexError, TypeError):
+                     raise Raised("IndexOutOfBoundsException" if engine.language == "java" else "IndexError") from None
+         if isinstance(receiver, dict) and name in {"put", "update"}:
+             if name == "put" and len(args) >= 2:
+-                old = receiver.get(args[0])
+-                receiver[args[0]] = args[1]
++                key,value=args[:2]
++                if engine.language=='java':
++                    from .java_boxing import argument,map_key
++                    key=map_key(engine,argument(engine,key,argument_types[0] if argument_types else '',span),span)
++                    value=argument(engine,value,argument_types[1] if len(argument_types)>1 else '',span)
++                old=receiver.get(key)
++                receiver[key]=value
+                 return old
+             if name == "update" and args:
+                 receiver.update(args[0])
+                 return None
+         if isinstance(receiver, list) and name in {"add", "append", "extend", "clear"}:
+             if name == "clear":
++                engine.state.mutated(receiver)
+                 receiver.clear()
+             elif name == "extend":
++                engine.state.mutated(receiver)
+                 receiver.extend(args[0])
+             else:
+-                receiver.append(args[0])
++                value=args[0]
++                if engine.language=='java':
++                    from .java_boxing import argument
++                    value=argument(engine,value,argument_types[0] if argument_types else '',span)
++                engine.state.mutated(receiver)
++                receiver.append(value)
+             return True if name == "add" else None
+         if isinstance(receiver, str):
++            if engine.language=='java' and name=='hashCode' and not args:
++                from .java_sets import hash_string
++                return hash_string(engine,receiver,span)
++            if engine.language=='java' and name=='equalsIgnoreCase' and len(args)==1:
++                if args[0] is None:return False
++                if not isinstance(args[0],str) or not receiver.isascii() or not args[0].isascii():engine.unsupported('Non-ASCII/unknown Java equalsIgnoreCase needs a character-case contract',span)
++                return receiver.lower()==args[0].lower()
+             operations = {"toLowerCase": str.lower, "lower": str.lower, "toUpperCase": str.upper, "upper": str.upper,
+                           "trim": str.strip, "strip": str.strip, "startsWith": str.startswith, "startswith": str.startswith,
+                           "endsWith": str.endswith, "endswith": str.endswith, "replace": str.replace, "split": str.split}
+--- phase5/code/polygraph/sql_queries.py
++++ phase6/code/polygraph/sql_queries.py
+@@ -50,6 +50,8 @@
+         return unresolved("SQL query is outside the tested read-only relational subset")
+     for item in list(node.find_all(exp.Placeholder)):
+         value = values.get(item.name, Unknown("missing named SQL input", origin=item.name))
++        from .java_boxing import boxed,unbox
++        if boxed(value):value=unbox(value)
+         if type(value) not in {str, int, bool, type(None)}:
+             return unresolved("SQL input is symbolic or has an unsupported scalar type")
+         item.replace(exp.convert(value))
+--- phase5/code/polygraph/state.py
++++ phase6/code/polygraph/state.py
+@@ -3,7 +3,7 @@
+ import gzip
+ import json
+ 
+-from .values import Object, Symbol, OpaqueString, Unknown
++from .values import Object, Symbol, OpaqueString, Unknown, MethodRef
+ 
+ 
+ class Store:
+@@ -50,6 +50,14 @@
+         self.immutable_globals = set()
+         self.browser = None
+         self.opaque_values = {}
++        self.container_versions = {}
++        self.box_cache = {}
++
++    def mutated(self,value):
++        previous=self.container_versions.get(id(value),(value,0))
++        self.container_versions[id(value)]=(value,previous[1]+1)
++
++    def mutation_version(self,value):return self.container_versions.get(id(value),(None,0))[1]
+ 
+     def new(self, typ, fields=None):
+         self.sequence += 1
+@@ -80,8 +88,12 @@
+                 continue
+             seen.add(id(value))
+             if isinstance(value, Object):
++                from .java_boxing import boxed
++                if boxed(value):continue
+                 pending.extend(value.fields.values())
+                 value.fields = {key: Unknown("unknown call may modify reachable object", origin=value.identity) for key in value.fields}
++            elif isinstance(value,MethodRef):
++                pending.append(value.receiver)
+             elif isinstance(value, (dict, list, set, tuple)):
+                 pending.extend(value.values() if isinstance(value, dict) else value)
+                 if not isinstance(value, tuple):
+--- phase5/code/polygraph/values.py
++++ phase6/code/polygraph/values.py
+@@ -61,6 +61,16 @@
+ @dataclass(frozen=True)
+ class FunctionRef:
+     name: str
++
++
++@dataclass(frozen=True)
++class MethodRef:
++    receiver: object
++    name: str
++    owner: str
++    span: object
++    qualifier_type: str = ''
++    return_type: str = ''
+ 
+ 
+ @dataclass
+@@ -158,6 +168,11 @@
+         return Unknown("symbolic equality", "bool")
+     if isinstance(left, Object) or isinstance(right, Object):
+         if isinstance(left, Object) and isinstance(right, Object):
++            from .java_boxing import boxed
++            if boxed(left) and boxed(right) and left.identity!=right.identity and left.typ==right.typ:
++                value=equal(left.fields.get('value'),right.fields.get('value'))
++                if value is not False and not (left.fields.get('fresh') or right.fields.get('fresh')):
++                    return Unknown('Wrapper reference identity outside a guaranteed shared cache','boolean')
+             return left.identity == right.identity
+         return False
+     return left == right
+@@ -175,6 +190,14 @@
+ 
+ 
+ def binary(op, left, right, language, typ=""):
++    if language=='java':
++        from .java_boxing import boxed,unbox
++        references=op in {'==','!=','is','is not'}
++        if not references or boxed(left) and type(right) in {int,bool,float} or boxed(right) and type(left) in {int,bool,float}:
++            if boxed(left):left=unbox(left)
++            if boxed(right):right=unbox(right)
++    if isinstance(left,TypeRef) and isinstance(right,TypeRef) and op in {'==','!='}:
++        return (left.name==right.name) if op=='==' else (left.name!=right.name)
+     if isinstance(left, TypeRef) and op in {"==", "!=", ">", "<", ">=", "<="}:
+         return Predicate(left.name, op, right)
+     if op in {"/", "//", "%"} and type(right) is int and right == 0 and (type(left) is int or symbolic(left)):
+@@ -197,6 +220,8 @@
+         return Unknown("unknown operand: " + op, typ)
+     if op == "+" and language == "java" and (isinstance(left, str) or isinstance(right, str)):
+         def string(v):
++            from .java_boxing import boxed,unbox
++            if boxed(v):v=unbox(v)
+             return "null" if v is None else str(v).lower() if type(v) is bool else str(v)
+         return string(left) + string(right)
+     if (left is None or right is None) and language == "java":
+@@ -227,6 +252,7 @@
+ 
+ 
+ def wire(value, active=frozenset()):
++    if isinstance(value,MethodRef):return Unknown('Callable serialization requires an explicit codec contract')
+     if type(value) in {datetime,date,time,timedelta}:
+         from pydantic_core import to_jsonable_python
+         return to_jsonable_python(value)
+@@ -235,12 +261,22 @@
+             return Unknown("wire cycle or depth requires an unmodeled serializer")
+         active = active | {id(value)}
+     if isinstance(value, Object):
++        from .java_boxing import boxed,unbox
++        if boxed(value):return wire(unbox(value),active)
++        if value.typ=='java.util.stream.Stream':return Unknown('Java stream serialization requires an explicit codec contract')
++        if value.typ in {'java.util.HashSet','java.util.LinkedHashSet'}:
++            items=value.fields.get('values')
++            if not isinstance(items,list):return Unknown('Java set state is unknown')
++            if value.typ=='java.util.HashSet' and len(items)>1:return Unknown('Unordered Java set serialization requires an order contract')
++            return wire(items,active)
+         if value.typ.startswith('java.time.') or value.typ=='java.util.Date':
+             return Unknown('Java temporal serialization requires an explicit codec contract')
+         if value.typ in {'spring.HttpHeaders', 'spring.ReadOnlyHttpHeaders'}:
+             return wire(value.fields.get('values'), active)
+         return {k: wire(v, active) for k, v in value.fields.items()}
+     if isinstance(value, dict):
++        from .java_boxing import MapKey
++        if any(isinstance(key,MapKey) for key in value):return Unknown('Java map key serialization requires a codec contract')
+         return {k: wire(v, active) for k, v in value.items()}
+     if isinstance(value, (list, tuple)):
+         return [wire(v, active) for v in value]
+@@ -249,7 +285,7 @@
+ 
+ def wire_incomplete(value):
+     if isinstance(value, Unknown):
+-        return value.reason in {"wire cycle or depth requires an unmodeled serializer",'Java temporal serialization requires an explicit codec contract'}
++        return value.reason in {"wire cycle or depth requires an unmodeled serializer",'Java temporal serialization requires an explicit codec contract','Callable serialization requires an explicit codec contract','Java stream serialization requires an explicit codec contract','Unordered Java set serialization requires an order contract','Java map key serialization requires a codec contract'}
+     return any(wire_incomplete(item) for item in (value.values() if isinstance(value, dict) else value)) if isinstance(value, (dict, list, tuple)) else False
+ 
+ 
+--- phase5/code/tests/test_java_boxing.py
++++ phase6/code/tests/test_java_boxing.py
+@@ -0,0 +1,124 @@
++"""Reference/class distinctions that affect branches and collection contents."""
++import pytest
++
++from polygraph.analysis import analyze
++from support import edge_set,fixture,scenario
++from test_java_streams import probe,response
++
++
++@pytest.mark.parametrize('body',[
++    'java.util.Set<Object> items=new java.util.HashSet<Object>();items.add(1);items.add(1L);return items.size();',
++    'return Arrays.asList(1,1L).stream().collect(Collectors.toSet()).size();',
++])
++def test_numeric_values_of_distinct_wrapper_classes_do_not_merge(tmp_path,body):
++    _,detail,_=probe(tmp_path,body)
++    assert response(detail)==2
++
++
++def test_boxed_map_keys_preserve_numeric_runtime_class(tmp_path):
++    _,detail,_=probe(tmp_path,'java.util.Map<Object,String> values=new java.util.HashMap<Object,String>();values.put(1,"integer");values.put(1L,"long");return Arrays.asList(values.size(),values.get(1),values.get(1L));')
++    assert response(detail)==[2,'integer','long']
++
++
++@pytest.mark.parametrize('body,expected',[
++    ('Integer left=new Integer(1);Integer right=new Integer(1);return Arrays.asList(left==right,left.equals(right));',[False,True]),
++    ('Integer left=127;Integer right=127;return left==right;',True),
++    ('Integer left=1000;Integer alias=left;return left==alias;',True),
++    ('Integer left=1;Long right=1L;return left.equals(right);',False),
++    ('Integer left=1;return left==1;',True),
++    ('Long value=2147483647L;return value+1;',2147483648),
++    ('Long value=1L;return value<<32L;',4294967296),
++    ('int value=2;return Arrays.asList(value>1,value==2,!(value<0),value>0&&value<3);',[True,True,True,True]),
++    ('Boolean flag=true;return flag;',True),
++    ('return Boolean.valueOf((String)null);',False),
++    ('return new Boolean((String)null);',False),
++])
++def test_boxing_unboxing_and_result_types(tmp_path,body,expected):
++    _,detail,_=probe(tmp_path,body)
++    assert response(detail)==expected
++
++
++def test_extended_cache_identity_remains_undecided(tmp_path):
++    _,detail,_=probe(tmp_path,'Integer left=1000;Integer right=1000;if(left==right)return true;return false;')
++    assert {step['response']['body'] for path in detail['paths'] for step in path['steps']}=={False,True}
++
++
++def test_unboxing_failure_happens_before_source_callee_entry(tmp_path):
++    block,detail,ids=probe(tmp_path,'Integer value=null;try{return take(value);}catch(NullPointerException e){return "unbox";}',
++        '@org.springframework.transaction.annotation.Transactional int take(int value){return value;}')
++    assert response(detail)=='unbox'
++    assert ids['Endpoint.take'] not in {edge[2] for edge in edge_set(block,'executes')}
++    assert not any(event['kind']=='rollback' for path in detail['paths'] for event in path['events'])
++
++
++@pytest.mark.parametrize('expression',[
++    'Integer.parseInt("2147483648")','Integer.parseInt(" 1")','Integer.parseInt("1_0")',
++    'Long.parseLong("9223372036854775808")',
++])
++def test_parse_failures_are_not_narrowed_or_accepted_by_python(tmp_path,expression):
++    _,detail,_=probe(tmp_path,'try{return '+expression+';}catch(NumberFormatException e){return "invalid";}')
++    assert response(detail)=='invalid'
++
++
++@pytest.mark.parametrize('body,expected',[
++    ('return Long.parseLong("9223372036854775807");',9223372036854775807),
++    ('Integer value=1;return Arrays.asList(value instanceof Number,value instanceof Object,value.getClass()==Integer.class);',[True,True,True]),
++    ('Integer value=1;return String.valueOf(value);','1'),
++])
++def test_scalar_library_boundaries_keep_wrapper_semantics(tmp_path,body,expected):
++    _,detail,_=probe(tmp_path,body)
++    assert response(detail)==expected
++
++
++def test_source_type_named_number_is_not_java_lang_number(tmp_path):
++    _,detail,_=probe(tmp_path,'Object value=Integer.valueOf(1);return Arrays.asList(value instanceof Number,value instanceof java.lang.Number);',classes='class Number {}')
++    assert response(detail)==[False,True]
++
++
++def test_source_type_named_integer_keeps_its_source_contract(tmp_path):
++    _,detail,_=probe(tmp_path,'Integer value=new Integer(7);return read(value);',
++        'int read(Integer value){return value.number();}',
++        'class Integer {private int value;Integer(int value){this.value=value;}int number(){return value;}}')
++    assert response(detail)==7
++
++
++def test_polluted_generic_stream_fails_before_primitive_callback(tmp_path):
++    block,detail,ids=probe(tmp_path,'List<Integer> typed=new ArrayList<Integer>();List raw=typed;raw.add(1L);try{return typed.stream().map(this::take).collect(Collectors.toList());}catch(ClassCastException e){return "cast";}',
++        'int take(int value){return value;}')
++    assert response(detail)=='cast'
++    assert ids['Endpoint.take'] not in {edge[2] for edge in edge_set(block,'executes')}
++
++
++def test_integer_stream_can_widen_unboxed_input_for_long_callback(tmp_path):
++    _,detail,_=probe(tmp_path,'List<Integer> typed=new ArrayList<Integer>();typed.add(7);return typed.stream().map(this::take).collect(Collectors.toList());',
++        'long take(long value){return value+2147483647L;}')
++    assert response(detail)==[2147483654]
++
++
++def test_polluted_generic_terminal_fails_before_source_consumer(tmp_path):
++    block,detail,ids=probe(tmp_path,'List<Integer> typed=new ArrayList<Integer>();List raw=typed;raw.add(1L);try{typed.stream().forEach(this::take);return "wrong";}catch(ClassCastException e){return "cast";}',
++        'void take(int value){seen++;}')
++    assert response(detail)=='cast'
++    assert ids['Endpoint.take'] not in {edge[2] for edge in edge_set(block,'executes')}
++
++
++@pytest.mark.parametrize('target,number,expected',[
++    ('Object','1',[True,True]),('Object','2147483648',[False,True]),('Integer','1',[True,True]),
++])
++def test_python_json_number_acquires_java_wrapper_class_at_http_boundary(tmp_path,target,number,expected):
++    sources={'java/Endpoint.java':'''import org.springframework.web.bind.annotation.*;import org.springframework.web.client.RestTemplate;import java.util.Arrays;
++@RestController class Endpoint {@GetMapping("/value") Object value(){Object result=new RestTemplate().getForObject("http://py/number",'''+target+'''.class);return Arrays.asList(result instanceof Integer,result instanceof Number);}}''',
++        'py/main.py':'from fastapi import FastAPI\napp=FastAPI()\n@app.get("/number")\ndef number():\n return '+number+'\n'}
++    project,store,_=fixture(tmp_path,sources,modules={'gateway':'java','py':'py'})
++    _,detail=analyze(project,store,{},scenario({'path':'/value'}))
++    assert response(detail)==expected
++
++
++def test_java_json_integer_overflow_is_not_silently_truncated(tmp_path):
++    sources={'java/Endpoint.java':'''import org.springframework.web.bind.annotation.*;import org.springframework.web.client.RestTemplate;
++@RestController class Endpoint {@GetMapping("/value") Object value(){return new RestTemplate().getForObject("http://py/number",Integer.class);}}''',
++        'py/main.py':'from fastapi import FastAPI\napp=FastAPI()\n@app.get("/number")\ndef number():\n return 4294967296\n'}
++    project,store,_=fixture(tmp_path,sources,modules={'gateway':'java','py':'py'})
++    _,detail=analyze(project,store,{},scenario({'path':'/value'}))
++    assert all(path['coverage']=='cutoff' and not path['steps'] for path in detail['paths'])
++    assert any('integer range/coercion' in note['message'] for path in detail['paths'] for note in path['diagnostics'])
+--- phase5/code/tests/test_java_streams.py
++++ phase6/code/tests/test_java_streams.py
+@@ -0,0 +1,179 @@
++"""Independent callback/effect and lazy-consumption contracts, not app names."""
++import pytest
++
++from polygraph.analysis import analyze
++from support import fixture,scenario,edge_set
++
++
++def probe(tmp_path,body,helpers='',classes='',**limits):
++    source='''import org.springframework.web.bind.annotation.*;
++import java.util.List;import java.util.ArrayList;import java.util.Arrays;
++import java.util.stream.Stream;import java.util.stream.Collectors;
++import java.util.function.Function;
++@RestController class Endpoint {
++ private int seen=0;
++ @GetMapping("/value") Object value(){'''+body+'}\n'+helpers+'}\n'+classes
++    project,store,ids=fixture(tmp_path,{'Endpoint.java':source})
++    block,detail=analyze(project,store,{},scenario({'path':'/value'}),**limits)
++    return block,detail,ids
++
++
++def response(detail):return detail['paths'][0]['steps'][0]['response']['body']
++
++
++def test_creating_a_pipeline_does_not_execute_its_callback(tmp_path):
++    block,detail,ids=probe(tmp_path,'Stream<Integer> pending=Arrays.asList(1,2).stream().map(this::tap);return seen;',
++        'private int tap(int n){seen++;return n*2;}')
++    assert response(detail)==0
++    assert ids['Endpoint.tap'] not in {edge[2] for edge in edge_set(block,'executes')}
++
++
++def test_bound_receiver_factory_is_evaluated_once_before_consumption(tmp_path):
++    block,detail,ids=probe(tmp_path,'Stream<Integer> pending=Arrays.asList(1,2).stream().map(target()::tap);return seen;',
++        'Endpoint target(){seen++;return this;} int tap(int n){seen++;return n;}')
++    assert response(detail)==1
++    assert ids['Endpoint.target'] in {edge[2] for edge in edge_set(block,'executes')}
++    assert ids['Endpoint.tap'] not in {edge[2] for edge in edge_set(block,'executes')}
++
++
++def test_null_bound_receiver_throws_when_reference_is_created_even_for_empty_stream(tmp_path):
++    block,detail,ids=probe(tmp_path,'Endpoint target=null;Stream<Integer> pending=Stream.empty().map(target::tap);return later();',
++        'int tap(int n){return n;} int later(){return 9;}')
++    assert detail['paths'][0]['steps'][0]['response']['status']==500
++    assert not ({ids['Endpoint.tap'],ids['Endpoint.later']} & {edge[2] for edge in edge_set(block,'executes')})
++
++
++def test_filter_map_reduce_use_source_static_and_bound_references(tmp_path):
++    block,detail,ids=probe(tmp_path,'return Arrays.asList(1,2,3).stream().filter(this::keep).map(Endpoint::twice).reduce(0,Endpoint::sum);',
++        'boolean keep(int n){return n>1;} static int twice(int n){return n*2;} static int sum(int left,int right){return left+right;}')
++    assert response(detail)==10 and len(detail['paths'])==1
++    assert all((ids['Endpoint.value'],'calls',ids['Endpoint.'+name]) in edge_set(block) for name in ['keep','twice','sum'])
++
++
++def test_escaped_stream_keeps_callback_callsite_owner(tmp_path):
++    block,detail,ids=probe(tmp_path,'return pending().collect(Collectors.toList());',
++        'Stream<Integer> pending(){return Arrays.asList(1,2).stream().map(this::tap);} int tap(int n){return n*3;}')
++    assert response(detail)==[3,6]
++    assert (ids['Endpoint.pending'],'calls',ids['Endpoint.tap']) in edge_set(block)
++    assert (ids['Endpoint.value'],'calls',ids['Endpoint.tap']) not in edge_set(block)
++
++
++@pytest.mark.parametrize('terminal,expected', [('findFirst().get()',10),('limit(1).collect(Collectors.toList())',[10]),('limit(0).collect(Collectors.toList())',[])])
++def test_short_circuiting_does_not_run_later_throwing_callbacks(tmp_path,terminal,expected):
++    block,detail,ids=probe(tmp_path,'return Arrays.asList(1,2).stream().map(this::tap).'+terminal+';',
++        'int tap(int n){if(n==2)return later();return n*10;} int later(){throw new IllegalStateException();}')
++    assert response(detail)==expected
++    assert ids['Endpoint.later'] not in {edge[2] for edge in edge_set(block,'executes')}
++
++
++def test_constructor_and_unbound_instance_references_are_deferred(tmp_path):
++    block,detail,ids=probe(tmp_path,'return Arrays.asList("A","B").stream().map(Item::new).map(Item::title).collect(Collectors.toList());',
++        classes='class Item {private String text;Item(String value){text=value;} String title(){return text;}}')
++    assert response(detail)==['A','B']
++    assert all((ids['Endpoint.value'],'calls',ids[name]) in edge_set(block) for name in ['Item.<init>','Item.title'])
++
++
++def test_native_unbound_string_reference_uses_native_value_at_invocation(tmp_path):
++    _,detail,_=probe(tmp_path,'return Arrays.asList("a","abc").stream().map(String::length).collect(Collectors.toList());')
++    assert response(detail)==[1,3]
++
++
++@pytest.mark.parametrize('reuse', ['pending.collect(Collectors.toList());pending.collect(Collectors.toList());',
++                                  'pending.map(this::tap);pending.collect(Collectors.toList());'])
++def test_linked_or_consumed_stream_is_not_reused(tmp_path,reuse):
++    _,detail,_=probe(tmp_path,'Stream<Integer> pending=Arrays.asList(1).stream();try{'+reuse+'return "wrong";}catch(IllegalStateException e){return "reuse";}',
++        'int tap(int n){return n;}')
++    assert response(detail)=='reuse'
++
++
++def test_source_collection_is_bound_late_at_terminal_operation(tmp_path):
++    _,detail,_=probe(tmp_path,'List<Integer> rows=new ArrayList();rows.add(1);Stream<Integer> pending=rows.stream().map(this::tap);rows.add(2);return pending.collect(Collectors.toList());',
++        'int tap(int n){return n*2;}')
++    assert response(detail)==[2,4]
++
++
++def test_clear_and_restore_same_source_element_is_still_interference(tmp_path):
++    block,detail,ids=probe(tmp_path,'rows.add(1);rows.stream().map(this::tap).collect(Collectors.toList());return later();',
++        'private List<Integer> rows=new ArrayList();int tap(int n){rows.clear();rows.add(n);return n;} int later(){return 9;}')
++    assert all(path['coverage']=='cutoff' for path in detail['paths'])
++    assert any('Interference' in note['message'] for path in detail['paths'] for note in path['diagnostics'])
++    assert ids['Endpoint.later'] not in {edge[2] for edge in edge_set(block,'executes')}
++
++
++def test_count_does_not_claim_a_version_dependent_callback_execution(tmp_path):
++    block,detail,ids=probe(tmp_path,'return Arrays.asList(1,2).stream().map(this::tap).count();','int tap(int n){seen++;return n;}')
++    assert all(path['coverage']=='cutoff' for path in detail['paths'])
++    assert ids['Endpoint.tap'] not in {edge[2] for edge in edge_set(block,'executes')}
++
++
++def test_plain_count_needs_no_callback_or_encounter_order(tmp_path):
++    _,detail,_=probe(tmp_path,'return Arrays.asList(1,2).stream().count();')
++    assert response(detail)==2
++
++
++def test_custom_collectors_class_is_executed_as_source(tmp_path):
++    source='''import org.springframework.web.bind.annotation.*;import java.util.Arrays;
++class Collectors {static String toList(){return "custom";}}
++@RestController class Endpoint {@GetMapping("/value") Object value(){return Arrays.asList(1).stream().collect(Collectors.toList());}}'''
++    p,store,ids=fixture(tmp_path,{'Endpoint.java':source});block,detail=analyze(p,store,{},scenario({'path':'/value'}))
++    assert all(path['coverage']=='cutoff' for path in detail['paths'])
++    assert ids['Collectors.toList'] in {edge[2] for edge in edge_set(block,'executes')}
++
++
++def test_stream_budget_is_a_cutoff_without_a_claim_of_no_more_effects(tmp_path):
++    _,detail,_=probe(tmp_path,'return Arrays.asList(1,2,3).stream().map(this::tap).collect(Collectors.toList());','int tap(int n){return n;}',loop_limit=2)
++    assert not detail['fully_explored_in_model'] and detail['must']==[]
++    assert all(path['coverage']=='cutoff' for path in detail['paths'])
++
++
++def test_source_hashcode_and_collision_equals_callbacks_are_not_skipped(tmp_path):
++    block,detail,ids=probe(tmp_path,'java.util.Set<Item> items=Arrays.asList("FB","Ea","FB").stream().map(this::item).collect(Collectors.toSet());return Arrays.asList(items.size(),hashes,comparisons);',
++        'private int hashes=0;private int comparisons=0;Item item(String title){return new Item(title,this);}void hashed(){hashes++;}void compared(){comparisons++;}',
++        'class Item {private String title;private Endpoint owner;Item(String title,Endpoint owner){this.title=title;this.owner=owner;}public int hashCode(){owner.hashed();return title.hashCode();}public boolean equals(Object other){owner.compared();return title.equals(((Item)other).title);}}')
++    assert response(detail)==[2,3,2]
++    assert ids['Item.hashCode'] in {edge[2] for edge in edge_set(block,'executes')}
++    assert ids['Item.equals'] in {edge[2] for edge in edge_set(block,'executes')}
++
++
++def test_unordered_set_stream_does_not_fabricate_callback_order(tmp_path):
++    block,detail,ids=probe(tmp_path,'return Arrays.asList("a","b").stream().collect(Collectors.toSet()).stream().map(this::tap).collect(Collectors.toList());',
++        'String tap(String text){return text;}')
++    assert all(path['coverage']=='cutoff' for path in detail['paths'])
++    assert ids['Endpoint.tap'] not in {edge[2] for edge in edge_set(block,'executes')}
++
++
++def test_singleton_set_can_feed_unbound_reference_without_order_uncertainty(tmp_path):
++    _,detail,_=probe(tmp_path,'return Arrays.asList("a","a").stream().collect(Collectors.toSet()).stream().map(String::length).collect(Collectors.toList());')
++    assert response(detail)==[1]
++
++
++@pytest.mark.parametrize('reference',['String::length','java.lang.String::length'])
++def test_incompatible_native_unbound_receiver_does_not_call_same_named_method(tmp_path,reference):
++    _,detail,_=probe(tmp_path,'try{return Arrays.asList(1).stream().map('+reference+').collect(Collectors.toList());}catch(ClassCastException e){return "cast";}')
++    assert response(detail)=='cast'
++
++
++def test_incompatible_source_receiver_does_not_dispatch_to_an_unrelated_class(tmp_path):
++    block,detail,ids=probe(tmp_path,'try{return Arrays.asList(new Other()).stream().map(Item::title).collect(Collectors.toList());}catch(ClassCastException e){return "cast";}',
++        classes='class Item {String title(){return "expected";}} class Other {String title(){return "wrong";}}')
++    assert response(detail)=='cast'
++    assert ids['Other.title'] not in {edge[2] for edge in edge_set(block,'executes')}
++
++
++def test_fully_qualified_native_type_is_not_a_chain_of_unknown_fields(tmp_path):
++    _,detail,_=probe(tmp_path,'return java.util.stream.Stream.of("ab").map(java.lang.String::length).collect(Collectors.toList());')
++    assert response(detail)==[2]
++
++
++def test_imported_source_type_is_resolved_before_static_or_method_reference_dispatch(tmp_path):
++    sources={'other/Names.java':'package other; public class Names {public static int value(){return 11;} public static int twice(int n){return n*2;}}',
++        'Endpoint.java':'''import org.springframework.web.bind.annotation.*;import other.Names;import java.util.Arrays;import java.util.stream.Collectors;
++@RestController class Endpoint {@GetMapping("/value") Object value(){return Arrays.asList(Names.value()).stream().map(Names::twice).collect(Collectors.toList());}}'''}
++    p,store,ids=fixture(tmp_path,sources);block,detail=analyze(p,store,{},scenario({'path':'/value'}))
++    assert response(detail)==[22]
++    assert all(ids[name] in {edge[2] for edge in edge_set(block,'executes')} for name in ['Names.value','Names.twice'])
++
++
++def test_direct_functional_interface_call_uses_captured_receiver(tmp_path):
++    _,detail,_=probe(tmp_path,'Function<Integer,Integer> action=this::tap;return action.apply(3);','int tap(int n){return n*4;}')
++    assert response(detail)==12

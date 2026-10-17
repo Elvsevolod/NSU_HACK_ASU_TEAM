@@ -1,0 +1,1 @@
+class Api {@GetMapping("/fail") String fail(){throw new IllegalArgumentException();}}

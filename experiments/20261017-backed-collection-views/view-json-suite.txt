@@ -1,0 +1,66 @@
+........................................................................ [  7%]
+........................................................................ [ 15%]
+........................................................................ [ 22%]
+........................................................................ [ 30%]
+........................................................................ [ 37%]
+........................................................................ [ 45%]
+........................................................................ [ 53%]
+........................................................F............... [ 60%]
+........................................................................ [ 68%]
+........................................................................ [ 75%]
+........................................................................ [ 83%]
+........................................................................ [ 91%]
+........................................................................ [ 98%]
+.............                                                            [100%]
+=================================== FAILURES ===================================
+_______ test_http_unordered_view_does_not_choose_a_python_first_element ________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-588/test_http_unordered_view_does_0')
+
+    def test_http_unordered_view_does_not_choose_a_python_first_element(tmp_path):
+>       result,engine=run_http(tmp_path,'Map map=new HashMap();map.put("first","left");map.put("second","right");')
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_backed-collection-views/code/tests/test_map_view_json.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_backed-collection-views/code/tests/test_map_view_json.py:13: in run_http
+    engine=Engine(project,ScenarioState(db));return engine.run(ids['Client.entry'],{}),engine
+                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:190: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:243: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+solutions/—_backed-collection-views/code/analyzer/engine.py:279: in continue_filter
+    frame['result']=self.invoke(frame['entry'],frame['args'],reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:417: in invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:501: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:506: in execute
+    value = self.value(node.named_children[0], env) if node.named_children else None
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_backed-collection-views/code/analyzer/engine.py:972: in value
+    decision = self.choose(self.method + ':ternary:' + str(node.start_point.row + 1), [True, False])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x1054d87d0>
+label = 'method:service:Client#entry():ternary:4', choices = [True, False]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:method:service:Client#entry():ternary:4', [True, False])
+
+solutions/—_backed-collection-views/code/analyzer/engine.py:165: AlternativeRequired
+=========================== short test summary info ============================
+FAILED solutions/—_backed-collection-views/code/tests/test_map_view_json.py::test_http_unordered_view_does_not_choose_a_python_first_element
+1 failed, 948 passed in 2.16s

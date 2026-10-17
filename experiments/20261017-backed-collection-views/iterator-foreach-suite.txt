@@ -1,0 +1,31 @@
+........................................................................ [  7%]
+........................................................................ [ 15%]
+........................................................................ [ 23%]
+........................................................................ [ 31%]
+........................................................................ [ 39%]
+........................................................................ [ 47%]
+........................................................................ [ 55%]
+...........................................................F............ [ 62%]
+........................................................................ [ 70%]
+........................................................................ [ 78%]
+........................................................................ [ 86%]
+........................................................................ [ 94%]
+....................................................                     [100%]
+=================================== FAILURES ===================================
+__________ test_known_native_map_view_has_a_separate_support_boundary __________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-577/test_known_native_map_view_has0')
+
+    def test_known_native_map_view_has_a_separate_support_boundary(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;
+          class Api {Object entry(){Map map=new HashMap();map.put("key","value");return map.keySet();}}'''})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{}) is U
+E       AssertionError: assert {'__map_view__': 'keys'} is <Unknown.VALUE: 'unknown'>
+E        +  where {'__map_view__': 'keys'} = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x102c5b1d0>.run
+
+solutions/—_backed-collection-views/code/tests/test_operation_diagnostics.py:18: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_backed-collection-views/code/tests/test_operation_diagnostics.py::test_known_native_map_view_has_a_separate_support_boundary
+1 failed, 915 passed in 2.03s

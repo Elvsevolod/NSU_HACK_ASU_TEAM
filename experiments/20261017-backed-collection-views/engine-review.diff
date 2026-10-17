@@ -1,0 +1,350 @@
+--- solutions/—_value-type-flow/code/analyzer/engine.py	2026-10-17 19:42:32
++++ solutions/—_backed-collection-views/code/analyzer/engine.py	2026-10-17 20:55:58
+@@ -19,10 +19,12 @@
+ from .java_exceptions import JavaThrow, assignable
+ from .symbolic_text import concat_text, http_text_parts
+ from .models import java_date_text, uuid_value, http_headers_type
+-from .java_collections import JavaObject, JavaRecord, JavaMap, JavaEnumValue, JavaTypeToken, JavaTypeFactory, JsonObject, JsonText, reference_equal, is_symbolic
++from .java_collections import JavaObject, JavaRecord, JavaMap, JavaMapView, JavaMapEntry, JavaMapIterator, JavaEnumValue, JavaTypeToken, JavaTypeFactory, JsonObject, JsonText, reference_equal, is_symbolic
+ from .java_numbers import parse_integer
+ from .http_json import decode_response,type_parts
+ from .map_keys import same_key
++from .heap_join import join_environment,clone_environment,owned_objects,widen
++from .map_views import iterator_next
+ from datetime import datetime
+ 
+ 
+@@ -40,7 +42,16 @@
+     return value.java_type if isinstance(value,JavaObject) else value.get('__type__',U) if type(value) is dict else U
+ 
+ 
+-def merge(a, b, active=None):
++def merge(a, b, active=None, memo=None):
++    active=set() if active is None else active
++    memo={} if memo is None else memo
++    pair=(id(a),id(b))
++    if pair in active:return U
++    if pair not in memo:memo[pair]=merge_values(a,b,active,memo)
++    return memo[pair]
++
++
++def merge_values(a, b, active, memo):
+     if a is b:return a
+     if isinstance(a,JavaTypeToken) or isinstance(b,JavaTypeToken):
+         return a if isinstance(a,JavaTypeToken) and isinstance(b,JavaTypeToken) and (a.written,a.kind,a.context)==(b.written,b.kind,b.context) else U
+@@ -54,7 +65,7 @@
+     active.add(pair)
+     try:
+         if isinstance(a,JavaRecord):
+-            fields={key:merge(a.get(key,U),b.get(key,U),active) for key in sorted(a.keys()|b.keys())}
++            fields={key:merge(a.get(key,U),b.get(key,U),active,memo) for key in sorted(a.keys()|b.keys())}
+             wire_fields=a.wire_fields|b.wire_fields
+             if isinstance(a,JavaObject) and isinstance(b,JavaObject):
+                 identity=a.java_identity if a.java_identity is b.java_identity else None
+@@ -66,22 +77,46 @@
+             if (not isinstance(a.mapping,dict) or not isinstance(b.mapping,dict) or a.mapping.keys()!=b.mapping.keys()
+                     or len(a.typed_entries)!=len(b.typed_entries)
+                     or any(same_key(left,right) is not True for left,right in zip(a.typed_entries,b.typed_entries))):
+-                return JavaMap(U,identity)
+-            typed=[{**left,'value':merge(left['value'],right['value'],active)} for left,right in zip(a.typed_entries,b.typed_entries)]
++                return JavaMap(U,identity).merge_metadata(a,b)
++            typed=[{**left,'value':merge(left['value'],right['value'],active,memo),
++                    'value_kind':left.get('value_kind') if left.get('value_kind')==right.get('value_kind') else None} for left,right in zip(a.typed_entries,b.typed_entries)]
+             origin=a.origin_type if a.origin_type==b.origin_type else None
+-            return JavaMap({key:merge(value,b.mapping[key],active) for key,value in a.mapping.items()},identity,typed,origin)
++            kinds={key:a.value_types.get(key) if a.value_types.get(key)==b.value_types.get(key) else None for key in a.mapping}
++            return JavaMap({key:merge(value,b.mapping[key],active,memo) for key,value in a.mapping.items()},identity,typed,origin,kinds).merge_metadata(a,b)
++        if isinstance(a,JavaMapView) or isinstance(b,JavaMapView):
++            if not isinstance(a,JavaMapView) or not isinstance(b,JavaMapView) or a.kind!=b.kind:return U
++            backing=merge(a.backing,b.backing,active,memo)
++            return JavaMapView(backing,a.kind) if isinstance(backing,JavaMap) else U
++        if isinstance(a,JavaMapEntry) or isinstance(b,JavaMapEntry):
++            if not isinstance(a,JavaMapEntry) or not isinstance(b,JavaMapEntry) or same_key(a.key,b.key) is not True:return U
++            backing=merge(a.backing,b.backing,active,memo)
++            if not isinstance(backing,JavaMap):return U
++            result=JavaMapEntry(backing,a.key);result.version=a.version if a.version==b.version else None
++            return result
++        if isinstance(a,JavaMapIterator) or isinstance(b,JavaMapIterator):
++            if not isinstance(a,JavaMapIterator) or not isinstance(b,JavaMapIterator):return U
++            view=merge(a.view,b.view,active,memo)
++            if not isinstance(view,JavaMapView):return U
++            result=JavaMapIterator(view)
++            result.remaining=merge(a.remaining,b.remaining,active,memo)
++            result.expected=a.expected if a.expected==b.expected else None
++            result.last=merge(a.last,b.last,active,memo)
++            return result
+         if isinstance(a,JsonText) or isinstance(b,JsonText):
+-            return JsonText(merge(a.payload,b.payload,active)) if isinstance(a,JsonText) and isinstance(b,JsonText) else U
++            return JsonText(merge(a.payload,b.payload,active,memo)) if isinstance(a,JsonText) and isinstance(b,JsonText) else U
+         if isinstance(a,JsonObject) or isinstance(b,JsonObject):
+             if not isinstance(a,JsonObject) or not isinstance(b,JsonObject):return U
+-            fields={key:merge(a.get(key,U),b.get(key,U),active) for key in a.keys()|b.keys()}
++            fields={key:merge(a.get(key,U),b.get(key,U),active,memo) for key in a.keys()|b.keys()}
+             return JsonObject(fields,a.origin_type if a.origin_type==b.origin_type else None)
+         if isinstance(a, dict) and isinstance(b, dict):
+-            return {key: merge(a.get(key, U), b.get(key, U),active) for key in sorted(a.keys() | b.keys(), key=lambda k: (type(k).__name__, str(k)))}
++            return {key: merge(a.get(key, U), b.get(key, U),active,memo) for key in sorted(a.keys() | b.keys(), key=lambda k: (type(k).__name__, str(k)))}
+         if isinstance(a,list) and isinstance(b,list):
+             if len(a)!=len(b):return U
+-            joined=[merge(left,right,active) for left,right in zip(a,b)]
+-            return a if joined==a and joined==b else U
++            joined=[merge(left,right,active,memo) for left,right in zip(a,b)]
++            return joined if joined==a and joined==b else U
++        if isinstance(a,tuple) and isinstance(b,tuple) and len(a)==len(b)==5 and a[0]==b[0]=='lambda':
++            if a[1]!=b[1] or a[3:]!=b[3:]:return U
++            return ('lambda',a[1],merge(a[2],b[2],active,memo),a[3],a[4])
+         if type(a) is type(b) and a == b:return a
+         return U
+     finally:
+@@ -493,7 +528,8 @@
+                     self.conditions[-1]['refined'] = refined
+                 return self.execute(node.child_by_field_name('consequence' if decision else 'alternative'), env)
+             before_state = self.state
+-            left, right = deepcopy(env), deepcopy(env)
++            left,left_copies=clone_environment(env)
++            right,right_copies=clone_environment(env)
+             self.state = self.execution_fork(before_state)
+             a, ac = self.execute(node.child_by_field_name('consequence'), left)
+             left_state = self.state
+@@ -508,22 +544,25 @@
+                     self.state.database.unknown_tables.add(table)
+             self.state.symbol_sequence=max(left_state.symbol_sequence,right_state.symbol_sequence)
+             self.state.input_sequence=max(left_state.input_sequence,right_state.input_sequence)
+-            env.update(merge(left, right))
++            join_environment(env,left,right,left_copies,right_copies,merge)
+             return (merge(a, b), ac) if ac == bc and ac else (U, None)
+         if typ == 'enhanced_for_statement':
+             values = self.value(node.child_by_field_name('value'), env)
+             name = text(node.child_by_field_name('name'))
+-            items = values if isinstance(values, list) else [U]
+-            if len(items) > 64:
++            if self.commuting_map_copy(node,values,env):return U,None
++            certain=isinstance(values,list) or isinstance(values,JavaMapView) and isinstance(values.backing.mapping,dict)
++            items = self.view_items(values,env,self.method+':'+str(node.start_point.row+1),
++                                    text(node.child_by_field_name('type')),self.source_type(node.child_by_field_name('value'))) if isinstance(values,JavaMapView) else values if isinstance(values,list) else [U]
++            if isinstance(items,list) and len(items) > 64:
+                 self.approximate = True
+                 self.warnings.add('loop collection widened after 64 elements')
+                 items = items[:64] + [U]
+             with self.binding_scope(env,[name]):
+                 self.variable_types[name]=text(node.child_by_field_name('type'))
+                 for item in items:
+-                    env[name] = item
++                    env[name] = self.primitive_value(item,self.variable_types[name])
+                     result, control = self.execute(node.child_by_field_name('body'), env)
+-                    if control in ('return', 'throw') and isinstance(values, list):
++                    if control in ('return', 'throw') and certain:
+                         return result, control
+                     if control == 'break': break
+             return U, None
+@@ -703,6 +742,31 @@
+             value = self.value(node.named_children[-1], env)
+             target = text(node.child_by_field_name('type'))
+             value=self.primitive_value(value,target)
++            if isinstance(value,(JavaMapView,JavaMapEntry,JavaMapIterator)):
++                base,_=type_parts(target)
++                allowed=['java.lang.Object']
++                if isinstance(value,JavaMapView):
++                    allowed+=['java.lang.Iterable','java.util.Collection','java.util.AbstractCollection']
++                    if value.kind!='values':allowed+=['java.util.Set','java.util.AbstractSet']
++                elif isinstance(value,JavaMapEntry):allowed+=['java.util.Map.Entry']
++                else:allowed+=['java.util.Iterator']
++                if any(self.standard_type(base,fqn) for fqn in allowed) or isinstance(value,JavaMapEntry) and base=='Map.Entry' and self.standard_type('Map','java.util.Map'):
++                    return value
++                meta=self.p.methods[self.method]
++                owner=self.p.resolve_type(base,meta['module'],meta['file'])
++                if owner or base in ('int','long','short','byte','char','boolean','float','double') or base.endswith('[]') or self.standard_type(base,'java.lang.String'):
++                    raise JavaThrow({'__type__':'ClassCastException'})
++                self.approximate=True
++                self.warnings.add('Map view/entry/iterator reference cast is unresolved: '+self.method)
++                self.fallback(self.method)
++                return U
++            if target=='char':
++                source=self.source_type(node.named_children[-1])
++                if type(value) is int:return chr(value%65536)
++                if isinstance(value,str) and (source=='char' or self.standard_type(source,'java.lang.Character')) and len(value.encode('utf-16-le',errors='surrogatepass'))==2:return value
++                self.approximate=True
++                self.warnings.add('unsupported Java char conversion: '+self.method)
++                return U
+             if isinstance(value,(str,JsonText)):
+                 base=target.split('<',1)[0]
+                 meta=self.p.methods[self.method]
+@@ -795,7 +859,7 @@
+                     converted.append(value)
+                 a,b=converted
+                 if a is U or b is U:return U
+-            if op in ('==','!=') and any(isinstance(value,(JavaRecord,JavaMap,JavaEnumValue,JavaTypeToken,JavaTypeFactory)) for value in (a,b)):
++            if op in ('==','!=') and any(isinstance(value,(JavaRecord,JavaMap,JavaMapView,JavaMapEntry,JavaMapIterator,JavaEnumValue,JavaTypeToken,JavaTypeFactory)) for value in (a,b)):
+                 equal=reference_equal(a,b)
+                 if equal is U:
+                     self.approximate=True
+@@ -1056,6 +1120,18 @@
+             name=text(node.child_by_field_name('name'))
+             arguments=node.child_by_field_name('arguments')
+             count=len(arguments.named_children) if arguments is not None else 0
++            base,type_arguments=type_parts(receiver)
++            native_entry=(self.standard_type(base,'java.util.Map.Entry') or base=='Map.Entry' and self.standard_type('Map','java.util.Map'))
++            if native_entry and type_arguments and len(type_arguments)==2 and count==0 and name in ('getKey','getValue'):
++                return type_arguments[0 if name=='getKey' else 1]
++            if type_arguments:
++                if name=='next' and count==0 and len(type_arguments)==1 and self.standard_type(base,'java.util.Iterator'):return type_arguments[0]
++                if name=='iterator' and count==0 and len(type_arguments)==1 and any(self.standard_type(base,'java.util.'+kind) for kind in ('Set','Collection','List')):
++                    return 'java.util.Iterator<'+type_arguments[0]+'>'
++                if count==0 and len(type_arguments)==2 and any(self.standard_type(base,'java.util.'+kind) for kind in ('Map','HashMap','LinkedHashMap')):
++                    if name=='keySet':return 'java.util.Set<'+type_arguments[0]+'>'
++                    if name=='values':return 'java.util.Collection<'+type_arguments[1]+'>'
++                    if name=='entrySet':return 'java.util.Set<java.util.Map.Entry<'+','.join(type_arguments)+'>>'
+             shadowed=text(obj) in self.variable_types or text(obj) in self.p.type_fields.get(meta['owner'],{})
+             if name=='asList' and count and not shadowed and self.standard_type(text(obj),'java.util.Arrays'):
+                 types={self.scalar_or_source_type(self.source_type(arg)) for arg in arguments.named_children}
+@@ -1089,10 +1165,13 @@
+     def map_key_type(self,node):
+         """Use source types for boxing, never the shape of a Python scalar."""
+         typ=self.source_type(node) or self.numeric_type(node)
+-        if typ in ('byte','short','char','int','long','float','double','boolean'):return typ
+-        for name in ('String','Integer','Long','Byte','Short','Character','Boolean'):
++        return self.native_scalar_type(typ) or 'unresolved'
++
++    def native_scalar_type(self,typ):
++        if typ in ('byte','short','char','int','long','float','double','boolean'):return typ
++        for name in ('String','Integer','Long','Byte','Short','Character','Boolean','Double','Float'):
+             if self.standard_type(typ,'java.lang.'+name):return name
+-        return 'unresolved'
++        return ''
+ 
+     def source_return_type(self,target):
+         meta=self.p.methods[target]
+@@ -1265,7 +1344,7 @@
+         for nodes in invocations:
+             values=[self.value(value,env) for value in nodes]
+             key_type=self.map_key_type(nodes[0])
+-            _,result=library('put',mapping,values,'this',self.state.now,key_type=key_type)
++            _,result=library('put',mapping,values,'this',self.state.now,key_type=key_type,value_type=self.map_key_type(nodes[1]))
+             if result is U or any(value is U for value in values):
+                 self.approximate=True
+                 self.warnings.add('native Map initializer contains an unresolved key or value: '+reason)
+@@ -1625,13 +1704,18 @@
+             self.warnings.add('DTO reference equality requires concrete runtime identity: '+reason)
+             return U
+         key_type=None
+-        if isinstance(obj,JavaMap) and args:
++        value_type=None
++        if isinstance(obj,(JavaMap,JavaMapView,JavaMapEntry,JavaMapIterator)) and args:
+             first=next(child for child in argnode.named_children if child.type not in ('line_comment','block_comment'))
+             key_type=self.map_key_type(first)
++            nodes=[child for child in argnode.named_children if child.type not in ('line_comment','block_comment')]
++            if name=='put' and len(nodes)==2:value_type=self.map_key_type(nodes[1])
++            elif isinstance(obj,(JavaMapView,JavaMapEntry)):value_type=self.map_key_type(first)
+         handled, value = library(name, obj, args, text(objnode), self.state.now,key_type=key_type,
+-                                 json_issue=lambda message:self.json_issue(message,reason)) if not targets else (False, U)
++                                 json_issue=lambda message:self.json_issue(message,reason),value_type=value_type,
++                                 choose=lambda label,options:self.choose_map_order(reason+':'+label,options)) if not targets else (False, U)
+         if handled:
+-            if isinstance(obj,JavaMap) and value is U:
++            if isinstance(obj,(JavaMap,JavaMapView,JavaMapEntry,JavaMapIterator)) and value is U:
+                 self.approximate=True
+                 self.warnings.add('Java Map operation remains unresolved: '+name+' at '+reason)
+                 kind=obj.last_issue or 'unknown_map_value'
+@@ -1729,7 +1813,102 @@
+                   else 'unresolved_object_model' if isinstance(obj,dict) else 'unsupported_library_operation')
+             self.operation_issues[(kind,name)]+=1
+         return U
++
++    def choose_map_order(self,reason,options):
++        self.approximate=True
++        self.warnings.add('Map iteration or removal order is unspecified: '+reason)
++        self.operation_issues[('unordered_map_iteration',reason.rsplit(':',1)[-1])]+=1
++        return self.choose(reason,options)
++
++    def widen_map_iteration(self,env,reason):
++        self.approximate=True
++        self.warnings.add('Map iteration budget or contents remain unresolved: '+reason)
++        self.operation_issues[('unknown_map_iteration','foreach')]+=1
++        for value in owned_objects(env):widen(value)
++        self.fallback(self.method)
+ 
++    def view_element(self,value,kind,target,contract,reason):
++        if value is None or value is U:return self.primitive_value(value,target)
++        _,arguments=type_parts(contract)
++        expected=self.native_scalar_type(arguments[0]) if arguments and len(arguments)==1 else ''
++        destination=self.native_scalar_type(target)
++        if kind is not None and expected and expected!=kind:
++            raise JavaThrow({'__type__':'ClassCastException'})
++        aliases={'byte':'Byte','short':'Short','int':'Integer','long':'Long','char':'Character','boolean':'Boolean','float':'Float','double':'Double'}
++        if destination in aliases:
++            if kind is not None and kind!=aliases[destination] and not expected:
++                self.approximate=True;self.warnings.add('unresolved raw collection scalar conversion: '+reason);return U
++            widening={'Byte':('byte','short','int','long','float','double'),'Short':('short','int','long','float','double'),
++                      'Character':('char','int','long','float','double'),'Integer':('int','long','float','double'),
++                      'Long':('long','float','double'),'Float':('float','double'),'Double':('double',),'Boolean':('boolean',)}
++            if kind not in widening or destination not in widening[kind] or destination=='float' or kind=='Float':
++                self.approximate=True;self.warnings.add('unsupported collection scalar promotion: '+reason);return U
++            if kind=='Character':
++                if not isinstance(value,str) or len(value.encode('utf-16-le',errors='surrogatepass'))!=2:return U
++                if destination!='char':value=int.from_bytes(value.encode('utf-16-le',errors='surrogatepass'),'little')
++            return float(value) if destination=='double' else value
++        if destination:
++            if kind is None:
++                self.approximate=True;self.warnings.add('unresolved collection boxed class: '+reason);return U
++            if destination!=kind:raise JavaThrow({'__type__':'ClassCastException'})
++        return value
++
++    def view_items(self,view,env,reason,target='',contract=''):
++        iterator=JavaMapIterator(view)
++        if not isinstance(iterator.remaining,list):
++            self.widen_map_iteration(env,reason);return
++        count=len(iterator.remaining)
++        for _ in range(min(count,64)):
++            value=iterator_next(iterator,lambda label,options:self.choose_map_order(reason+':'+label,options))
++            if iterator.last_issue:
++                self.widen_map_iteration(env,reason);return
++            slot=view.backing.slot(iterator.last)
++            kind=slot.get('kind') if view.kind=='keys' else slot.get('value_kind') if view.kind=='values' else None
++            value=self.view_element(value,kind,target,contract,reason)
++            yield value
++        if count>64:self.widen_map_iteration(env,reason)
++
++    def commuting_map_copy(self,node,view,env):
++        """Summarize only disjoint native writes dst.put(k, source.get(k))."""
++        if not isinstance(view,JavaMapView) or view.kind!='keys':return False
++        source=view.backing
++        if not isinstance(source.mapping,dict) or source.flavor not in ('HashMap','LinkedHashMap'):return False
++        body=node.child_by_field_name('body')
++        if body.type=='block':
++            statements=[child for child in body.named_children if child.type not in ('line_comment','block_comment')]
++            if len(statements)!=1:return False
++            body=statements[0]
++        if body.type!='expression_statement' or len(body.named_children)!=1:return False
++        put=body.named_children[0]
++        if put.type!='method_invocation' or text(put.child_by_field_name('name'))!='put':return False
++        receiver=put.child_by_field_name('object')
++        arguments=put.child_by_field_name('arguments')
++        if receiver is None or receiver.type!='identifier' or arguments is None:return False
++        args=[child for child in arguments.named_children if child.type not in ('line_comment','block_comment')]
++        name=text(node.child_by_field_name('name'))
++        if len(args)!=2 or args[0].type!='identifier' or text(args[0])!=name:return False
++        get=args[1]
++        if get.type!='method_invocation' or text(get.child_by_field_name('name'))!='get':return False
++        origin=get.child_by_field_name('object');lookup=get.child_by_field_name('arguments')
++        if origin is None or origin.type!='identifier' or env.get(text(origin)) is not source or lookup is None:return False
++        keys=[child for child in lookup.named_children if child.type not in ('line_comment','block_comment')]
++        if len(keys)!=1 or keys[0].type!='identifier' or text(keys[0])!=name:return False
++        destination=env.get(text(receiver))
++        if not isinstance(destination,JavaMap) or not isinstance(destination.mapping,dict) or destination.flavor not in ('HashMap','LinkedHashMap'):return False
++        kind=self.native_scalar_type(text(node.child_by_field_name('type')))
++        entries=source.entries()
++        # No implicit conversion, custom equality, abrupt completion or writes
++        # through the iteration variable may be hidden by this proof.
++        if not kind or kind[:1].islower() or len(entries)>10000:return False
++        if any(entry['kind']!=kind or type(entry['key']) not in (str,int,bool) for entry in entries):return False
++        slots=[destination.slot(entry) for entry in entries]
++        if any(slot is U for slot in slots):return False
++        new_keys=sum(slot is None for slot in slots)
++        if not isinstance(source.order,list) and new_keys>1:destination.order=U
++        for entry in entries:
++            destination.put({'kind':entry['kind'],'key':entry['key']},entry['value'],entry.get('value_kind'))
++        return True
++
+     def collection_membership(self,items,value,name,reason):
+         unknown=False
+         for index,item in enumerate(items):

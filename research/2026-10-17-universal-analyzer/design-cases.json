@@ -1,0 +1,372 @@
+{
+  "title": "Проверяемые требования к будущему ядру",
+  "status": "Проект тестового контракта. Проверки не реализованы и не запускались в этом исследовании; это не новый бенчмарк.",
+  "cases": [
+    {
+      "id": "C01",
+      "title": "Разная целочисленная семантика Java и Python",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "java": "int x = Integer.MAX_VALUE; if (x + 1 < 0) negative(); else positive();",
+        "python": "x = 2147483647\nif x + 1 < 0: negative()\nelse: positive()"
+      },
+      "initial_context": {},
+      "expected": {
+        "java_calls": [
+          "negative"
+        ],
+        "python_calls": [
+          "positive"
+        ]
+      },
+      "rejects": "Одинаковый результат из-за арифметики Python в общем интерпретаторе."
+    },
+    {
+      "id": "C02",
+      "title": "Тип исключения и finally",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "java": "try { throw new IllegalArgumentException(); } catch (IllegalStateException e) { wrong(); } catch (IllegalArgumentException e) { right(); } finally { cleanup(); } after();"
+      },
+      "initial_context": {
+        "assumption": "cleanup завершается нормально"
+      },
+      "expected": {
+        "calls": [
+          "right",
+          "cleanup",
+          "after"
+        ],
+        "excluded": [
+          "wrong"
+        ]
+      },
+      "rejects": "Выбор первого catch независимо от типа."
+    },
+    {
+      "id": "C03",
+      "title": "Return внутри switch",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "java": "switch (kind) { case 1: return selected(); default: return fallback(); }"
+      },
+      "initial_context": {
+        "kind": 1
+      },
+      "expected": {
+        "calls": [
+          "selected"
+        ],
+        "excluded": [
+          "fallback"
+        ],
+        "control": "return"
+      },
+      "rejects": "Потеря сигнала return при переходе из switch."
+    },
+    {
+      "id": "C04",
+      "title": "Null receiver",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "java": "if (name.equals(\"Ada\")) match(); after();"
+      },
+      "initial_context": {
+        "name": null
+      },
+      "expected": {
+        "control": "throw NullPointerException",
+        "excluded": [
+          "match",
+          "after"
+        ]
+      },
+      "rejects": "Подмена null.equals на false с продолжением."
+    },
+    {
+      "id": "C05",
+      "title": "HTTP-метод входит в контракт",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "handlers": [
+          "GET /items -> ItemController.list",
+          "POST /items -> ItemController.create"
+        ],
+        "request": {
+          "method": "GET",
+          "path": "/items"
+        }
+      },
+      "initial_context": {},
+      "expected": {
+        "handler": "ItemController.list",
+        "excluded": [
+          "ItemController.create"
+        ]
+      },
+      "rejects": "Связывание remote только по URL."
+    },
+    {
+      "id": "C06",
+      "title": "Разный контракт HTTP-ошибки",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "java": "new RestTemplate().getForObject(url, String.class); after();",
+        "javascript": "const r = await fetch(url); after();"
+      },
+      "initial_context": {
+        "response": {
+          "status": 404
+        },
+        "assumption": "Стандартный RestTemplate error handler; fetch получает обычный HTTP-ответ без сетевой ошибки"
+      },
+      "expected": {
+        "java": {
+          "control": "throw",
+          "excluded": [
+            "after"
+          ]
+        },
+        "javascript": {
+          "calls": [
+            "after"
+          ],
+          "response_status": 404
+        }
+      },
+      "rejects": "Одна общая модель HTTP-клиентов, игнорирующая status/throw."
+    },
+    {
+      "id": "C07",
+      "title": "Изоляция состояний сценариев",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "scenario_a": [
+          "create item Ada",
+          "read created item"
+        ],
+        "scenario_b": [
+          "read initial items"
+        ]
+      },
+      "initial_context": {
+        "items": []
+      },
+      "expected": {
+        "a_reads_created": true,
+        "b_items": []
+      },
+      "rejects": "Передача изменений сценария A в независимый B."
+    },
+    {
+      "id": "C08",
+      "title": "Поле id разных сущностей",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "dto_types": [
+          "Item{id}",
+          "Account{id}"
+        ],
+        "step1": "Create Item -> Item{id:item-7}",
+        "step2": "Read Account(accountId)"
+      },
+      "initial_context": {},
+      "expected": {
+        "step2_accountId": "unknown",
+        "reason": "Нет источника Account.id"
+      },
+      "rejects": "Привязка Item.id к Account.id по одному имени."
+    },
+    {
+      "id": "C09",
+      "title": "MySQL columns и экранирование",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "sql": "CREATE TABLE person (id int, name varchar(64)); INSERT INTO person (name, id) VALUES ('O''Brien', 7);"
+      },
+      "initial_context": {},
+      "expected": {
+        "rows": [
+          {
+            "id": 7,
+            "name": "O'Brien"
+          }
+        ]
+      },
+      "rejects": "Потеря строки или имени при допустимом SQL-синтаксисе."
+    },
+    {
+      "id": "C10",
+      "title": "Rollback не стирает совершённые обращения",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "program": [
+          "begin",
+          "insert item item-7",
+          "throw",
+          "rollback",
+          "next request: read item-7"
+        ]
+      },
+      "initial_context": {
+        "items": []
+      },
+      "expected": {
+        "insert_data_edge": "Сохраняется как выполненное обращение при достигнутой операции",
+        "committed_items": [],
+        "next_request_item": "absent"
+      },
+      "rejects": "Смешение факта обращения к таблице и состояния после отката."
+    },
+    {
+      "id": "C11",
+      "title": "Граница точности JSON Number",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "wire_json": "{\"id\":9007199254740993}",
+        "javascript": "const x = JSON.parse(wire); if (String(x.id) === '9007199254740993') exact(); else changed();"
+      },
+      "initial_context": {},
+      "expected": {
+        "calls": [
+          "changed"
+        ],
+        "number_value": 9007199254740992
+      },
+      "rejects": "Перенос 64-битного ID между языками без модели wire codec."
+    },
+    {
+      "id": "C12",
+      "title": "Профили и middleware",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "controllers": [
+          "@Profile(\"prod\") handlerProd",
+          "@Profile(\"test\") handlerTest"
+        ],
+        "filter": "Gate returns without chain.doFilter"
+      },
+      "initial_context": {
+        "profile": "test"
+      },
+      "expected": {
+        "active_handler_candidate": "handlerTest",
+        "executes_controller_after_gate": false
+      },
+      "rejects": "Выбор неактивного обработчика и выполнение после отказа фильтра."
+    },
+    {
+      "id": "C13",
+      "title": "Неподдержанная функция может менять состояние",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "program": "unknownLibrary.mutate(entity); if (entity.active) yes(); else no(); after();"
+      },
+      "initial_context": {
+        "entity": {
+          "active": false
+        },
+        "library_contract": null
+      },
+      "expected": {
+        "entity_active": "unknown",
+        "branch_status": "alternative/unknown",
+        "may_throw": "unknown unless contract excludes"
+      },
+      "rejects": "Считать вызов без тела чистым и успешно завершившимся."
+    },
+    {
+      "id": "C14",
+      "title": "Исчерпанный бюджет не означает отсутствия вызовов",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "program": "while (unknown()) { body(); } after();"
+      },
+      "initial_context": {
+        "iteration_budget": "finite"
+      },
+      "expected": {
+        "coverage": "partial",
+        "tail": "summarized or unknown effects",
+        "after_must_execute": false
+      },
+      "rejects": "Отбросить необследованные пути и объявить результат complete."
+    },
+    {
+      "id": "C15",
+      "title": "Холодный и тёплый кеш совпадают",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "mutations": [
+          "Изменить callee",
+          "Удалить файл",
+          "Изменить профиль",
+          "Изменить модель HTTP-ошибок",
+          "Изменить исходное состояние БД",
+          "Изменить schema/model version"
+        ]
+      },
+      "initial_context": {},
+      "expected": {
+        "comparison": "Для каждого нового входа cold и warm дают одинаковый нормализованный граф, state и существенную диагностику"
+      },
+      "rejects": "Ключ кеша только по тексту метода или имени."
+    },
+    {
+      "id": "C16",
+      "title": "Единицы измерения",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "scenario": "Set weight to 5 kg",
+        "dto": "weightGrams",
+        "source_unit_contract": null
+      },
+      "initial_context": {},
+      "expected": {
+        "binding": "unknown с объяснением, пока единицы целевого контракта не подтверждены",
+        "conditional": "Если исходники явно подтверждают граммы, преобразовать в 5000."
+      },
+      "rejects": "Молча передать 5 в поле граммов или угадать единицу только по похожему имени."
+    },
+    {
+      "id": "C17",
+      "title": "Неоднозначный запрос",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "scenario": "Create name Ada",
+        "candidates": [
+          "POST /accounts",
+          "POST /items"
+        ],
+        "additional_evidence": null
+      },
+      "initial_context": {},
+      "expected": {
+        "binding": "несколько гипотез либо unknown",
+        "confirmed_global_edges": []
+      },
+      "rejects": "Выдать лучший лексический вариант за безусловно подтверждённый."
+    },
+    {
+      "id": "C18",
+      "title": "Фоновые изменения",
+      "kind": "Спецификация будущей проверки; здесь не запускалась",
+      "source": {
+        "steps": [
+          "read stock",
+          "background worker may update stock",
+          "reserve stock"
+        ]
+      },
+      "initial_context": {
+        "stock": 1,
+        "worker_order": "unspecified"
+      },
+      "expected": {
+        "reservation_result": "alternative/unknown",
+        "assumption_required": "Нужна явная модель порядка и видимости изменений."
+      },
+      "rejects": "Применить изолированную последовательную модель без указания допущения."
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+# Goal active: previous turn = progress
+
+Frozen17:972 tests; all8 exact archive replay; S0 0.9509803921568627; unknown46/103 and137 pairs. This is incomplete. Preserve17, older inputs/variants/results and parallel13; no individual Train Ticket action/source tracing or tuning.
+
+Working hypothesis: source generic inheritance loses property types at the JSON boundary; correct declaration-owned substitutions can retain DTO fields/maps and improve branch/data/remote prediction. Inspect current metadata and decoder; build independent multi-level, nested, shadowed/raw/bounded/cyclic/codec examples before code. Implement source facts and bounded substitution without guessing Python scalar classes or generic reference-cast timing. Runtime type/cast provenance remains a separate open frontier, not automatically solved by static substitution. Full suite and adversarial review, fixed-reference graph panel, pinned Petclinic probes, aggregate-only all8 measurements, offline+archive replay. No fake values or suppressed diagnostics.
+
+DeepSeek assessment: narrow design review of namespace-preserving generic substitution would help. Last17 review hit length without an answer; follow-up and test delegation403. One new bounded inline-only design request may establish availability for this distinct problem; if403 persists, report and continue independently, no repeated retries or model substitution.

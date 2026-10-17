@@ -1,0 +1,23 @@
+{
+  "scope": "logical non-identifiability of two new field values, not execution/reference data",
+  "scenario_file_sha256": "597af634a4f5f96f73d99f320b18da2cdeb3a25e7792eb5b8c93813cc0977bde",
+  "action": "Change the consignee's name and phone number in the consignment",
+  "fields": {
+    "consignee": "String",
+    "phone": "String"
+  },
+  "source_declaration": "ts-consign-service/src/main/java/consign/entity/Consign.java",
+  "source_assignments": "ConsignServiceImpl.updateConsignRecord copies getConsignee()/getPhone() into the saved record",
+  "hypothetical_completions": [
+    {
+      "consignee": "Example A",
+      "phone": "10000000001"
+    },
+    {
+      "consignee": "Example B",
+      "phone": "20000000002"
+    }
+  ],
+  "interpretation": "Both are examples consistent with a request to change name and phone; no supplied new literal selects between them. Other inputs can remain the same. These examples are never used by the predictor.",
+  "does_not_explain_all_unknown_inputs": true
+}

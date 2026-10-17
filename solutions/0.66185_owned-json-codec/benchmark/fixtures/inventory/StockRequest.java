@@ -1,0 +1,1 @@
+class StockRequest { public String key; public boolean enabled; }

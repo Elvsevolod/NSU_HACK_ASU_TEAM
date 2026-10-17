@@ -1,0 +1,34 @@
+{
+  "user_confirms_all_files_provided": true,
+  "missing_concrete_values": [
+    {
+      "source": "tt-challenge/scenarios/S4.json",
+      "step": 1,
+      "quote": "Register a new passenger account (username, password, gender, ID document, e-mail)",
+      "missing": [
+        "gender value",
+        "ID document value",
+        "email value",
+        "username/password concrete values"
+      ]
+    },
+    {
+      "source": "tt-challenge/scenarios/S7.json",
+      "step": 12,
+      "quote": "Change the consignee's name and phone number in the consignment",
+      "missing": [
+        "new name",
+        "new phone number"
+      ]
+    }
+  ],
+  "context_source": "tt-challenge/context/README.md",
+  "context_supplies": [
+    "existing credentials",
+    "initial database",
+    "trip date and clock",
+    "first-result choices"
+  ],
+  "rule": "No arbitrary concrete values, source-derived defaults only on proven omission; symbolic inputs remain explicitly non-concrete.",
+  "choice_context_correction": "Authoritative choices context explicitly selects first unspecified store or dish. Food selections are recoverable analyzer work, not missing user facts; earlier missing_food categorization must not be used."
+}

@@ -1,0 +1,2171 @@
+--- solutions/—_script-state-flow/code/analyzer/__main__.py
++++ solutions/—_http-json-collections/code/analyzer/__main__.py
+@@ -141,6 +141,8 @@
+                                     'path_conditions': engine.conditions, 'decisions': outcome['decisions'],
+                                     'pruned_paths': outcome.get('pruned_paths', []),
+                                     'outcome': engine.outcome, 'unresolved': problems,
++                                    'operation_issues':[{'kind':kind,'operation':name,'occurrences':count}
++                                                        for (kind,name),count in sorted(engine.operation_issues.items())],
+                                     'data_operations': engine.data_operations,
+                                     'state_after': following.snapshot(), 'edges': pack(engine.edges, scenario['id'])})
+         if len(next_states) > path_limit:
+--- solutions/—_script-state-flow/code/analyzer/context_choices.py
++++ solutions/—_http-json-collections/code/analyzer/context_choices.py
+@@ -3,6 +3,7 @@
+ from baseline_nlp import ntoks
+ from .provenance import entity_words, contains_unknown, new_for, ordinal_for
+ from .state import U
++from .java_collections import JavaMap,schema_type,semantic_view
+ from .nl_inputs import control_polarity
+ 
+ 
+@@ -60,13 +61,14 @@
+         observed = []
+         context_action = history[index].get('action', '')
+         def visit(value, path, labels):
++            value=semantic_view(value)
+             if isinstance(value, list):
+                 if not value or any(child is U for child in value):
+                     return
+-                typed = [child for child in value if isinstance(child, dict) and child.get('__type__')]
++                typed = [child for child in value if isinstance(child, dict) and schema_type(child)]
+                 if len(typed) != len(value):
+                     return
+-                selecting = [rule for rule in active if all(rule_matches(rule, child['__type__']) for child in typed)]
++                selecting = [rule for rule in active if all(rule_matches(rule, schema_type(child)) for child in typed)]
+                 if selecting:
+                     selected = selecting[-1]
+                     ordinal = ordinal_for(action, set(selected['entity']))
+@@ -77,28 +79,32 @@
+                     for position, child in enumerate(value):
+                         visit(child, path + '[' + str(position) + ']', labels)
+             elif isinstance(value, dict):
+-                mapping = value.get('__map__')
+-                if isinstance(mapping, dict):
+-                    keys = [key for key in mapping if isinstance(key, str) and concepts(key)
+-                            and concepts(key) <= concepts(context_action + ' ' + action)]
+-                    if not keys and len(mapping) == 1:
+-                        keys = list(mapping)
++                if isinstance(value,JavaMap):
++                    mapping=value.mapping
++                    if not isinstance(mapping,dict):return
++                    entries=value.entries()
++                    keys = [index for index,entry in enumerate(entries) if entry['kind']=='String'
++                            and isinstance(entry['key'],str) and concepts(entry['key'])
++                            and concepts(entry['key']) <= concepts(context_action + ' ' + action)]
++                    if not keys and len(entries) == 1:
++                        keys = [0]
+                     if len(keys) == 1:
+-                        visit(mapping[keys[0]], path + '[' + repr(keys[0]) + ']', labels)
++                        entry=entries[keys[0]]
++                        visit(entry['value'], path + '[' + repr(entry['key']) + ']', labels)
+                     return
+-                if value.get('__type__') and '__symbol__' not in value:
++                if schema_type(value):
+                     observed.append((path, value, labels))
+-                    labels = labels | concepts(' '.join(entity_words(value['__type__'])))
++                    labels = labels | concepts(' '.join(entity_words(schema_type(value))))
+                 for key, child in value.items():
+                     if not str(key).startswith('__'):
+                         visit(child, path + '.' + str(key), labels | concepts(str(key)))
+         visit(history[index].get('result', U), 'history[' + str(index) + '].result', set())
+         for path, obj, labels in observed:
+-            owner = concepts(' '.join(entity_words(obj['__type__'])))
+-            matching = [rule for rule in active if rule_matches(rule, obj['__type__'])]
++            owner = concepts(' '.join(entity_words(schema_type(obj))))
++            matching = [rule for rule in active if rule_matches(rule, schema_type(obj))]
+             if not matching:
+                 continue
+-            tid = project.resolve_type(obj['__type__'], meta['module'], meta['file'])
++            tid = project.resolve_type(schema_type(obj), meta['module'], meta['file'])
+             declared = project.type_fields.get(tid, {})
+             children = set().union(*(concepts(part) for info in declared.values()
+                                      for part in re.findall(r'<\s*([\w.]+)', info['type'])))
+--- solutions/—_script-state-flow/code/analyzer/contracts.py
++++ solutions/—_http-json-collections/code/analyzer/contracts.py
+@@ -15,6 +15,7 @@
+ from .nl_inputs import field_role, language_roles, canonical_ui_literal, introduced_value, control_polarity, intermediate_field
+ from .provenance import entity_words
+ from .frontend import json_value, truth
++from .java_collections import JsonText
+ from .scenario_literals import structured_bindings, canonical_reference
+ from .structured_literals import literal_value
+ from .context_choices import choice_rules, default_choices
+@@ -434,7 +435,7 @@
+                     body = {key: self.frontend.evaluate(expr, path_state, extra=site['event_values'], definitions=site['definitions'])
+                             for key, expr in {**site['body_fields'], **site.get('conditional_fields', {})}.items()}
+                     key = parameter['name']
+-                    params[key] = {'__json__': json_value(body) if site.get('body_complete') or site.get('body_keys_complete') else U}
++                    params[key] = JsonText(json_value(body) if site.get('body_complete') or site.get('body_keys_complete') else U)
+                     bindings[key] = {'source': 'ui', 'reference': site['id'] + ':JSON.stringify',
+                                      'quote': '', 'resolved': not contains_unknown(params[key])}
+             for key, value in partial_url_parameters(self.frontend, mid, site, path_state).items():
+--- solutions/—_script-state-flow/code/analyzer/engine.py
++++ solutions/—_http-json-collections/code/analyzer/engine.py
+@@ -3,7 +3,7 @@
+ Only source text is interpreted. This module never loads JVM classes or contacts
+ the application's services. Unresolved branches retain both possible paths.
+ """
+-from collections import defaultdict
++from collections import defaultdict,Counter
+ from copy import deepcopy
+ import json
+ import operator
+@@ -11,13 +11,17 @@
+ import re
+ from urllib.parse import urlsplit, parse_qsl, unquote
+ 
+-from .project import text
++from .project import text,walk
+ from .state import U
+ from .models import construct, library, known, unwrap, wire, key_equal, http_entity, optional_value, status_code, header_values
+ from .constraints import assume, compare
+ from .java_exceptions import JavaThrow, assignable
+ from .symbolic_text import concat_text, http_text_parts
+ from .models import java_date_text, uuid_value, http_headers_type
++from .java_collections import JavaObject, JavaRecord, JavaMap, JavaEnumValue, JavaTypeToken, JavaTypeFactory, JsonObject, JsonText, reference_equal, is_symbolic
++from .java_numbers import parse_integer
++from .http_json import decode_response,type_parts
++from .map_keys import same_key
+ from datetime import datetime
+ 
+ 
+@@ -26,16 +30,61 @@
+         return U
+     if key in obj:
+         return obj[key]
++    if isinstance(obj,(JavaRecord,JsonObject,JavaEnumValue)):return U
+     normalized = re.sub(r'[^a-z0-9]', '', key.lower())
+     return next((v for k, v in obj.items() if re.sub(r'[^a-z0-9]', '', k.lower()) == normalized), U)
+ 
+ 
+-def merge(a, b):
+-    if a == b:
+-        return a
+-    if isinstance(a, dict) and isinstance(b, dict):
+-        return {key: merge(a.get(key, U), b.get(key, U)) for key in sorted(a.keys() | b.keys(), key=lambda k: (type(k).__name__, str(k)))}
+-    return U
++def exception_type(value):
++    return value.java_type if isinstance(value,JavaObject) else value.get('__type__',U) if type(value) is dict else U
++
++
++def merge(a, b, active=None):
++    if a is b:return a
++    if isinstance(a,JavaTypeToken) or isinstance(b,JavaTypeToken):
++        return a if isinstance(a,JavaTypeToken) and isinstance(b,JavaTypeToken) and (a.written,a.kind,a.context)==(b.written,b.kind,b.context) else U
++    if isinstance(a,JavaEnumValue) or isinstance(b,JavaEnumValue):
++        return a if isinstance(a,JavaEnumValue) and isinstance(b,JavaEnumValue) and a.enum_key==b.enum_key and a==b else U
++    if isinstance(a,JavaRecord) or isinstance(b,JavaRecord):
++        if not isinstance(a,JavaRecord) or not isinstance(b,JavaRecord) or a.declared_type!=b.declared_type:return U
++    active=set() if active is None else active
++    pair=(id(a),id(b))
++    if pair in active:return U
++    active.add(pair)
++    try:
++        if isinstance(a,JavaRecord):
++            fields={key:merge(a.get(key,U),b.get(key,U),active) for key in sorted(a.keys()|b.keys())}
++            wire_fields=a.wire_fields|b.wire_fields
++            if isinstance(a,JavaObject) and isinstance(b,JavaObject):
++                identity=a.java_identity if a.java_identity is b.java_identity else None
++                return JavaObject(a.java_type,fields,identity,wire_fields)
++            return JavaRecord(a.declared_type,fields,wire_fields)
++        if isinstance(a,JavaMap) or isinstance(b,JavaMap):
++            if not isinstance(a,JavaMap) or not isinstance(b,JavaMap):return U
++            identity=a.java_identity if a.java_identity is b.java_identity else None
++            if (not isinstance(a.mapping,dict) or not isinstance(b.mapping,dict) or a.mapping.keys()!=b.mapping.keys()
++                    or len(a.typed_entries)!=len(b.typed_entries)
++                    or any(same_key(left,right) is not True for left,right in zip(a.typed_entries,b.typed_entries))):
++                return JavaMap(U,identity)
++            typed=[{**left,'value':merge(left['value'],right['value'],active)} for left,right in zip(a.typed_entries,b.typed_entries)]
++            origin=a.origin_type if a.origin_type==b.origin_type else None
++            return JavaMap({key:merge(value,b.mapping[key],active) for key,value in a.mapping.items()},identity,typed,origin)
++        if isinstance(a,JsonText) or isinstance(b,JsonText):
++            return JsonText(merge(a.payload,b.payload,active)) if isinstance(a,JsonText) and isinstance(b,JsonText) else U
++        if isinstance(a,JsonObject) or isinstance(b,JsonObject):
++            if not isinstance(a,JsonObject) or not isinstance(b,JsonObject):return U
++            fields={key:merge(a.get(key,U),b.get(key,U),active) for key in a.keys()|b.keys()}
++            return JsonObject(fields,a.origin_type if a.origin_type==b.origin_type else None)
++        if isinstance(a, dict) and isinstance(b, dict):
++            return {key: merge(a.get(key, U), b.get(key, U),active) for key in sorted(a.keys() | b.keys(), key=lambda k: (type(k).__name__, str(k)))}
++        if isinstance(a,list) and isinstance(b,list):
++            if len(a)!=len(b):return U
++            joined=[merge(left,right,active) for left,right in zip(a,b)]
++            return a if joined==a and joined==b else U
++        if type(a) is type(b) and a == b:return a
++        return U
++    finally:
++        active.remove(pair)
+ 
+ 
+ class AlternativeRequired(Exception):
+@@ -65,6 +114,7 @@
+         self.variable_types = {}
+         self.constraint_sequence = 0
+         self.filter_frames = []
++        self.operation_issues=Counter()
+ 
+     def constraint_symbol(self):
+         self.constraint_sequence += 1
+@@ -88,17 +138,33 @@
+     def executed(self, mid, reason):
+         self.add('', 'executes', mid, reason)
+ 
++    def json_issue(self,message,reason):
++        self.approximate=True
++        self.warnings.add(message+': '+reason)
++        self.operation_issues[('http_json_binding',message)]+=1
++
++    def json_wire(self,value,reason):
++        return wire(value,lambda message:self.json_issue(message,reason),self.p.json_model_limits)
++
+     def run(self, entry, params):
+         self.params = params
+         self.entry = entry
+         try:
+             args = [self.input_value(name, typ, params) for name, typ in self.p.parameters(entry)]
+             result,_ = self.http_invoke(entry, args, 'scenario request')
++            if any(entry==handler for handler,_,_ in self.p.ix.handlers):
++                try:self.json_wire(unwrap(result),entry)
++                except JavaThrow as failure:
++                    if isinstance(failure.value,dict) and failure.value.get('__serialization_failure__'):
++                        self.outcome='HTTP serialization failure'
++                        self.warnings.add('default HTTP JSON serialization failed on cyclic object graph: '+entry)
++                        return U
++                    raise
+             if http_entity(result) and type(result.get('status')) is int and result['status']>=400:
+                 self.outcome='HTTP error response'
+         except JavaThrow as exc:
+             self.outcome = 'uncaught application exception'
+-            self.warnings.add('uncaught Java exception: '+str(exc.value.get('__type__',U) if isinstance(exc.value,dict) else U))
++            self.warnings.add('uncaught Java exception: '+str(exception_type(exc.value)))
+             return U
+         return unwrap(result)
+ 
+@@ -172,10 +238,11 @@
+         if typ.split('.')[-1].lstrip('?')=='HttpHeaders':
+             return {'__type__': 'HttpHeaders','__http_headers__':True,'headers':U}
+         if name in params:
+-            if isinstance(params[name], dict) and '__json__' in params[name] and any(
+-                    p['name'] == name and p['kind'] == 'RequestBody' and p['type'].split('.')[-1] == 'String'
+-                    for p in self.p.http_parameters(self.method or getattr(self, 'entry', ''))):
+-                return deepcopy(params[name])
++            target=self.method or getattr(self,'entry','')
++            if any(p['name']==name and p['kind']=='RequestBody' for p in self.p.http_parameters(target)):
++                if self.standard_type(typ,'java.lang.String',self.p.methods[target]):
++                    return deepcopy(params[name]) if isinstance(params[name],JsonText) else self.coerce(params[name],typ)
++                return self.bind_http_body(params[name],typ,target,'scenario request')
+             return self.coerce(params[name], typ)
+         if typ.split('.')[-1] in ('String', 'UUID', 'int', 'double', 'boolean', 'Date', 'Long'):
+             return U
+@@ -184,8 +251,26 @@
+         meta = self.p.methods.get(method, {})
+         tid = self.p.resolve_type(typ, meta.get('module'), meta.get('file'))
+         if tid in self.p.type_fields and not typ.startswith('org.springframework.http.'):
+-            value['__http_entity__'] = False
++            if '__http_entity__' not in self.p.type_fields[tid]:value['__http_entity__'] = False
++            value=JavaRecord(self.p.nodes[tid]['fqn'],value,self.p.type_fields[tid])
+         return value
++
++    def bind_http_body(self,value,typ,target,reason):
++        """Own the HTTP value independently and rebind by the receiver's schema."""
++        meta=self.p.methods[target]
++        payload=self.json_wire(value,reason)
++        if self.standard_type(typ,'java.lang.String',meta):
++            if isinstance(payload,(JsonText,str)) or is_symbolic(payload) and payload.get('__type__') in ('String','java.lang.String'):return deepcopy(payload)
++            if type(payload) in (int,bool):return str(payload).lower()
++            if isinstance(payload,(dict,list)):return JsonText(payload)
++            if payload is U or payload is None:return payload
++            self.json_issue('HTTP request text representation is not modeled',reason)
++            return U
++        if isinstance(payload,JsonText):payload=payload.payload
++        owner=self.p.resolve_type(typ,meta['module'],meta['file'])
++        if owner in self.p.type_fields and isinstance(payload,dict) and not is_symbolic(payload):
++            payload=JsonObject({**self.p.request_body_defaults(target),**payload},getattr(payload,'origin_type',None))
++        return decode_response(self.p,payload,typ,meta,self.standard_type,lambda message:self.json_issue(message,reason))
+ 
+     @staticmethod
+     def coerce(value, typ):
+@@ -195,7 +280,7 @@
+         typ = typ.split('.')[-1]
+         if value is U or value is None:
+             return value
+-        if isinstance(value, dict) and '__symbol__' in value:
++        if is_symbolic(value):
+             aliases = {'Integer': 'int', 'Long': 'long', 'Boolean': 'boolean', 'Double': 'double', 'Float': 'float'}
+             source_type = value['__type__'].split('.')[-1]
+             return value if aliases.get(source_type, source_type) == aliases.get(typ, typ) else U
+@@ -303,6 +388,11 @@
+                     if rows is not None:
+                         self.state.database.invalidate(rows)
+ 
++    def execution_fork(self,state):
++        # Method execution never mutates completed request observations. Share
++        # their payloads, but own the journal list and all mutable execution data.
++        return deepcopy(state,{id(state.history):list(state.history)})
++
+     def execute(self, node, env):
+         if node is None:
+             return U, None
+@@ -336,22 +426,22 @@
+                                      self.variable_types, self.constraint_symbol)
+                     self.conditions[-1]['refined'] = refined
+                 return self.execute(node.child_by_field_name('consequence' if decision else 'alternative'), env)
+-            before_state = deepcopy(self.state)
++            before_state = self.state
+             left, right = deepcopy(env), deepcopy(env)
+-            self.uncertain += 1
+-            self.state = deepcopy(before_state)
++            self.state = self.execution_fork(before_state)
+             a, ac = self.execute(node.child_by_field_name('consequence'), left)
+             left_state = self.state
+-            self.state = deepcopy(before_state)
++            self.state = self.execution_fork(before_state)
+             b, bc = self.execute(node.child_by_field_name('alternative'), right)
+             right_state = self.state
+-            self.state = before_state
+-            # Changes on incompatible paths are not committed to a shared database.
++            self.state = left_state
++            # Keep agreed writes; conflicting contents are unavailable to queries.
+             self.state.database.unknown_tables.update(left_state.database.unknown_tables | right_state.database.unknown_tables)
+             for table in set(left_state.database.tables) | set(right_state.database.tables):
+                 if left_state.database.tables.get(table) != right_state.database.tables.get(table):
+                     self.state.database.unknown_tables.add(table)
+-            self.uncertain -= 1
++            self.state.symbol_sequence=max(left_state.symbol_sequence,right_state.symbol_sequence)
++            self.state.input_sequence=max(left_state.input_sequence,right_state.input_sequence)
+             env.update(merge(left, right))
+             return (merge(a, b), ac) if ac == bc and ac else (U, None)
+         if typ == 'enhanced_for_statement':
+@@ -411,7 +501,7 @@
+                     if child.type == 'catch_clause':
+                         parameter = next(c for c in child.named_children if c.type=='catch_formal_parameter')
+                         types = next(c for c in parameter.named_children if c.type=='catch_type')
+-                        thrown = result.get('__type__',U) if isinstance(result,dict) else U
++                        thrown = exception_type(result)
+                         matches = [assignable(thrown,text(c),self.p) for c in types.named_children]
+                         match = True if True in matches else U if U in matches else False
+                         if match is U:
+@@ -462,8 +552,8 @@
+                 continue
+             for case in label.named_children:
+                 value = self.value(case,env)
+-                if value is U and isinstance(selected,dict) and '__enum__' in selected:
+-                    key = selected['__enum__'].rsplit('.',1)[0]+'.'+text(case)
++                if value is U and isinstance(selected,JavaEnumValue):
++                    key = selected.enum_key.rsplit('.',1)[0]+'.'+text(case)
+                     value = self.p.enum_objects.get(key,U)
+                 equal = key_equal(selected,value)
+                 if equal is True:
+@@ -528,6 +618,24 @@
+         if typ == 'cast_expression':
+             value = self.value(node.named_children[-1], env)
+             target = text(node.child_by_field_name('type'))
++            if isinstance(value,(str,JsonText)):
++                base=target.split('<',1)[0]
++                meta=self.p.methods[self.method]
++                owner=self.p.resolve_type(base,meta['module'],meta['file'])
++                source_incompatible=owner and self.p.nodes[owner]['fqn'] not in ('java.lang.String','java.lang.Object')
++                if source_incompatible or any(self.standard_type(base,'java.util.'+name) for name in ('Map','HashMap','LinkedHashMap')):
++                    raise JavaThrow({'__type__':'ClassCastException'})
++            if isinstance(value,JavaMap):
++                meta=self.p.methods[self.method]
++                owner=self.p.resolve_type(target,meta['module'],meta['file'])
++                allowed=('java.util.Map','java.util.HashMap','java.util.AbstractMap',
++                         'java.lang.Object','java.lang.Cloneable','java.io.Serializable')
++                if any(self.standard_type(target,typ) for typ in allowed):return value
++                if target.endswith('[]') or owner and not self.p.nodes[owner]['fqn'].startswith('java.'):
++                    raise JavaThrow({'__type__':'ClassCastException'})
++                self.approximate=True
++                self.warnings.add('Java Map reference cast is not proven compatible: '+text(node))
++                return U
+             limits = {'byte': (-128, 127), 'short': (-32768, 32767),
+                       'int': (-2147483648, 2147483647), 'long': (-9223372036854775808, 9223372036854775807)}
+             if target in limits:
+@@ -584,7 +692,13 @@
+                 return True
+             if a is U or b is U:
+                 return U
+-            if op=='+' and any(isinstance(v,dict) and v.get('__type__') in ('String','java.lang.String')
++            if op in ('==','!=') and any(isinstance(value,(JavaRecord,JavaMap,JavaEnumValue,JavaTypeToken,JavaTypeFactory)) for value in (a,b)):
++                equal=reference_equal(a,b)
++                if equal is U:
++                    self.approximate=True
++                    self.warnings.add('unresolved Java reference identity: '+raw)
++                return equal if equal is U or op=='==' else not equal
++            if op=='+' and any(type(v) is dict and v.get('__type__') in ('String','java.lang.String')
+                                and '__symbol__' in v for v in (a,b)):
+                 def string_part(value):
+                     if value is None:return 'null'
+@@ -593,7 +707,7 @@
+                     if isinstance(value,datetime):return java_date_text(value)
+                     return value
+                 return concat_text(string_part(a),string_part(b))
+-            if any(isinstance(v, dict) and '__symbol__' in v for v in (a, b)):
++            if any(is_symbolic(v) for v in (a, b)):
+                 if op in ('==','!='):
+                     equal=key_equal(a,b)
+                     if equal is not U:return equal if op=='==' else not equal
+@@ -713,6 +827,7 @@
+             return arr[idx] if isinstance(arr, list) and isinstance(idx, int) and 0 <= idx < len(arr) else U
+         if typ == 'expression_statement':
+             return self.value(node.named_children[0], env)
++        if typ=='class_literal':return JavaTypeToken(raw.removesuffix('.class'),self.p.methods[self.method],'Class')
+         if typ in ('type_identifier', 'scoped_type_identifier', 'generic_type', 'class_literal', 'line_comment', 'block_comment'):
+             return U
+         self.approximate=True
+@@ -818,6 +933,115 @@
+         self.warnings.add('unknown Java integer width; numeric result retained as unknown: '+self.method)
+         return U
+ 
++    def standard_type(self,name,fqn,meta=None):
++        """A source-proven JDK type, rather than an unrelated namesake."""
++        meta=self.p.methods[self.method] if meta is None else meta
++        if self.p.resolve_type(name,meta['module'],meta['file']):
++            return False
++        if name==fqn:return True
++        if name!=fqn.rsplit('.',1)[-1]:return False
++        imports=[match[1] for node in self.p.trees[meta['file']].root_node.named_children if node.type=='import_declaration'
++                 for match in [re.search(r'\bimport\s+(?:static\s+)?([\w.*]+)\s*;',text(node))] if match]
++        explicit=[item for item in imports if item.rsplit('.',1)[-1]==name]
++        if explicit:return explicit==[fqn]
++        return fqn.startswith('java.lang.') or fqn.rsplit('.',1)[0]+'.*' in imports
++
++    def method_modifiers(self,target):
++        source=self.p.ast.get(target)
++        flags={keyword.type for child in source.named_children if child.type=='modifiers'
++               for keyword in child.children if not keyword.is_named} if source is not None else set()
++        if source is not None and source.parent.parent.type=='interface_declaration' and 'private' not in flags:
++            flags.add('public')
++        return flags
++
++    def concrete_dispatch(self,owner,name,arity,targets,declared,reason):
++        """Refine the supplied declaration by class and parameter signature."""
++        anchors=[target for target in declared if target in self.p.methods] or targets
++        if any(self.method_modifiers(target) & {'static','private'} for target in anchors):return targets
++        ancestry,level=set(),[owner]
++        levels=[]
++        while level:
++            levels.append(set(level));ancestry.update(level)
++            level=sorted({parent for current in level for parent in self.p.type_parents.get(current,[]) if parent not in ancestry})
++        signatures={self.p.dispatch_signature(target) for target in anchors}
++        candidates=[target for target in self.p.by_name.get(name,[]) if self.p.methods[target]['owner'] in ancestry
++                    and len(self.p.parameters(target))==arity and not self.p.methods[target].get('abstract')
++                    and not self.method_modifiers(target) & {'static','private'}
++                    and self.p.ix.unit_of(self.method) in self.p.ix.units.get(self.p.methods[target]['module'],())]
++        if None in signatures or any(self.p.dispatch_signature(target) is None for target in candidates):
++            self.approximate=True
++            self.warnings.add('generic or unresolved dispatch signature; alternatives retained: '+reason)
++            return sorted(set(targets)|set(candidates))
++        selected=[]
++        parents={}
++        def ancestors(current):
++            if current not in parents:
++                found,pending=set(),list(self.p.type_parents.get(current,[]))
++                while pending:
++                    parent=pending.pop()
++                    if parent in found:continue
++                    found.add(parent);pending.extend(self.p.type_parents.get(parent,[]))
++                parents[current]=found
++            return parents[current]
++        def package(target):
++            return self.p.nodes[self.p.methods[target]['owner']]['fqn'].rpartition('.')[0]
++        for anchor in anchors:
++            if self.p.methods[anchor]['owner'] not in ancestry:
++                self.approximate=True
++                self.warnings.add('declared dispatch owner is not a proven receiver supertype: '+reason)
++                return targets
++            signature=self.p.dispatch_signature(anchor)
++            eligible={anchor}
++            matching=[target for target in candidates if self.p.dispatch_signature(target)==signature]
++            changed=True
++            while changed:
++                changed=False
++                for target in matching:
++                    if target in eligible:continue
++                    if any(self.p.methods[base]['owner'] in ancestors(self.p.methods[target]['owner'])
++                           and (self.method_modifiers(base) & {'public','protected'} or package(base)==package(target))
++                           for base in eligible):
++                        eligible.add(target);changed=True
++            for level in levels:
++                nearest=[target for target in matching if target in eligible and self.p.methods[target]['owner'] in level]
++                if nearest:
++                    selected.extend(nearest)
++                    break
++        return sorted(set(selected)) or targets
++
++    def map_initializer(self,node,args,env,reason):
++        """Native Map subclasses with put-only instance blocks and no overrides."""
++        typ=text(node.child_by_field_name('type'))
++        base=typ.split('<',1)[0]
++        if not any(self.standard_type(base,'java.util.'+name) for name in ('HashMap','LinkedHashMap')):return False,U
++        handled,mapping=construct(typ,args,self.state.now)
++        if not handled or not isinstance(mapping,JavaMap):return False,U
++        body=next(child for child in node.named_children if child.type=='class_body')
++        blocks=[child for child in body.named_children if child.type not in ('line_comment','block_comment')]
++        if any(block.type!='block' for block in blocks):return False,U
++        invocations=[]
++        for block in blocks:
++            for statement in block.named_children:
++                if statement.type in ('line_comment','block_comment'):continue
++                if statement.type!='expression_statement' or len(statement.named_children)!=1:return False,U
++                call=statement.named_children[0]
++                if call.type!='method_invocation' or text(call.child_by_field_name('name'))!='put' or text(call.child_by_field_name('object')) not in ('','this'):return False,U
++                values=[child for child in call.child_by_field_name('arguments').named_children if child.type not in ('line_comment','block_comment')]
++                if len(values)!=2:return False,U
++                if any(child.type=='this' or child.type=='method_invocation' and child.child_by_field_name('object') is None
++                       for value in values for child in walk(value)):return False,U
++                invocations.append(values)
++        for nodes in invocations:
++            values=[self.value(value,env) for value in nodes]
++            key_type={'string_literal':'String','character_literal':'char','true':'boolean','false':'boolean'}.get(nodes[0].type)
++            key_type=key_type or self.numeric_type(nodes[0]) or 'unresolved'
++            _,result=library('put',mapping,values,'this',self.state.now,key_type=key_type)
++            if result is U or any(value is U for value in values):
++                self.approximate=True
++                self.warnings.add('native Map initializer contains an unresolved key or value: '+reason)
++                self.operation_issues[(mapping.last_issue or 'unknown_map_value','initializer.put')]+=1
++        return True,mapping
++
+     def call(self, node, env):
+         mid = self.method
+         site = self.p.site(mid, node)
+@@ -829,10 +1053,10 @@
+         args = [self.value(child, env) for child in argnode.named_children
+                 if child.type not in ('line_comment', 'block_comment')] if argnode else []
+         reason = site or f"{self.p.methods[mid]['file']}:{node.start_point.row + 1}"
+-        if name=='doFilter' and isinstance(obj,dict) and '__filter_chain__' in obj:
++        if name=='doFilter' and type(obj) is dict and '__filter_chain__' in obj:
+             self.continue_filter(*obj['__filter_chain__'])
+             return None
+-        if isinstance(obj,dict) and obj.get('__type__')=='HttpServletResponse':
++        if type(obj) is dict and obj.get('__type__')=='HttpServletResponse':
+             if name in ('setStatus','sendError') and args:
+                 obj['status']=status_code(args[0])
+                 return None
+@@ -842,9 +1066,25 @@
+         if not targets and not wiring.get('data_access'):
+             targets=self.p.source_targets(mid,node)
+         receiver_type = cs.get('receiver_type')
++        if name=='<init>' and any(child.type=='class_body' for child in node.named_children):
++            base,type_args=type_parts(text(node.child_by_field_name('type')))
++            body=next(child for child in node.named_children if child.type=='class_body')
++            if not args and type_args and len(type_args)==1 and type_args[0] and not any(child.type not in ('line_comment','block_comment') for child in body.named_children):
++                for fqn in ('org.springframework.core.ParameterizedTypeReference','com.fasterxml.jackson.core.type.TypeReference'):
++                    if self.standard_type(base,fqn):return JavaTypeToken(type_args[0],self.p.methods[mid],fqn.rsplit('.',1)[-1])
++            handled,value=self.map_initializer(node,args,env,reason) if not targets else (False,U)
++            if handled:return value
++            self.approximate=True
++            self.warnings.add('anonymous class construction or initializer is not modeled: '+reason)
++            self.operation_issues[('unsupported_java_construction','anonymous_class')]+=1
++            self.fallback(mid)
++            return U
++        if name != '<init>' and isinstance(obj,JavaObject) and text(objnode) != 'super':
++            owner=self.p.resolve_type(obj.java_type,self.p.methods[mid]['module'],self.p.methods[mid]['file'])
++            if owner and targets:
++                targets=self.concrete_dispatch(owner,name,len(args),targets,wiring.get('calls',set()),reason)
+         if objnode is not None and obj is None:
+-            static = targets and all(any(c.type=='modifiers' and re.search(r'\bstatic\b',text(c))
+-                                         for c in self.p.ast[target].named_children) for target in targets if target in self.p.ast)
++            static = targets and all('static' in self.method_modifiers(target) for target in targets)
+             if not static:
+                 if targets or name in ('equals','equalsIgnoreCase','toString','length','isEmpty','isBlank','orElseThrow','getForObject','getForEntity','postForObject','postForEntity','exchange'):
+                     raise JavaThrow({'__type__':'NullPointerException'})
+@@ -854,8 +1094,8 @@
+         if not targets and name == 'builder' and receiver_type in self.p.builder_types:
+             fields = self.p.builder_types[receiver_type]
+             return {'__builder__': receiver_type, 'fields': {n: False if t == 'boolean' else 0 if t in ('int', 'long', 'double', 'float') else None for n, t in fields}}
+-        if not targets and isinstance(obj, dict) and '__builder__' in obj:
+-            if name == 'build': return {'__type__': obj['__builder__'], **deepcopy(obj['fields'])}
++        if not targets and type(obj) is dict and '__builder__' in obj:
++            if name == 'build': return JavaRecord(obj['__builder__'],{'__type__': obj['__builder__'], **deepcopy(obj['fields'])},obj['fields'])
+             if name in obj['fields'] and len(args) == 1:
+                 obj['fields'][name] = args[0]
+                 return obj
+@@ -864,11 +1104,12 @@
+             tid = self.p.resolve_type(text(objnode), meta['module'], meta['file'])
+             values = [deepcopy(self.p.enum_objects[key]) for key in self.p.enum_members.get(tid, [])]
+             if values: return values
++        if not targets and isinstance(obj,JavaEnumValue) and name=='name' and not args:return obj.enum_name
+         if not targets and name == 'encode' and receiver_type and 'PasswordEncoder' in receiver_type and args and isinstance(args[0], str):
+             # Abstract non-null encoding; no hashing or authentication is executed.
+             return 'encoded:' + args[0]
+-        if not targets and isinstance(obj, dict) and (obj.get('__type__') or obj.get('__enum_type__')) and name != '<init>':
+-            runtime_type = self.p.nodes[obj['__enum_type__']]['fqn'] if obj.get('__enum_type__') else obj['__type__']
++        if not targets and isinstance(obj, dict) and (isinstance(obj,(JavaRecord,JavaEnumValue)) or type(obj) is dict and obj.get('__type__')) and name != '<init>':
++            runtime_type = obj.declared_type if isinstance(obj,JavaRecord) else self.p.nodes[obj.enum_owner]['fqn'] if isinstance(obj,JavaEnumValue) else self.p.nodes[obj['__enum_type__']]['fqn'] if obj.get('__enum_type__') else obj['__type__']
+             runtime_owner=self.p.resolve_type(runtime_type,self.p.methods[mid]['module'],self.p.methods[mid]['file'])
+             targets = [m for m in self.p.inherited_methods(runtime_owner,name,len(args))
+                        if not self.p.methods[m].get('abstract')
+@@ -878,7 +1119,7 @@
+             obj = {'__type__': typ}
+             tid = self.p.resolve_type(typ, self.p.methods[mid]['module'], self.p.methods[mid]['file'])
+             if tid:
+-                obj = {'__type__': self.p.nodes[tid]['fqn'], '__http_entity__': False}
++                obj = JavaObject(self.p.nodes[tid]['fqn'],{'__type__': self.p.nodes[tid]['fqn'], '__http_entity__': False},wire_fields=self.p.type_fields.get(tid,{}))
+             for field, info in self.p.type_fields.get(tid, {}).items():
+                 default = info['default']
+                 if default is U and not info['has_initializer']:
+@@ -892,7 +1133,9 @@
+             if not tid and re.match(r'(ArrayList|LinkedList|List|HashSet|Set)', typ):
+                 obj = list(args[0]) if args and isinstance(args[0], list) else []
+         if name == '<init>':
+-            handled, value = construct(typ, args, self.state.now) if not tid and not targets else (False, U)
++            base=typ.split('<')[0]
++            unresolved_map=not tid and base.rsplit('.',1)[-1] in ('Map','HashMap','LinkedHashMap') and not self.standard_type(base,'java.util.'+base.rsplit('.',1)[-1])
++            handled, value = (True,U) if unresolved_map else construct(typ, args, self.state.now) if not tid and not targets else (False, U)
+             if handled:
+                 obj = value
+                 if value is U:
+@@ -900,7 +1143,7 @@
+                     self.warnings.add('unresolved modeled constructor: '+typ+' at '+reason)
+             elif not targets and receiver_type in self.p.all_args_types:
+                 fields = self.p.all_args_types[receiver_type]
+-                if len(fields) == len(args): obj = {'__type__': receiver_type, **{n: v for (n, _), v in zip(fields, args)}}
++                if len(fields) == len(args): obj = JavaObject(self.p.nodes[tid]['fqn'],{'__type__': receiver_type, **{n: v for (n, _), v in zip(fields, args)}},wire_fields=self.p.type_fields.get(tid,{})) if tid else {'__type__': receiver_type, **{n: v for (n, _), v in zip(fields, args)}}
+         if len(targets) > 1:
+             selected = self.choose(reason + ':dispatch', targets)
+             if selected is not None:
+@@ -919,8 +1162,10 @@
+                      'GET' if name in ('getForObject','getForEntity') else
+                      'POST' if name in ('postForObject','postForEntity') else None)
+         url=args[0] if args else None
+-        is_http_client=(name in ('exchange','getForEntity','postForEntity','getForObject','postForObject')
+-                        and receiver_type and receiver_type.split('.')[-1] in ('RestTemplate','RestOperations'))
++        client_type=self.source_type(objnode) or receiver_type
++        is_http_client=(not targets and name in ('exchange','getForEntity','postForEntity','getForObject','postForObject')
++                        and any(self.standard_type(client_type or '',fqn) for fqn in
++                                ('org.springframework.web.client.RestTemplate','org.springframework.web.client.RestOperations')))
+         if is_http_client and isinstance(url,str) and ('{' in url or '}' in url):
+             url=self.expand_http_template(url,args,name,reason)
+         address=self.request_address(url) if remote or is_http_client else None
+@@ -948,6 +1193,14 @@
+             request = args[2] if name == 'exchange' and len(args) > 2 else args[1] if name.startswith('post') and len(args) > 1 else None
+             headers=header_values(request.get('headers',U)) if http_entity(request) else {}
+             body = unwrap(request) if http_entity(request) else request if name.startswith('post') else None if request is None else U
++            original_body=body
++            try:body=self.json_wire(body,reason)
++            except JavaThrow as failure:
++                if isinstance(failure.value,dict) and failure.value.get('__serialization_failure__'):
++                    self.warnings.add('default HTTP request serialization failed on cyclic object graph: '+reason)
++                    raise JavaThrow({'__type__':'HttpMessageNotWritableException'})
++                raise
++            if isinstance(original_body,JavaEnumValue) and body is not U:body=JsonText(body)
+             if len(remote) > 1:
+                 selected = self.choose(reason + ':remote', remote)
+                 if selected is not None:
+@@ -990,14 +1243,18 @@
+                         values.append(U)
+                         self.approximate=True
+                         self.warnings.add('unresolved remote route parameter: '+par+' at '+reason)
++                    elif parameters.get(par,{}).get('kind')=='RequestBody':
++                        values.append(self.bind_http_body(body,typ,target,reason))
+                     else:
+                         decoded=body
+-                        if typ.split('.')[-1]!='String' and isinstance(decoded,dict) and '__json__' in decoded:
+-                            decoded=decoded['__json__']
++                        if typ.split('.')[-1]!='String' and isinstance(decoded,JsonText):
++                            decoded=decoded.payload
+                         target_type=self.p.resolve_type(typ,self.p.methods[target]['module'],self.p.methods[target]['file'])
+                         if target_type in self.p.type_fields and isinstance(decoded,dict) and '__symbol__' not in decoded:
+-                            decoded={**self.p.request_body_defaults(target),**deepcopy(decoded),
+-                                     '__type__':self.p.nodes[target_type]['fqn'],'__http_entity__':False}
++                            decoded={**self.p.request_body_defaults(target),**deepcopy(decoded)}
++                            if '__type__' not in self.p.type_fields[target_type]:decoded['__type__']=self.p.nodes[target_type]['fqn']
++                            if '__http_entity__' not in self.p.type_fields[target_type]:decoded['__http_entity__']=False
++                            decoded=JavaRecord(self.p.nodes[target_type]['fqn'],decoded,self.p.type_fields[target_type])
+                         values.append(decoded)
+                 response,entered = self.http_invoke(target, values, reason)
+                 if entered and self.p.ix.unit_of(mid)!=self.p.ix.unit_of(target):
+@@ -1017,14 +1274,34 @@
+                     self.warnings.add('unknown HTTP response status: '+reason)
+                 elif status >= 400:
+                     raise JavaThrow({'__type__':'HttpClientErrorException' if status<500 else 'HttpServerErrorException','status':status})
+-                payload=wire(unwrap(response))
++                try:payload=self.json_wire(unwrap(response),reason)
++                except JavaThrow as failure:
++                    if isinstance(failure.value,dict) and failure.value.get('__serialization_failure__'):
++                        self.warnings.add('default HTTP JSON serialization failed on cyclic object graph: '+reason)
++                        raise JavaThrow({'__type__':'HttpServerErrorException','status':500})
++                    raise
+                 class_index=3 if name=='exchange' else 2 if name.startswith('post') else 1
+-                class_nodes=[child for child in argnode.named_children if child.type not in ('line_comment','block_comment')] if argnode else []
+-                response_type=text(class_nodes[class_index]).removesuffix('.class') if len(class_nodes)>class_index and class_nodes[class_index].type=='class_literal' else None
+-                if response_type in ('String','java.lang.String') and isinstance(payload,(dict,list)) and not (isinstance(payload,dict) and ('__json__' in payload or '__symbol__' in payload)):
+-                    payload={'__json__':payload}
+-                elif response_type not in ('String','java.lang.String') and isinstance(payload,dict) and '__json__' in payload:
+-                    payload=payload['__json__']
++                token=args[class_index] if len(args)>class_index else None
++                allowed=('Class','ParameterizedTypeReference') if name=='exchange' else ('Class',)
++                response_type=token.written if isinstance(token,JavaTypeToken) and token.kind in allowed else None
++                type_context=token.context if response_type is not None else self.p.methods[mid]
++                native_string=response_type is not None and self.standard_type(response_type,'java.lang.String',type_context)
++                if native_string and type(payload) in (int,bool):payload=str(payload).lower()
++                elif native_string and (type(payload) is float or is_symbolic(payload) and payload.get('__type__') not in ('String','java.lang.String')):
++                    payload=JsonText(payload)
++                if native_string and (isinstance(payload,(dict,list)) or isinstance(unwrap(response),JavaEnumValue)) and not isinstance(payload,JsonText) and not (type(payload) is dict and '__symbol__' in payload):
++                    payload=JsonText(payload)
++                elif not native_string and isinstance(payload,JsonText):
++                    payload=payload.payload
++                if response_type and not native_string:
++                    def unresolved_json(message):
++                        self.approximate=True
++                        self.warnings.add(message+': '+reason)
++                        self.operation_issues[('http_json_binding',message)]+=1
++                    payload=decode_response(self.p,payload,response_type,type_context,self.standard_type,unresolved_json)
++                if response_type is None:
++                    self.json_issue('HTTP response type descriptor is not modeled',reason)
++                    payload=U
+                 results.append(payload)
+             value = results[0] if len(results) == 1 else U
+             return {'__type__': 'ResponseEntity', '__http_entity__': True, 'body': value,'status':status if len(results)==1 else U} if name in ('exchange', 'getForEntity', 'postForEntity') else value
+@@ -1034,16 +1311,85 @@
+             return obj
+         if not targets and isinstance(obj,list) and name in ('contains','indexOf') and len(args)==1:
+             return self.collection_membership(obj,args[0],name,reason)
+-        if not targets and name=='getClass' and not args and isinstance(obj,dict) and obj.get('__type__'):
+-            tid=self.p.resolve_type(obj['__type__'],self.p.methods[mid]['module'],self.p.methods[mid]['file'])
+-            return {'__java_class__':self.p.nodes[tid]['fqn'] if tid else obj['__type__']}
++        if not targets and name=='getClass' and not args and isinstance(obj,dict) and (isinstance(obj,JavaRecord) or type(obj) is dict and obj.get('__type__')):
++            if isinstance(obj,JavaRecord) and not isinstance(obj,JavaObject):
++                self.approximate=True
++                self.warnings.add('DTO declared type does not prove its exact runtime class: '+reason)
++                return U
++            actual=obj.java_type if isinstance(obj,JavaObject) else obj['__type__']
++            tid=self.p.resolve_type(actual,self.p.methods[mid]['module'],self.p.methods[mid]['file'])
++            return {'__java_class__':self.p.nodes[tid]['fqn'] if tid else actual}
++        if not targets and name=='equals' and len(args)==1 and isinstance(obj,JavaObject):
++            owner=self.p.resolve_type(obj.java_type,self.p.methods[mid]['module'],self.p.methods[mid]['file'])
++            pending,seen=[owner],set()
++            while pending:
++                current=pending.pop()
++                if current in seen:continue
++                seen.add(current)
++                node=self.p.nodes.get(current,{})
++                generated=any(a['name'].split('.')[-1] in ('Data','EqualsAndHashCode','Value') for a in node.get('annotations',[]))
++                parents=self.p.framework_types.get(current,set())
++                if generated or any(parent not in ('Object','java.lang.Object') and not self.p.resolve_type(parent,node.get('module'),node.get('file')) for parent in parents):
++                    self.approximate=True
++                    self.warnings.add('project or generated Object.equals implementation is unresolved: '+reason)
++                    return U
++                pending.extend(parent for parent in self.p.type_parents.get(current,[]) if parent not in seen)
++            equal=reference_equal(obj,args[0])
++            if equal is U:
++                self.approximate=True
++                self.warnings.add('Object.equals reference identity is unresolved: '+reason)
++            return equal
+         if not targets:
+             handled, value = self.stream_call(name, obj, args, text(objnode), reason, env)
+             if handled:
+                 return value
+-        handled, value = library(name, obj, args, text(objnode), self.state.now) if not targets else (False, U)
++        if not targets and isinstance(obj,JavaTypeFactory):
++            if name=='constructParametricType' and len(args)>=2 and all(isinstance(arg,JavaTypeToken) and arg.kind=='Class' and arg.context==args[0].context for arg in args):
++                return JavaTypeToken(args[0].written+'<'+','.join(arg.written for arg in args[1:])+'>',args[0].context,'JavaType')
++            self.json_issue('JSON type factory overload or type context is not modeled',reason)
++            return U
++        if not targets and name in ('writeValueAsString','readValue','convertValue','getTypeFactory'):
++            mapper_type=self.source_type(objnode)
++            if not self.standard_type(mapper_type,'com.fasterxml.jackson.databind.ObjectMapper'):
++                self.approximate=True
++                self.warnings.add('unresolved JSON mapper type: '+reason)
++                return U
++            if name=='getTypeFactory' and not args:return JavaTypeFactory()
++            if name=='writeValueAsString' and len(args)==1:
++                return JsonText(self.json_wire(args[0],reason))
++            if len(args)==2 and isinstance(args[1],JavaTypeToken) and args[1].kind in ('Class','JavaType','TypeReference') and (name=='convertValue' or isinstance(args[0],JsonText)):
++                payload=self.json_wire(args[0],reason) if name=='convertValue' else args[0].payload
++                return decode_response(self.p,payload,args[1].written,args[1].context,self.standard_type,
++                                       lambda message:self.json_issue(message,reason))
++            self.json_issue('JSON mapper overload or text representation is not modeled',reason)
++            return U
++        if not targets and isinstance(obj,JsonText):
++            if name=='toString' and not args:return obj
++            if name=='equals' and len(args)==1 and obj is args[0]:return True
++            self.json_issue('JSON text scalar operation is not modeled: '+name,reason)
++            return U
++        if not targets and isinstance(obj,JavaEnumValue) and name=='equals' and len(args)==1:
++            equal=reference_equal(obj,args[0])
++            if equal is U:self.json_issue('enum reference identity is unresolved',reason)
++            return equal
++        if not targets and name=='equals' and isinstance(obj,JavaRecord):
++            self.approximate=True
++            self.warnings.add('DTO reference equality requires concrete runtime identity: '+reason)
++            return U
++        key_type=None
++        if isinstance(obj,JavaMap) and args:
++            first=next(child for child in argnode.named_children if child.type not in ('line_comment','block_comment'))
++            key_type={'string_literal':'String','character_literal':'char','true':'boolean','false':'boolean'}.get(first.type)
++            if key_type is None:key_type=self.numeric_type(first) or 'unresolved'
++        handled, value = library(name, obj, args, text(objnode), self.state.now,key_type=key_type,
++                                 json_issue=lambda message:self.json_issue(message,reason)) if not targets else (False, U)
+         if handled:
+-            if isinstance(obj,dict) and obj.get('__type__') in ('SimpleDateFormat','DecimalFormat') and name in ('format','parse'):
++            if isinstance(obj,JavaMap) and value is U:
++                self.approximate=True
++                self.warnings.add('Java Map operation remains unresolved: '+name+' at '+reason)
++                kind=obj.last_issue or 'unknown_map_value'
++                self.operation_issues[(kind,name)]+=1
++            if type(obj) is dict and obj.get('__type__') in ('SimpleDateFormat','DecimalFormat') and name in ('format','parse'):
+                 self.approximate=True
+                 self.warnings.add('formatter default locale/time zone not supplied; numeric date fields and dot decimal symbols modeled: '+reason)
+             return value
+@@ -1094,10 +1440,23 @@
+             return obj.startswith(args[0])
+         if name == 'toString':
+             return str(obj) if isinstance(obj, (str, int, float)) else U
+-        if name=='fromString' and text(objnode) in ('UUID','java.util.UUID') and args:
++        if name=='fromString' and not self.source_type(objnode) and self.standard_type(text(objnode),'java.util.UUID') and args:
+             converted=uuid_value(args[0])
+             if converted is not U:return converted
+-        if name in ('parseInt', 'parseDouble', 'parseFloat') and args and args[0] is not U:
++        if name=='parseInt' and not self.source_type(objnode) and self.standard_type(text(objnode),'java.lang.Integer'):
++            if len(args) not in (1,2):
++                self.approximate=True
++                self.warnings.add('unsupported Integer.parseInt overload: '+reason)
++                return U
++            value=parse_integer(*args)
++            if value is U:
++                self.approximate=True
++                self.warnings.add('Integer.parseInt value, radix or Unicode digit rules are unresolved: '+reason)
++                valid=self.choose(reason+':parse-int-valid',[True,False])
++                if valid is False:raise JavaThrow({'__type__':'NumberFormatException'})
++                if valid is None:self.fallback(mid)
++            return value
++        if name in ('parseDouble', 'parseFloat') and args and args[0] is not U:
+             try:
+                 return int(args[0]) if name == 'parseInt' else float(args[0]) if name in ('parseDouble', 'parseFloat') else args[0]
+             except (ValueError, TypeError):
+@@ -1111,11 +1470,17 @@
+             obj.extend(args[0] if name == 'addAll' and isinstance(args[0], list) else [args[0]])
+             return True
+         if name == 'randomUUID':
+-            if text(objnode) in ('UUID','java.util.UUID'):
++            if not self.source_type(objnode) and self.standard_type(text(objnode),'java.util.UUID'):
+                 return self.state.generated_value('UUID','java.util.UUID.randomUUID')
+         if name not in ('debug', 'info', 'warn', 'error', 'trace', 'println', 'print'):
+             self.approximate = True
+             self.warnings.add('unsupported call: ' + reason + ' ' + name)
++            declared=self.source_type(objnode)
++            kind=('unknown_receiver' if obj is U and declared else 'unresolved_external_type' if obj is U
++                  else 'unresolved_source_method' if isinstance(obj,JavaObject)
++                  else 'unsupported_collection_operation' if isinstance(obj,list)
++                  else 'unresolved_object_model' if isinstance(obj,dict) else 'unsupported_library_operation')
++            self.operation_issues[(kind,name)]+=1
+         return U
+ 
+     def collection_membership(self,items,value,name,reason):
+@@ -1123,7 +1488,7 @@
+         for index,item in enumerate(items):
+             equal=U
+             if isinstance(value,dict) and '__type__' in value and '__symbol__' not in value:
+-                tid=self.p.resolve_type(value['__type__'],self.p.methods[self.method]['module'],self.p.methods[self.method]['file'])
++                tid=self.p.resolve_type(value.declared_type if isinstance(value,JavaRecord) else value['__type__'],self.p.methods[self.method]['module'],self.p.methods[self.method]['file'])
+                 pending,seen=[tid],set()
+                 targets=[]
+                 while pending and not targets:
+@@ -1164,7 +1529,7 @@
+             shadowed = receiver in env or self.p.resolve_type(receiver, meta['module'], meta['file'])
+             if not shadowed and (receiver.startswith('java.') or imported):
+                 return True, {'__collector__': 'java.util.stream.Collectors.toList'}
+-        if not isinstance(obj, dict) or '__stream__' not in obj:
++        if type(obj) is not dict or '__stream__' not in obj:
+             return False, U
+         if obj['lifecycle']['consumed'] or obj['linked']:
+             self.approximate = True
+@@ -1229,7 +1594,11 @@
+ 
+     def expand_http_template(self,url,args,name,reason):
+         variables=args[4 if name=='exchange' else 3 if name.startswith('post') else 2:]
+-        mapping=variables[0]['__map__'] if len(variables)==1 and isinstance(variables[0],dict) and '__map__' in variables[0] else None
++        mapping=variables[0].mapping if len(variables)==1 and isinstance(variables[0],JavaMap) else None
++        if mapping is not None and not isinstance(mapping,dict):
++            self.approximate=True
++            self.warnings.add('unresolved Java Map URI variables: '+reason)
++            return U
+         placeholders=list(re.finditer(r'\{([A-Za-z_]\w*)\}',url))
+         rest=re.sub(r'\{([A-Za-z_]\w*)\}','',url)
+         result,offset='',0
+@@ -1359,12 +1728,15 @@
+             query = self.p.repository_queries.get(query_key)
+             primary_keys = self.p.id_fields.get(rid, [])
+             pairs = []
++            comparisons = []
+             if declared_query:
+                 if query is None or any(int(index) > len(args) or int(index) < 1 for _, _, index in query):
+                     unknown_query = True
+                 else:
+                     from .state import camel
+-                    pairs = [(camel(field) + ('In' if op.lower() == 'in' else ''), args[int(index)-1]) for field, op, index in query]
++                    pairs = [(camel(field) + ('In' if op.lower() == 'in' else ''), args[int(index)-1])
++                             for field, op, index in query if op.lower() in ('=','in')]
++                    comparisons = [(camel(field),op,args[int(index)-1]) for field,op,index in query if op.lower() not in ('=','in')]
+             elif name == 'findAllById' and args and isinstance(args[0], list):
+                 if len(primary_keys) == 1:
+                     selected = [r for r in selected if r.get(primary_keys[0]) in args[0]]
+@@ -1383,13 +1755,15 @@
+                 in_query = field.endswith('In')
+                 field = field[:-2] if in_query else field
+                 prop = field[:1].lower() + field[1:]
+-                symbolic_query = isinstance(value, dict) and '__symbol__' in value
++                symbolic_query = is_symbolic(value)
+                 if not known(value) and not symbolic_query:
+                     unknown_query = True
+                 else:
+                     def matches(row):
+                         nonlocal unknown_query
+                         stored = member(row, prop)
++                        if declared_query and (stored is None or value is None):
++                            return False
+                         if symbolic_query or isinstance(stored, dict) and '__symbol__' in stored:
+                             equal = key_equal(stored, value)
+                             if equal is U:
+@@ -1404,6 +1778,21 @@
+                             return equal is not False
+                         return stored in value if in_query and isinstance(value, list) else stored == value
+                     selected = [r for r in selected if matches(r)]
++            for field,op,value in comparisons:
++                kept=[]
++                for row in selected:
++                    stored=member(row,field)
++                    # A SQL comparison involving NULL is never TRUE in WHERE.
++                    if stored is None or value is None:
++                        continue
++                    numeric=all(type(item) in (int,float) and math.isfinite(item) for item in (stored,value))
++                    if not numeric:
++                        unknown_query=True
++                        kept.append(row)
++                        continue
++                    passed={'>':operator.gt,'>=':operator.ge,'<':operator.lt,'<=':operator.le,'!=':operator.ne,'<>':operator.ne}[op](stored,value)
++                    if passed:kept.append(row)
++                selected=kept
+             if (unknown_query and not declared_query and len(primary_keys)==1 and args and
+                     name in ('findById','getById','getReferenceById','existsById')):
+                 exact=[row for row in selected if key_equal(member(row,primary_keys[0]),args[0]) is True]
+@@ -1438,6 +1827,7 @@
+             materialized = []
+             for row in selected:
+                 record = {'__type__': self.p.nodes[entity]['fqn'] if entity else '', **deepcopy(row)}
++                if entity:record=JavaRecord(self.p.nodes[entity]['fqn'],record,self.p.type_fields.get(entity,{}))
+                 if entity:
+                     for ctor in self.p.methods_of(entity, '<init>'):
+                         if not self.p.methods[ctor].get('params_as_written'):
+--- solutions/—_script-state-flow/code/analyzer/frontend.py
++++ solutions/—_http-json-collections/code/analyzer/frontend.py
+@@ -21,6 +21,9 @@
+ from .units import unit_name
+ from .response_arrays import summarize_array_copy
+ from .script_flow import ScriptFlow
++from .models import wire
++from .java_exceptions import JavaThrow
++from .java_collections import JsonObject,schema_type
+ 
+ 
+ def pairs(node):
+@@ -45,7 +48,8 @@
+ 
+ def constant(node):
+     if node is not None and node.type == 'object':
+-        return {key: constant(val) for key, val in pairs(node).items()}
++        fields=pairs(node)
++        return U if '__proto__' in fields else JsonObject({key: constant(val) for key, val in fields.items()})
+     if node is not None and node.type == 'array':
+         return [constant(child) for child in node.named_children]
+     return literal(node)
+@@ -53,14 +57,15 @@
+ 
+ def json_value(value):
+     if isinstance(value, dict):
+-        return {key: json_value(val) for key, val in value.items() if val is not JS_UNDEFINED}
++        if type(value) is dict and value.get('__type__') in ('String','java.lang.String') and '__symbol__' in value:return value
++        return JsonObject({key: json_value(val) for key, val in value.items() if val is not JS_UNDEFINED},getattr(value,'origin_type',None))
+     if isinstance(value, list):
+         return [None if val is JS_UNDEFINED else json_value(val) for val in value]
+     return value
+ 
+ 
+ def truth(value):
+-    if value is U or isinstance(value, dict) and '__symbol__' in value:
++    if value is U or isinstance(value, dict) and not isinstance(value,JsonObject) and '__symbol__' in value:
+         return U
+     if value is JS_UNDEFINED or value is None:
+         return False
+@@ -75,7 +80,7 @@
+         if value is None:return 'null'
+         if type(value) is bool:return 'boolean'
+         if type(value) in (int,float):return 'number'
+-        if isinstance(value,str) or isinstance(value,dict) and value.get('__type__') in ('String','java.lang.String') and '__symbol__' in value:return 'string'
++        if isinstance(value,str) or type(value) is dict and value.get('__type__') in ('String','java.lang.String') and '__symbol__' in value:return 'string'
+         if isinstance(value,(dict,list)):return 'object'
+         return 'unknown'
+     a,b = category(left),category(right)
+@@ -109,7 +114,7 @@
+     if type(value) is int and abs(value) <= 9007199254740991:return str(value)
+     if type(value) is float and abs(value) <= 9007199254740991 and 'e' not in repr(value):
+         return str(int(value)) if value.is_integer() else repr(value)
+-    if isinstance(value,dict) and value.get('__type__') in ('String','java.lang.String') and '__symbol__' in value:return value
++    if type(value) is dict and value.get('__type__') in ('String','java.lang.String') and '__symbol__' in value:return value
+     return U
+ 
+ 
+@@ -909,10 +914,10 @@
+             return {}, None
+         matches = {}
+         for position, row in enumerate(rows):
+-            if not isinstance(row, dict) or not row.get('__type__'):
+-                continue
+-            owner = entity_words(row['__type__'])
+-            tid = self.project.resolve_type(row['__type__'], '')
++            if not isinstance(row, dict) or not schema_type(row):
++                continue
++            owner = entity_words(schema_type(row))
++            tid = self.project.resolve_type(schema_type(row), '')
+             declared = self.project.type_fields.get(tid, {})
+             keys = [key for key, info in declared.items() if info.get('id') or key in ('id', 'key')
+                     or key.lower().endswith('id') and entity_words(key) == owner]
+@@ -1145,17 +1150,17 @@
+             if kind == 'member_expression':
+                 obj = value(node.child_by_field_name('object'))
+                 key = text(node.child_by_field_name('property'))
+-                if key.startswith('__'):
++                if key.startswith('__') and not isinstance(obj,JsonObject):
+                     state.limitations.append('Abstract metadata is not a browser data property: ' + raw)
+                     return U
+-                if key=='length' and isinstance(obj,dict) and obj.get('__type__') in ('String','java.lang.String') and '__symbol__' in obj:
++                if key=='length' and type(obj) is dict and obj.get('__type__') in ('String','java.lang.String') and '__symbol__' in obj:
+                     return obj.get('__length__',U)
+                 if key == 'length' and isinstance(obj,str):
+                     return len(obj.encode('utf-16-le',errors='surrogatepass'))//2
+                 return obj.get(key, U) if isinstance(obj, dict) else len(obj) if key == 'length' and isinstance(obj, list) else U
+             if kind == 'subscript_expression':
+                 obj, key = value(node.child_by_field_name('object')), value(node.child_by_field_name('index'))
+-                if isinstance(key, str) and key.startswith('__'):
++                if isinstance(key, str) and key.startswith('__') and not isinstance(obj,JsonObject):
+                     state.limitations.append('Abstract metadata is not a browser data property: ' + raw)
+                     return U
+                 if isinstance(obj, dict):
+@@ -1180,7 +1185,7 @@
+                     return not equal if '!' in op else equal
+                 if left is U or right is U or left is JS_UNDEFINED or right is JS_UNDEFINED:
+                     return U
+-                if op=='+' and any(isinstance(v,dict) and '__symbol__' in v and
++                if op=='+' and any(type(v) is dict and '__symbol__' in v and
+                                    v.get('__type__') in ('String','java.lang.String') for v in (left,right)):
+                     def string_part(item):
+                         if item is None:return 'null'
+@@ -1188,7 +1193,7 @@
+                         if type(item) is int and abs(item)<=9007199254740991:return str(item)
+                         return item
+                     return concat_text(string_part(left),string_part(right))
+-                if any(isinstance(value, dict) and '__symbol__' in value for value in (left, right)):
++                if any(type(value) is dict and '__symbol__' in value for value in (left, right)):
+                     return U
+                 if op == '+':
+                     if isinstance(left, str) or isinstance(right, str):
+@@ -1317,7 +1322,11 @@
+                 args = node.child_by_field_name('arguments')
+                 return state.now if args is not None and not args.named_children and isinstance(state.now, datetime) else U
+             if kind == 'object':
+-                return {key: value(val) for key, val in pairs(node).items()}
++                fields=pairs(node)
++                if '__proto__' in fields:
++                    state.limitations.append('Object literal prototype initializer is not modeled')
++                    return U
++                return JsonObject({key:value(val) for key,val in fields.items()})
+             if kind == 'array':
+                 return [value(c) for c in node.named_children]
+             return U
+@@ -1395,7 +1404,13 @@
+ 
+     def apply_response(self, site, result, state):
+         event_values = {key:value for key,value in site.get('event_values',{}).items() if key not in site.get('script_reads',[])}
+-        env = {**self.script_values(site,state,callback=True),**event_values,site['response_name']: deepcopy(result)}
++        try:response=wire(result,lambda message:state.limitations.append(message+': '+site['id']),self.project.json_model_limits)
++        except JavaThrow as failure:
++            if isinstance(failure.value,dict) and failure.value.get('__serialization_failure__'):
++                state.limitations.append('default HTTP JSON serialization failed; browser success callback not executed: '+site['id'])
++                return
++            raise
++        env = {**self.script_values(site,state,callback=True),**event_values,site['response_name']: deepcopy(response)}
+         if 'response_this' in site:
+             env['this']=state.browser['form'] if site['response_this'] else U
+             env.setdefault('that',U)
+--- solutions/—_script-state-flow/code/analyzer/http_json.py
++++ solutions/—_http-json-collections/code/analyzer/http_json.py
+@@ -0,0 +1,126 @@
++"""Default JSON collection binding using declared response/property types.
++
++This preserves the analyzer's DTO metadata; it is not a Jackson implementation.
++Custom codecs, polymorphism and generic inheritance remain unresolved.
++"""
++from copy import deepcopy
++import re
++from datetime import datetime
++from .java_collections import JavaMap,JavaRecord,JsonObject,JsonText,raw_json_map
++from .state import U
++from .models import uuid_value
++from .java_exceptions import JavaThrow
++
++
++def type_parts(written):
++    written=re.sub(r'\s+','',written)
++    if '<' not in written:return written,[]
++    base,tail=written.split('<',1)
++    if not tail.endswith('>'):return base,None
++    result,start,depth=[],0,0
++    for index,char in enumerate(tail[:-1]):
++        if char=='<':depth+=1
++        elif char=='>':depth-=1
++        elif char==',' and depth==0:result.append(tail[start:index]);start=index+1
++    result.append(tail[start:-1])
++    return base,result if depth==0 else None
++
++
++def decode_response(project,payload,response_type,meta,standard_type,unresolved):
++    def fail(message):
++        unresolved(message)
++        return U
++    def resolve(written,context,bindings):
++        for _ in range(64):
++            if written not in bindings:return written,context,bindings
++            written,context,bindings=bindings[written]
++        return '',context,{}
++    def decode(value,written,context,bindings=None):
++        if value is U or value is None:return value
++        bindings={} if bindings is None else bindings
++        written,context,bindings=resolve(written,context,bindings)
++        base,arguments=type_parts(written)
++        if isinstance(value,JsonText):
++            if standard_type(base,'java.lang.String',context) or standard_type(base,'java.lang.Object',context):return deepcopy(value)
++            return fail('JSON text scalar is incompatible with the requested structured type')
++        if standard_type(base,'java.util.UUID',context):
++            try:result=uuid_value(value)
++            except JavaThrow:result=U
++            return result if result is not U else fail('HTTP UUID text conversion is not modeled for this value')
++        if isinstance(value,dict) and not isinstance(value,JsonObject) and '__symbol__' in value:
++            aliases={'Integer':'int','Long':'long','Double':'double','Float':'float','Boolean':'boolean'}
++            scalar=value.get('__type__','').rsplit('.',1)[-1]
++            wanted=base.rsplit('.',1)[-1]
++            primitive=base in ('int','long','double','float','boolean')
++            native=wanted in ('String','Integer','Long','Double','Float','Boolean') and standard_type(base,'java.lang.'+wanted,context)
++            if (primitive or native) and aliases.get(scalar,scalar)==aliases.get(wanted,wanted):return deepcopy(value)
++            if scalar in ('String','int','long','double','float','boolean') and standard_type(base,'java.lang.Object',context):return deepcopy(value)
++            return fail('opaque HTTP value has an unresolved declared scalar type')
++        if standard_type(base,'java.lang.Object',context):
++            return raw_json_map(value,unresolved)
++        map_type=base.rsplit('.',1)[-1]
++        if map_type in ('Map','HashMap','LinkedHashMap') and standard_type(base,'java.util.'+map_type,context):
++            if not isinstance(value,dict) or '__type__' in value and not isinstance(value,JsonObject) or any(type(key) is not str for key in value):
++                return fail('HTTP Map value is not an unambiguous JSON object')
++            key,key_context,_=resolve(arguments[0],context,bindings) if arguments else ('java.lang.String',context,{})
++            if arguments is None or arguments and (len(arguments)!=2 or not standard_type(key,'java.lang.String',key_context)):
++                return fail('HTTP Map key or generic type is not modeled')
++            typ=arguments[1] if arguments else 'java.lang.Object'
++            return JavaMap({key:decode(child,typ,context,bindings) for key,child in value.items()})
++        list_type=base.rsplit('.',1)[-1]
++        if list_type in ('List','ArrayList','LinkedList') and standard_type(base,'java.util.'+list_type,context):
++            if not isinstance(value,list) or arguments is None or len(arguments)>1:
++                return fail('HTTP collection shape or generic type is not modeled')
++            return [decode(child,arguments[0] if arguments else 'java.lang.Object',context,bindings) for child in value]
++        owner=project.resolve_type(base,context['module'],context['file'])
++        if owner in project.enum_members:
++            constants=[project.enum_objects[key] for key in project.enum_members[owner]]
++            if any(not item.json_default for item in constants):return fail('custom enum JSON binding is not modeled')
++            match=next((item for item in constants if item.enum_name==value),None) if isinstance(value,str) else None
++            return deepcopy(match) if match is not None else fail('HTTP enum JSON value is not a supported constant name')
++        if owner in project.type_fields and not isinstance(value,dict):
++            return fail('HTTP DTO scalar coercion is not modeled')
++        if owner in project.type_fields and isinstance(value,dict):
++            for message in project.json_model_limits(project.nodes[owner]['fqn'],'deserialize'):unresolved(message)
++            if set(value)-project.type_fields[owner].keys():
++                unresolved('undeclared JSON properties require an explicit unknown-property policy')
++            variables=project.type_variables.get(owner,{})
++            if arguments is None or arguments and len(arguments)!=len(variables):return fail('HTTP DTO generic argument count is not modeled')
++            local={name:(arg,context,bindings) for name,arg in zip(variables,arguments)} if arguments else {
++                name:(bound,project.nodes[owner],{}) for name,bound in variables.items() if bound is not None}
++            annotations=project.nodes[owner].get('annotations',[])
++            if any(a['name'].split('.')[-1] in ('JsonDeserialize','JsonSerialize','JsonTypeInfo') for a in annotations):
++                return fail('custom or polymorphic HTTP JSON binding is not modeled')
++            result=deepcopy(value)
++            if '__type__' not in project.type_fields[owner]:result['__type__']=project.nodes[owner]['fqn']
++            if '__http_entity__' not in project.type_fields[owner]:result['__http_entity__']=False
++            for field,info in project.type_fields[owner].items():
++                if field not in value:continue
++                declared=info['declaring_type']
++                typ=info['type']
++                variables=project.type_variables.get(declared,{})
++                used=set(re.findall(r'[\w.]+',typ)) & variables.keys()
++                if used:
++                    if declared!=owner or any(name not in local for name in used):
++                        result[field]=fail('HTTP generic property substitution is not modeled')
++                        continue
++                result[field]=decode(value[field],typ,project.nodes[declared],local if declared==owner else {})
++            return JavaRecord(project.nodes[owner]['fqn'],result,project.type_fields[owner])
++        if isinstance(value,(dict,list)):
++            return fail('HTTP structured value has an unsupported declared type: '+written)
++        simple=base.rsplit('.',1)[-1]
++        scalars={'String':str,'Boolean':bool,'boolean':bool,'Integer':int,'int':int,
++                 'Long':int,'long':int,'Byte':int,'byte':int,'Short':int,'short':int,
++                 'Double':float,'double':float}
++        native=base in ('boolean','int','long','byte','short','double') or simple in scalars and standard_type(base,'java.lang.'+simple,context)
++        if native:
++            expected=scalars[simple]
++            if expected is float and type(value) in (int,float):return float(value)
++            if type(value) is not expected:return fail('HTTP scalar coercion is not modeled: '+written)
++            if expected is int:
++                bits={'Integer':32,'int':32,'Long':64,'long':64,'Byte':8,'byte':8,'Short':16,'short':16}[simple]
++                if not -(1<<(bits-1))<=value<(1<<(bits-1)):return fail('HTTP integer range conversion is not modeled')
++            return value
++        if standard_type(base,'java.util.Date',context) and isinstance(value,datetime):return value
++        return fail('HTTP scalar declared type is not modeled: '+written)
++    return decode(payload,response_type,meta)
+--- solutions/—_script-state-flow/code/analyzer/java_collections.py
++++ solutions/—_http-json-collections/code/analyzer/java_collections.py
+@@ -0,0 +1,133 @@
++"""Constructor-owned values: JSON dictionaries cannot forge a Java Map type."""
++from .state import U
++from copy import deepcopy
++
++
++class JavaIdentity:
++    """An opaque allocation token shared by copies of abstract state."""
++    def __deepcopy__(self,memo):return self
++
++
++class JavaTypeToken(dict):
++    """A source-proven Class/JSON type descriptor, never inferred from data."""
++    def __init__(self,written,context,kind):
++        super().__init__(__java_type__=written)
++        self.written,self.kind=written,kind
++        self.context={key:context[key] for key in ('module','file')}
++
++
++class JavaTypeFactory(dict):
++    def __init__(self):super().__init__(__type_factory__=True)
++
++
++class JavaEnumValue(dict):
++    """A source-declared enum constant; identity is separate from business fields."""
++    def __init__(self,key,owner,fields,json_default=True):
++        super().__init__(fields)
++        self.enum_key,self.enum_owner=key,owner
++        self.enum_name=key.rsplit('.',1)[-1]
++        self.json_default=json_default
++
++
++class JavaRecord(dict):
++    """Source-declared DTO fields, without a claim about exact runtime class."""
++    def __init__(self,declared_type,fields,wire_fields=None):
++        super().__init__(fields)
++        self.declared_type=declared_type
++        self.wire_fields=frozenset(set(fields)-{'__type__','__http_entity__'} if wire_fields is None else wire_fields)
++
++
++class JsonObject(dict):
++    """Actual JSON properties; an optional source-schema hint is not a property."""
++    def __init__(self,values=(),origin_type=None):
++        super().__init__(values)
++        self.origin_type=origin_type
++
++
++class JsonText(dict):
++    """An abstract serialized JSON string, created only by JSON adapters."""
++    def __init__(self,payload):super().__init__(__json__=payload)
++    @property
++    def payload(self):return self['__json__']
++
++
++class JavaObject(JavaRecord):
++    """An object whose concrete class was observed at a source constructor."""
++    def __init__(self, java_type, fields, identity=...,wire_fields=None):
++        super().__init__(java_type,fields,wire_fields)
++        self.java_type = java_type
++        self.java_identity = JavaIdentity() if identity is ... else identity
++
++
++class JavaMap(dict):
++    def __init__(self, values=None, identity=..., typed_entries=None,origin_type=None):
++        # Keep the report representation stable, while retaining runtime identity.
++        super().__init__(__map__={} if values is None else values)
++        self['__typed_entries__']=[] if typed_entries is None else typed_entries
++        self.java_identity = JavaIdentity() if identity is ... else identity
++        self.last_issue=None
++        self.origin_type=origin_type
++
++    @property
++    def mapping(self):
++        return self['__map__']
++
++    def invalidate(self):
++        self['__map__'] = U
++        self['__typed_entries__']=[]
++        if self.last_issue is None:self.last_issue='unknown_map_state'
++
++    @property
++    def typed_entries(self):return self['__typed_entries__']
++
++    def entries(self):
++        return [{'kind':'String','key':key,'value':value} for key,value in self.mapping.items()]+self.typed_entries
++
++
++def reference_equal(left,right):
++    if left is U or right is U:return U
++    if left is right:return True
++    if isinstance(left,JavaEnumValue) and isinstance(right,JavaEnumValue):return left.enum_key==right.enum_key
++    if isinstance(left,(JavaObject,JavaMap)) and isinstance(right,(JavaObject,JavaMap)):
++        return left.java_identity is right.java_identity if left.java_identity is not None and right.java_identity is not None else U
++    if left is None or right is None or type(left) in (str,int,float,bool) or type(right) in (str,int,float,bool):return False
++    return U
++
++
++def schema_type(value):
++    """A source schema hint for binding; never proof of a Java runtime class."""
++    if isinstance(value,JavaRecord):return value.declared_type
++    if isinstance(value,(JavaMap,JsonObject)):return value.origin_type
++    if isinstance(value,JavaEnumValue):return None
++    typ=value.get('__type__') if isinstance(value,dict) and '__symbol__' not in value else None
++    return typ if isinstance(typ,str) else None
++
++
++def is_symbolic(value):
++    return type(value) is dict and '__symbol__' in value
++
++
++def semantic_view(value):
++    """Expose source-proven JSON object fields to the language-binding layer."""
++    if isinstance(value,JavaMap) and value.origin_type and isinstance(value.mapping,dict):
++        fields=dict(value.mapping)
++        fields.setdefault('__type__',value.origin_type)
++        return JavaRecord(value.origin_type,fields,value.mapping)
++    return value
++
++
++def raw_json_map(value,unresolved=None):
++    """Default untyped JSON binding, never inferred from a business key shape."""
++    if isinstance(value,JsonText):return deepcopy(value)
++    if isinstance(value,dict):
++        if is_symbolic(value) and value.get('__type__') in ('String','java.lang.String','int','long','boolean','double','float'):
++            return deepcopy(value)
++        # A typed abstract DTO still carries metadata that a JSON codec must
++        # resolve from source; do not expose it as a fabricated user map entry.
++        if '__type__' in value and not isinstance(value,JsonObject) or any(type(key) is not str for key in value):
++            if unresolved:unresolved('untyped HTTP JSON contains ambiguous abstract DTO metadata or non-string keys')
++            return U
++        return JavaMap({key:raw_json_map(item,unresolved) for key,item in value.items()},origin_type=getattr(value,'origin_type',None))
++    if isinstance(value,list):
++        return [raw_json_map(item,unresolved) for item in value]
++    return value
+--- solutions/—_script-state-flow/code/analyzer/java_exceptions.py
++++ solutions/—_http-json-collections/code/analyzer/java_exceptions.py
+@@ -12,6 +12,7 @@
+     'IllegalArgumentException':'RuntimeException','IllegalStateException':'RuntimeException',
+     'NumberFormatException':'IllegalArgumentException','NullPointerException':'RuntimeException',
+     'NoSuchElementException':'RuntimeException','ArithmeticException':'RuntimeException',
++    'ClassCastException':'RuntimeException',
+     'IndexOutOfBoundsException':'RuntimeException','ArrayIndexOutOfBoundsException':'IndexOutOfBoundsException',
+     'StringIndexOutOfBoundsException':'IndexOutOfBoundsException',
+     'IOException':'Exception','FileNotFoundException':'IOException',
+@@ -19,6 +20,8 @@
+     'RestClientException':'RuntimeException','RestClientResponseException':'RestClientException',
+     'HttpStatusCodeException':'RestClientResponseException','HttpClientErrorException':'HttpStatusCodeException',
+     'HttpServerErrorException':'HttpStatusCodeException',
++    'HttpMessageConversionException':'RuntimeException',
++    'HttpMessageNotWritableException':'HttpMessageConversionException',
+ }
+ 
+ 
+--- solutions/—_script-state-flow/code/analyzer/java_numbers.py
++++ solutions/—_http-json-collections/code/analyzer/java_numbers.py
+@@ -0,0 +1,30 @@
++"""The ASCII slice of java.lang.Integer.parseInt, with explicit failure."""
++from .state import U
++from .java_exceptions import JavaThrow
++
++
++def parse_integer(value, radix=10):
++    if value is U or radix is U:
++        return U
++    if value is None:
++        raise JavaThrow({'__type__':'NumberFormatException'})
++    if not isinstance(value,str) or type(radix) is not int:
++        return U
++    if not 2 <= radix <= 36:
++        raise JavaThrow({'__type__':'NumberFormatException'})
++    if not value.isascii():
++        return U
++    negative=value.startswith('-')
++    digits=value[1:] if value.startswith(('-','+')) else value
++    if not digits:
++        raise JavaThrow({'__type__':'NumberFormatException'})
++    limit=2147483648 if negative else 2147483647
++    result=0
++    for char in digits.lower():
++        digit=ord(char)-ord('0') if '0'<=char<='9' else ord(char)-ord('a')+10 if 'a'<=char<='z' else -1
++        if not 0 <= digit < radix:
++            raise JavaThrow({'__type__':'NumberFormatException'})
++        result=result*radix+digit
++        if result>limit:
++            raise JavaThrow({'__type__':'NumberFormatException'})
++    return -result if negative else result
+--- solutions/—_script-state-flow/code/analyzer/map_keys.py
++++ solutions/—_http-json-collections/code/analyzer/map_keys.py
+@@ -0,0 +1,42 @@
++"""A bounded key model: boxing identity matters before JSON serialization."""
++from .state import U
++
++
++def key_spec(value,hint=None):
++    aliases={'int':'Integer','long':'Long','short':'Short','byte':'Byte','char':'Character','boolean':'Boolean',
++             'java.lang.String':'String','java.lang.Integer':'Integer','java.lang.Long':'Long',
++             'java.lang.Character':'Character','java.lang.Boolean':'Boolean','java.lang.Short':'Short','java.lang.Byte':'Byte'}
++    kind=aliases.get(hint,hint)
++    if isinstance(value,str) and kind in (None,'String','Character'):
++        if kind=='Character' and len(value.encode('utf-16-le',errors='surrogatepass'))!=2:return None
++        return {'kind':kind or 'String','key':value}
++    if type(value) is bool and kind in (None,'Boolean'):return {'kind':'Boolean','key':value}
++    if type(value) is int and kind in (None,'Integer','Long','Short','Byte'):
++        kind=kind or 'Integer'
++        bits={'Integer':32,'Long':64,'Short':16,'Byte':8}[kind]
++        if -(1<<(bits-1))<=value<(1<<(bits-1)):return {'kind':kind,'key':value}
++    if type(value) is dict and value.get('__type__') in ('String','java.lang.String') and type(value.get('__symbol__')) is str:
++        return {'kind':'String','key':value}
++    return None
++
++
++def same_key(left,right):
++    if left['kind']!=right['kind']:return False
++    a,b=left['key'],right['key']
++    if isinstance(a,dict) or isinstance(b,dict):
++        if isinstance(a,dict) and isinstance(b,dict) and a.get('__symbol__')==b.get('__symbol__'):return True
++        for symbol,other in ((a,b),(b,a)):
++            if isinstance(symbol,dict) and isinstance(other,str):
++                length=len(other.encode('utf-16-le',errors='surrogatepass'))//2
++                if type(symbol.get('__length__')) is int and symbol['__length__']!=length:return False
++                if other in symbol.get('__distinct_from__',[]):return False
++            if isinstance(symbol,dict) and isinstance(other,dict) and other.get('__symbol__') in symbol.get('__distinct_symbols__',[]):return False
++        return U
++    return a==b
++
++
++def json_key(entry):
++    value=entry['key']
++    if entry['kind']=='Boolean':return 'true' if value else 'false'
++    if type(value) in (str,int):return str(value)
++    return U
+--- solutions/—_script-state-flow/code/analyzer/models.py
++++ solutions/—_http-json-collections/code/analyzer/models.py
+@@ -6,6 +6,8 @@
+ from copy import deepcopy
+ from .state import U
+ from .java_exceptions import JavaThrow
++from .java_collections import JavaMap,JavaObject,JavaRecord,JavaEnumValue,JavaTypeToken,JavaTypeFactory,JsonObject,JsonText
++from .map_keys import key_spec,same_key,json_key
+ 
+ 
+ def http_headers_type(typ):
+@@ -14,7 +16,7 @@
+ 
+ def uuid_value(value):
+     if value is None:raise JavaThrow({'__type__':'NullPointerException'})
+-    if isinstance(value,dict):
++    if type(value) is dict:
+         if value.get('__type__','').split('.')[-1]=='UUID':return value
+         if value.get('__uuid_text__') is True and '__symbol__' in value:
+             return {'__type__':'UUID','__symbol__':value.get('__uuid_origin__',value['__symbol__']+':UUID'),
+@@ -37,29 +39,79 @@
+             'NOT_IMPLEMENTED':501,'BAD_GATEWAY':502,'SERVICE_UNAVAILABLE':503}.get(value,U) if isinstance(value,str) else U
+ 
+ 
+-def known(value):
++def known(value, active=None):
+     if value is U:
+         return False
+-    if isinstance(value, dict):
+-        if '__symbol__' in value:
+-            return False
+-        return all(known(v) for k, v in value.items() if not k.startswith('__'))
+-    if isinstance(value, (list, tuple)):
+-        return all(known(v) for v in value)
+-    return True
++    if not isinstance(value,(dict,list,tuple)):
++        return True
++    active=set() if active is None else active
++    if id(value) in active:return False
++    active.add(id(value))
++    try:
++        if isinstance(value,JsonText):return False
++        if isinstance(value,JavaRecord):return all(key in value and known(value[key],active) for key in value.wire_fields)
++        if isinstance(value,JavaEnumValue):return all(known(child,active) for child in value.values())
++        if isinstance(value,JsonObject):return all(known(child,active) for child in value.values())
++        if isinstance(value,JavaMap):
++            return isinstance(value.mapping,dict) and all(known(e['key'],active) and known(e['value'],active) for e in value.entries())
++        if isinstance(value,dict):
++            if '__symbol__' in value:return False
++            return all(known(v,active) for k,v in value.items() if not k.startswith('__'))
++        return all(known(v,active) for v in value)
++    finally:
++        active.remove(id(value))
++
++
++def map_equal(left,right):
++    if not isinstance(right,JavaMap):
++        return False if right is None or type(right) in (str,bool,int,float) else U
++    if left is right or left.java_identity is not None and left.java_identity is right.java_identity:return True
++    if not isinstance(left.mapping,dict) or not isinstance(right.mapping,dict):return U
++    if len(left.entries())!=len(right.entries()):return False
++    results=[]
++    for entry in left.entries():
++        found=map_slot(right,entry)
++        if found is U:results.append(U);continue
++        if found is None:return False
++        a,b=entry['value'],found['value']
++        if a is U or b is U:results.append(U)
++        elif a is None or b is None:results.append(a is None and b is None)
++        elif type(a) in (str,bool) and type(b) in (str,bool):results.append(type(a) is type(b) and a==b)
++        elif type(a) in (str,bool,int,float) and type(b) in (str,bool,int,float):
++            if any(type(item) is float and (item!=item or item in (float('inf'),float('-inf'))) for item in (a,b)):
++                results.append(U)
++            else:
++                results.append(False if type(a)!=type(b) and (type(a) in (str,bool) or type(b) in (str,bool)) or a!=b else U)
++        elif isinstance(a,(JavaMap,list)) and a is b:results.append(True)
++        else:results.append(U) # Project-defined equals requires execution, not structural Python equality.
++    return False if False in results else U if U in results else True
++
++
++def map_slot(mapping,key):
++    if key['kind']=='String' and isinstance(key['key'],str) and key['key'] in mapping.mapping:
++        return {'kind':'String','key':key['key'],'value':mapping.mapping[key['key']]}
++    uncertain=False
++    entries=mapping.typed_entries if key['kind']!='String' or isinstance(key['key'],str) else mapping.entries()
++    for entry in entries:
++        equal=same_key(entry,key)
++        if equal is True:return entry
++        if equal is U:uncertain=True
++    return U if uncertain else None
+ 
+ 
+ def key_equal(a, b):
+     if a is U or b is U: return U
+-    uuid_a=isinstance(a,dict) and a.get('__type__','').split('.')[-1]=='UUID'
+-    uuid_b=isinstance(b,dict) and b.get('__type__','').split('.')[-1]=='UUID'
++    if isinstance(a,JavaMap):return map_equal(a,b)
++    if isinstance(b,JavaMap):return map_equal(b,a)
++    uuid_a=type(a) is dict and isinstance(a.get('__type__'),str) and a['__type__'].split('.')[-1]=='UUID'
++    uuid_b=type(b) is dict and isinstance(b.get('__type__'),str) and b['__type__'].split('.')[-1]=='UUID'
+     if uuid_a or uuid_b:
+         if not uuid_a or not uuid_b:return False
+         if '__uuid_literal__' in a and '__uuid_literal__' in b:return a['__uuid_literal__']==b['__uuid_literal__']
+         if a.get('__symbol__') and a.get('__symbol__')==b.get('__symbol__'):return True
+         return U
+-    symbolic_a = isinstance(a, dict) and '__symbol__' in a
+-    symbolic_b = isinstance(b, dict) and '__symbol__' in b
++    symbolic_a = type(a) is dict and '__symbol__' in a
++    symbolic_b = type(b) is dict and '__symbol__' in b
+     if symbolic_a or symbolic_b:
+         if symbolic_a and symbolic_b and a['__symbol__'] == b['__symbol__'] and a.get('__type__') == b.get('__type__'):
+             return True
+@@ -74,15 +126,17 @@
+                     return False
+         return U
+     if isinstance(a, dict) and isinstance(b, dict):
+-        if '__enum__' in a and '__enum__' in b:
+-            return a['__enum__'] == b['__enum__']
+-        results = [key_equal(a.get(k, U), v) for k, v in b.items() if not k.startswith('__')]
++        if isinstance(a,JavaEnumValue) and isinstance(b,JavaEnumValue):
++            return a.enum_key == b.enum_key
++        if isinstance(a,JavaEnumValue) or isinstance(b,JavaEnumValue):return False
++        keys=b.keys() if isinstance(b,JsonObject) else b.wire_fields if isinstance(b,JavaRecord) else [k for k in b if not k.startswith('__')]
++        results = [key_equal(a.get(k,U),b.get(k,U)) for k in keys]
+         return False if False in results else U if U in results else True
+     return a == b
+ 
+ 
+ def http_entity(value):
+-    if not isinstance(value, dict):
++    if not isinstance(value, dict) or isinstance(value,(JavaRecord,JavaEnumValue,JsonObject,JsonText)):
+         return False
+     if '__http_entity__' in value:
+         return value['__http_entity__'] is True
+@@ -94,25 +148,65 @@
+ 
+ def header_values(value):
+     if value is U:return U
+-    if isinstance(value,dict) and value.get('__http_headers__'):
++    if type(value) is dict and value.get('__http_headers__'):
+         return value.get('headers',U)
+     return value if isinstance(value,dict) and not value.get('__type__') else U
+ 
+ 
+ def optional_value(value):
+-    return isinstance(value, dict) and value.get('__optional__') is True
++    return isinstance(value, dict) and not isinstance(value,(JavaRecord,JavaEnumValue,JsonObject,JsonText)) and value.get('__optional__') is True
+ 
+ 
+ def unwrap(value):
+     return value.get('body', U) if http_entity(value) else value
+ 
+ 
+-def wire(value):
+-    if isinstance(value, dict):
+-        if optional_value(value): return wire(value['optional'])
+-        return {k: wire(v) for k, v in value.items()}
+-    if isinstance(value, list): return [wire(v) for v in value]
+-    return value
++def wire(value,unresolved=None,schema_limits=None):
++    active=set()
++    def convert(item):
++        if not isinstance(item,(dict,list)):
++            return item
++        if id(item) in active:
++            raise JavaThrow({'__type__':'JsonMappingException','__serialization_failure__':True})
++        active.add(id(item))
++        try:
++            if isinstance(item,JsonText):return JsonText(convert(item.payload))
++            if isinstance(item,(JavaTypeToken,JavaTypeFactory)):
++                if unresolved:unresolved('JSON encoding of a Java type descriptor is not modeled')
++                return U
++            if isinstance(item,JavaEnumValue):
++                if item.json_default:return item.enum_name
++                if unresolved:unresolved('custom enum JSON representation is not modeled')
++                return U
++            if isinstance(item,JavaRecord):
++                if unresolved and schema_limits:
++                    for message in schema_limits(item.declared_type):unresolved(message)
++                return JsonObject({key:convert(item.get(key,U)) for key in sorted(item.wire_fields)},item.declared_type)
++            if isinstance(item,JsonObject):return JsonObject({key:convert(child) for key,child in item.items()},item.origin_type)
++            if isinstance(item,JavaMap):
++                if not isinstance(item.mapping,dict):
++                    if unresolved:unresolved('Java Map contents are unknown at the JSON boundary')
++                    return U
++                result={}
++                for entry in item.entries():
++                    key=json_key(entry)
++                    if key is U or key in result:
++                        if unresolved:unresolved('Java Map JSON key encoding or duplicate-field order is unresolved')
++                        return U
++                    result[key]=convert(entry['value'])
++                return JsonObject(result,item.origin_type)
++            if isinstance(item,dict):
++                if type(item) is dict and item.get('__type__') in ('UUID','java.util.UUID'):
++                    handled,result=library('toString',item,[],'',U)
++                    if handled:return result
++                    if unresolved:unresolved('UUID JSON text is not known')
++                    return U
++                if optional_value(item):return convert(item['optional'])
++                return {key:convert(child) for key,child in item.items()}
++            return [convert(child) for child in item]
++        finally:
++            active.remove(id(item))
++    return convert(value)
+ 
+ 
+ def date_value(value):
+@@ -180,12 +274,23 @@
+     if base in ('SimpleDateFormat', 'DecimalFormat'):
+         return True, {'__type__': base, 'pattern': args[0] if args else U,'options':args[1:]}
+     if base in ('HashMap', 'LinkedHashMap', 'Map'):
+-        return True, {'__map__': {}}
++        if not args:
++            return True,JavaMap()
++        if len(args)==1 and args[0] is None:
++            raise JavaThrow({'__type__':'NullPointerException'})
++        if len(args)==1 and isinstance(args[0],JavaMap):
++            return True,JavaMap(dict(args[0].mapping) if isinstance(args[0].mapping,dict) else U,
++                                typed_entries=[dict(entry) for entry in args[0].typed_entries])
++        if len(args)==1 and type(args[0]) is int:
++            if args[0]<0:raise JavaThrow({'__type__':'IllegalArgumentException'})
++            return True,JavaMap()
++        return True,U
+     return False, U
+ 
+ 
+-def library(name, obj, args, receiver, now):
++def library(name, obj, args, receiver, now, key_type=None,json_issue=None):
+     """Return (handled, value). Unsupported operations retain Unknown."""
++    if isinstance(obj,(JavaRecord,JavaEnumValue,JavaTypeToken,JavaTypeFactory,JsonObject,JsonText)):return False,U
+     typ = obj.get('__type__', '') if isinstance(obj, dict) else ''
+     if typ.split('.')[-1]=='UUID':
+         if name=='toString' and '__uuid_string__' in obj:return True,deepcopy(obj['__uuid_string__'])
+@@ -244,9 +349,9 @@
+     if name == 'asList' and receiver == 'Arrays':
+         return True, args[0] if len(args) == 1 and isinstance(args[0], list) else list(args)
+     if name == 'writeValueAsString' and args:
+-        return True, {'__json__': wire(args[0])}
+-    if name == 'readValue' and args and isinstance(args[0], dict) and '__json__' in args[0]:
+-        return True, args[0]['__json__']
++        return True, JsonText(wire(args[0],json_issue))
++    if name == 'readValue' and args and isinstance(args[0],JsonText):
++        return False,U # The engine needs the explicit target class and source type.
+     if name == 'ok' and (receiver.endswith('ResponseEntity') or not receiver):
+         return True, {'__type__': 'ResponseEntity', '__http_entity__': True, 'body': args[0] if args else None,'status':200}
+     if name == 'orElse' and optional_value(obj):
+@@ -349,16 +454,53 @@
+             if i>=len(items):raise JavaThrow({'__type__':'NoSuchElementException'})
+             obj['index'] += 1
+             return True, items[i] if i < len(items) else U
+-    if isinstance(obj, dict) and '__map__' in obj:
+-        mapping = obj['__map__']
+-        if name == 'put' and len(args) == 2 and known(args[0]):
+-            old = mapping.get(str(args[0])); mapping[str(args[0])] = args[1]; return True, old
+-        if name == 'get' and args:
+-            return True, mapping.get(str(args[0])) if known(args[0]) else U
+-        if name == 'entrySet':
+-            return True, [{'key': k, 'value': v} for k, v in mapping.items()]
+-        if name in ('keySet', 'values'):
+-            return True, list(mapping.keys() if name == 'keySet' else mapping.values())
+-        if name == 'containsKey' and args:
+-            return True, str(args[0]) in mapping if known(args[0]) else U
++    if isinstance(obj,JavaMap):
++        obj.last_issue=None
++        mapping = obj.mapping
++        if name == 'equals' and len(args)==1:return True,map_equal(obj,args[0])
++        if name=='clear' and not args:
++            obj['__map__']={};obj.typed_entries.clear();return True,None
++        if not isinstance(mapping,dict):
++            obj.last_issue='unknown_map_state'
++            return True,U
++        if name in ('put','get','containsKey','remove','getOrDefault') and args:
++            key=key_spec(args[0],key_type)
++            found=map_slot(obj,key) if key is not None else U
++            if found is U:
++                obj.last_issue='unsupported_map_key' if key is None else 'unknown_map_key_equality'
++                if name in ('put','remove'):obj.invalidate()
++                return True,U
++            if name=='containsKey':return True,found is not None
++            old=found['value'] if found is not None else None
++            if name=='get':return True,old
++            if name=='getOrDefault' and len(args)==2:return True,old if found is not None else args[1]
++            if name=='put' and len(args)==2:
++                if key['kind']=='String' and isinstance(key['key'],str):mapping[key['key']]=args[1]
++                elif found is not None:found['value']=args[1]
++                else:obj.typed_entries.append({**key,'value':args[1]})
++                return True,old
++            if name=='remove' and len(args)==1:
++                if found is not None:
++                    if key['kind']=='String' and isinstance(key['key'],str):del mapping[key['key']]
++                    else:del obj.typed_entries[next(i for i,e in enumerate(obj.typed_entries) if e is found)]
++                return True,old
++        if name=='putAll' and len(args)==1:
++            if args[0] is None:raise JavaThrow({'__type__':'NullPointerException'})
++            if isinstance(args[0],JavaMap) and isinstance(args[0].mapping,dict):
++                for entry in args[0].entries():
++                    library('put',obj,[entry['key'],entry['value']],receiver,now,key_type=entry['kind'])
++                    if obj.mapping is U:return True,U
++                return True,None
++            obj.invalidate();return True,U
++        if name == 'size' and not args:return True,len(mapping)+len(obj.typed_entries)
++        if name == 'isEmpty' and not args:return True,not mapping and not obj.typed_entries
++        if name in ('entrySet','keySet','values','containsValue','hashCode','toString','getClass'):
++            # These are backed views or require additional Java value rules.
++            # Python list/dict order and snapshots are not Java Map semantics.
++            obj.last_issue='unsupported_map_view' if name in ('entrySet','keySet','values') else 'unsupported_map_operation'
++            return True,U
++        # An unsupported callback/mutation must not leave earlier values known.
++        obj.invalidate()
++        obj.last_issue='unsupported_map_mutation'
++        return True,U
+     return False, U
+--- solutions/—_script-state-flow/code/analyzer/project.py
++++ solutions/—_http-json-collections/code/analyzer/project.py
+@@ -3,6 +3,7 @@
+ from pathlib import Path
+ import re
+ import json
++from copy import deepcopy
+ import warnings
+ 
+ from tree_sitter import Language, Parser
+@@ -10,6 +11,7 @@
+ from baseline_closure import Index, load_json, RouteWarning
+ from .state import U
+ from .models import date_value
++from .java_collections import JavaRecord,JavaEnumValue
+ 
+ 
+ def text(node):
+@@ -20,6 +22,11 @@
+     yield node
+     for child in node.named_children:
+         yield from walk(child)
++
++
++def keywords(node):
++    modifiers=next((child for child in node.named_children if child.type=='modifiers'),None)
++    return {child.type for child in modifiers.children if not child.is_named} if modifiers else set()
+ 
+ 
+ class Project:
+@@ -80,7 +87,7 @@
+                     for var in field.named_children:
+                         if var.type != 'variable_declarator': continue
+                         name = text(var.child_by_field_name('name'))
+-                        if re.search(r'\bstatic\b', text(field)):
++                        if 'static' in keywords(field):
+                             try: self.constants[meta['fqn'].split('.')[-1] + '.' + name] = json.loads(text(var.child_by_field_name('value')))
+                             except ValueError: pass
+                         else:
+@@ -158,11 +165,11 @@
+                     predicates = None
+                 elif where:
+                     for part in re.split(r'\band\b', where[1], flags=re.I):
+-                        match = re.fullmatch(r'\s*(?:\w+\.)?(\w+)\s*(=|in)\s*\(?\s*\?(\d+)\s*\)?\s*', part, re.I)
++                        match = re.fullmatch(r'\s*(?:\w+\.)?(\w+)\s*(>=|<=|<>|!=|=|>|<|in)\s*(?:\(\s*\?(\d+)\s*\)|\?(\d+))\s*', part, re.I)
+                         if not match:
+                             predicates = None
+                             break
+-                        predicates.append(match.groups())
++                        predicates.append((match.group(1), match.group(2), match.group(3) or match.group(4)))
+                 self.repository_queries[(owner, self.methods[mid]['name'])] = predicates
+         self.entities = {}
+         self.column_aliases = {}
+@@ -260,6 +267,8 @@
+     def extract_metadata(self):
+         """Derive field, enum and datasource contracts from source declarations."""
+         self.type_fields, self.enum_members, self.id_fields, self.framework_types = {}, {}, {}, {}
++        self.type_variables={}
++        self.json_type_notes={}
+         self.config = [dict(id=i, **n) for i, n in self.nodes.items() if n['kind'] == 'config_entry']
+         self.schemas = {}
+         self.active_profiles = {'default'}
+@@ -282,15 +291,27 @@
+             if not declarations:
+                 continue
+             decl = declarations[0]
++            notes=set()
++            if any(n.type in ('annotation','marker_annotation') and text(n.child_by_field_name('name')).split('.')[-1].startswith('Json') for n in walk(decl)):
++                notes.add('Jackson annotations can change fields or invoke codecs')
++            if any(a['name'].split('.')[-1] in ('Data','Value','Getter','Setter','Builder','NoArgsConstructor','AllArgsConstructor') for a in meta.get('annotations',[])):
++                notes.add('generated JavaBeans or construction behavior is not executed by the JSON field projection')
++            self.json_type_notes[tid]=notes
++            params=decl.child_by_field_name('type_parameters')
++            self.type_variables[tid]={text(p.named_children[0]):'java.lang.Object' if len(p.named_children)==1 else None
++                                      for p in params.named_children if p.named_children} if params else {}
+             header = text(decl).split('{', 1)[0]
+             self.framework_types[tid] = set(re.findall(r'\b(?:implements|extends)\s+([\w.]+)', header))
+             if decl.type == 'enum_declaration':
+                 members = []
++                json_default=not any(n.type in ('annotation','marker_annotation') and text(n.child_by_field_name('name')).split('.')[-1] in
++                    ('JsonValue','JsonFormat','JsonProperty','JsonAlias','JsonCreator','JsonSerialize','JsonDeserialize','JsonTypeInfo','EnumNaming') for n in walk(decl))
+                 for n in walk(decl):
+                     if n.type != 'enum_constant':
+                         continue
+                     key = self.enum_prefixes[tid] + '.' + text(n.child_by_field_name('name'))
+                     self.enum_objects.setdefault(key, {'__enum__': key, '__enum_type__': tid, 'name': key.rsplit('.', 1)[-1]})
++                    self.enum_objects[key]=JavaEnumValue(key,tid,self.enum_objects[key],json_default)
+                     members.append(key)
+                 self.enum_members[tid] = members
+             fields = {}
+@@ -303,8 +324,10 @@
+                     if key and strategy:generators[key[1]]=strategy[1]
+             body = decl.child_by_field_name('body')
+             for field in body.named_children if body else []:
+-                if field.type != 'field_declaration' or re.search(r'\bstatic\b', text(field)):
++                if field.type != 'field_declaration' or 'static' in keywords(field):
+                     continue
++                if 'public' not in keywords(field) or 'transient' in keywords(field):
++                    notes.add('non-public or transient fields require JSON visibility rules')
+                 raw = text(field)
+                 generator=re.search(r'@GeneratedValue\([^)]*\bgenerator\s*=\s*"([^"]+)"',raw)
+                 column = re.search(r'@Column\([^)]*\bname\s*=\s*"([^"]+)"', raw)
+@@ -329,6 +352,7 @@
+                                     'qualifier': (re.search(r'@Qualifier\(\s*"([^"]+)"', raw)[1]
+                                                   if re.search(r'@Qualifier\(\s*"([^"]+)"', raw) else None),
+                                     'enum_string': 'EnumType.STRING' in raw,
++                                    'declaring_type':tid,
+                                     'file': meta['file'], 'line': field.start_point.row + 1}
+             self.type_fields[tid] = fields
+         self.type_parents={tid:sorted({parent for name in names
+@@ -351,6 +375,25 @@
+             from .state import camel
+             self.column_aliases.setdefault(rid,{}).update({camel(field['column']):name for name,field in fields.items()})
+ 
++    def json_model_limits(self,declared_type,direction='serialize'):
++        cache=self.__dict__.setdefault('_json_model_limits_cache',{})
++        key=(declared_type,direction)
++        if key not in cache:
++            pending=[tid for tid,node in self.nodes.items() if node['kind']=='type' and node.get('fqn')==declared_type]
++            seen,notes=set(),set()
++            while pending:
++                owner=pending.pop()
++                if owner in seen:continue
++                seen.add(owner)
++                notes.update(self.json_type_notes.get(owner,()))
++                members=[meta for meta in self.methods.values() if meta['owner']==owner]
++                if any((meta['name']=='<init>' or re.match(r'set[A-Z]',meta['name'])) if direction=='deserialize'
++                       else re.match(r'(?:get|is)[A-Z]',meta['name']) for meta in members):
++                    notes.add('JavaBeans or constructor callbacks are not executed by the JSON '+direction+' field projection')
++                pending.extend(self.type_parents.get(owner,()))
++            cache[key]=tuple('approximate JSON DTO field projection: '+note for note in sorted(notes))
++        return cache[key]
++
+     def enum_reference(self, expression, mid):
+         if '.' not in expression or mid not in self.methods:
+             return None
+@@ -370,14 +413,16 @@
+         return cache[key]
+ 
+     def _resolve_type(self,name,module,file):
++        def visible(candidates):
++            local=[tid for tid in candidates if self.nodes[tid].get('module')==module]
++            return local[0] if len(local)==1 else candidates[0] if len(candidates)==1 else None
+         written = name.split('<')[0].replace('[]', '').strip()
+         name = written.split('.')[-1]
+         candidates = [tid for tid, node in self.nodes.items() if node['kind'] == 'type'
+                       and node['fqn'].split('.')[-1] == name]
+         exact = [tid for tid in candidates if self.nodes[tid]['fqn'] == written]
+         if '.' in written:
+-            local = [tid for tid in exact if self.nodes[tid].get('module') == module]
+-            return local[0] if len(local) == 1 else exact[0] if len(exact) == 1 else None
++            return visible(exact)
+         if file and candidates:
+             cache = self.__dict__.setdefault('_source_namespaces', {})
+             if file not in cache:
+@@ -390,15 +435,18 @@
+             package, imports = cache[file]
+             imported = [tid for tid in candidates if self.nodes[tid]['fqn'] in imports]
+             if imported:
+-                return imported[0] if len(imported) == 1 else None
++                return visible(imported)
+             if any(not imported.endswith('.*') and imported.rsplit('.', 1)[-1] == name for imported in imports):
+                 return None
+             same_package = [tid for tid in candidates if self.nodes[tid]['fqn'] == (package + '.' if package else '') + name]
+             if same_package:
+-                return same_package[0] if len(same_package) == 1 else None
++                return visible(same_package)
+             wildcard = [tid for tid in candidates if self.nodes[tid]['fqn'].rsplit('.', 1)[0] + '.*' in imports]
+             if wildcard:
+-                return wildcard[0] if len(wildcard) == 1 else None
++                return visible(wildcard)
++            # With a source namespace, an unrelated globally unique type is
++            # still invisible; it cannot shadow an imported or java.lang type.
++            return None
+         same = [tid for tid in candidates if self.nodes[tid].get('module') == module]
+         return same[0] if len(same) == 1 else candidates[0] if len(candidates) == 1 else None
+ 
+@@ -512,15 +560,15 @@
+                     element = re.fullmatch(r'(?:List|Set|Collection)<([\w.]+)>', field['type'])
+                     target = self.resolve_type(element[1], self.nodes[owner].get('module'), field['file']) if element else None
+                     if target in self.type_fields:
+-                        val = [{'__type__': self.nodes[target]['fqn'], **item} if isinstance(item, dict) and '__type__' not in item else item for item in val]
++                        val = [fill(target,{'__type__':self.nodes[target]['fqn'],**item},item) if isinstance(item,dict) else item for item in val]
+                 if target in self.enum_members and val is not U:
+                     members = self.enum_members[target]
+-                    match=(val['__enum__'] if isinstance(val,dict) and val.get('__enum__') in members else
++                    match=(val.enum_key if isinstance(val,JavaEnumValue) and val.enum_key in members else
+                            next((x for x in members if x.rsplit('.', 1)[-1] == val),None) if isinstance(val,str) else
+                            members[val] if type(val) is int and 0<=val<len(members) else None)
+-                    val = dict(self.enum_objects[match]) if match else U
++                    val = deepcopy(self.enum_objects[match]) if match else U
+                 obj[name] = val
+-            return obj
++            return JavaRecord(self.nodes[owner]['fqn'],obj,self.type_fields.get(owner,{}))
+ 
+         return fill(tid, record) if tid else record
+ 
+@@ -603,6 +651,57 @@
+     def methods_of(self, owner, name):
+         return [mid for mid in self.by_name.get(name, []) if self.methods[mid]['owner'] == owner and not self.methods[mid].get('abstract')]
+ 
++    def dispatch_signature(self,mid):
++        """Source identity of erased parameter types; type variables stay unknown.
++
++        This does not implement generic substitution or overload resolution.
++        Erasure is useful only after the skeleton supplies a declared method.
++        """
++        cache=self.__dict__.setdefault('_dispatch_signature_cache',{})
++        if mid in cache:return cache[mid]
++        node=self.ast.get(mid)
++        if node is None:return None
++        cache[mid]=None
++        variables=set()
++        parent=node
++        while parent is not None:
++            params=parent.child_by_field_name('type_parameters')
++            if params:
++                variables.update(text(p.named_children[0]) for p in params.named_children if p.named_children)
++            parent=parent.parent
++        meta=self.methods[mid]
++        root=self.trees[meta['file']].root_node
++        imports=[match[1] for child in root.named_children if child.type=='import_declaration'
++                 for match in [re.search(r'\bimport\s+(?:static\s+)?([\w.*]+)\s*;',text(child))] if match]
++        package=next((re.search(r'\bpackage\s+([\w.]+)',text(child))[1] for child in root.named_children
++                      if child.type=='package_declaration'),'')
++        result=[]
++        parameters=node.child_by_field_name('parameters')
++        if parameters is None or any(p.type=='spread_parameter' for p in parameters.named_children):return None
++        for parameter in parameters.named_children:
++            if parameter.type!='formal_parameter':continue
++            written=text(parameter.child_by_field_name('type'))
++            written+=''.join(text(child) for child in parameter.named_children if child.type=='dimensions')
++            erased=re.sub(r'<.*>','',re.sub(r'\s+','',written))
++            base=erased.replace('[]','')
++            if base in variables or not re.fullmatch(r'[\w.$]+(?:\[\])*',erased):return None
++            tid=self.resolve_type(base,meta['module'],meta['file'])
++            explicit=[item for item in imports if item.rsplit('.',1)[-1]==base]
++            if tid:identity=('source',tid)
++            elif '.' in base or base in ('boolean','byte','short','char','int','long','float','double'):
++                identity=('named',base)
++            elif len(explicit)==1:identity=('named',explicit[0])
++            elif base in ('String','Object','Integer','Long','Double','Float','Boolean','Character','Short','Byte','Class','CharSequence','Iterable'):
++                identity=('named','java.lang.'+base)
++            elif base in ('List','Map','Set','Collection','Iterator') and 'java.util.*' in imports:
++                identity=('named','java.util.'+base)
++            elif not any(item.endswith('.*') for item in imports):
++                identity=('named',(package+'.' if package else '')+base)
++            else:return None
++            result.append((identity,erased.count('[]')))
++        cache[mid]=tuple(result)
++        return cache[mid]
++
+     def inherited_methods(self,owner,name,count):
+         """Resolve explicit source accessors through the nearest declaring class."""
+         pending,seen=[owner],set()
+--- solutions/—_script-state-flow/code/analyzer/provenance.py
++++ solutions/—_http-json-collections/code/analyzer/provenance.py
+@@ -5,6 +5,7 @@
+ from .state import U
+ from .project import text
+ from .models import date_value
++from .java_collections import JavaMap,JavaRecord,JavaEnumValue,JsonObject,JsonText,schema_type,semantic_view
+ 
+ 
+ def source_string(project, value):
+@@ -18,7 +19,7 @@
+         methods = [m for m in project.methods_of(tid, name) if not project.parameters(m)]
+         if not methods:
+             if name == 'name' and tid in project.enum_members and isinstance(obj, dict):
+-                return obj.get('__enum__', '').rsplit('.', 1)[-1] or U
++                return obj.enum_name if isinstance(obj,JavaEnumValue) else U
+             return U
+         if len(methods) != 1:
+             return U
+@@ -68,17 +69,30 @@
+ 
+     if not isinstance(value, dict):
+         return U
+-    tid = project.resolve_type(value.get('__type__', ''), '')
++    tid = project.resolve_type(schema_type(value) or '', '')
+     result = invoke(value, tid, 'toString')
+     return result if isinstance(result, str) else U
+ 
+ 
+-def contains_unknown(value):
++def contains_unknown(value,active=None):
+     if value is U:
+         return True
+-    if isinstance(value, dict):
+-        return any(contains_unknown(v) for k, v in value.items() if not str(k).startswith('__') or k in ('__json__', '__map__'))
+-    return isinstance(value, (list, tuple)) and any(contains_unknown(v) for v in value)
++    if not isinstance(value,(dict,list,tuple)):return False
++    active=set() if active is None else active
++    if id(value) in active:return True
++    active.add(id(value))
++    try:
++        if isinstance(value,JsonText):return contains_unknown(value.payload,active)
++        if isinstance(value,JavaMap):
++            return value.mapping is U or any(contains_unknown(entry['key'],active) or contains_unknown(entry['value'],active) for entry in value.entries())
++        if isinstance(value,JavaRecord):
++            return any(key not in value or contains_unknown(value[key],active) for key in value.wire_fields)
++        if isinstance(value,(JsonObject,JavaEnumValue)):return any(contains_unknown(child,active) for child in value.values())
++        if isinstance(value,dict):
++            return any(contains_unknown(v,active) for k,v in value.items() if not str(k).startswith('__') or k in ('__json__','__map__'))
++        return any(contains_unknown(child,active) for child in value)
++    finally:
++        active.remove(id(value))
+ 
+ 
+ def entity_words(value):
+@@ -87,11 +101,16 @@
+ 
+ 
+ def objects(value, path):
++    value=semantic_view(value)
++    if isinstance(value,JavaMap):
++        if isinstance(value.mapping,dict):
++            for entry in value.entries():yield from objects(entry['value'],path+'['+repr(entry['key'])+']')
++        return
+     if isinstance(value, dict):
+-        if value.get('__type__') and '__symbol__' not in value:
++        if schema_type(value):
+             yield path, value
+         for key, child in value.items():
+-            if not str(key).startswith('__'):
++            if isinstance(value,JsonObject) or isinstance(value,JavaRecord) and key in value.wire_fields or not str(key).startswith('__'):
+                 yield from objects(child, path + '.' + str(key))
+     elif isinstance(value, list):
+         for index, child in enumerate(value):
+@@ -165,8 +184,8 @@
+         observed = [*objects(item.get('result', U), 'history[' + str(index) + '].result'),
+                     *objects(item.get('created_objects', []), 'history[' + str(index) + '].created_objects')]
+         for path, obj in observed:
+-            owner = entity_words(obj['__type__'])
+-            tid = project.resolve_type(obj['__type__'], project.methods[mid]['module'])
++            owner = entity_words(schema_type(obj))
++            tid = project.resolve_type(schema_type(obj), project.methods[mid]['module'])
+             declared = project.type_fields.get(tid, {})
+             ids = [k for k, meta in declared.items() if meta.get('id')]
+             keys = [k for k in obj if norm(k) == norm(field)]
+@@ -268,7 +287,7 @@
+             entity = set(item.get('entity', []))
+             if mid is not None and not (tuple(sorted(entity)) in owners or entity and entity <= entity_words(field)):
+                 continue
+-            tid = project.resolve_type(obj.get('__type__', ''), '') if isinstance(obj, dict) else None
++            tid = project.resolve_type(schema_type(obj) or '', '') if isinstance(obj, dict) else None
+             if field not in project.type_fields.get(tid, {}):
+                 continue
+             linked = any(entity_words(key) == set(item.get('entity', [])) and value == item.get('value') for key, value in params.items())
+@@ -299,12 +318,12 @@
+                 return 'history[' + str(index) + '].parameters.' + values[0][0], values[0][1]
+         matches = []
+         for path, obj in objects(history[index].get('result', U), 'history[' + str(index) + '].result'):
+-            tid = project.resolve_type(obj['__type__'], '')
++            tid = project.resolve_type(schema_type(obj), '')
+             declared = project.type_fields.get(tid, {})
+             linked = False
+             for key, expected in identifiers.items():
+                 keys = [key] if key in declared else [name for name, info in declared.items() if info.get('id')]
+-                if key not in declared and entity_words(key) != entity_words(obj['__type__']):
++                if key not in declared and entity_words(key) != entity_words(schema_type(obj)):
+                     keys = []
+                 value = obj.get(keys[0], U) if len(keys) == 1 else U
+                 if isinstance(value, dict) and '__symbol__' not in value:
+--- solutions/—_script-state-flow/code/analyzer/selection.py
++++ solutions/—_http-json-collections/code/analyzer/selection.py
+@@ -1,3 +1,4 @@
++from .java_collections import schema_type
+ """Explicit selection language links later requests to source-typed objects."""
+ from copy import deepcopy
+ import re
+@@ -15,8 +16,8 @@
+     for index, item in enumerate(history):
+         for name in ('result', 'created_objects'):
+             observed.extend(objects(item.get(name, U), 'history[' + str(index) + '].' + name))
+-    groups = {tuple(sorted(entity_words(obj['__type__']))) for _, obj in observed
+-              if entity_words(obj['__type__']) and entity_words(obj['__type__']) <= words}
++    groups = {tuple(sorted(entity_words(schema_type(obj)))) for _, obj in observed
++              if entity_words(schema_type(obj)) and entity_words(schema_type(obj)) <= words}
+     fields = project.request_fields(mid)
+     groups.update(tuple(sorted(entity_words(field))) for field in fields
+                   if field.lower().endswith('id') and entity_words(field) and entity_words(field) <= words)
+@@ -42,9 +43,9 @@
+             continue
+         matches = []
+         for path, obj in observed:
+-            if entity_words(obj['__type__']) != entity:
++            if entity_words(schema_type(obj)) != entity:
+                 continue
+-            tid = project.resolve_type(obj['__type__'], project.methods[mid]['module'])
++            tid = project.resolve_type(schema_type(obj), project.methods[mid]['module'])
+             for key, info in project.type_fields.get(tid, {}).items():
+                 if not info.get('id'):
+                     continue
+--- solutions/—_script-state-flow/code/analyzer/symbolic_text.py
++++ solutions/—_http-json-collections/code/analyzer/symbolic_text.py
+@@ -29,7 +29,7 @@
+ 
+ 
+ def _string_symbol(value):
+-    return (isinstance(value, dict) and isinstance(value.get('__symbol__'), str)
++    return (type(value) is dict and isinstance(value.get('__symbol__'), str)
+             and value.get('__type__') in _STRING_TYPES)
+ 
+ 

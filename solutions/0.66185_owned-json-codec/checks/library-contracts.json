@@ -1,0 +1,23 @@
+{
+  "checked_on": "2026-10-17",
+  "docs_lookup": "Context7 resolve-library-id then query-docs; current result partly Jackson3, therefore verified against primary Jackson2 API references",
+  "scope": "com.fasterxml.jackson Jackson2 only, exact default ObjectMapper constructor and supported observed settings",
+  "features": {
+    "FAIL_ON_UNKNOWN_PROPERTIES": true,
+    "FAIL_ON_NULL_FOR_PRIMITIVES": false
+  },
+  "contracts": [
+    "Configure before any read/write; configuration after use may not take effect",
+    "copy produces an independent configurable mapper",
+    "convertValue wraps conversion failures in IllegalArgumentException; readValue exposes checked JSON failures",
+    "Known JSON binding failure represented by JsonMappingException upper bound; exact subclass is not fabricated",
+    "Global HTTP conversion context is separate from a local mapper instance"
+  ],
+  "primary_sources": [
+    "https://fasterxml.github.io/jackson-databind/javadoc/2.9/com/fasterxml/jackson/databind/ObjectMapper.html",
+    "https://fasterxml.github.io/jackson-databind/javadoc/2.9/com/fasterxml/jackson/databind/DeserializationFeature.html",
+    "https://fasterxml.github.io/jackson-databind/javadoc/2.9/com/fasterxml/jackson/databind/JsonMappingException.html",
+    "https://fasterxml.github.io/jackson-databind/javadoc/2.9/com/fasterxml/jackson/databind/exc/UnrecognizedPropertyException.html"
+  ],
+  "runtime_network_or_JVM_used": false
+}

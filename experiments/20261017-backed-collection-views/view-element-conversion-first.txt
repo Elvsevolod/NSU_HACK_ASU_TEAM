@@ -1,0 +1,15 @@
+.....................F.                                                  [100%]
+=================================== FAILURES ===================================
+_____________ test_foreach_promotes_a_known_character_value_to_int _____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-580/test_foreach_promotes_a_known_0')
+
+    def test_foreach_promotes_a_known_character_value_to_int(tmp_path):
+        result,_=run(tmp_path,'Map<String,Character> map=new HashMap();map.put("key",\'A\');for(int item:map.values()){return item+1;}return "missing";')
+>       assert result==66
+E       AssertionError: assert 'A1' == 66
+
+solutions/—_backed-collection-views/code/tests/test_backed_map_views.py:86: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_backed-collection-views/code/tests/test_backed_map_views.py::test_foreach_promotes_a_known_character_value_to_int
+1 failed, 22 passed in 0.09s

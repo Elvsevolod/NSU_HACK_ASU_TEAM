@@ -1,0 +1,3905 @@
+{
+  "reference_sha256": "e0ebe4160fd1a109c697871685bdd814faa3a3146e4b2b0e619b76b322c105f0",
+  "scope": "HTTP requests through real source dependencies, credentials, JWT, ORM state and response schemas. No target imports or application execution. Startup succeeded with explicitly supplied validated configuration and database snapshot; startup itself is outside this trace.",
+  "application_executed": false,
+  "source_sha256": {
+    "app/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "app/alembic/env.py": "5e65dea30d8b09742383af77fe10abe22dab87d92d36a8e46781fde08d64a265",
+    "app/alembic/versions/1a31ce608336_add_cascade_delete_relationships.py": "56d9a949c1455e59dc9a4b09c469a4d35cd6063230ab1ac1059ba4b58f6804c1",
+    "app/alembic/versions/9c0a54914c78_add_max_length_for_string_varchar_.py": "d9919ae828a0d1aa0fa68fd75bc75a90994a256b66a3a153918149d9578c0c1b",
+    "app/alembic/versions/d98dd8ec85a3_edit_replace_id_integers_in_all_models_.py": "d5c549df50ddda6c9877e637e146cd757095460ee6285a7db06bb66724f32730",
+    "app/alembic/versions/e2412789c190_initialize_models.py": "a73fcd9ff8a143b0a75228b63b6589e0ecbfa14c27286d33d4adeffe99c40075",
+    "app/alembic/versions/fe56fa70289e_add_created_at_to_user_and_item.py": "68dc46eb06c7a6fe9059930eadbdeb349f5b13c789bb1a11846b05eccea0c304",
+    "app/api/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "app/api/deps.py": "84c30966b3b862c643009c14146d1924dec50be5b0efb9f56798e2fda5189daa",
+    "app/api/main.py": "9e9d533bea7c8616a1d9dd3d7e7cdfefa36726fb221bb289fd102654b7e93b3f",
+    "app/api/routes/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "app/api/routes/items.py": "7f0fa55d1f7b02188c4abd4f88aa6db92fe03de38258b765ed050ec72032b410",
+    "app/api/routes/login.py": "3c7f7c395b74cea54e505a16052679614b4fd92325d88b761385df8d952af642",
+    "app/api/routes/private.py": "f5df74cc276f0d8d83337922fb8e05e69ecbc885d466d90d2e3de54ba5e4c8f4",
+    "app/api/routes/users.py": "566f253330d75bdbf04f2fd59b380dd2c51041d931bd7af6b2064ee66ea96e6d",
+    "app/api/routes/utils.py": "5e77b59fab0bfcb1cef581938dcc8a47afb7518664a497763d4c50711898e925",
+    "app/core/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "app/core/config.py": "ef306f8b68c64f1864269891d353c23807d5685d62e514066598b33ee099ca08",
+    "app/core/db.py": "22b8642606ae619a1ea07b5e3c3bee49c2fc0ded5d0e583e810fba6e7ffadfc9",
+    "app/core/security.py": "adb90882929ab33c238e2e9fa81b03fa0364c1a8cce0e9e70b98c68c321f468f",
+    "app/crud.py": "f69d79e858ee22cee7792494b0df0370afaed20439ed16bbf6f70767926254d1",
+    "app/initial_data.py": "29b51ebdd3c8cb9fde80a426f9c10af08c606ad0ffcec39a23fddc6587ab812c",
+    "app/main.py": "e8b28b639d86c76dcf60348185c91125a789951ff085a5289d9f5add0854dfda",
+    "app/models.py": "4696396c84832a50ca9d60337c2b6ba24e961f2ee5b5e660d8081fb929ebf459",
+    "app/utils.py": "61fbc8476b1c1247b80e2220d28f89e33370434e2eb172f325ed0a6643e433b3"
+  },
+  "parse_errors": [],
+  "preparation_seconds": 0.8569324580021203,
+  "cases": [
+    {
+      "id": "login-create-update-read-delete-missing",
+      "passed": false,
+      "checks": {
+        "edges": true,
+        "one_path": true,
+        "statuses": true,
+        "complete_chain": true,
+        "response_projection": false,
+        "state_and_result": true,
+        "token_transferred": true
+      },
+      "relations": {
+        "executes": {
+          "expected": 13,
+          "predicted": 13,
+          "intersection": 13,
+          "iou": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [],
+          "empty_both": false
+        },
+        "calls": {
+          "expected": 5,
+          "predicted": 5,
+          "intersection": 5,
+          "iou": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [],
+          "empty_both": false
+        },
+        "remote": {
+          "expected": 0,
+          "predicted": 0,
+          "intersection": 0,
+          "iou": 1.0,
+          "precision": null,
+          "recall": null,
+          "missing": [],
+          "extra": [],
+          "empty_both": true
+        },
+        "data": {
+          "expected": 6,
+          "predicted": 6,
+          "intersection": 6,
+          "iou": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [],
+          "empty_both": false
+        }
+      },
+      "analysis_seconds": 0.15900504199089482,
+      "detail": {
+        "status": "complete-in-model",
+        "projection": "may",
+        "paths": [
+          {
+            "decisions": [],
+            "edges": [
+              {
+                "source": "method:backend:app/api/deps.py#get_current_user:30",
+                "relation": "data",
+                "target": "resource:user"
+              },
+              {
+                "source": "method:backend:app/api/routes/items.py#create_item:62",
+                "relation": "calls",
+                "target": "method:backend:app/models.py#get_datetime_utc:8"
+              },
+              {
+                "source": "method:backend:app/api/routes/items.py#create_item:62",
+                "relation": "data",
+                "target": "resource:item"
+              },
+              {
+                "source": "method:backend:app/api/routes/items.py#delete_item:100",
+                "relation": "data",
+                "target": "resource:item"
+              },
+              {
+                "source": "method:backend:app/api/routes/items.py#read_item:49",
+                "relation": "data",
+                "target": "resource:item"
+              },
+              {
+                "source": "method:backend:app/api/routes/items.py#update_item:76",
+                "relation": "data",
+                "target": "resource:item"
+              },
+              {
+                "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+                "relation": "calls",
+                "target": "method:backend:app/core/security.py#create_access_token:22"
+              },
+              {
+                "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+                "relation": "calls",
+                "target": "method:backend:app/crud.py#authenticate:45"
+              },
+              {
+                "source": "method:backend:app/crud.py#authenticate:45",
+                "relation": "calls",
+                "target": "method:backend:app/core/security.py#verify_password:29"
+              },
+              {
+                "source": "method:backend:app/crud.py#authenticate:45",
+                "relation": "calls",
+                "target": "method:backend:app/crud.py#get_user_by_email:34"
+              },
+              {
+                "source": "method:backend:app/crud.py#get_user_by_email:34",
+                "relation": "data",
+                "target": "resource:user"
+              },
+              {
+                "source": "scenario:login-create-update-read-delete-missing",
+                "relation": "executes",
+                "target": "method:backend:app/api/deps.py#get_current_user:30"
+              },
+              {
+                "source": "scenario:login-create-update-read-delete-missing",
+                "relation": "executes",
+                "target": "method:backend:app/api/deps.py#get_db:21"
+              },
+              {
+                "source": "scenario:login-create-update-read-delete-missing",
+                "relation": "executes",
+                "target": "method:backend:app/api/routes/items.py#create_item:62"
+              },
+              {
+                "source": "scenario:login-create-update-read-delete-missing",
+                "relation": "executes",
+                "target": "method:backend:app/api/routes/items.py#delete_item:100"
+              },
+              {
+                "source": "scenario:login-create-update-read-delete-missing",
+                "relation": "executes",
+                "target": "method:backend:app/api/routes/items.py#read_item:49"
+              },
+              {
+                "source": "scenario:login-create-update-read-delete-missing",
+                "relation": "executes",
+                "target": "method:backend:app/api/routes/items.py#update_item:76"
+              },
+              {
+                "source": "scenario:login-create-update-read-delete-missing",
+                "relation": "executes",
+                "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+              },
+              {
+                "source": "scenario:login-create-update-read-delete-missing",
+                "relation": "executes",
+                "target": "method:backend:app/api/routes/login.py#test_token:46"
+              },
+              {
+                "source": "scenario:login-create-update-read-delete-missing",
+                "relation": "executes",
+                "target": "method:backend:app/core/security.py#create_access_token:22"
+              },
+              {
+                "source": "scenario:login-create-update-read-delete-missing",
+                "relation": "executes",
+                "target": "method:backend:app/core/security.py#verify_password:29"
+              },
+              {
+                "source": "scenario:login-create-update-read-delete-missing",
+                "relation": "executes",
+                "target": "method:backend:app/crud.py#authenticate:45"
+              },
+              {
+                "source": "scenario:login-create-update-read-delete-missing",
+                "relation": "executes",
+                "target": "method:backend:app/crud.py#get_user_by_email:34"
+              },
+              {
+                "source": "scenario:login-create-update-read-delete-missing",
+                "relation": "executes",
+                "target": "method:backend:app/models.py#get_datetime_utc:8"
+              }
+            ],
+            "steps": [
+              {
+                "step": 1,
+                "grounding": {
+                  "kind": "explicit-request",
+                  "input": {
+                    "method": "POST",
+                    "path": "/api/v1/login/access-token",
+                    "form": {
+                      "username": "reader@example.com",
+                      "password": "fixture-password-39"
+                    }
+                  }
+                },
+                "request": {
+                  "method": "POST",
+                  "path": "/api/v1/login/access-token",
+                  "form": {
+                    "username": "reader@example.com",
+                    "password": "fixture-password-39"
+                  }
+                },
+                "response": {
+                  "kind": "Response",
+                  "body": {
+                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDg5MDAsInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.paqDIRQjJN7powOKHmm10IzuOsoiTvACa3y68ay4SBk",
+                    "token_type": "bearer"
+                  },
+                  "status": 200,
+                  "headers": {},
+                  "headers_readonly": null
+                }
+              },
+              {
+                "step": 2,
+                "grounding": {
+                  "kind": "explicit-request",
+                  "input": {
+                    "method": "POST",
+                    "path": "/api/v1/login/test-token",
+                    "headers": {
+                      "Authorization": {
+                        "$concat": [
+                          "Bearer ",
+                          {
+                            "$ref": "steps.1.body.access_token"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "request": {
+                  "method": "POST",
+                  "path": "/api/v1/login/test-token",
+                  "headers": {
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDg5MDAsInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.paqDIRQjJN7powOKHmm10IzuOsoiTvACa3y68ay4SBk"
+                  }
+                },
+                "response": {
+                  "kind": "Response",
+                  "body": {
+                    "email": "reader@example.com",
+                    "is_active": true,
+                    "is_superuser": false,
+                    "full_name": "Reader",
+                    "id": "10000000-0000-4000-8000-000000000001",
+                    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FFlG0wReNGaj6MIY93SN5A$Xs2CqTMQgkBjrhJLMDQbG2ynjXLzzOl7vdQNDmuZQ0M",
+                    "created_at": null,
+                    "items": []
+                  },
+                  "status": 200,
+                  "headers": {},
+                  "headers_readonly": null
+                }
+              },
+              {
+                "step": 3,
+                "grounding": {
+                  "kind": "explicit-request",
+                  "input": {
+                    "method": "POST",
+                    "path": "/api/v1/items/",
+                    "headers": {
+                      "Authorization": {
+                        "$concat": [
+                          "Bearer ",
+                          {
+                            "$ref": "steps.1.body.access_token"
+                          }
+                        ]
+                      }
+                    },
+                    "body": {
+                      "title": "Before",
+                      "description": "keep"
+                    }
+                  }
+                },
+                "request": {
+                  "method": "POST",
+                  "path": "/api/v1/items/",
+                  "headers": {
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDg5MDAsInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.paqDIRQjJN7powOKHmm10IzuOsoiTvACa3y68ay4SBk"
+                  },
+                  "body": {
+                    "title": "Before",
+                    "description": "keep"
+                  }
+                },
+                "response": {
+                  "kind": "Response",
+                  "body": {
+                    "title": "Before",
+                    "description": "keep",
+                    "id": {
+                      "kind": "Symbol",
+                      "identity": "fresh:19",
+                      "typ": "UUID",
+                      "nonnull": true,
+                      "sort": ""
+                    },
+                    "created_at": "2026-01-02T10:00:00Z",
+                    "owner_id": "10000000-0000-4000-8000-000000000001",
+                    "owner": null
+                  },
+                  "status": 200,
+                  "headers": {},
+                  "headers_readonly": null
+                }
+              },
+              {
+                "step": 4,
+                "grounding": {
+                  "kind": "explicit-request",
+                  "input": {
+                    "method": "PUT",
+                    "path": "/api/v1/items/{id}",
+                    "path_params": {
+                      "id": {
+                        "$ref": "steps.3.body.id"
+                      }
+                    },
+                    "headers": {
+                      "Authorization": {
+                        "$concat": [
+                          "Bearer ",
+                          {
+                            "$ref": "steps.1.body.access_token"
+                          }
+                        ]
+                      }
+                    },
+                    "body": {
+                      "title": "Changed"
+                    }
+                  }
+                },
+                "request": {
+                  "method": "PUT",
+                  "path": "/api/v1/items/{id}",
+                  "path_params": {
+                    "id": {
+                      "kind": "Symbol",
+                      "identity": "fresh:19",
+                      "typ": "UUID",
+                      "nonnull": true,
+                      "sort": ""
+                    }
+                  },
+                  "headers": {
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDg5MDAsInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.paqDIRQjJN7powOKHmm10IzuOsoiTvACa3y68ay4SBk"
+                  },
+                  "body": {
+                    "title": "Changed"
+                  }
+                },
+                "response": {
+                  "kind": "Response",
+                  "body": {
+                    "title": "Changed",
+                    "description": "keep",
+                    "id": {
+                      "kind": "Symbol",
+                      "identity": "fresh:19",
+                      "typ": "UUID",
+                      "nonnull": true,
+                      "sort": ""
+                    },
+                    "created_at": "2026-01-02T10:00:00Z",
+                    "owner_id": "10000000-0000-4000-8000-000000000001",
+                    "owner": null
+                  },
+                  "status": 200,
+                  "headers": {},
+                  "headers_readonly": null
+                }
+              },
+              {
+                "step": 5,
+                "grounding": {
+                  "kind": "explicit-request",
+                  "input": {
+                    "method": "GET",
+                    "path": "/api/v1/items/{id}",
+                    "path_params": {
+                      "id": {
+                        "$ref": "steps.3.body.id"
+                      }
+                    },
+                    "headers": {
+                      "Authorization": {
+                        "$concat": [
+                          "Bearer ",
+                          {
+                            "$ref": "steps.1.body.access_token"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "request": {
+                  "method": "GET",
+                  "path": "/api/v1/items/{id}",
+                  "path_params": {
+                    "id": {
+                      "kind": "Symbol",
+                      "identity": "fresh:19",
+                      "typ": "UUID",
+                      "nonnull": true,
+                      "sort": ""
+                    }
+                  },
+                  "headers": {
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDg5MDAsInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.paqDIRQjJN7powOKHmm10IzuOsoiTvACa3y68ay4SBk"
+                  }
+                },
+                "response": {
+                  "kind": "Response",
+                  "body": {
+                    "title": "Changed",
+                    "description": "keep",
+                    "id": {
+                      "kind": "Symbol",
+                      "identity": "fresh:19",
+                      "typ": "UUID",
+                      "nonnull": true,
+                      "sort": ""
+                    },
+                    "created_at": "2026-01-02T10:00:00Z",
+                    "owner_id": "10000000-0000-4000-8000-000000000001",
+                    "owner": null
+                  },
+                  "status": 200,
+                  "headers": {},
+                  "headers_readonly": null
+                }
+              },
+              {
+                "step": 6,
+                "grounding": {
+                  "kind": "explicit-request",
+                  "input": {
+                    "method": "DELETE",
+                    "path": "/api/v1/items/{id}",
+                    "path_params": {
+                      "id": {
+                        "$ref": "steps.3.body.id"
+                      }
+                    },
+                    "headers": {
+                      "Authorization": {
+                        "$concat": [
+                          "Bearer ",
+                          {
+                            "$ref": "steps.1.body.access_token"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "request": {
+                  "method": "DELETE",
+                  "path": "/api/v1/items/{id}",
+                  "path_params": {
+                    "id": {
+                      "kind": "Symbol",
+                      "identity": "fresh:19",
+                      "typ": "UUID",
+                      "nonnull": true,
+                      "sort": ""
+                    }
+                  },
+                  "headers": {
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDg5MDAsInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.paqDIRQjJN7powOKHmm10IzuOsoiTvACa3y68ay4SBk"
+                  }
+                },
+                "response": {
+                  "kind": "Response",
+                  "body": {
+                    "message": "Item deleted successfully"
+                  },
+                  "status": 200,
+                  "headers": {},
+                  "headers_readonly": null
+                }
+              },
+              {
+                "step": 7,
+                "grounding": {
+                  "kind": "explicit-request",
+                  "input": {
+                    "method": "GET",
+                    "path": "/api/v1/items/{id}",
+                    "path_params": {
+                      "id": {
+                        "$ref": "steps.3.body.id"
+                      }
+                    },
+                    "headers": {
+                      "Authorization": {
+                        "$concat": [
+                          "Bearer ",
+                          {
+                            "$ref": "steps.1.body.access_token"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "request": {
+                  "method": "GET",
+                  "path": "/api/v1/items/{id}",
+                  "path_params": {
+                    "id": {
+                      "kind": "Symbol",
+                      "identity": "fresh:19",
+                      "typ": "UUID",
+                      "nonnull": true,
+                      "sort": ""
+                    }
+                  },
+                  "headers": {
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDg5MDAsInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.paqDIRQjJN7powOKHmm10IzuOsoiTvACa3y68ay4SBk"
+                  }
+                },
+                "response": {
+                  "kind": "Response",
+                  "body": {
+                    "detail": "Item not found"
+                  },
+                  "status": 404,
+                  "headers": {},
+                  "headers_readonly": null
+                }
+              }
+            ],
+            "events": [
+              {
+                "kind": "http",
+                "method": "POST",
+                "path": "/api/v1/login/access-token",
+                "handler": "method:backend:app/api/routes/login.py#login_access_token:24",
+                "bound": {
+                  "session": {
+                    "kind": "Object",
+                    "identity": "o2",
+                    "typ": "sqlmodel.Session",
+                    "fields": {
+                      "bind": {
+                        "kind": "Object",
+                        "identity": "o1",
+                        "typ": "sqlalchemy.Engine",
+                        "fields": {
+                          "url": "postgresql://fixture:fixture@database/portable",
+                          "pool_pre_ping": true
+                        },
+                        "provided": null
+                      },
+                      "binding_status": "bound"
+                    },
+                    "provided": null
+                  },
+                  "form_data": {
+                    "kind": "Object",
+                    "identity": "o3",
+                    "typ": "fastapi.security.OAuth2PasswordRequestForm",
+                    "fields": {
+                      "grant_type": null,
+                      "username": "reader@example.com",
+                      "password": "fixture-password-39",
+                      "scopes": [],
+                      "client_id": null,
+                      "client_secret": null
+                    },
+                    "provided": null
+                  }
+                },
+                "status": 200,
+                "body": {
+                  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDg5MDAsInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.paqDIRQjJN7powOKHmm10IzuOsoiTvACa3y68ay4SBk",
+                  "token_type": "bearer"
+                }
+              },
+              {
+                "kind": "http",
+                "method": "POST",
+                "path": "/api/v1/login/test-token",
+                "handler": "method:backend:app/api/routes/login.py#test_token:46",
+                "bound": {
+                  "current_user": {
+                    "kind": "Object",
+                    "identity": "o13",
+                    "typ": "app.models.User",
+                    "fields": {
+                      "email": "reader@example.com",
+                      "is_active": true,
+                      "is_superuser": false,
+                      "full_name": "Reader",
+                      "id": "10000000-0000-4000-8000-000000000001",
+                      "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FFlG0wReNGaj6MIY93SN5A$Xs2CqTMQgkBjrhJLMDQbG2ynjXLzzOl7vdQNDmuZQ0M",
+                      "created_at": null,
+                      "items": []
+                    },
+                    "provided": null
+                  }
+                },
+                "status": 200,
+                "body": {
+                  "email": "reader@example.com",
+                  "is_active": true,
+                  "is_superuser": false,
+                  "full_name": "Reader",
+                  "id": "10000000-0000-4000-8000-000000000001",
+                  "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FFlG0wReNGaj6MIY93SN5A$Xs2CqTMQgkBjrhJLMDQbG2ynjXLzzOl7vdQNDmuZQ0M",
+                  "created_at": null,
+                  "items": []
+                }
+              },
+              {
+                "kind": "http",
+                "method": "POST",
+                "path": "/api/v1/items/",
+                "handler": "method:backend:app/api/routes/items.py#create_item:62",
+                "bound": {
+                  "session": {
+                    "kind": "Object",
+                    "identity": "o14",
+                    "typ": "sqlmodel.Session",
+                    "fields": {
+                      "bind": {
+                        "kind": "Object",
+                        "identity": "o1",
+                        "typ": "sqlalchemy.Engine",
+                        "fields": {
+                          "url": "postgresql://fixture:fixture@database/portable",
+                          "pool_pre_ping": true
+                        },
+                        "provided": null
+                      },
+                      "binding_status": "bound"
+                    },
+                    "provided": null
+                  },
+                  "current_user": {
+                    "kind": "Object",
+                    "identity": "o16",
+                    "typ": "app.models.User",
+                    "fields": {
+                      "email": "reader@example.com",
+                      "is_active": true,
+                      "is_superuser": false,
+                      "full_name": "Reader",
+                      "id": "10000000-0000-4000-8000-000000000001",
+                      "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FFlG0wReNGaj6MIY93SN5A$Xs2CqTMQgkBjrhJLMDQbG2ynjXLzzOl7vdQNDmuZQ0M",
+                      "created_at": null,
+                      "items": []
+                    },
+                    "provided": null
+                  },
+                  "item_in": {
+                    "kind": "Object",
+                    "identity": "o17",
+                    "typ": "app.models.ItemCreate",
+                    "fields": {
+                      "title": "Before",
+                      "description": "keep"
+                    },
+                    "provided": [
+                      "description",
+                      "title"
+                    ]
+                  }
+                },
+                "status": 200,
+                "body": {
+                  "title": "Before",
+                  "description": "keep",
+                  "id": {
+                    "kind": "Symbol",
+                    "identity": "fresh:19",
+                    "typ": "UUID",
+                    "nonnull": true,
+                    "sort": ""
+                  },
+                  "created_at": "2026-01-02T10:00:00Z",
+                  "owner_id": "10000000-0000-4000-8000-000000000001",
+                  "owner": null
+                }
+              },
+              {
+                "kind": "http",
+                "method": "PUT",
+                "path": "/api/v1/items/{id}",
+                "handler": "method:backend:app/api/routes/items.py#update_item:76",
+                "bound": {
+                  "session": {
+                    "kind": "Object",
+                    "identity": "o21",
+                    "typ": "sqlmodel.Session",
+                    "fields": {
+                      "bind": {
+                        "kind": "Object",
+                        "identity": "o1",
+                        "typ": "sqlalchemy.Engine",
+                        "fields": {
+                          "url": "postgresql://fixture:fixture@database/portable",
+                          "pool_pre_ping": true
+                        },
+                        "provided": null
+                      },
+                      "binding_status": "bound"
+                    },
+                    "provided": null
+                  },
+                  "current_user": {
+                    "kind": "Object",
+                    "identity": "o23",
+                    "typ": "app.models.User",
+                    "fields": {
+                      "email": "reader@example.com",
+                      "is_active": true,
+                      "is_superuser": false,
+                      "full_name": "Reader",
+                      "id": "10000000-0000-4000-8000-000000000001",
+                      "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FFlG0wReNGaj6MIY93SN5A$Xs2CqTMQgkBjrhJLMDQbG2ynjXLzzOl7vdQNDmuZQ0M",
+                      "created_at": null,
+                      "items": []
+                    },
+                    "provided": null
+                  },
+                  "id": {
+                    "kind": "Symbol",
+                    "identity": "fresh:19",
+                    "typ": "UUID",
+                    "nonnull": true,
+                    "sort": ""
+                  },
+                  "item_in": {
+                    "kind": "Object",
+                    "identity": "o24",
+                    "typ": "app.models.ItemUpdate",
+                    "fields": {
+                      "title": "Changed",
+                      "description": null
+                    },
+                    "provided": [
+                      "title"
+                    ]
+                  }
+                },
+                "status": 200,
+                "body": {
+                  "title": "Changed",
+                  "description": "keep",
+                  "id": {
+                    "kind": "Symbol",
+                    "identity": "fresh:19",
+                    "typ": "UUID",
+                    "nonnull": true,
+                    "sort": ""
+                  },
+                  "created_at": "2026-01-02T10:00:00Z",
+                  "owner_id": "10000000-0000-4000-8000-000000000001",
+                  "owner": null
+                }
+              },
+              {
+                "kind": "http",
+                "method": "GET",
+                "path": "/api/v1/items/{id}",
+                "handler": "method:backend:app/api/routes/items.py#read_item:49",
+                "bound": {
+                  "session": {
+                    "kind": "Object",
+                    "identity": "o27",
+                    "typ": "sqlmodel.Session",
+                    "fields": {
+                      "bind": {
+                        "kind": "Object",
+                        "identity": "o1",
+                        "typ": "sqlalchemy.Engine",
+                        "fields": {
+                          "url": "postgresql://fixture:fixture@database/portable",
+                          "pool_pre_ping": true
+                        },
+                        "provided": null
+                      },
+                      "binding_status": "bound"
+                    },
+                    "provided": null
+                  },
+                  "current_user": {
+                    "kind": "Object",
+                    "identity": "o29",
+                    "typ": "app.models.User",
+                    "fields": {
+                      "email": "reader@example.com",
+                      "is_active": true,
+                      "is_superuser": false,
+                      "full_name": "Reader",
+                      "id": "10000000-0000-4000-8000-000000000001",
+                      "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FFlG0wReNGaj6MIY93SN5A$Xs2CqTMQgkBjrhJLMDQbG2ynjXLzzOl7vdQNDmuZQ0M",
+                      "created_at": null,
+                      "items": []
+                    },
+                    "provided": null
+                  },
+                  "id": {
+                    "kind": "Symbol",
+                    "identity": "fresh:19",
+                    "typ": "UUID",
+                    "nonnull": true,
+                    "sort": ""
+                  }
+                },
+                "status": 200,
+                "body": {
+                  "title": "Changed",
+                  "description": "keep",
+                  "id": {
+                    "kind": "Symbol",
+                    "identity": "fresh:19",
+                    "typ": "UUID",
+                    "nonnull": true,
+                    "sort": ""
+                  },
+                  "created_at": "2026-01-02T10:00:00Z",
+                  "owner_id": "10000000-0000-4000-8000-000000000001",
+                  "owner": null
+                }
+              },
+              {
+                "kind": "http",
+                "method": "DELETE",
+                "path": "/api/v1/items/{id}",
+                "handler": "method:backend:app/api/routes/items.py#delete_item:100",
+                "bound": {
+                  "session": {
+                    "kind": "Object",
+                    "identity": "o31",
+                    "typ": "sqlmodel.Session",
+                    "fields": {
+                      "bind": {
+                        "kind": "Object",
+                        "identity": "o1",
+                        "typ": "sqlalchemy.Engine",
+                        "fields": {
+                          "url": "postgresql://fixture:fixture@database/portable",
+                          "pool_pre_ping": true
+                        },
+                        "provided": null
+                      },
+                      "binding_status": "bound"
+                    },
+                    "provided": null
+                  },
+                  "current_user": {
+                    "kind": "Object",
+                    "identity": "o33",
+                    "typ": "app.models.User",
+                    "fields": {
+                      "email": "reader@example.com",
+                      "is_active": true,
+                      "is_superuser": false,
+                      "full_name": "Reader",
+                      "id": "10000000-0000-4000-8000-000000000001",
+                      "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FFlG0wReNGaj6MIY93SN5A$Xs2CqTMQgkBjrhJLMDQbG2ynjXLzzOl7vdQNDmuZQ0M",
+                      "created_at": null,
+                      "items": []
+                    },
+                    "provided": null
+                  },
+                  "id": {
+                    "kind": "Symbol",
+                    "identity": "fresh:19",
+                    "typ": "UUID",
+                    "nonnull": true,
+                    "sort": ""
+                  }
+                },
+                "status": 200,
+                "body": {
+                  "message": "Item deleted successfully"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "coverage": "complete",
+            "partial": false,
+            "state": {
+              "resource:item": [],
+              "resource:user": [
+                {
+                  "id": "10000000-0000-4000-8000-000000000001",
+                  "email": "reader@example.com",
+                  "is_active": true,
+                  "is_superuser": false,
+                  "full_name": "Reader",
+                  "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FFlG0wReNGaj6MIY93SN5A$Xs2CqTMQgkBjrhJLMDQbG2ynjXLzzOl7vdQNDmuZQ0M",
+                  "created_at": null,
+                  "items": []
+                }
+              ]
+            },
+            "operations": 450
+          }
+        ],
+        "path_attempts": 1,
+        "pending_paths": 0,
+        "path_attempt_limit": 257,
+        "path_budget_exhausted": false,
+        "fully_explored_in_model": true,
+        "must": [
+          {
+            "source": "method:backend:app/api/deps.py#get_current_user:30",
+            "relation": "data",
+            "target": "resource:user"
+          },
+          {
+            "source": "method:backend:app/api/routes/items.py#create_item:62",
+            "relation": "calls",
+            "target": "method:backend:app/models.py#get_datetime_utc:8"
+          },
+          {
+            "source": "method:backend:app/api/routes/items.py#create_item:62",
+            "relation": "data",
+            "target": "resource:item"
+          },
+          {
+            "source": "method:backend:app/api/routes/items.py#delete_item:100",
+            "relation": "data",
+            "target": "resource:item"
+          },
+          {
+            "source": "method:backend:app/api/routes/items.py#read_item:49",
+            "relation": "data",
+            "target": "resource:item"
+          },
+          {
+            "source": "method:backend:app/api/routes/items.py#update_item:76",
+            "relation": "data",
+            "target": "resource:item"
+          },
+          {
+            "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+            "relation": "calls",
+            "target": "method:backend:app/core/security.py#create_access_token:22"
+          },
+          {
+            "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          },
+          {
+            "source": "method:backend:app/crud.py#get_user_by_email:34",
+            "relation": "data",
+            "target": "resource:user"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_current_user:30"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_db:21"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/items.py#create_item:62"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/items.py#delete_item:100"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/items.py#read_item:49"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/items.py#update_item:76"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/login.py#test_token:46"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/core/security.py#create_access_token:22"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/models.py#get_datetime_utc:8"
+          }
+        ],
+        "may": [
+          {
+            "source": "method:backend:app/api/deps.py#get_current_user:30",
+            "relation": "data",
+            "target": "resource:user"
+          },
+          {
+            "source": "method:backend:app/api/routes/items.py#create_item:62",
+            "relation": "calls",
+            "target": "method:backend:app/models.py#get_datetime_utc:8"
+          },
+          {
+            "source": "method:backend:app/api/routes/items.py#create_item:62",
+            "relation": "data",
+            "target": "resource:item"
+          },
+          {
+            "source": "method:backend:app/api/routes/items.py#delete_item:100",
+            "relation": "data",
+            "target": "resource:item"
+          },
+          {
+            "source": "method:backend:app/api/routes/items.py#read_item:49",
+            "relation": "data",
+            "target": "resource:item"
+          },
+          {
+            "source": "method:backend:app/api/routes/items.py#update_item:76",
+            "relation": "data",
+            "target": "resource:item"
+          },
+          {
+            "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+            "relation": "calls",
+            "target": "method:backend:app/core/security.py#create_access_token:22"
+          },
+          {
+            "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          },
+          {
+            "source": "method:backend:app/crud.py#get_user_by_email:34",
+            "relation": "data",
+            "target": "resource:user"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_current_user:30"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_db:21"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/items.py#create_item:62"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/items.py#delete_item:100"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/items.py#read_item:49"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/items.py#update_item:76"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/login.py#test_token:46"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/core/security.py#create_access_token:22"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          },
+          {
+            "source": "scenario:login-create-update-read-delete-missing",
+            "relation": "executes",
+            "target": "method:backend:app/models.py#get_datetime_utc:8"
+          }
+        ],
+        "solver": {
+          "enabled": true,
+          "timeout_ms": 50,
+          "checks": 0,
+          "pruned_outcomes": 0,
+          "unknown": 0,
+          "seconds": 0.0,
+          "failures": []
+        },
+        "evidence": {
+          "scenario:login-create-update-read-delete-missing | executes | method:backend:app/api/deps.py#get_db:21": [
+            {
+              "file": "app/api/deps.py",
+              "line": 21,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:login-create-update-read-delete-missing | executes | method:backend:app/api/routes/login.py#login_access_token:24": [
+            {
+              "file": "app/api/routes/login.py",
+              "line": 24,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/routes/login.py#login_access_token:24 | calls | method:backend:app/crud.py#authenticate:45": [
+            {
+              "file": "app/api/routes/login.py",
+              "line": 30,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:login-create-update-read-delete-missing | executes | method:backend:app/crud.py#authenticate:45": [
+            {
+              "file": "app/crud.py",
+              "line": 45,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/crud.py#authenticate:45 | calls | method:backend:app/crud.py#get_user_by_email:34": [
+            {
+              "file": "app/crud.py",
+              "line": 46,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:login-create-update-read-delete-missing | executes | method:backend:app/crud.py#get_user_by_email:34": [
+            {
+              "file": "app/crud.py",
+              "line": 34,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/crud.py#get_user_by_email:34 | data | resource:user": [
+            {
+              "file": "app/crud.py",
+              "line": 36,
+              "reason": "source select on declared entity/table"
+            }
+          ],
+          "method:backend:app/crud.py#authenticate:45 | calls | method:backend:app/core/security.py#verify_password:29": [
+            {
+              "file": "app/crud.py",
+              "line": 52,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:login-create-update-read-delete-missing | executes | method:backend:app/core/security.py#verify_password:29": [
+            {
+              "file": "app/core/security.py",
+              "line": 29,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/routes/login.py#login_access_token:24 | calls | method:backend:app/core/security.py#create_access_token:22": [
+            {
+              "file": "app/api/routes/login.py",
+              "line": 39,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:login-create-update-read-delete-missing | executes | method:backend:app/core/security.py#create_access_token:22": [
+            {
+              "file": "app/core/security.py",
+              "line": 22,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:login-create-update-read-delete-missing | executes | method:backend:app/api/deps.py#get_current_user:30": [
+            {
+              "file": "app/api/deps.py",
+              "line": 30,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/deps.py#get_current_user:30 | data | resource:user": [
+            {
+              "file": "app/api/deps.py",
+              "line": 41,
+              "reason": "source select on declared entity/table"
+            }
+          ],
+          "scenario:login-create-update-read-delete-missing | executes | method:backend:app/api/routes/login.py#test_token:46": [
+            {
+              "file": "app/api/routes/login.py",
+              "line": 46,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:login-create-update-read-delete-missing | executes | method:backend:app/api/routes/items.py#create_item:62": [
+            {
+              "file": "app/api/routes/items.py",
+              "line": 62,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/routes/items.py#create_item:62 | calls | method:backend:app/models.py#get_datetime_utc:8": [
+            {
+              "file": "app/models.py",
+              "line": 89,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:login-create-update-read-delete-missing | executes | method:backend:app/models.py#get_datetime_utc:8": [
+            {
+              "file": "app/models.py",
+              "line": 8,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/routes/items.py#create_item:62 | data | resource:item": [
+            {
+              "file": "app/api/routes/items.py",
+              "line": 69,
+              "reason": "source save on declared entity/table"
+            },
+            {
+              "file": "app/api/routes/items.py",
+              "line": 71,
+              "reason": "source select on declared entity/table"
+            }
+          ],
+          "scenario:login-create-update-read-delete-missing | executes | method:backend:app/api/routes/items.py#update_item:76": [
+            {
+              "file": "app/api/routes/items.py",
+              "line": 76,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/routes/items.py#update_item:76 | data | resource:item": [
+            {
+              "file": "app/api/routes/items.py",
+              "line": 86,
+              "reason": "source select on declared entity/table"
+            },
+            {
+              "file": "app/api/routes/items.py",
+              "line": 93,
+              "reason": "source save on declared entity/table"
+            },
+            {
+              "file": "app/api/routes/items.py",
+              "line": 95,
+              "reason": "source select on declared entity/table"
+            }
+          ],
+          "scenario:login-create-update-read-delete-missing | executes | method:backend:app/api/routes/items.py#read_item:49": [
+            {
+              "file": "app/api/routes/items.py",
+              "line": 49,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/routes/items.py#read_item:49 | data | resource:item": [
+            {
+              "file": "app/api/routes/items.py",
+              "line": 53,
+              "reason": "source select on declared entity/table"
+            }
+          ],
+          "scenario:login-create-update-read-delete-missing | executes | method:backend:app/api/routes/items.py#delete_item:100": [
+            {
+              "file": "app/api/routes/items.py",
+              "line": 100,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/routes/items.py#delete_item:100 | data | resource:item": [
+            {
+              "file": "app/api/routes/items.py",
+              "line": 106,
+              "reason": "source select on declared entity/table"
+            },
+            {
+              "file": "app/api/routes/items.py",
+              "line": 111,
+              "reason": "source delete on declared entity/table"
+            }
+          ]
+        },
+        "scope": "Observed/model-supported effects; opaque tails may contain additional unknown effects"
+      }
+    },
+    {
+      "id": "wrong-password",
+      "passed": true,
+      "checks": {
+        "edges": true,
+        "one_path": true,
+        "statuses": true,
+        "detail": true
+      },
+      "relations": {
+        "executes": {
+          "expected": 5,
+          "predicted": 5,
+          "intersection": 5,
+          "iou": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [],
+          "empty_both": false
+        },
+        "calls": {
+          "expected": 3,
+          "predicted": 3,
+          "intersection": 3,
+          "iou": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [],
+          "empty_both": false
+        },
+        "remote": {
+          "expected": 0,
+          "predicted": 0,
+          "intersection": 0,
+          "iou": 1.0,
+          "precision": null,
+          "recall": null,
+          "missing": [],
+          "extra": [],
+          "empty_both": true
+        },
+        "data": {
+          "expected": 1,
+          "predicted": 1,
+          "intersection": 1,
+          "iou": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [],
+          "empty_both": false
+        }
+      },
+      "analysis_seconds": 0.03892212500795722,
+      "detail": {
+        "status": "complete-in-model",
+        "projection": "may",
+        "paths": [
+          {
+            "decisions": [],
+            "edges": [
+              {
+                "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+                "relation": "calls",
+                "target": "method:backend:app/crud.py#authenticate:45"
+              },
+              {
+                "source": "method:backend:app/crud.py#authenticate:45",
+                "relation": "calls",
+                "target": "method:backend:app/core/security.py#verify_password:29"
+              },
+              {
+                "source": "method:backend:app/crud.py#authenticate:45",
+                "relation": "calls",
+                "target": "method:backend:app/crud.py#get_user_by_email:34"
+              },
+              {
+                "source": "method:backend:app/crud.py#get_user_by_email:34",
+                "relation": "data",
+                "target": "resource:user"
+              },
+              {
+                "source": "scenario:wrong-password",
+                "relation": "executes",
+                "target": "method:backend:app/api/deps.py#get_db:21"
+              },
+              {
+                "source": "scenario:wrong-password",
+                "relation": "executes",
+                "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+              },
+              {
+                "source": "scenario:wrong-password",
+                "relation": "executes",
+                "target": "method:backend:app/core/security.py#verify_password:29"
+              },
+              {
+                "source": "scenario:wrong-password",
+                "relation": "executes",
+                "target": "method:backend:app/crud.py#authenticate:45"
+              },
+              {
+                "source": "scenario:wrong-password",
+                "relation": "executes",
+                "target": "method:backend:app/crud.py#get_user_by_email:34"
+              }
+            ],
+            "steps": [
+              {
+                "step": 1,
+                "grounding": {
+                  "kind": "explicit-request",
+                  "input": {
+                    "method": "POST",
+                    "path": "/api/v1/login/access-token",
+                    "form": {
+                      "username": "reader@example.com",
+                      "password": "incorrect"
+                    }
+                  }
+                },
+                "request": {
+                  "method": "POST",
+                  "path": "/api/v1/login/access-token",
+                  "form": {
+                    "username": "reader@example.com",
+                    "password": "incorrect"
+                  }
+                },
+                "response": {
+                  "kind": "Response",
+                  "body": {
+                    "detail": "Incorrect email or password"
+                  },
+                  "status": 400,
+                  "headers": {},
+                  "headers_readonly": null
+                }
+              }
+            ],
+            "events": [],
+            "diagnostics": [],
+            "coverage": "complete",
+            "partial": false,
+            "state": {
+              "resource:item": [],
+              "resource:user": [
+                {
+                  "id": "10000000-0000-4000-8000-000000000001",
+                  "email": "reader@example.com",
+                  "is_active": true,
+                  "is_superuser": false,
+                  "full_name": "Reader",
+                  "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FFlG0wReNGaj6MIY93SN5A$Xs2CqTMQgkBjrhJLMDQbG2ynjXLzzOl7vdQNDmuZQ0M",
+                  "created_at": null,
+                  "items": []
+                }
+              ]
+            },
+            "operations": 68
+          }
+        ],
+        "path_attempts": 1,
+        "pending_paths": 0,
+        "path_attempt_limit": 257,
+        "path_budget_exhausted": false,
+        "fully_explored_in_model": true,
+        "must": [
+          {
+            "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          },
+          {
+            "source": "method:backend:app/crud.py#get_user_by_email:34",
+            "relation": "data",
+            "target": "resource:user"
+          },
+          {
+            "source": "scenario:wrong-password",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_db:21"
+          },
+          {
+            "source": "scenario:wrong-password",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+          },
+          {
+            "source": "scenario:wrong-password",
+            "relation": "executes",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "scenario:wrong-password",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "scenario:wrong-password",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          }
+        ],
+        "may": [
+          {
+            "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          },
+          {
+            "source": "method:backend:app/crud.py#get_user_by_email:34",
+            "relation": "data",
+            "target": "resource:user"
+          },
+          {
+            "source": "scenario:wrong-password",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_db:21"
+          },
+          {
+            "source": "scenario:wrong-password",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+          },
+          {
+            "source": "scenario:wrong-password",
+            "relation": "executes",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "scenario:wrong-password",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "scenario:wrong-password",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          }
+        ],
+        "solver": {
+          "enabled": true,
+          "timeout_ms": 50,
+          "checks": 0,
+          "pruned_outcomes": 0,
+          "unknown": 0,
+          "seconds": 0.0,
+          "failures": []
+        },
+        "evidence": {
+          "scenario:wrong-password | executes | method:backend:app/api/deps.py#get_db:21": [
+            {
+              "file": "app/api/deps.py",
+              "line": 21,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:wrong-password | executes | method:backend:app/api/routes/login.py#login_access_token:24": [
+            {
+              "file": "app/api/routes/login.py",
+              "line": 24,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/routes/login.py#login_access_token:24 | calls | method:backend:app/crud.py#authenticate:45": [
+            {
+              "file": "app/api/routes/login.py",
+              "line": 30,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:wrong-password | executes | method:backend:app/crud.py#authenticate:45": [
+            {
+              "file": "app/crud.py",
+              "line": 45,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/crud.py#authenticate:45 | calls | method:backend:app/crud.py#get_user_by_email:34": [
+            {
+              "file": "app/crud.py",
+              "line": 46,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:wrong-password | executes | method:backend:app/crud.py#get_user_by_email:34": [
+            {
+              "file": "app/crud.py",
+              "line": 34,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/crud.py#get_user_by_email:34 | data | resource:user": [
+            {
+              "file": "app/crud.py",
+              "line": 36,
+              "reason": "source select on declared entity/table"
+            }
+          ],
+          "method:backend:app/crud.py#authenticate:45 | calls | method:backend:app/core/security.py#verify_password:29": [
+            {
+              "file": "app/crud.py",
+              "line": 52,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:wrong-password | executes | method:backend:app/core/security.py#verify_password:29": [
+            {
+              "file": "app/core/security.py",
+              "line": 29,
+              "reason": "source semantics"
+            }
+          ]
+        },
+        "scope": "Observed/model-supported effects; opaque tails may contain additional unknown effects"
+      }
+    },
+    {
+      "id": "inactive-account",
+      "passed": true,
+      "checks": {
+        "edges": true,
+        "one_path": true,
+        "statuses": true,
+        "detail": true
+      },
+      "relations": {
+        "executes": {
+          "expected": 5,
+          "predicted": 5,
+          "intersection": 5,
+          "iou": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [],
+          "empty_both": false
+        },
+        "calls": {
+          "expected": 3,
+          "predicted": 3,
+          "intersection": 3,
+          "iou": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [],
+          "empty_both": false
+        },
+        "remote": {
+          "expected": 0,
+          "predicted": 0,
+          "intersection": 0,
+          "iou": 1.0,
+          "precision": null,
+          "recall": null,
+          "missing": [],
+          "extra": [],
+          "empty_both": true
+        },
+        "data": {
+          "expected": 1,
+          "predicted": 1,
+          "intersection": 1,
+          "iou": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [],
+          "empty_both": false
+        }
+      },
+      "analysis_seconds": 0.03889266699843574,
+      "detail": {
+        "status": "complete-in-model",
+        "projection": "may",
+        "paths": [
+          {
+            "decisions": [],
+            "edges": [
+              {
+                "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+                "relation": "calls",
+                "target": "method:backend:app/crud.py#authenticate:45"
+              },
+              {
+                "source": "method:backend:app/crud.py#authenticate:45",
+                "relation": "calls",
+                "target": "method:backend:app/core/security.py#verify_password:29"
+              },
+              {
+                "source": "method:backend:app/crud.py#authenticate:45",
+                "relation": "calls",
+                "target": "method:backend:app/crud.py#get_user_by_email:34"
+              },
+              {
+                "source": "method:backend:app/crud.py#get_user_by_email:34",
+                "relation": "data",
+                "target": "resource:user"
+              },
+              {
+                "source": "scenario:inactive-account",
+                "relation": "executes",
+                "target": "method:backend:app/api/deps.py#get_db:21"
+              },
+              {
+                "source": "scenario:inactive-account",
+                "relation": "executes",
+                "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+              },
+              {
+                "source": "scenario:inactive-account",
+                "relation": "executes",
+                "target": "method:backend:app/core/security.py#verify_password:29"
+              },
+              {
+                "source": "scenario:inactive-account",
+                "relation": "executes",
+                "target": "method:backend:app/crud.py#authenticate:45"
+              },
+              {
+                "source": "scenario:inactive-account",
+                "relation": "executes",
+                "target": "method:backend:app/crud.py#get_user_by_email:34"
+              }
+            ],
+            "steps": [
+              {
+                "step": 1,
+                "grounding": {
+                  "kind": "explicit-request",
+                  "input": {
+                    "method": "POST",
+                    "path": "/api/v1/login/access-token",
+                    "form": {
+                      "username": "reader@example.com",
+                      "password": "fixture-password-39"
+                    }
+                  }
+                },
+                "request": {
+                  "method": "POST",
+                  "path": "/api/v1/login/access-token",
+                  "form": {
+                    "username": "reader@example.com",
+                    "password": "fixture-password-39"
+                  }
+                },
+                "response": {
+                  "kind": "Response",
+                  "body": {
+                    "detail": "Inactive user"
+                  },
+                  "status": 400,
+                  "headers": {},
+                  "headers_readonly": null
+                }
+              }
+            ],
+            "events": [],
+            "diagnostics": [],
+            "coverage": "complete",
+            "partial": false,
+            "state": {
+              "resource:item": [],
+              "resource:user": [
+                {
+                  "id": "10000000-0000-4000-8000-000000000001",
+                  "email": "reader@example.com",
+                  "is_active": false,
+                  "is_superuser": false,
+                  "full_name": "Reader",
+                  "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FFlG0wReNGaj6MIY93SN5A$Xs2CqTMQgkBjrhJLMDQbG2ynjXLzzOl7vdQNDmuZQ0M",
+                  "created_at": null,
+                  "items": []
+                }
+              ]
+            },
+            "operations": 74
+          }
+        ],
+        "path_attempts": 1,
+        "pending_paths": 0,
+        "path_attempt_limit": 257,
+        "path_budget_exhausted": false,
+        "fully_explored_in_model": true,
+        "must": [
+          {
+            "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          },
+          {
+            "source": "method:backend:app/crud.py#get_user_by_email:34",
+            "relation": "data",
+            "target": "resource:user"
+          },
+          {
+            "source": "scenario:inactive-account",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_db:21"
+          },
+          {
+            "source": "scenario:inactive-account",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+          },
+          {
+            "source": "scenario:inactive-account",
+            "relation": "executes",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "scenario:inactive-account",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "scenario:inactive-account",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          }
+        ],
+        "may": [
+          {
+            "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          },
+          {
+            "source": "method:backend:app/crud.py#get_user_by_email:34",
+            "relation": "data",
+            "target": "resource:user"
+          },
+          {
+            "source": "scenario:inactive-account",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_db:21"
+          },
+          {
+            "source": "scenario:inactive-account",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+          },
+          {
+            "source": "scenario:inactive-account",
+            "relation": "executes",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "scenario:inactive-account",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "scenario:inactive-account",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          }
+        ],
+        "solver": {
+          "enabled": true,
+          "timeout_ms": 50,
+          "checks": 0,
+          "pruned_outcomes": 0,
+          "unknown": 0,
+          "seconds": 0.0,
+          "failures": []
+        },
+        "evidence": {
+          "scenario:inactive-account | executes | method:backend:app/api/deps.py#get_db:21": [
+            {
+              "file": "app/api/deps.py",
+              "line": 21,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:inactive-account | executes | method:backend:app/api/routes/login.py#login_access_token:24": [
+            {
+              "file": "app/api/routes/login.py",
+              "line": 24,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/routes/login.py#login_access_token:24 | calls | method:backend:app/crud.py#authenticate:45": [
+            {
+              "file": "app/api/routes/login.py",
+              "line": 30,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:inactive-account | executes | method:backend:app/crud.py#authenticate:45": [
+            {
+              "file": "app/crud.py",
+              "line": 45,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/crud.py#authenticate:45 | calls | method:backend:app/crud.py#get_user_by_email:34": [
+            {
+              "file": "app/crud.py",
+              "line": 46,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:inactive-account | executes | method:backend:app/crud.py#get_user_by_email:34": [
+            {
+              "file": "app/crud.py",
+              "line": 34,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/crud.py#get_user_by_email:34 | data | resource:user": [
+            {
+              "file": "app/crud.py",
+              "line": 36,
+              "reason": "source select on declared entity/table"
+            }
+          ],
+          "method:backend:app/crud.py#authenticate:45 | calls | method:backend:app/core/security.py#verify_password:29": [
+            {
+              "file": "app/crud.py",
+              "line": 52,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:inactive-account | executes | method:backend:app/core/security.py#verify_password:29": [
+            {
+              "file": "app/core/security.py",
+              "line": 29,
+              "reason": "source semantics"
+            }
+          ]
+        },
+        "scope": "Observed/model-supported effects; opaque tails may contain additional unknown effects"
+      }
+    },
+    {
+      "id": "missing-bearer",
+      "passed": true,
+      "checks": {
+        "edges": true,
+        "one_path": true,
+        "statuses": true
+      },
+      "relations": {
+        "executes": {
+          "expected": 1,
+          "predicted": 1,
+          "intersection": 1,
+          "iou": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [],
+          "empty_both": false
+        },
+        "calls": {
+          "expected": 0,
+          "predicted": 0,
+          "intersection": 0,
+          "iou": 1.0,
+          "precision": null,
+          "recall": null,
+          "missing": [],
+          "extra": [],
+          "empty_both": true
+        },
+        "remote": {
+          "expected": 0,
+          "predicted": 0,
+          "intersection": 0,
+          "iou": 1.0,
+          "precision": null,
+          "recall": null,
+          "missing": [],
+          "extra": [],
+          "empty_both": true
+        },
+        "data": {
+          "expected": 0,
+          "predicted": 0,
+          "intersection": 0,
+          "iou": 1.0,
+          "precision": null,
+          "recall": null,
+          "missing": [],
+          "extra": [],
+          "empty_both": true
+        }
+      },
+      "analysis_seconds": 0.00046304200077429414,
+      "detail": {
+        "status": "complete-in-model",
+        "projection": "may",
+        "paths": [
+          {
+            "decisions": [],
+            "edges": [
+              {
+                "source": "scenario:missing-bearer",
+                "relation": "executes",
+                "target": "method:backend:app/api/deps.py#get_db:21"
+              }
+            ],
+            "steps": [
+              {
+                "step": 1,
+                "grounding": {
+                  "kind": "explicit-request",
+                  "input": {
+                    "method": "GET",
+                    "path": "/api/v1/items/30000000-0000-4000-8000-000000000001"
+                  }
+                },
+                "request": {
+                  "method": "GET",
+                  "path": "/api/v1/items/30000000-0000-4000-8000-000000000001"
+                },
+                "response": {
+                  "kind": "Response",
+                  "body": {
+                    "detail": "Not authenticated"
+                  },
+                  "status": 401,
+                  "headers": {
+                    "WWW-Authenticate": "Bearer"
+                  },
+                  "headers_readonly": null
+                }
+              }
+            ],
+            "events": [],
+            "diagnostics": [],
+            "coverage": "complete",
+            "partial": false,
+            "state": {
+              "resource:item": [],
+              "resource:user": [
+                {
+                  "id": "10000000-0000-4000-8000-000000000001",
+                  "email": "reader@example.com",
+                  "is_active": true,
+                  "is_superuser": false,
+                  "full_name": "Reader",
+                  "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FFlG0wReNGaj6MIY93SN5A$Xs2CqTMQgkBjrhJLMDQbG2ynjXLzzOl7vdQNDmuZQ0M",
+                  "created_at": null,
+                  "items": []
+                }
+              ]
+            },
+            "operations": 15
+          }
+        ],
+        "path_attempts": 1,
+        "pending_paths": 0,
+        "path_attempt_limit": 257,
+        "path_budget_exhausted": false,
+        "fully_explored_in_model": true,
+        "must": [
+          {
+            "source": "scenario:missing-bearer",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_db:21"
+          }
+        ],
+        "may": [
+          {
+            "source": "scenario:missing-bearer",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_db:21"
+          }
+        ],
+        "solver": {
+          "enabled": true,
+          "timeout_ms": 50,
+          "checks": 0,
+          "pruned_outcomes": 0,
+          "unknown": 0,
+          "seconds": 0.0,
+          "failures": []
+        },
+        "evidence": {
+          "scenario:missing-bearer | executes | method:backend:app/api/deps.py#get_db:21": [
+            {
+              "file": "app/api/deps.py",
+              "line": 21,
+              "reason": "source semantics"
+            }
+          ]
+        },
+        "scope": "Observed/model-supported effects; opaque tails may contain additional unknown effects"
+      }
+    },
+    {
+      "id": "invalid-signature-token",
+      "passed": true,
+      "checks": {
+        "edges": true,
+        "one_path": true,
+        "statuses": true,
+        "detail": true
+      },
+      "relations": {
+        "executes": {
+          "expected": 2,
+          "predicted": 2,
+          "intersection": 2,
+          "iou": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [],
+          "empty_both": false
+        },
+        "calls": {
+          "expected": 0,
+          "predicted": 0,
+          "intersection": 0,
+          "iou": 1.0,
+          "precision": null,
+          "recall": null,
+          "missing": [],
+          "extra": [],
+          "empty_both": true
+        },
+        "remote": {
+          "expected": 0,
+          "predicted": 0,
+          "intersection": 0,
+          "iou": 1.0,
+          "precision": null,
+          "recall": null,
+          "missing": [],
+          "extra": [],
+          "empty_both": true
+        },
+        "data": {
+          "expected": 0,
+          "predicted": 0,
+          "intersection": 0,
+          "iou": 1.0,
+          "precision": null,
+          "recall": null,
+          "missing": [],
+          "extra": [],
+          "empty_both": true
+        }
+      },
+      "analysis_seconds": 0.0005039170064264908,
+      "detail": {
+        "status": "complete-in-model",
+        "projection": "may",
+        "paths": [
+          {
+            "decisions": [],
+            "edges": [
+              {
+                "source": "scenario:invalid-signature-token",
+                "relation": "executes",
+                "target": "method:backend:app/api/deps.py#get_current_user:30"
+              },
+              {
+                "source": "scenario:invalid-signature-token",
+                "relation": "executes",
+                "target": "method:backend:app/api/deps.py#get_db:21"
+              }
+            ],
+            "steps": [
+              {
+                "step": 1,
+                "grounding": {
+                  "kind": "explicit-request",
+                  "input": {
+                    "method": "GET",
+                    "path": "/api/v1/items/30000000-0000-4000-8000-000000000001",
+                    "headers": {
+                      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDg5MDAsInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.iQ13yhWTDP8Mo-9SzGOQ0xtv0FAE-u85HB3g7KBE4EE"
+                    }
+                  }
+                },
+                "request": {
+                  "method": "GET",
+                  "path": "/api/v1/items/30000000-0000-4000-8000-000000000001",
+                  "headers": {
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDg5MDAsInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.iQ13yhWTDP8Mo-9SzGOQ0xtv0FAE-u85HB3g7KBE4EE"
+                  }
+                },
+                "response": {
+                  "kind": "Response",
+                  "body": {
+                    "detail": "Could not validate credentials"
+                  },
+                  "status": 403,
+                  "headers": {},
+                  "headers_readonly": null
+                }
+              }
+            ],
+            "events": [],
+            "diagnostics": [],
+            "coverage": "complete",
+            "partial": false,
+            "state": {
+              "resource:item": [],
+              "resource:user": [
+                {
+                  "id": "10000000-0000-4000-8000-000000000001",
+                  "email": "reader@example.com",
+                  "is_active": true,
+                  "is_superuser": false,
+                  "full_name": "Reader",
+                  "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FFlG0wReNGaj6MIY93SN5A$Xs2CqTMQgkBjrhJLMDQbG2ynjXLzzOl7vdQNDmuZQ0M",
+                  "created_at": null,
+                  "items": []
+                }
+              ]
+            },
+            "operations": 31
+          }
+        ],
+        "path_attempts": 1,
+        "pending_paths": 0,
+        "path_attempt_limit": 257,
+        "path_budget_exhausted": false,
+        "fully_explored_in_model": true,
+        "must": [
+          {
+            "source": "scenario:invalid-signature-token",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_current_user:30"
+          },
+          {
+            "source": "scenario:invalid-signature-token",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_db:21"
+          }
+        ],
+        "may": [
+          {
+            "source": "scenario:invalid-signature-token",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_current_user:30"
+          },
+          {
+            "source": "scenario:invalid-signature-token",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_db:21"
+          }
+        ],
+        "solver": {
+          "enabled": true,
+          "timeout_ms": 50,
+          "checks": 0,
+          "pruned_outcomes": 0,
+          "unknown": 0,
+          "seconds": 0.0,
+          "failures": []
+        },
+        "evidence": {
+          "scenario:invalid-signature-token | executes | method:backend:app/api/deps.py#get_db:21": [
+            {
+              "file": "app/api/deps.py",
+              "line": 21,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:invalid-signature-token | executes | method:backend:app/api/deps.py#get_current_user:30": [
+            {
+              "file": "app/api/deps.py",
+              "line": 30,
+              "reason": "source semantics"
+            }
+          ]
+        },
+        "scope": "Observed/model-supported effects; opaque tails may contain additional unknown effects"
+      }
+    },
+    {
+      "id": "expired-token",
+      "passed": true,
+      "checks": {
+        "edges": true,
+        "one_path": true,
+        "statuses": true,
+        "detail": true
+      },
+      "relations": {
+        "executes": {
+          "expected": 2,
+          "predicted": 2,
+          "intersection": 2,
+          "iou": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [],
+          "empty_both": false
+        },
+        "calls": {
+          "expected": 0,
+          "predicted": 0,
+          "intersection": 0,
+          "iou": 1.0,
+          "precision": null,
+          "recall": null,
+          "missing": [],
+          "extra": [],
+          "empty_both": true
+        },
+        "remote": {
+          "expected": 0,
+          "predicted": 0,
+          "intersection": 0,
+          "iou": 1.0,
+          "precision": null,
+          "recall": null,
+          "missing": [],
+          "extra": [],
+          "empty_both": true
+        },
+        "data": {
+          "expected": 0,
+          "predicted": 0,
+          "intersection": 0,
+          "iou": 1.0,
+          "precision": null,
+          "recall": null,
+          "missing": [],
+          "extra": [],
+          "empty_both": true
+        }
+      },
+      "analysis_seconds": 0.0004134170012548566,
+      "detail": {
+        "status": "complete-in-model",
+        "projection": "may",
+        "paths": [
+          {
+            "decisions": [],
+            "edges": [
+              {
+                "source": "scenario:expired-token",
+                "relation": "executes",
+                "target": "method:backend:app/api/deps.py#get_current_user:30"
+              },
+              {
+                "source": "scenario:expired-token",
+                "relation": "executes",
+                "target": "method:backend:app/api/deps.py#get_db:21"
+              }
+            ],
+            "steps": [
+              {
+                "step": 1,
+                "grounding": {
+                  "kind": "explicit-request",
+                  "input": {
+                    "method": "GET",
+                    "path": "/api/v1/items/30000000-0000-4000-8000-000000000001",
+                    "headers": {
+                      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDc5OTksInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.xwb1ttiKFL-48BdDCwILiubhIzdyiDWdlHSwEAOhYsI"
+                    }
+                  }
+                },
+                "request": {
+                  "method": "GET",
+                  "path": "/api/v1/items/30000000-0000-4000-8000-000000000001",
+                  "headers": {
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDc5OTksInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.xwb1ttiKFL-48BdDCwILiubhIzdyiDWdlHSwEAOhYsI"
+                  }
+                },
+                "response": {
+                  "kind": "Response",
+                  "body": {
+                    "detail": "Could not validate credentials"
+                  },
+                  "status": 403,
+                  "headers": {},
+                  "headers_readonly": null
+                }
+              }
+            ],
+            "events": [],
+            "diagnostics": [],
+            "coverage": "complete",
+            "partial": false,
+            "state": {
+              "resource:item": [],
+              "resource:user": [
+                {
+                  "id": "10000000-0000-4000-8000-000000000001",
+                  "email": "reader@example.com",
+                  "is_active": true,
+                  "is_superuser": false,
+                  "full_name": "Reader",
+                  "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FFlG0wReNGaj6MIY93SN5A$Xs2CqTMQgkBjrhJLMDQbG2ynjXLzzOl7vdQNDmuZQ0M",
+                  "created_at": null,
+                  "items": []
+                }
+              ]
+            },
+            "operations": 31
+          }
+        ],
+        "path_attempts": 1,
+        "pending_paths": 0,
+        "path_attempt_limit": 257,
+        "path_budget_exhausted": false,
+        "fully_explored_in_model": true,
+        "must": [
+          {
+            "source": "scenario:expired-token",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_current_user:30"
+          },
+          {
+            "source": "scenario:expired-token",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_db:21"
+          }
+        ],
+        "may": [
+          {
+            "source": "scenario:expired-token",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_current_user:30"
+          },
+          {
+            "source": "scenario:expired-token",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_db:21"
+          }
+        ],
+        "solver": {
+          "enabled": true,
+          "timeout_ms": 50,
+          "checks": 0,
+          "pruned_outcomes": 0,
+          "unknown": 0,
+          "seconds": 0.0,
+          "failures": []
+        },
+        "evidence": {
+          "scenario:expired-token | executes | method:backend:app/api/deps.py#get_db:21": [
+            {
+              "file": "app/api/deps.py",
+              "line": 21,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:expired-token | executes | method:backend:app/api/deps.py#get_current_user:30": [
+            {
+              "file": "app/api/deps.py",
+              "line": 30,
+              "reason": "source semantics"
+            }
+          ]
+        },
+        "scope": "Observed/model-supported effects; opaque tails may contain additional unknown effects"
+      }
+    },
+    {
+      "id": "foreign-owner",
+      "passed": true,
+      "checks": {
+        "edges": true,
+        "one_path": true,
+        "statuses": true,
+        "detail": true
+      },
+      "relations": {
+        "executes": {
+          "expected": 8,
+          "predicted": 8,
+          "intersection": 8,
+          "iou": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [],
+          "empty_both": false
+        },
+        "calls": {
+          "expected": 4,
+          "predicted": 4,
+          "intersection": 4,
+          "iou": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [],
+          "empty_both": false
+        },
+        "remote": {
+          "expected": 0,
+          "predicted": 0,
+          "intersection": 0,
+          "iou": 1.0,
+          "precision": null,
+          "recall": null,
+          "missing": [],
+          "extra": [],
+          "empty_both": true
+        },
+        "data": {
+          "expected": 3,
+          "predicted": 3,
+          "intersection": 3,
+          "iou": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [],
+          "empty_both": false
+        }
+      },
+      "analysis_seconds": 0.03993829200044274,
+      "detail": {
+        "status": "complete-in-model",
+        "projection": "may",
+        "paths": [
+          {
+            "decisions": [],
+            "edges": [
+              {
+                "source": "method:backend:app/api/deps.py#get_current_user:30",
+                "relation": "data",
+                "target": "resource:user"
+              },
+              {
+                "source": "method:backend:app/api/routes/items.py#read_item:49",
+                "relation": "data",
+                "target": "resource:item"
+              },
+              {
+                "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+                "relation": "calls",
+                "target": "method:backend:app/core/security.py#create_access_token:22"
+              },
+              {
+                "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+                "relation": "calls",
+                "target": "method:backend:app/crud.py#authenticate:45"
+              },
+              {
+                "source": "method:backend:app/crud.py#authenticate:45",
+                "relation": "calls",
+                "target": "method:backend:app/core/security.py#verify_password:29"
+              },
+              {
+                "source": "method:backend:app/crud.py#authenticate:45",
+                "relation": "calls",
+                "target": "method:backend:app/crud.py#get_user_by_email:34"
+              },
+              {
+                "source": "method:backend:app/crud.py#get_user_by_email:34",
+                "relation": "data",
+                "target": "resource:user"
+              },
+              {
+                "source": "scenario:foreign-owner",
+                "relation": "executes",
+                "target": "method:backend:app/api/deps.py#get_current_user:30"
+              },
+              {
+                "source": "scenario:foreign-owner",
+                "relation": "executes",
+                "target": "method:backend:app/api/deps.py#get_db:21"
+              },
+              {
+                "source": "scenario:foreign-owner",
+                "relation": "executes",
+                "target": "method:backend:app/api/routes/items.py#read_item:49"
+              },
+              {
+                "source": "scenario:foreign-owner",
+                "relation": "executes",
+                "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+              },
+              {
+                "source": "scenario:foreign-owner",
+                "relation": "executes",
+                "target": "method:backend:app/core/security.py#create_access_token:22"
+              },
+              {
+                "source": "scenario:foreign-owner",
+                "relation": "executes",
+                "target": "method:backend:app/core/security.py#verify_password:29"
+              },
+              {
+                "source": "scenario:foreign-owner",
+                "relation": "executes",
+                "target": "method:backend:app/crud.py#authenticate:45"
+              },
+              {
+                "source": "scenario:foreign-owner",
+                "relation": "executes",
+                "target": "method:backend:app/crud.py#get_user_by_email:34"
+              }
+            ],
+            "steps": [
+              {
+                "step": 1,
+                "grounding": {
+                  "kind": "explicit-request",
+                  "input": {
+                    "method": "POST",
+                    "path": "/api/v1/login/access-token",
+                    "form": {
+                      "username": "reader@example.com",
+                      "password": "fixture-password-39"
+                    }
+                  }
+                },
+                "request": {
+                  "method": "POST",
+                  "path": "/api/v1/login/access-token",
+                  "form": {
+                    "username": "reader@example.com",
+                    "password": "fixture-password-39"
+                  }
+                },
+                "response": {
+                  "kind": "Response",
+                  "body": {
+                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDg5MDAsInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.paqDIRQjJN7powOKHmm10IzuOsoiTvACa3y68ay4SBk",
+                    "token_type": "bearer"
+                  },
+                  "status": 200,
+                  "headers": {},
+                  "headers_readonly": null
+                }
+              },
+              {
+                "step": 2,
+                "grounding": {
+                  "kind": "explicit-request",
+                  "input": {
+                    "method": "GET",
+                    "path": "/api/v1/items/30000000-0000-4000-8000-000000000001",
+                    "headers": {
+                      "Authorization": {
+                        "$concat": [
+                          "Bearer ",
+                          {
+                            "$ref": "steps.1.body.access_token"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "request": {
+                  "method": "GET",
+                  "path": "/api/v1/items/30000000-0000-4000-8000-000000000001",
+                  "headers": {
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDg5MDAsInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.paqDIRQjJN7powOKHmm10IzuOsoiTvACa3y68ay4SBk"
+                  }
+                },
+                "response": {
+                  "kind": "Response",
+                  "body": {
+                    "detail": "Not enough permissions"
+                  },
+                  "status": 403,
+                  "headers": {},
+                  "headers_readonly": null
+                }
+              }
+            ],
+            "events": [
+              {
+                "kind": "http",
+                "method": "POST",
+                "path": "/api/v1/login/access-token",
+                "handler": "method:backend:app/api/routes/login.py#login_access_token:24",
+                "bound": {
+                  "session": {
+                    "kind": "Object",
+                    "identity": "o2",
+                    "typ": "sqlmodel.Session",
+                    "fields": {
+                      "bind": {
+                        "kind": "Object",
+                        "identity": "o1",
+                        "typ": "sqlalchemy.Engine",
+                        "fields": {
+                          "url": "postgresql://fixture:fixture@database/portable",
+                          "pool_pre_ping": true
+                        },
+                        "provided": null
+                      },
+                      "binding_status": "bound"
+                    },
+                    "provided": null
+                  },
+                  "form_data": {
+                    "kind": "Object",
+                    "identity": "o3",
+                    "typ": "fastapi.security.OAuth2PasswordRequestForm",
+                    "fields": {
+                      "grant_type": null,
+                      "username": "reader@example.com",
+                      "password": "fixture-password-39",
+                      "scopes": [],
+                      "client_id": null,
+                      "client_secret": null
+                    },
+                    "provided": null
+                  }
+                },
+                "status": 200,
+                "body": {
+                  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDg5MDAsInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.paqDIRQjJN7powOKHmm10IzuOsoiTvACa3y68ay4SBk",
+                  "token_type": "bearer"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "coverage": "complete",
+            "partial": false,
+            "state": {
+              "resource:item": [
+                {
+                  "id": "30000000-0000-4000-8000-000000000001",
+                  "title": "Existing",
+                  "description": "keep",
+                  "owner_id": "20000000-0000-4000-8000-000000000001",
+                  "created_at": null,
+                  "owner": null
+                }
+              ],
+              "resource:user": [
+                {
+                  "id": "10000000-0000-4000-8000-000000000001",
+                  "email": "reader@example.com",
+                  "is_active": true,
+                  "is_superuser": false,
+                  "full_name": "Reader",
+                  "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FFlG0wReNGaj6MIY93SN5A$Xs2CqTMQgkBjrhJLMDQbG2ynjXLzzOl7vdQNDmuZQ0M",
+                  "created_at": null,
+                  "items": []
+                }
+              ]
+            },
+            "operations": 167
+          }
+        ],
+        "path_attempts": 1,
+        "pending_paths": 0,
+        "path_attempt_limit": 257,
+        "path_budget_exhausted": false,
+        "fully_explored_in_model": true,
+        "must": [
+          {
+            "source": "method:backend:app/api/deps.py#get_current_user:30",
+            "relation": "data",
+            "target": "resource:user"
+          },
+          {
+            "source": "method:backend:app/api/routes/items.py#read_item:49",
+            "relation": "data",
+            "target": "resource:item"
+          },
+          {
+            "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+            "relation": "calls",
+            "target": "method:backend:app/core/security.py#create_access_token:22"
+          },
+          {
+            "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          },
+          {
+            "source": "method:backend:app/crud.py#get_user_by_email:34",
+            "relation": "data",
+            "target": "resource:user"
+          },
+          {
+            "source": "scenario:foreign-owner",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_current_user:30"
+          },
+          {
+            "source": "scenario:foreign-owner",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_db:21"
+          },
+          {
+            "source": "scenario:foreign-owner",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/items.py#read_item:49"
+          },
+          {
+            "source": "scenario:foreign-owner",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+          },
+          {
+            "source": "scenario:foreign-owner",
+            "relation": "executes",
+            "target": "method:backend:app/core/security.py#create_access_token:22"
+          },
+          {
+            "source": "scenario:foreign-owner",
+            "relation": "executes",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "scenario:foreign-owner",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "scenario:foreign-owner",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          }
+        ],
+        "may": [
+          {
+            "source": "method:backend:app/api/deps.py#get_current_user:30",
+            "relation": "data",
+            "target": "resource:user"
+          },
+          {
+            "source": "method:backend:app/api/routes/items.py#read_item:49",
+            "relation": "data",
+            "target": "resource:item"
+          },
+          {
+            "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+            "relation": "calls",
+            "target": "method:backend:app/core/security.py#create_access_token:22"
+          },
+          {
+            "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          },
+          {
+            "source": "method:backend:app/crud.py#get_user_by_email:34",
+            "relation": "data",
+            "target": "resource:user"
+          },
+          {
+            "source": "scenario:foreign-owner",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_current_user:30"
+          },
+          {
+            "source": "scenario:foreign-owner",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_db:21"
+          },
+          {
+            "source": "scenario:foreign-owner",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/items.py#read_item:49"
+          },
+          {
+            "source": "scenario:foreign-owner",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+          },
+          {
+            "source": "scenario:foreign-owner",
+            "relation": "executes",
+            "target": "method:backend:app/core/security.py#create_access_token:22"
+          },
+          {
+            "source": "scenario:foreign-owner",
+            "relation": "executes",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "scenario:foreign-owner",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "scenario:foreign-owner",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          }
+        ],
+        "solver": {
+          "enabled": true,
+          "timeout_ms": 50,
+          "checks": 0,
+          "pruned_outcomes": 0,
+          "unknown": 0,
+          "seconds": 0.0,
+          "failures": []
+        },
+        "evidence": {
+          "scenario:foreign-owner | executes | method:backend:app/api/deps.py#get_db:21": [
+            {
+              "file": "app/api/deps.py",
+              "line": 21,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:foreign-owner | executes | method:backend:app/api/routes/login.py#login_access_token:24": [
+            {
+              "file": "app/api/routes/login.py",
+              "line": 24,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/routes/login.py#login_access_token:24 | calls | method:backend:app/crud.py#authenticate:45": [
+            {
+              "file": "app/api/routes/login.py",
+              "line": 30,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:foreign-owner | executes | method:backend:app/crud.py#authenticate:45": [
+            {
+              "file": "app/crud.py",
+              "line": 45,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/crud.py#authenticate:45 | calls | method:backend:app/crud.py#get_user_by_email:34": [
+            {
+              "file": "app/crud.py",
+              "line": 46,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:foreign-owner | executes | method:backend:app/crud.py#get_user_by_email:34": [
+            {
+              "file": "app/crud.py",
+              "line": 34,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/crud.py#get_user_by_email:34 | data | resource:user": [
+            {
+              "file": "app/crud.py",
+              "line": 36,
+              "reason": "source select on declared entity/table"
+            }
+          ],
+          "method:backend:app/crud.py#authenticate:45 | calls | method:backend:app/core/security.py#verify_password:29": [
+            {
+              "file": "app/crud.py",
+              "line": 52,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:foreign-owner | executes | method:backend:app/core/security.py#verify_password:29": [
+            {
+              "file": "app/core/security.py",
+              "line": 29,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/routes/login.py#login_access_token:24 | calls | method:backend:app/core/security.py#create_access_token:22": [
+            {
+              "file": "app/api/routes/login.py",
+              "line": 39,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:foreign-owner | executes | method:backend:app/core/security.py#create_access_token:22": [
+            {
+              "file": "app/core/security.py",
+              "line": 22,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:foreign-owner | executes | method:backend:app/api/deps.py#get_current_user:30": [
+            {
+              "file": "app/api/deps.py",
+              "line": 30,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/deps.py#get_current_user:30 | data | resource:user": [
+            {
+              "file": "app/api/deps.py",
+              "line": 41,
+              "reason": "source select on declared entity/table"
+            }
+          ],
+          "scenario:foreign-owner | executes | method:backend:app/api/routes/items.py#read_item:49": [
+            {
+              "file": "app/api/routes/items.py",
+              "line": 49,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/routes/items.py#read_item:49 | data | resource:item": [
+            {
+              "file": "app/api/routes/items.py",
+              "line": 53,
+              "reason": "source select on declared entity/table"
+            }
+          ]
+        },
+        "scope": "Observed/model-supported effects; opaque tails may contain additional unknown effects"
+      }
+    },
+    {
+      "id": "empty-title-validation",
+      "passed": false,
+      "checks": {
+        "edges": false,
+        "one_path": true,
+        "statuses": false
+      },
+      "relations": {
+        "executes": {
+          "expected": 7,
+          "predicted": 9,
+          "intersection": 7,
+          "iou": 0.7777777777777778,
+          "precision": 0.7777777777777778,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [
+            [
+              "scenario:empty-title-validation",
+              "executes",
+              "method:backend:app/api/routes/items.py#create_item:62"
+            ],
+            [
+              "scenario:empty-title-validation",
+              "executes",
+              "method:backend:app/models.py#get_datetime_utc:8"
+            ]
+          ],
+          "empty_both": false
+        },
+        "calls": {
+          "expected": 4,
+          "predicted": 5,
+          "intersection": 4,
+          "iou": 0.8,
+          "precision": 0.8,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [
+            [
+              "method:backend:app/api/routes/items.py#create_item:62",
+              "calls",
+              "method:backend:app/models.py#get_datetime_utc:8"
+            ]
+          ],
+          "empty_both": false
+        },
+        "remote": {
+          "expected": 0,
+          "predicted": 0,
+          "intersection": 0,
+          "iou": 1.0,
+          "precision": null,
+          "recall": null,
+          "missing": [],
+          "extra": [],
+          "empty_both": true
+        },
+        "data": {
+          "expected": 2,
+          "predicted": 3,
+          "intersection": 2,
+          "iou": 0.6666666666666666,
+          "precision": 0.6666666666666666,
+          "recall": 1.0,
+          "missing": [],
+          "extra": [
+            [
+              "method:backend:app/api/routes/items.py#create_item:62",
+              "data",
+              "resource:item"
+            ]
+          ],
+          "empty_both": false
+        }
+      },
+      "analysis_seconds": 0.04013683300581761,
+      "detail": {
+        "status": "complete-in-model",
+        "projection": "may",
+        "paths": [
+          {
+            "decisions": [],
+            "edges": [
+              {
+                "source": "method:backend:app/api/deps.py#get_current_user:30",
+                "relation": "data",
+                "target": "resource:user"
+              },
+              {
+                "source": "method:backend:app/api/routes/items.py#create_item:62",
+                "relation": "calls",
+                "target": "method:backend:app/models.py#get_datetime_utc:8"
+              },
+              {
+                "source": "method:backend:app/api/routes/items.py#create_item:62",
+                "relation": "data",
+                "target": "resource:item"
+              },
+              {
+                "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+                "relation": "calls",
+                "target": "method:backend:app/core/security.py#create_access_token:22"
+              },
+              {
+                "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+                "relation": "calls",
+                "target": "method:backend:app/crud.py#authenticate:45"
+              },
+              {
+                "source": "method:backend:app/crud.py#authenticate:45",
+                "relation": "calls",
+                "target": "method:backend:app/core/security.py#verify_password:29"
+              },
+              {
+                "source": "method:backend:app/crud.py#authenticate:45",
+                "relation": "calls",
+                "target": "method:backend:app/crud.py#get_user_by_email:34"
+              },
+              {
+                "source": "method:backend:app/crud.py#get_user_by_email:34",
+                "relation": "data",
+                "target": "resource:user"
+              },
+              {
+                "source": "scenario:empty-title-validation",
+                "relation": "executes",
+                "target": "method:backend:app/api/deps.py#get_current_user:30"
+              },
+              {
+                "source": "scenario:empty-title-validation",
+                "relation": "executes",
+                "target": "method:backend:app/api/deps.py#get_db:21"
+              },
+              {
+                "source": "scenario:empty-title-validation",
+                "relation": "executes",
+                "target": "method:backend:app/api/routes/items.py#create_item:62"
+              },
+              {
+                "source": "scenario:empty-title-validation",
+                "relation": "executes",
+                "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+              },
+              {
+                "source": "scenario:empty-title-validation",
+                "relation": "executes",
+                "target": "method:backend:app/core/security.py#create_access_token:22"
+              },
+              {
+                "source": "scenario:empty-title-validation",
+                "relation": "executes",
+                "target": "method:backend:app/core/security.py#verify_password:29"
+              },
+              {
+                "source": "scenario:empty-title-validation",
+                "relation": "executes",
+                "target": "method:backend:app/crud.py#authenticate:45"
+              },
+              {
+                "source": "scenario:empty-title-validation",
+                "relation": "executes",
+                "target": "method:backend:app/crud.py#get_user_by_email:34"
+              },
+              {
+                "source": "scenario:empty-title-validation",
+                "relation": "executes",
+                "target": "method:backend:app/models.py#get_datetime_utc:8"
+              }
+            ],
+            "steps": [
+              {
+                "step": 1,
+                "grounding": {
+                  "kind": "explicit-request",
+                  "input": {
+                    "method": "POST",
+                    "path": "/api/v1/login/access-token",
+                    "form": {
+                      "username": "reader@example.com",
+                      "password": "fixture-password-39"
+                    }
+                  }
+                },
+                "request": {
+                  "method": "POST",
+                  "path": "/api/v1/login/access-token",
+                  "form": {
+                    "username": "reader@example.com",
+                    "password": "fixture-password-39"
+                  }
+                },
+                "response": {
+                  "kind": "Response",
+                  "body": {
+                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDg5MDAsInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.paqDIRQjJN7powOKHmm10IzuOsoiTvACa3y68ay4SBk",
+                    "token_type": "bearer"
+                  },
+                  "status": 200,
+                  "headers": {},
+                  "headers_readonly": null
+                }
+              },
+              {
+                "step": 2,
+                "grounding": {
+                  "kind": "explicit-request",
+                  "input": {
+                    "method": "POST",
+                    "path": "/api/v1/items/",
+                    "headers": {
+                      "Authorization": {
+                        "$concat": [
+                          "Bearer ",
+                          {
+                            "$ref": "steps.1.body.access_token"
+                          }
+                        ]
+                      }
+                    },
+                    "body": {
+                      "title": ""
+                    }
+                  }
+                },
+                "request": {
+                  "method": "POST",
+                  "path": "/api/v1/items/",
+                  "headers": {
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDg5MDAsInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.paqDIRQjJN7powOKHmm10IzuOsoiTvACa3y68ay4SBk"
+                  },
+                  "body": {
+                    "title": ""
+                  }
+                },
+                "response": {
+                  "kind": "Response",
+                  "body": {
+                    "title": "",
+                    "description": null,
+                    "id": {
+                      "kind": "Symbol",
+                      "identity": "fresh:16",
+                      "typ": "UUID",
+                      "nonnull": true,
+                      "sort": ""
+                    },
+                    "created_at": "2026-01-02T10:00:00Z",
+                    "owner_id": "10000000-0000-4000-8000-000000000001",
+                    "owner": null
+                  },
+                  "status": 200,
+                  "headers": {},
+                  "headers_readonly": null
+                }
+              }
+            ],
+            "events": [
+              {
+                "kind": "http",
+                "method": "POST",
+                "path": "/api/v1/login/access-token",
+                "handler": "method:backend:app/api/routes/login.py#login_access_token:24",
+                "bound": {
+                  "session": {
+                    "kind": "Object",
+                    "identity": "o2",
+                    "typ": "sqlmodel.Session",
+                    "fields": {
+                      "bind": {
+                        "kind": "Object",
+                        "identity": "o1",
+                        "typ": "sqlalchemy.Engine",
+                        "fields": {
+                          "url": "postgresql://fixture:fixture@database/portable",
+                          "pool_pre_ping": true
+                        },
+                        "provided": null
+                      },
+                      "binding_status": "bound"
+                    },
+                    "provided": null
+                  },
+                  "form_data": {
+                    "kind": "Object",
+                    "identity": "o3",
+                    "typ": "fastapi.security.OAuth2PasswordRequestForm",
+                    "fields": {
+                      "grant_type": null,
+                      "username": "reader@example.com",
+                      "password": "fixture-password-39",
+                      "scopes": [],
+                      "client_id": null,
+                      "client_secret": null
+                    },
+                    "provided": null
+                  }
+                },
+                "status": 200,
+                "body": {
+                  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDg5MDAsInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.paqDIRQjJN7powOKHmm10IzuOsoiTvACa3y68ay4SBk",
+                  "token_type": "bearer"
+                }
+              },
+              {
+                "kind": "http",
+                "method": "POST",
+                "path": "/api/v1/items/",
+                "handler": "method:backend:app/api/routes/items.py#create_item:62",
+                "bound": {
+                  "session": {
+                    "kind": "Object",
+                    "identity": "o10",
+                    "typ": "sqlmodel.Session",
+                    "fields": {
+                      "bind": {
+                        "kind": "Object",
+                        "identity": "o1",
+                        "typ": "sqlalchemy.Engine",
+                        "fields": {
+                          "url": "postgresql://fixture:fixture@database/portable",
+                          "pool_pre_ping": true
+                        },
+                        "provided": null
+                      },
+                      "binding_status": "bound"
+                    },
+                    "provided": null
+                  },
+                  "current_user": {
+                    "kind": "Object",
+                    "identity": "o13",
+                    "typ": "app.models.User",
+                    "fields": {
+                      "email": "reader@example.com",
+                      "is_active": true,
+                      "is_superuser": false,
+                      "full_name": "Reader",
+                      "id": "10000000-0000-4000-8000-000000000001",
+                      "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FFlG0wReNGaj6MIY93SN5A$Xs2CqTMQgkBjrhJLMDQbG2ynjXLzzOl7vdQNDmuZQ0M",
+                      "created_at": null,
+                      "items": []
+                    },
+                    "provided": null
+                  },
+                  "item_in": {
+                    "kind": "Object",
+                    "identity": "o14",
+                    "typ": "app.models.ItemCreate",
+                    "fields": {
+                      "title": "",
+                      "description": null
+                    },
+                    "provided": [
+                      "title"
+                    ]
+                  }
+                },
+                "status": 200,
+                "body": {
+                  "title": "",
+                  "description": null,
+                  "id": {
+                    "kind": "Symbol",
+                    "identity": "fresh:16",
+                    "typ": "UUID",
+                    "nonnull": true,
+                    "sort": ""
+                  },
+                  "created_at": "2026-01-02T10:00:00Z",
+                  "owner_id": "10000000-0000-4000-8000-000000000001",
+                  "owner": null
+                }
+              }
+            ],
+            "diagnostics": [],
+            "coverage": "complete",
+            "partial": false,
+            "state": {
+              "resource:item": [
+                {
+                  "title": "",
+                  "description": null,
+                  "id": {
+                    "kind": "Symbol",
+                    "identity": "fresh:16",
+                    "typ": "UUID",
+                    "nonnull": true,
+                    "sort": ""
+                  },
+                  "created_at": "2026-01-02T10:00:00Z",
+                  "owner_id": "10000000-0000-4000-8000-000000000001",
+                  "owner": null
+                }
+              ],
+              "resource:user": [
+                {
+                  "id": "10000000-0000-4000-8000-000000000001",
+                  "email": "reader@example.com",
+                  "is_active": true,
+                  "is_superuser": false,
+                  "full_name": "Reader",
+                  "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FFlG0wReNGaj6MIY93SN5A$Xs2CqTMQgkBjrhJLMDQbG2ynjXLzzOl7vdQNDmuZQ0M",
+                  "created_at": null,
+                  "items": []
+                }
+              ]
+            },
+            "operations": 174
+          }
+        ],
+        "path_attempts": 1,
+        "pending_paths": 0,
+        "path_attempt_limit": 257,
+        "path_budget_exhausted": false,
+        "fully_explored_in_model": true,
+        "must": [
+          {
+            "source": "method:backend:app/api/deps.py#get_current_user:30",
+            "relation": "data",
+            "target": "resource:user"
+          },
+          {
+            "source": "method:backend:app/api/routes/items.py#create_item:62",
+            "relation": "calls",
+            "target": "method:backend:app/models.py#get_datetime_utc:8"
+          },
+          {
+            "source": "method:backend:app/api/routes/items.py#create_item:62",
+            "relation": "data",
+            "target": "resource:item"
+          },
+          {
+            "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+            "relation": "calls",
+            "target": "method:backend:app/core/security.py#create_access_token:22"
+          },
+          {
+            "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          },
+          {
+            "source": "method:backend:app/crud.py#get_user_by_email:34",
+            "relation": "data",
+            "target": "resource:user"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_current_user:30"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_db:21"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/items.py#create_item:62"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/core/security.py#create_access_token:22"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/models.py#get_datetime_utc:8"
+          }
+        ],
+        "may": [
+          {
+            "source": "method:backend:app/api/deps.py#get_current_user:30",
+            "relation": "data",
+            "target": "resource:user"
+          },
+          {
+            "source": "method:backend:app/api/routes/items.py#create_item:62",
+            "relation": "calls",
+            "target": "method:backend:app/models.py#get_datetime_utc:8"
+          },
+          {
+            "source": "method:backend:app/api/routes/items.py#create_item:62",
+            "relation": "data",
+            "target": "resource:item"
+          },
+          {
+            "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+            "relation": "calls",
+            "target": "method:backend:app/core/security.py#create_access_token:22"
+          },
+          {
+            "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "method:backend:app/crud.py#authenticate:45",
+            "relation": "calls",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          },
+          {
+            "source": "method:backend:app/crud.py#get_user_by_email:34",
+            "relation": "data",
+            "target": "resource:user"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_current_user:30"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/api/deps.py#get_db:21"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/items.py#create_item:62"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/core/security.py#create_access_token:22"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/core/security.py#verify_password:29"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#authenticate:45"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/crud.py#get_user_by_email:34"
+          },
+          {
+            "source": "scenario:empty-title-validation",
+            "relation": "executes",
+            "target": "method:backend:app/models.py#get_datetime_utc:8"
+          }
+        ],
+        "solver": {
+          "enabled": true,
+          "timeout_ms": 50,
+          "checks": 0,
+          "pruned_outcomes": 0,
+          "unknown": 0,
+          "seconds": 0.0,
+          "failures": []
+        },
+        "evidence": {
+          "scenario:empty-title-validation | executes | method:backend:app/api/deps.py#get_db:21": [
+            {
+              "file": "app/api/deps.py",
+              "line": 21,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:empty-title-validation | executes | method:backend:app/api/routes/login.py#login_access_token:24": [
+            {
+              "file": "app/api/routes/login.py",
+              "line": 24,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/routes/login.py#login_access_token:24 | calls | method:backend:app/crud.py#authenticate:45": [
+            {
+              "file": "app/api/routes/login.py",
+              "line": 30,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:empty-title-validation | executes | method:backend:app/crud.py#authenticate:45": [
+            {
+              "file": "app/crud.py",
+              "line": 45,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/crud.py#authenticate:45 | calls | method:backend:app/crud.py#get_user_by_email:34": [
+            {
+              "file": "app/crud.py",
+              "line": 46,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:empty-title-validation | executes | method:backend:app/crud.py#get_user_by_email:34": [
+            {
+              "file": "app/crud.py",
+              "line": 34,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/crud.py#get_user_by_email:34 | data | resource:user": [
+            {
+              "file": "app/crud.py",
+              "line": 36,
+              "reason": "source select on declared entity/table"
+            }
+          ],
+          "method:backend:app/crud.py#authenticate:45 | calls | method:backend:app/core/security.py#verify_password:29": [
+            {
+              "file": "app/crud.py",
+              "line": 52,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:empty-title-validation | executes | method:backend:app/core/security.py#verify_password:29": [
+            {
+              "file": "app/core/security.py",
+              "line": 29,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/routes/login.py#login_access_token:24 | calls | method:backend:app/core/security.py#create_access_token:22": [
+            {
+              "file": "app/api/routes/login.py",
+              "line": 39,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:empty-title-validation | executes | method:backend:app/core/security.py#create_access_token:22": [
+            {
+              "file": "app/core/security.py",
+              "line": 22,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:empty-title-validation | executes | method:backend:app/api/deps.py#get_current_user:30": [
+            {
+              "file": "app/api/deps.py",
+              "line": 30,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/deps.py#get_current_user:30 | data | resource:user": [
+            {
+              "file": "app/api/deps.py",
+              "line": 41,
+              "reason": "source select on declared entity/table"
+            }
+          ],
+          "scenario:empty-title-validation | executes | method:backend:app/api/routes/items.py#create_item:62": [
+            {
+              "file": "app/api/routes/items.py",
+              "line": 62,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/routes/items.py#create_item:62 | calls | method:backend:app/models.py#get_datetime_utc:8": [
+            {
+              "file": "app/models.py",
+              "line": 89,
+              "reason": "source semantics"
+            }
+          ],
+          "scenario:empty-title-validation | executes | method:backend:app/models.py#get_datetime_utc:8": [
+            {
+              "file": "app/models.py",
+              "line": 8,
+              "reason": "source semantics"
+            }
+          ],
+          "method:backend:app/api/routes/items.py#create_item:62 | data | resource:item": [
+            {
+              "file": "app/api/routes/items.py",
+              "line": 69,
+              "reason": "source save on declared entity/table"
+            },
+            {
+              "file": "app/api/routes/items.py",
+              "line": 71,
+              "reason": "source select on declared entity/table"
+            }
+          ]
+        },
+        "scope": "Observed/model-supported effects; opaque tails may contain additional unknown effects"
+      }
+    }
+  ],
+  "passed": false
+}

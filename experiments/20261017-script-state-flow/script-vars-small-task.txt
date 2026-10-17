@@ -1,0 +1,19 @@
+Implement a SMALL pure lexical adapter. Working directory /Users/vsevolod/Desktop/NSU_HACK_ASU_TEAM. Write ONLY solutions/—_script-state-flow/code/analyzer/script_vars.py and solutions/—_script-state-flow/code/tests/test_deepseek_script_vars.py. No shell, other edits or delegation. Successfully load native karpathy-guidelines BEFORE writing. Do not read frontend.py or other variants: this module receives an existing tree-sitter JavaScript root; it does not parse files, run JS, manage pages or model HTTP.
+
+class ScriptVars(root):
+  bindings: dict name -> {initializer: raw source str|None, line:int, initializer_safe:bool}
+  program_names: set all program-bound names, including unsupported declarations
+  diagnostics: list strings with source line/reason
+  resolve(node,name=None) -> str|None: identifier node or anchor+name; name only if it resolves to a unique supported direct-program var, with no local shadow
+  write(assignment_node) -> str|None: simple assignment to a global identifier
+  function_shadow_names(node) -> set: conservative declarations in enclosing function bodies/blocks/catch excluding unrelated nested function bodies.
+
+Support FIRST common slice only: direct program var with plain identifier; ordinary functions/methods/arrows with plain parameters, hoisted function-local var, block let/const identifiers (including before-declaration TDZ), bare catch parameter, simple for-head bindings. Nested function locals must not shadow an outer reference outside that function. Named function expression self-name shadows its global name. Program duplicates/function/lexical name collisions are unsafe, never last-write-wins. var inside program blocks is program-bound but not a supported direct initializer.
+
+FAIL CLOSED, with diagnostics, for destructuring/default/rest patterns, classes, source ERROR, import/export, with/eval; it is fine to disable all bindings for the file in this first slice. Do not attempt full ECMAScript support. Bare undeclared assignment is not invented as global. Property identifiers are not declarations.
+
+Initializer_safe only for a closed literal number/string/bool/null/object/array (no escapes/comments/holes/spread/shorthand/computed properties/calls/new) at a safe program prelude: only preceding comments/empty/functions and other safe literal var declarations. Record raw initializer even when unsafe. Uninitialized var is not a concrete value. Conservative false is fine for complicated literals.
+
+IMPORTANT actual tree-sitter-javascript0.25 AST: plain assignment_expression has left/right fields but NO operator field; '=' is anonymous. augmented_assignment_expression has an operator. write must not reject '=' just because child_by_field_name('operator') is None. Use the existing Node.text/named_children/parent API; no new dependencies. You may import text/walk from analyzer.project (these are trivial helpers), but do not read unrelated files.
+
+Keep implementation around150-220 lines if practical. Write 10-15 focused parser-based tests for the common positives and fail-closed limits: true global after function, param shadow, hoisted local after reference, block/catch shadow, outside-block global vs function_shadow_names, unrelated nested local, duplicates, assignment vs +=, safe/unsafe initializer, eval/module/destructuring rejection. Test command (Codex runs it, shell denied here): PYTHONPATH=code python -B -m pytest code/tests/test_deepseek_script_vars.py -q -p no:cacheprovider. Report checks unrun and limits. Stop after final report.

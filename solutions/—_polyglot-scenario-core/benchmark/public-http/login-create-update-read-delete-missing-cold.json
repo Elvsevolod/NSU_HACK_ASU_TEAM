@@ -1,0 +1,130 @@
+{
+  "project": "public-python",
+  "scenarios": {
+    "login-create-update-read-delete-missing": {
+      "method": "polyglot-ir-may",
+      "edges": [
+        {
+          "source": "method:backend:app/api/deps.py#get_current_user:30",
+          "relation": "data",
+          "target": "resource:user"
+        },
+        {
+          "source": "method:backend:app/api/routes/items.py#create_item:62",
+          "relation": "calls",
+          "target": "method:backend:app/models.py#get_datetime_utc:8"
+        },
+        {
+          "source": "method:backend:app/api/routes/items.py#create_item:62",
+          "relation": "data",
+          "target": "resource:item"
+        },
+        {
+          "source": "method:backend:app/api/routes/items.py#delete_item:100",
+          "relation": "data",
+          "target": "resource:item"
+        },
+        {
+          "source": "method:backend:app/api/routes/items.py#read_item:49",
+          "relation": "data",
+          "target": "resource:item"
+        },
+        {
+          "source": "method:backend:app/api/routes/items.py#update_item:76",
+          "relation": "data",
+          "target": "resource:item"
+        },
+        {
+          "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+          "relation": "calls",
+          "target": "method:backend:app/core/security.py#create_access_token:22"
+        },
+        {
+          "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+          "relation": "calls",
+          "target": "method:backend:app/crud.py#authenticate:45"
+        },
+        {
+          "source": "method:backend:app/crud.py#authenticate:45",
+          "relation": "calls",
+          "target": "method:backend:app/core/security.py#verify_password:29"
+        },
+        {
+          "source": "method:backend:app/crud.py#authenticate:45",
+          "relation": "calls",
+          "target": "method:backend:app/crud.py#get_user_by_email:34"
+        },
+        {
+          "source": "method:backend:app/crud.py#get_user_by_email:34",
+          "relation": "data",
+          "target": "resource:user"
+        },
+        {
+          "source": "scenario:login-create-update-read-delete-missing",
+          "relation": "executes",
+          "target": "method:backend:app/api/deps.py#get_current_user:30"
+        },
+        {
+          "source": "scenario:login-create-update-read-delete-missing",
+          "relation": "executes",
+          "target": "method:backend:app/api/deps.py#get_db:21"
+        },
+        {
+          "source": "scenario:login-create-update-read-delete-missing",
+          "relation": "executes",
+          "target": "method:backend:app/api/routes/items.py#create_item:62"
+        },
+        {
+          "source": "scenario:login-create-update-read-delete-missing",
+          "relation": "executes",
+          "target": "method:backend:app/api/routes/items.py#delete_item:100"
+        },
+        {
+          "source": "scenario:login-create-update-read-delete-missing",
+          "relation": "executes",
+          "target": "method:backend:app/api/routes/items.py#read_item:49"
+        },
+        {
+          "source": "scenario:login-create-update-read-delete-missing",
+          "relation": "executes",
+          "target": "method:backend:app/api/routes/items.py#update_item:76"
+        },
+        {
+          "source": "scenario:login-create-update-read-delete-missing",
+          "relation": "executes",
+          "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+        },
+        {
+          "source": "scenario:login-create-update-read-delete-missing",
+          "relation": "executes",
+          "target": "method:backend:app/api/routes/login.py#test_token:46"
+        },
+        {
+          "source": "scenario:login-create-update-read-delete-missing",
+          "relation": "executes",
+          "target": "method:backend:app/core/security.py#create_access_token:22"
+        },
+        {
+          "source": "scenario:login-create-update-read-delete-missing",
+          "relation": "executes",
+          "target": "method:backend:app/core/security.py#verify_password:29"
+        },
+        {
+          "source": "scenario:login-create-update-read-delete-missing",
+          "relation": "executes",
+          "target": "method:backend:app/crud.py#authenticate:45"
+        },
+        {
+          "source": "scenario:login-create-update-read-delete-missing",
+          "relation": "executes",
+          "target": "method:backend:app/crud.py#get_user_by_email:34"
+        },
+        {
+          "source": "scenario:login-create-update-read-delete-missing",
+          "relation": "executes",
+          "target": "method:backend:app/models.py#get_datetime_utc:8"
+        }
+      ]
+    }
+  }
+}

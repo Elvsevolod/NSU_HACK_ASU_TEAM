@@ -1,0 +1,119 @@
+{
+  "status": "Verified phase 5 checkpoint; full product objective remains active",
+  "baseline_archive_sha256": "64b0757e6681341518f98629f77d3ebd93f97aa5a57e4957eebd12aff6eb769a",
+  "runtime_and_tests_changes": {
+    "code/polygraph/analysis.py": {
+      "added": 2,
+      "removed": 0
+    },
+    "code/polygraph/cli.py": {
+      "added": 3,
+      "removed": 2
+    },
+    "code/polygraph/ir.py": {
+      "added": 1,
+      "removed": 0
+    },
+    "code/polygraph/java.py": {
+      "added": 21,
+      "removed": 3
+    },
+    "code/polygraph/java_contracts.py": {
+      "added": 1,
+      "removed": 0
+    },
+    "code/polygraph/java_time.py": {
+      "added": 135,
+      "removed": 0
+    },
+    "code/polygraph/java_validation.py": {
+      "added": 136,
+      "removed": 0
+    },
+    "code/polygraph/models.py": {
+      "added": 9,
+      "removed": 3
+    },
+    "code/polygraph/project.py": {
+      "added": 21,
+      "removed": 13
+    },
+    "code/polygraph/protocol.py": {
+      "added": 13,
+      "removed": 1
+    },
+    "code/polygraph/spring_config.py": {
+      "added": 243,
+      "removed": 0
+    },
+    "code/polygraph/spring_http.py": {
+      "added": 124,
+      "removed": 0
+    },
+    "code/polygraph/values.py": {
+      "added": 3,
+      "removed": 1
+    },
+    "code/tests/support.py": {
+      "added": 4,
+      "removed": 3
+    },
+    "code/tests/test_java_framework_boundaries.py": {
+      "added": 57,
+      "removed": 0
+    },
+    "code/tests/test_java_time.py": {
+      "added": 98,
+      "removed": 0
+    },
+    "code/tests/test_java_validation_advice.py": {
+      "added": 160,
+      "removed": 0
+    },
+    "code/tests/test_spring_configuration.py": {
+      "added": 185,
+      "removed": 0
+    }
+  },
+  "review": "Codex reviewed runtime changes and source-derived targets, added counterexamples and ran offline replays. No independent DeepSeek review completed. Manual targets are authored by Codex; public source projects are independent of the challenge.",
+  "corrected_defects": [
+    "Global regex configuration mixed deployments and lost YAML/properties semantics",
+    "Unresolved external configuration could expose local values/profiles as final facts",
+    "Ordered snapshot could hide a custom DispatcherServlet path or profile conflict",
+    "Unsupported profile groups/includes/cloud activation were silently ignored",
+    "Enum member wrapper hid source methods",
+    "Feign fallback was selected as the ordinary successful implementation",
+    "Missing Java body fields were fabricated as unknown rather than JVM defaults",
+    "Known source MVC advice and validation outcomes were absent",
+    "Unsupported validation callbacks/groups/type-use/executable constraints could be silently accepted",
+    "Generic temporal string conversion could fabricate a native representation",
+    "Host time/zone data, fractional milliseconds and DST needed explicit reproducible semantics",
+    "A valid unsupported Java ZoneId form could be mistaken for a known Java error",
+    "Manual source reference missed ControllerAdvice; corrected 500 to 400 with the callback edge"
+  ],
+  "verification": {
+    "tests": 348,
+    "public_FastAPI_HTTP_cases": 8,
+    "public_FastAPI_all_passed": true,
+    "public_Spring_conditional_cases": 7,
+    "public_Spring_conditional_passed": 6,
+    "public_Spring_failed_targets": [
+      "stateful-account-statistics-chain"
+    ],
+    "full_Spring_HTTP_support_proven": false,
+    "offline_replays_per_public_case": 2,
+    "public_source_unchanged": true,
+    "local_S0": 0.2928921568627451,
+    "TT_submission_sha256": "27f4aa4c3feb97206e9e45cdf3930b4f5cb2f4d0177d5845261400549ab5bf3b",
+    "models_called": 0
+  },
+  "open_work": [
+    "Source method references, closures and lazy Java Stream callbacks with correct effect ownership",
+    "Deep Java DTO/enum/BigDecimal binding, external response snapshots and stateful statistics writes",
+    "Spring token services/filter/Feign interceptor lifecycle, Jackson accessors and persistence converters",
+    "Independent real mixed Java/Python project chain beyond synthetic fixtures",
+    "Natural-language/UI compound requests and callback chains; current challenge recall remains low",
+    "Summaries/footprints, fixpoint/widening and selective invalidation",
+    "Broader blind reference authorship and hardware portability verification"
+  ]
+}

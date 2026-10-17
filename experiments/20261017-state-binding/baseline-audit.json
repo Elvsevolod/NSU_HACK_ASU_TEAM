@@ -1,0 +1,3125 @@
+{
+  "steps_with_unknowns": 82,
+  "missing_field_occurrences": 277,
+  "fields": {
+    "orderId": 28,
+    "loginId": 19,
+    "boughtDateEnd": 14,
+    "boughtDateStart": 14,
+    "enableBoughtDateQuery": 14,
+    "enableStateQuery": 14,
+    "enableTravelDateQuery": 14,
+    "state": 14,
+    "travelDateEnd": 14,
+    "travelDateStart": 14,
+    "startStation": 12,
+    "id": 11,
+    "seatType": 10,
+    "destStation": 9,
+    "stations": 9,
+    "totalNum": 9,
+    "trainNumber": 9,
+    "tripId": 8,
+    "from": 6,
+    "to": 6,
+    "endStation": 3,
+    "c": 3,
+    "stationFoodStoreId": 2,
+    "weight": 2,
+    "userId": 2,
+    "isWithinRegion": 1,
+    "documentNum": 1,
+    "documentType": 1,
+    "email": 1,
+    "gender": 1,
+    "price": 1,
+    "trainType": 1,
+    "viaStation": 1,
+    "s": 1,
+    "t": 1,
+    "request": 1,
+    "basicPriceRate": 1,
+    "firstClassPriceRate": 1,
+    "routeId": 1,
+    "consignee": 1,
+    "handleDate": 1,
+    "targetDate": 1
+  },
+  "structural_causes": {
+    "field_absent_from_ui_body": 44,
+    "no_linked_ui_request": 224,
+    "ui_expression_unresolved": 9
+  },
+  "sites": 57,
+  "warnings": [
+    "ts-ui-dashboard/static/assets/js/admin_config.js: unresolved request URL",
+    "ts-ui-dashboard/static/assets/js/admin_config.js: unresolved request body: new Object()",
+    "ts-ui-dashboard/static/assets/js/admin_config.js: unresolved request body: new Object()",
+    "ts-ui-dashboard/static/assets/js/admin_contacts.js: unresolved request URL",
+    "ts-ui-dashboard/static/assets/js/admin_contacts.js: unresolved request body: new Object()",
+    "ts-ui-dashboard/static/assets/js/admin_contacts.js: unresolved request body: new Object()",
+    "ts-ui-dashboard/static/assets/js/admin_price.js: unresolved request URL",
+    "ts-ui-dashboard/static/assets/js/admin_price.js: unresolved request body: new Object()",
+    "ts-ui-dashboard/static/assets/js/admin_price.js: unresolved request body: new Object()",
+    "ts-ui-dashboard/static/assets/js/admin_station.js: unresolved request URL",
+    "ts-ui-dashboard/static/assets/js/admin_station.js: unresolved request body: new Object()",
+    "ts-ui-dashboard/static/assets/js/admin_station.js: unresolved request body: new Object()",
+    "ts-ui-dashboard/static/assets/js/admin_train.js: unresolved request URL",
+    "ts-ui-dashboard/static/assets/js/admin_train.js: unresolved request body: new Object()",
+    "ts-ui-dashboard/static/assets/js/admin_train.js: unresolved request body: new Object()",
+    "ts-ui-dashboard/static/assets/js/client_adsearch.js: unresolved request URL",
+    "ts-ui-dashboard/static/assets/js/client_adsearch.js: unresolved request URL",
+    "ts-ui-dashboard/static/assets/js/client_adsearch.js: unresolved request URL",
+    "ts-ui-dashboard/static/assets/js/client_collect.js: unresolved request URL",
+    "ts-ui-dashboard/static/assets/js/client_enter_station.js: unresolved request URL",
+    "ts-ui-dashboard/static/assets/js/client_order_list.js: unresolved request URL",
+    "ts-ui-dashboard/static/assets/js/client_order_list.js: unresolved request body: data",
+    "ts-ui-dashboard/static/assets/js/client_order_list.js: unresolved request URL",
+    "ts-ui-dashboard/static/assets/js/client_order_list.js: unresolved request URL",
+    "ts-ui-dashboard/static/assets/js/client_ticket_book.js: unresolved request URL",
+    "ts-ui-dashboard/static/assets/js/index.js: unresolved request URL",
+    "ts-ui-dashboard/static/js/flowAdvancedSearch.js: unresolved request URL",
+    "ts-ui-dashboard/static/js/flowPreserve.js: unresolved request URL",
+    "ts-ui-dashboard/static/js/order.js: unresolved request URL"
+  ],
+  "steps": [
+    {
+      "scenario": "S0",
+      "step": 2,
+      "action": "Open the contact book",
+      "entry": "method:ts-contacts-service:contacts.controller.ContactsController#getContactsByContactsId(java.lang.String,?HttpHeaders)",
+      "missing": [
+        "id"
+      ],
+      "missing_types": {
+        "id": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_ticket_book.js:56",
+      "body_fields": {},
+      "url": "\"/api/v1/contactservice/contacts/account/\" + sessionStorage.getItem(\"client_id\")",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": {
+          "unknown": true
+        },
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "id": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S0",
+      "step": 3,
+      "action": "Refresh the list of orders for high-speed (GaoTie/DongChe) trains",
+      "entry": "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "boughtDateEnd",
+        "boughtDateStart",
+        "enableBoughtDateQuery",
+        "enableStateQuery",
+        "enableTravelDateQuery",
+        "loginId",
+        "state",
+        "travelDateEnd",
+        "travelDateStart"
+      ],
+      "missing_types": {
+        "boughtDateEnd": "String",
+        "boughtDateStart": "String",
+        "enableBoughtDateQuery": "boolean",
+        "enableStateQuery": "boolean",
+        "enableTravelDateQuery": "boolean",
+        "loginId": "String",
+        "state": "int",
+        "travelDateEnd": "String",
+        "travelDateStart": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Query Orders For Refresh Success",
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "boughtDateEnd": "no_linked_ui_request",
+        "boughtDateStart": "no_linked_ui_request",
+        "enableBoughtDateQuery": "no_linked_ui_request",
+        "enableStateQuery": "no_linked_ui_request",
+        "enableTravelDateQuery": "no_linked_ui_request",
+        "loginId": "no_linked_ui_request",
+        "state": "no_linked_ui_request",
+        "travelDateEnd": "no_linked_ui_request",
+        "travelDateStart": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S0",
+      "step": 4,
+      "action": "Refresh the list of orders for regular ('Other' type) trains",
+      "entry": "method:ts-order-other-service:other.controller.OrderOtherController#queryOrdersForRefresh(other.entity.QueryInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "boughtDateEnd",
+        "boughtDateStart",
+        "enableBoughtDateQuery",
+        "enableStateQuery",
+        "enableTravelDateQuery",
+        "loginId",
+        "state",
+        "travelDateEnd",
+        "travelDateStart"
+      ],
+      "missing_types": {
+        "boughtDateEnd": "String",
+        "boughtDateStart": "String",
+        "enableBoughtDateQuery": "boolean",
+        "enableStateQuery": "boolean",
+        "enableTravelDateQuery": "boolean",
+        "loginId": "String",
+        "state": "int",
+        "travelDateEnd": "String",
+        "travelDateStart": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": {
+          "unknown": true
+        },
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "boughtDateEnd": "no_linked_ui_request",
+        "boughtDateStart": "no_linked_ui_request",
+        "enableBoughtDateQuery": "no_linked_ui_request",
+        "enableStateQuery": "no_linked_ui_request",
+        "enableTravelDateQuery": "no_linked_ui_request",
+        "loginId": "no_linked_ui_request",
+        "state": "no_linked_ui_request",
+        "travelDateEnd": "no_linked_ui_request",
+        "travelDateStart": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S0",
+      "step": 5,
+      "action": "Refresh the list of orders filtered by the 'Paid' status",
+      "entry": "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "boughtDateEnd",
+        "boughtDateStart",
+        "enableBoughtDateQuery",
+        "enableStateQuery",
+        "enableTravelDateQuery",
+        "loginId",
+        "state",
+        "travelDateEnd",
+        "travelDateStart"
+      ],
+      "missing_types": {
+        "boughtDateEnd": "String",
+        "boughtDateStart": "String",
+        "enableBoughtDateQuery": "boolean",
+        "enableStateQuery": "boolean",
+        "enableTravelDateQuery": "boolean",
+        "loginId": "String",
+        "state": "int",
+        "travelDateEnd": "String",
+        "travelDateStart": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Query Orders For Refresh Success",
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "boughtDateEnd": "no_linked_ui_request",
+        "boughtDateStart": "no_linked_ui_request",
+        "enableBoughtDateQuery": "no_linked_ui_request",
+        "enableStateQuery": "no_linked_ui_request",
+        "enableTravelDateQuery": "no_linked_ui_request",
+        "loginId": "no_linked_ui_request",
+        "state": "no_linked_ui_request",
+        "travelDateEnd": "no_linked_ui_request",
+        "travelDateStart": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 3,
+      "action": "Open the details of the first trip found",
+      "entry": "method:ts-travel-service:travel.controller.TravelController#getTripAllDetailInfo(edu.fudan.common.entity.TripAllDetailInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "from",
+        "to",
+        "tripId"
+      ],
+      "missing_types": {
+        "from": "String",
+        "to": "String",
+        "tripId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {
+        "travelDate": "2026-10-01"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Trip not found",
+        "data": {
+          "__type__": "TripAllDetail",
+          "tripResponse": null,
+          "trip": null
+        }
+      },
+      "causes": {
+        "from": "no_linked_ui_request",
+        "to": "no_linked_ui_request",
+        "tripId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 4,
+      "action": "View the food menu offered on this trip",
+      "entry": "method:ts-food-service:foodsearch.controller.FoodController#getAllFood(java.lang.String,java.lang.String,java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "endStation",
+        "startStation",
+        "tripId"
+      ],
+      "missing_types": {
+        "endStation": "String",
+        "startStation": "String",
+        "tripId": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_ticket_book.js:192@33:44",
+      "body_fields": {},
+      "url": "\"/api/v1/foodservice/foods/\" + data.date + \"/\" + data.startStation + \"/\" + data.endStation + \"/\" + data.tripId",
+      "parameters": {
+        "date": "2026-10-01"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Trip id is not suitable",
+        "data": null
+      },
+      "causes": {
+        "endStation": "field_absent_from_ui_body",
+        "startStation": "field_absent_from_ui_body",
+        "tripId": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 5,
+      "action": "Open the contact book and take the first contact",
+      "entry": "method:ts-contacts-service:contacts.controller.ContactsController#getContactsByContactsId(java.lang.String,?HttpHeaders)",
+      "missing": [
+        "id"
+      ],
+      "missing_types": {
+        "id": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_ticket_book.js:56",
+      "body_fields": {},
+      "url": "\"/api/v1/contactservice/contacts/account/\" + sessionStorage.getItem(\"client_id\")",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": {
+          "unknown": true
+        },
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "id": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 6,
+      "action": "Book one first-class seat on the trip for this contact, with food on the train, assurance (insurance) of the first type and luggage consignment of 2 kg to a consignee",
+      "entry": "method:ts-seat-service:seat.controller.SeatController#create(edu.fudan.common.entity.Seat,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "destStation",
+        "seatType",
+        "startStation",
+        "stations",
+        "totalNum",
+        "trainNumber"
+      ],
+      "missing_types": {
+        "destStation": "String",
+        "seatType": "int",
+        "startStation": "String",
+        "stations": "List<String>",
+        "totalNum": "int",
+        "trainNumber": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {
+        "travelDate": "2026-10-01"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Use a new seat number!",
+        "data": {
+          "__type__": "Ticket",
+          "destStation": {
+            "unknown": true
+          },
+          "seatNo": {
+            "unknown": true
+          },
+          "startStation": {
+            "unknown": true
+          }
+        }
+      },
+      "causes": {
+        "destStation": "no_linked_ui_request",
+        "seatType": "no_linked_ui_request",
+        "startStation": "no_linked_ui_request",
+        "stations": "no_linked_ui_request",
+        "totalNum": "no_linked_ui_request",
+        "trainNumber": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 7,
+      "action": "Refresh the list of orders",
+      "entry": "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "boughtDateEnd",
+        "boughtDateStart",
+        "enableBoughtDateQuery",
+        "enableStateQuery",
+        "enableTravelDateQuery",
+        "loginId",
+        "state",
+        "travelDateEnd",
+        "travelDateStart"
+      ],
+      "missing_types": {
+        "boughtDateEnd": "String",
+        "boughtDateStart": "String",
+        "enableBoughtDateQuery": "boolean",
+        "enableStateQuery": "boolean",
+        "enableTravelDateQuery": "boolean",
+        "loginId": "String",
+        "state": "int",
+        "travelDateEnd": "String",
+        "travelDateStart": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Query Orders For Refresh Success",
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "boughtDateEnd": "no_linked_ui_request",
+        "boughtDateStart": "no_linked_ui_request",
+        "enableBoughtDateQuery": "no_linked_ui_request",
+        "enableStateQuery": "no_linked_ui_request",
+        "enableTravelDateQuery": "no_linked_ui_request",
+        "loginId": "no_linked_ui_request",
+        "state": "no_linked_ui_request",
+        "travelDateEnd": "no_linked_ui_request",
+        "travelDateStart": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 8,
+      "action": "Open the new order",
+      "entry": "method:ts-order-other-service:other.controller.OrderOtherController#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": null
+      },
+      "causes": {
+        "orderId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 9,
+      "action": "Check the price of the order",
+      "entry": "method:ts-order-service:order.controller.OrderController#getOrderPrice(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": "-1.0"
+      },
+      "causes": {
+        "orderId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 10,
+      "action": "Pay for the order from the internal account balance",
+      "entry": "method:ts-order-service:order.controller.OrderController#payOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": null
+      },
+      "causes": {
+        "orderId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 11,
+      "action": "Collect the ticket for the order",
+      "entry": "method:ts-execute-service:execute.controller.ExecuteControlller#collectTicket(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_collect.js:104",
+      "body_fields": {},
+      "url": "\"/api/v1/executeservice/execute/collected/\" + executeInfo.orderId",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Order Not Found",
+        "data": null
+      },
+      "causes": {
+        "orderId": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 12,
+      "action": "Enter the station (board the train) with the order",
+      "entry": "method:ts-execute-service:execute.controller.ExecuteControlller#executeTicket(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_enter_station.js:98",
+      "body_fields": {},
+      "url": "\"/api/v1/executeservice/execute/execute/\" + executeInfo.orderId",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Order Not Found",
+        "data": null
+      },
+      "causes": {
+        "orderId": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 13,
+      "action": "Look up the luggage consignment record of the order",
+      "entry": "method:ts-consign-service:consign.controller.ConsignController#findByOrderId(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "id"
+      ],
+      "missing_types": {
+        "id": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_order_list.js:397",
+      "body_fields": {},
+      "url": "\"/api/v1/consignservice/consigns/order/\" + orderId",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Find consign by order id success",
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "id": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 14,
+      "action": "Look up the assurance (insurance) record of the order",
+      "entry": "method:ts-assurance-service:assurance.controller.AssuranceController#findAssuranceByOrderId(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "No Content by this orderId",
+        "data": null
+      },
+      "causes": {
+        "orderId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 3,
+      "action": "Open the details of the first trip found",
+      "entry": "method:ts-travel-service:travel.controller.TravelController#getTripAllDetailInfo(edu.fudan.common.entity.TripAllDetailInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "from",
+        "to",
+        "tripId"
+      ],
+      "missing_types": {
+        "from": "String",
+        "to": "String",
+        "tripId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {
+        "travelDate": "2026-10-01"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Trip not found",
+        "data": {
+          "__type__": "TripAllDetail",
+          "tripResponse": null,
+          "trip": null
+        }
+      },
+      "causes": {
+        "from": "no_linked_ui_request",
+        "to": "no_linked_ui_request",
+        "tripId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 4,
+      "action": "Browse the food stores at Suzhou station",
+      "entry": "method:ts-station-food-service:food.controller.StationFoodController#getFoodListByStationFoodStoreId(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "stationFoodStoreId"
+      ],
+      "missing_types": {
+        "stationFoodStoreId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": null
+      },
+      "causes": {
+        "stationFoodStoreId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 5,
+      "action": "Open the contact book and take the first contact",
+      "entry": "method:ts-contacts-service:contacts.controller.ContactsController#getContactsByContactsId(java.lang.String,?HttpHeaders)",
+      "missing": [
+        "id"
+      ],
+      "missing_types": {
+        "id": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_ticket_book.js:56",
+      "body_fields": {},
+      "url": "\"/api/v1/contactservice/contacts/account/\" + sessionStorage.getItem(\"client_id\")",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": {
+          "unknown": true
+        },
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "id": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 6,
+      "action": "Book one first-class seat on the regular train for this contact, with food from a station store, no assurance (insurance) and no luggage consignment",
+      "entry": "method:ts-seat-service:seat.controller.SeatController#create(edu.fudan.common.entity.Seat,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "destStation",
+        "seatType",
+        "startStation",
+        "stations",
+        "totalNum",
+        "trainNumber"
+      ],
+      "missing_types": {
+        "destStation": "String",
+        "seatType": "int",
+        "startStation": "String",
+        "stations": "List<String>",
+        "totalNum": "int",
+        "trainNumber": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {
+        "travelDate": "2026-10-01"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Use a new seat number!",
+        "data": {
+          "__type__": "Ticket",
+          "destStation": {
+            "unknown": true
+          },
+          "seatNo": {
+            "unknown": true
+          },
+          "startStation": {
+            "unknown": true
+          }
+        }
+      },
+      "causes": {
+        "destStation": "no_linked_ui_request",
+        "seatType": "no_linked_ui_request",
+        "startStation": "no_linked_ui_request",
+        "stations": "no_linked_ui_request",
+        "totalNum": "no_linked_ui_request",
+        "trainNumber": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 7,
+      "action": "Refresh the list of orders",
+      "entry": "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "boughtDateEnd",
+        "boughtDateStart",
+        "enableBoughtDateQuery",
+        "enableStateQuery",
+        "enableTravelDateQuery",
+        "loginId",
+        "state",
+        "travelDateEnd",
+        "travelDateStart"
+      ],
+      "missing_types": {
+        "boughtDateEnd": "String",
+        "boughtDateStart": "String",
+        "enableBoughtDateQuery": "boolean",
+        "enableStateQuery": "boolean",
+        "enableTravelDateQuery": "boolean",
+        "loginId": "String",
+        "state": "int",
+        "travelDateEnd": "String",
+        "travelDateStart": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Query Orders For Refresh Success",
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "boughtDateEnd": "no_linked_ui_request",
+        "boughtDateStart": "no_linked_ui_request",
+        "enableBoughtDateQuery": "no_linked_ui_request",
+        "enableStateQuery": "no_linked_ui_request",
+        "enableTravelDateQuery": "no_linked_ui_request",
+        "loginId": "no_linked_ui_request",
+        "state": "no_linked_ui_request",
+        "travelDateEnd": "no_linked_ui_request",
+        "travelDateStart": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 8,
+      "action": "Pay for the order from the internal account balance",
+      "entry": "method:ts-order-service:order.controller.OrderController#payOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": null
+      },
+      "causes": {
+        "orderId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 9,
+      "action": "Ask how much would be refunded if the order were cancelled",
+      "entry": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "loginId",
+        "orderId"
+      ],
+      "missing_types": {
+        "loginId": "String",
+        "orderId": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_order_list.js:170",
+      "body_fields": {},
+      "url": "\"/api/v1/cancelservice/cancel/refound/\" + orderId",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Order Not Found.",
+        "data": null
+      },
+      "causes": {
+        "loginId": "field_absent_from_ui_body",
+        "orderId": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 10,
+      "action": "Cancel the order",
+      "entry": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "loginId",
+        "orderId"
+      ],
+      "missing_types": {
+        "loginId": "String",
+        "orderId": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_order_list.js:170",
+      "body_fields": {},
+      "url": "\"/api/v1/cancelservice/cancel/refound/\" + orderId",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Order Not Found.",
+        "data": null
+      },
+      "causes": {
+        "loginId": "field_absent_from_ui_body",
+        "orderId": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 11,
+      "action": "Book another first-class seat on the same regular train for the same contact with the same station food",
+      "entry": "method:ts-seat-service:seat.controller.SeatController#create(edu.fudan.common.entity.Seat,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "destStation",
+        "seatType",
+        "startStation",
+        "stations",
+        "totalNum",
+        "trainNumber"
+      ],
+      "missing_types": {
+        "destStation": "String",
+        "seatType": "int",
+        "startStation": "String",
+        "stations": "List<String>",
+        "totalNum": "int",
+        "trainNumber": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {
+        "travelDate": "2026-10-01"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Use a new seat number!",
+        "data": {
+          "__type__": "Ticket",
+          "destStation": {
+            "unknown": true
+          },
+          "seatNo": {
+            "unknown": true
+          },
+          "startStation": {
+            "unknown": true
+          }
+        }
+      },
+      "causes": {
+        "destStation": "no_linked_ui_request",
+        "seatType": "no_linked_ui_request",
+        "startStation": "no_linked_ui_request",
+        "stations": "no_linked_ui_request",
+        "totalNum": "no_linked_ui_request",
+        "trainNumber": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 12,
+      "action": "Refresh the list of orders",
+      "entry": "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "boughtDateEnd",
+        "boughtDateStart",
+        "enableBoughtDateQuery",
+        "enableStateQuery",
+        "enableTravelDateQuery",
+        "loginId",
+        "state",
+        "travelDateEnd",
+        "travelDateStart"
+      ],
+      "missing_types": {
+        "boughtDateEnd": "String",
+        "boughtDateStart": "String",
+        "enableBoughtDateQuery": "boolean",
+        "enableStateQuery": "boolean",
+        "enableTravelDateQuery": "boolean",
+        "loginId": "String",
+        "state": "int",
+        "travelDateEnd": "String",
+        "travelDateStart": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Query Orders For Refresh Success",
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "boughtDateEnd": "no_linked_ui_request",
+        "boughtDateStart": "no_linked_ui_request",
+        "enableBoughtDateQuery": "no_linked_ui_request",
+        "enableStateQuery": "no_linked_ui_request",
+        "enableTravelDateQuery": "no_linked_ui_request",
+        "loginId": "no_linked_ui_request",
+        "state": "no_linked_ui_request",
+        "travelDateEnd": "no_linked_ui_request",
+        "travelDateStart": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 13,
+      "action": "Pay for the new order from the internal account balance",
+      "entry": "method:ts-order-service:order.controller.OrderController#payOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": null
+      },
+      "causes": {
+        "orderId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 14,
+      "action": "Rebook the paid ticket to a second-class seat on the same regular train (the cheaper ticket: the difference is refunded to the internal balance)",
+      "entry": "method:ts-rebook-service:rebook.controller.RebookController#payDifference(rebook.entity.RebookInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "loginId",
+        "seatType"
+      ],
+      "missing_types": {
+        "loginId": "String",
+        "seatType": "int"
+      },
+      "ui_site": "ts-ui-dashboard/static/js/orderRebook.js:35",
+      "body_fields": {
+        "orderId": "$(\"#single_rebook_order_id\").val()",
+        "oldTripId": "$(\"#single_rebook_old_trip_id\").val()",
+        "tripId": "$(\"#single_rebook_trip_id\").val()",
+        "seatType": "$(\"#single_rebook_seat_type\").val()",
+        "date": "$(\"#single_rebook_date\").val()"
+      },
+      "url": "\"/api/v1/rebookservice/rebook/difference\"",
+      "parameters": {
+        "orderId": "8177ac5a-61ac-42f4-83f4-bd7b394d0531",
+        "oldTripId": "G1234",
+        "tripId": "G1235",
+        "date": ""
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": null
+      },
+      "causes": {
+        "loginId": "field_absent_from_ui_body",
+        "seatType": "ui_expression_unresolved"
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 3,
+      "action": "Open the details of the first trip found",
+      "entry": "method:ts-travel-service:travel.controller.TravelController#getTripAllDetailInfo(edu.fudan.common.entity.TripAllDetailInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "from",
+        "to",
+        "tripId"
+      ],
+      "missing_types": {
+        "from": "String",
+        "to": "String",
+        "tripId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {
+        "travelDate": "2026-10-01"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Trip not found",
+        "data": {
+          "__type__": "TripAllDetail",
+          "tripResponse": null,
+          "trip": null
+        }
+      },
+      "causes": {
+        "from": "no_linked_ui_request",
+        "to": "no_linked_ui_request",
+        "tripId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 4,
+      "action": "Browse the food stores at Suzhou station",
+      "entry": "method:ts-station-food-service:food.controller.StationFoodController#getFoodListByStationFoodStoreId(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "stationFoodStoreId"
+      ],
+      "missing_types": {
+        "stationFoodStoreId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": null
+      },
+      "causes": {
+        "stationFoodStoreId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 5,
+      "action": "Open the contact book and take the first contact",
+      "entry": "method:ts-contacts-service:contacts.controller.ContactsController#getContactsByContactsId(java.lang.String,?HttpHeaders)",
+      "missing": [
+        "id"
+      ],
+      "missing_types": {
+        "id": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_ticket_book.js:56",
+      "body_fields": {},
+      "url": "\"/api/v1/contactservice/contacts/account/\" + sessionStorage.getItem(\"client_id\")",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": {
+          "unknown": true
+        },
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "id": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 6,
+      "action": "Add a new contact (a companion with an ID card) to the contact book",
+      "entry": "method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#addContacts(edu.fudan.common.entity.Contacts,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "c"
+      ],
+      "missing_types": {
+        "c": "Contacts"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/admin_contacts.js:127",
+      "body_fields": {},
+      "url": "\"/api/v1/adminbasicservice/adminbasic/contacts\"",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "data": {
+          "unknown": true
+        },
+        "msg": {
+          "unknown": true
+        },
+        "status": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "c": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 7,
+      "action": "Book a first-class seat on the trip for the first contact, with food from a station store, assurance (insurance) of the first type and a luggage consignment of 0.5 kg to a consignee",
+      "entry": "method:ts-seat-service:seat.controller.SeatController#create(edu.fudan.common.entity.Seat,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "destStation",
+        "seatType",
+        "startStation",
+        "stations",
+        "totalNum",
+        "trainNumber"
+      ],
+      "missing_types": {
+        "destStation": "String",
+        "seatType": "int",
+        "startStation": "String",
+        "stations": "List<String>",
+        "totalNum": "int",
+        "trainNumber": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {
+        "travelDate": "2026-10-01"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Use a new seat number!",
+        "data": {
+          "__type__": "Ticket",
+          "destStation": {
+            "unknown": true
+          },
+          "seatNo": {
+            "unknown": true
+          },
+          "startStation": {
+            "unknown": true
+          }
+        }
+      },
+      "causes": {
+        "destStation": "no_linked_ui_request",
+        "seatType": "no_linked_ui_request",
+        "startStation": "no_linked_ui_request",
+        "stations": "no_linked_ui_request",
+        "totalNum": "no_linked_ui_request",
+        "trainNumber": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 8,
+      "action": "Book a second-class seat on the same trip for the new contact, without food, assurance or consignment",
+      "entry": "method:ts-seat-service:seat.controller.SeatController#create(edu.fudan.common.entity.Seat,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "destStation",
+        "seatType",
+        "startStation",
+        "stations",
+        "totalNum",
+        "trainNumber"
+      ],
+      "missing_types": {
+        "destStation": "String",
+        "seatType": "int",
+        "startStation": "String",
+        "stations": "List<String>",
+        "totalNum": "int",
+        "trainNumber": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {
+        "travelDate": "2026-10-01"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Use a new seat number!",
+        "data": {
+          "__type__": "Ticket",
+          "destStation": {
+            "unknown": true
+          },
+          "seatNo": {
+            "unknown": true
+          },
+          "startStation": {
+            "unknown": true
+          }
+        }
+      },
+      "causes": {
+        "destStation": "no_linked_ui_request",
+        "seatType": "no_linked_ui_request",
+        "startStation": "no_linked_ui_request",
+        "stations": "no_linked_ui_request",
+        "totalNum": "no_linked_ui_request",
+        "trainNumber": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 9,
+      "action": "Refresh the list of orders",
+      "entry": "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "boughtDateEnd",
+        "boughtDateStart",
+        "enableBoughtDateQuery",
+        "enableStateQuery",
+        "enableTravelDateQuery",
+        "loginId",
+        "state",
+        "travelDateEnd",
+        "travelDateStart"
+      ],
+      "missing_types": {
+        "boughtDateEnd": "String",
+        "boughtDateStart": "String",
+        "enableBoughtDateQuery": "boolean",
+        "enableStateQuery": "boolean",
+        "enableTravelDateQuery": "boolean",
+        "loginId": "String",
+        "state": "int",
+        "travelDateEnd": "String",
+        "travelDateStart": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Query Orders For Refresh Success",
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "boughtDateEnd": "no_linked_ui_request",
+        "boughtDateStart": "no_linked_ui_request",
+        "enableBoughtDateQuery": "no_linked_ui_request",
+        "enableStateQuery": "no_linked_ui_request",
+        "enableTravelDateQuery": "no_linked_ui_request",
+        "loginId": "no_linked_ui_request",
+        "state": "no_linked_ui_request",
+        "travelDateEnd": "no_linked_ui_request",
+        "travelDateStart": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 10,
+      "action": "Open the first new order",
+      "entry": "method:ts-order-other-service:other.controller.OrderOtherController#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": null
+      },
+      "causes": {
+        "orderId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 11,
+      "action": "Open the second new order",
+      "entry": "method:ts-order-other-service:other.controller.OrderOtherController#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": null
+      },
+      "causes": {
+        "orderId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 12,
+      "action": "Pay for the first order from the internal account balance",
+      "entry": "method:ts-order-service:order.controller.OrderController#payOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": null
+      },
+      "causes": {
+        "orderId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 13,
+      "action": "Pay for the second order from the internal account balance",
+      "entry": "method:ts-order-service:order.controller.OrderController#payOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": null
+      },
+      "causes": {
+        "orderId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 14,
+      "action": "Check what a 0.5 kg consignment within the region costs",
+      "entry": "method:ts-consign-price-service:consignprice.controller.ConsignPriceController#getPriceByWeightAndRegion(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "isWithinRegion",
+        "weight"
+      ],
+      "missing_types": {
+        "isWithinRegion": "String",
+        "weight": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": {
+          "unknown": true
+        },
+        "data": 8
+      },
+      "causes": {
+        "isWithinRegion": "no_linked_ui_request",
+        "weight": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 1,
+      "action": "Register a new passenger account (username, password, gender, ID document, e-mail)",
+      "entry": "method:ts-user-service:user.controller.UserController#registerUser(user.dto.UserDto,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "documentNum",
+        "documentType",
+        "email",
+        "gender",
+        "userId"
+      ],
+      "missing_types": {
+        "documentNum": "String",
+        "documentType": "int",
+        "email": "String",
+        "gender": "int",
+        "userId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {
+        "userName": {
+          "__symbol__": "symbolic-input-userName-1",
+          "__type__": "String",
+          "__constraints__": [
+            "non_null",
+            "fresh_unique"
+          ]
+        },
+        "password": {
+          "__symbol__": "symbolic-input-password-2",
+          "__type__": "String",
+          "__constraints__": [
+            "non_null",
+            "fresh_unique"
+          ]
+        }
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "REGISTER USER SUCCESS",
+        "data": {
+          "__type__": "user.entity.User",
+          "userId": "symbolic-1",
+          "userName": {
+            "__symbol__": "symbolic-input-userName-1",
+            "__type__": "String",
+            "__constraints__": [
+              "non_null",
+              "fresh_unique"
+            ]
+          },
+          "password": {
+            "__symbol__": "symbolic-input-password-2",
+            "__type__": "String",
+            "__constraints__": [
+              "non_null",
+              "fresh_unique"
+            ]
+          },
+          "gender": {
+            "unknown": true
+          },
+          "documentType": {
+            "unknown": true
+          },
+          "documentNum": {
+            "unknown": true
+          },
+          "email": {
+            "unknown": true
+          }
+        }
+      },
+      "causes": {
+        "documentNum": "no_linked_ui_request",
+        "documentType": "no_linked_ui_request",
+        "email": "no_linked_ui_request",
+        "gender": "no_linked_ui_request",
+        "userId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 3,
+      "action": "Add a contact (the passenger themselves) to the empty contact book",
+      "entry": "method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#addContacts(edu.fudan.common.entity.Contacts,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "c"
+      ],
+      "missing_types": {
+        "c": "Contacts"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/admin_contacts.js:127",
+      "body_fields": {},
+      "url": "\"/api/v1/adminbasicservice/adminbasic/contacts\"",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "data": {
+          "unknown": true
+        },
+        "msg": {
+          "unknown": true
+        },
+        "status": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "c": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 5,
+      "action": "Open the details of the first trip found",
+      "entry": "method:ts-travel-service:travel.controller.TravelController#getTripAllDetailInfo(edu.fudan.common.entity.TripAllDetailInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "from",
+        "to",
+        "tripId"
+      ],
+      "missing_types": {
+        "from": "String",
+        "to": "String",
+        "tripId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {
+        "travelDate": "2026-10-01"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Trip not found",
+        "data": {
+          "__type__": "TripAllDetail",
+          "tripResponse": null,
+          "trip": null
+        }
+      },
+      "causes": {
+        "from": "no_linked_ui_request",
+        "to": "no_linked_ui_request",
+        "tripId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 6,
+      "action": "View the food menu offered on this trip",
+      "entry": "method:ts-food-service:foodsearch.controller.FoodController#getAllFood(java.lang.String,java.lang.String,java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "endStation",
+        "startStation",
+        "tripId"
+      ],
+      "missing_types": {
+        "endStation": "String",
+        "startStation": "String",
+        "tripId": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_ticket_book.js:192@33:44",
+      "body_fields": {},
+      "url": "\"/api/v1/foodservice/foods/\" + data.date + \"/\" + data.startStation + \"/\" + data.endStation + \"/\" + data.tripId",
+      "parameters": {
+        "date": "2026-10-01"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Trip id is not suitable",
+        "data": null
+      },
+      "causes": {
+        "endStation": "field_absent_from_ui_body",
+        "startStation": "field_absent_from_ui_body",
+        "tripId": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 7,
+      "action": "Book a first-class seat on the trip for the new contact, with food on the train and assurance (insurance) of the first type, without consignment",
+      "entry": "method:ts-seat-service:seat.controller.SeatController#create(edu.fudan.common.entity.Seat,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "destStation",
+        "seatType",
+        "startStation",
+        "stations",
+        "totalNum",
+        "trainNumber"
+      ],
+      "missing_types": {
+        "destStation": "String",
+        "seatType": "int",
+        "startStation": "String",
+        "stations": "List<String>",
+        "totalNum": "int",
+        "trainNumber": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {
+        "travelDate": "2026-10-01"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Use a new seat number!",
+        "data": {
+          "__type__": "Ticket",
+          "destStation": {
+            "unknown": true
+          },
+          "seatNo": {
+            "unknown": true
+          },
+          "startStation": {
+            "unknown": true
+          }
+        }
+      },
+      "causes": {
+        "destStation": "no_linked_ui_request",
+        "seatType": "no_linked_ui_request",
+        "startStation": "no_linked_ui_request",
+        "stations": "no_linked_ui_request",
+        "totalNum": "no_linked_ui_request",
+        "trainNumber": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 8,
+      "action": "Refresh the list of orders",
+      "entry": "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "boughtDateEnd",
+        "boughtDateStart",
+        "enableBoughtDateQuery",
+        "enableStateQuery",
+        "enableTravelDateQuery",
+        "loginId",
+        "state",
+        "travelDateEnd",
+        "travelDateStart"
+      ],
+      "missing_types": {
+        "boughtDateEnd": "String",
+        "boughtDateStart": "String",
+        "enableBoughtDateQuery": "boolean",
+        "enableStateQuery": "boolean",
+        "enableTravelDateQuery": "boolean",
+        "loginId": "String",
+        "state": "int",
+        "travelDateEnd": "String",
+        "travelDateStart": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Query Orders For Refresh Success",
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "boughtDateEnd": "no_linked_ui_request",
+        "boughtDateStart": "no_linked_ui_request",
+        "enableBoughtDateQuery": "no_linked_ui_request",
+        "enableStateQuery": "no_linked_ui_request",
+        "enableTravelDateQuery": "no_linked_ui_request",
+        "loginId": "no_linked_ui_request",
+        "state": "no_linked_ui_request",
+        "travelDateEnd": "no_linked_ui_request",
+        "travelDateStart": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 9,
+      "action": "Open the new order",
+      "entry": "method:ts-order-other-service:other.controller.OrderOtherController#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": null
+      },
+      "causes": {
+        "orderId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 10,
+      "action": "Check the price of the order",
+      "entry": "method:ts-order-service:order.controller.OrderController#getOrderPrice(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": "-1.0"
+      },
+      "causes": {
+        "orderId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 11,
+      "action": "Pay for the order: the internal balance is empty, so the payment is completed through the external payment channel",
+      "entry": "method:ts-inside-payment-service:inside_payment.controller.InsidePaymentController#pay(inside_payment.entity.PaymentInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "price",
+        "userId"
+      ],
+      "missing_types": {
+        "price": "String",
+        "userId": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_order_list.js:125",
+      "body_fields": {
+        "orderId": "that.orderId",
+        "tripId": "that.tripId"
+      },
+      "url": "\"/api/v1/inside_pay_service/inside_payment\"",
+      "parameters": {
+        "orderId": "",
+        "tripId": ""
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Error. Order status Not allowed to Pay.",
+        "data": null
+      },
+      "causes": {
+        "price": "field_absent_from_ui_body",
+        "userId": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 12,
+      "action": "Ask how much would be refunded if the paid order were cancelled",
+      "entry": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "loginId",
+        "orderId"
+      ],
+      "missing_types": {
+        "loginId": "String",
+        "orderId": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_order_list.js:170",
+      "body_fields": {},
+      "url": "\"/api/v1/cancelservice/cancel/refound/\" + orderId",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Order Not Found.",
+        "data": null
+      },
+      "causes": {
+        "loginId": "field_absent_from_ui_body",
+        "orderId": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 13,
+      "action": "Cancel the paid order (the refund goes back to the internal balance)",
+      "entry": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "loginId",
+        "orderId"
+      ],
+      "missing_types": {
+        "loginId": "String",
+        "orderId": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_order_list.js:170",
+      "body_fields": {},
+      "url": "\"/api/v1/cancelservice/cancel/refound/\" + orderId",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Order Not Found.",
+        "data": null
+      },
+      "causes": {
+        "loginId": "field_absent_from_ui_body",
+        "orderId": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 14,
+      "action": "Refresh the list of orders filtered by the 'Cancel' status",
+      "entry": "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "boughtDateEnd",
+        "boughtDateStart",
+        "enableBoughtDateQuery",
+        "enableStateQuery",
+        "enableTravelDateQuery",
+        "loginId",
+        "state",
+        "travelDateEnd",
+        "travelDateStart"
+      ],
+      "missing_types": {
+        "boughtDateEnd": "String",
+        "boughtDateStart": "String",
+        "enableBoughtDateQuery": "boolean",
+        "enableStateQuery": "boolean",
+        "enableTravelDateQuery": "boolean",
+        "loginId": "String",
+        "state": "int",
+        "travelDateEnd": "String",
+        "travelDateStart": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Query Orders For Refresh Success",
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "boughtDateEnd": "no_linked_ui_request",
+        "boughtDateStart": "no_linked_ui_request",
+        "enableBoughtDateQuery": "no_linked_ui_request",
+        "enableStateQuery": "no_linked_ui_request",
+        "enableTravelDateQuery": "no_linked_ui_request",
+        "loginId": "no_linked_ui_request",
+        "state": "no_linked_ui_request",
+        "travelDateEnd": "no_linked_ui_request",
+        "travelDateStart": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 4,
+      "action": "Advanced search: the trips with the fewest stops from Shanghai to Nanjing on 1 October 2026",
+      "entry": "method:ts-travel-service:travel.controller.TravelController#deleteTrip(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "tripId"
+      ],
+      "missing_types": {
+        "tripId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": null
+      },
+      "causes": {
+        "tripId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 5,
+      "action": "Ask for trips with a transfer at Suzhou (Shanghai — Suzhou — Nanjing) on 1 October 2026",
+      "entry": "method:ts-travel-plan-service:travelplan.controller.TravelPlanController#getTransferResult(travelplan.entity.TransferTravelInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "endStation",
+        "startStation",
+        "trainType",
+        "viaStation"
+      ],
+      "missing_types": {
+        "endStation": "String",
+        "startStation": "String",
+        "trainType": "String",
+        "viaStation": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {
+        "travelDate": "2026-10-01T00:00:00"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Success.",
+        "data": {
+          "__type__": "TransferTravelResult",
+          "firstSectionResult": [],
+          "secondSectionResult": []
+        }
+      },
+      "causes": {
+        "endStation": "no_linked_ui_request",
+        "startStation": "no_linked_ui_request",
+        "trainType": "no_linked_ui_request",
+        "viaStation": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 7,
+      "action": "Open the contact book and take the first contact",
+      "entry": "method:ts-contacts-service:contacts.controller.ContactsController#getContactsByContactsId(java.lang.String,?HttpHeaders)",
+      "missing": [
+        "id"
+      ],
+      "missing_types": {
+        "id": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_ticket_book.js:56",
+      "body_fields": {},
+      "url": "\"/api/v1/contactservice/contacts/account/\" + sessionStorage.getItem(\"client_id\")",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": {
+          "unknown": true
+        },
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "id": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 8,
+      "action": "Book a first-class seat on the cheapest (regular) trip for this contact, without food, assurance or consignment",
+      "entry": "method:ts-seat-service:seat.controller.SeatController#create(edu.fudan.common.entity.Seat,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "destStation",
+        "seatType",
+        "startStation",
+        "stations",
+        "totalNum",
+        "trainNumber"
+      ],
+      "missing_types": {
+        "destStation": "String",
+        "seatType": "int",
+        "startStation": "String",
+        "stations": "List<String>",
+        "totalNum": "int",
+        "trainNumber": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {
+        "travelDate": "2026-10-01"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Use a new seat number!",
+        "data": {
+          "__type__": "Ticket",
+          "destStation": {
+            "unknown": true
+          },
+          "seatNo": {
+            "unknown": true
+          },
+          "startStation": {
+            "unknown": true
+          }
+        }
+      },
+      "causes": {
+        "destStation": "no_linked_ui_request",
+        "seatType": "no_linked_ui_request",
+        "startStation": "no_linked_ui_request",
+        "stations": "no_linked_ui_request",
+        "totalNum": "no_linked_ui_request",
+        "trainNumber": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 9,
+      "action": "Refresh the list of orders",
+      "entry": "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "boughtDateEnd",
+        "boughtDateStart",
+        "enableBoughtDateQuery",
+        "enableStateQuery",
+        "enableTravelDateQuery",
+        "loginId",
+        "state",
+        "travelDateEnd",
+        "travelDateStart"
+      ],
+      "missing_types": {
+        "boughtDateEnd": "String",
+        "boughtDateStart": "String",
+        "enableBoughtDateQuery": "boolean",
+        "enableStateQuery": "boolean",
+        "enableTravelDateQuery": "boolean",
+        "loginId": "String",
+        "state": "int",
+        "travelDateEnd": "String",
+        "travelDateStart": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Query Orders For Refresh Success",
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "boughtDateEnd": "no_linked_ui_request",
+        "boughtDateStart": "no_linked_ui_request",
+        "enableBoughtDateQuery": "no_linked_ui_request",
+        "enableStateQuery": "no_linked_ui_request",
+        "enableTravelDateQuery": "no_linked_ui_request",
+        "loginId": "no_linked_ui_request",
+        "state": "no_linked_ui_request",
+        "travelDateEnd": "no_linked_ui_request",
+        "travelDateStart": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 10,
+      "action": "Pay for the order from the internal account balance",
+      "entry": "method:ts-order-service:order.controller.OrderController#payOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": null
+      },
+      "causes": {
+        "orderId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 11,
+      "action": "Collect the ticket for the order",
+      "entry": "method:ts-execute-service:execute.controller.ExecuteControlller#collectTicket(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_collect.js:104",
+      "body_fields": {},
+      "url": "\"/api/v1/executeservice/execute/collected/\" + executeInfo.orderId",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Order Not Found",
+        "data": null
+      },
+      "causes": {
+        "orderId": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 12,
+      "action": "Enter the station (board the train) with the order",
+      "entry": "method:ts-execute-service:execute.controller.ExecuteControlller#executeTicket(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_enter_station.js:98",
+      "body_fields": {},
+      "url": "\"/api/v1/executeservice/execute/execute/\" + executeInfo.orderId",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Order Not Found",
+        "data": null
+      },
+      "causes": {
+        "orderId": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 2,
+      "action": "Add a new station Ning Bo with a stay time of 5 minutes",
+      "entry": "method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#addStation(edu.fudan.common.entity.Station,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "s"
+      ],
+      "missing_types": {
+        "s": "Station"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/admin_station.js:124",
+      "body_fields": {},
+      "url": "\"/api/v1/adminbasicservice/adminbasic/stations\"",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Already exists",
+        "data": {
+          "__type__": "Station",
+          "stayTime": {
+            "unknown": true
+          }
+        }
+      },
+      "causes": {
+        "s": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 3,
+      "action": "Add a new train type GaoTieSix with 100 second-class and 30 first-class seats and an average speed of 300",
+      "entry": "method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#addTrain(edu.fudan.common.entity.TrainType,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "t"
+      ],
+      "missing_types": {
+        "t": "TrainType"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/admin_train.js:129",
+      "body_fields": {},
+      "url": "\"/api/v1/adminbasicservice/adminbasic/trains\"",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "data": {
+          "unknown": true
+        },
+        "msg": {
+          "unknown": true
+        },
+        "status": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "t": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 4,
+      "action": "Add a new route Shanghai — Suzhou — Ning Bo with distances 0, 100 and 250",
+      "entry": "method:ts-admin-route-service:adminroute.controller.AdminRouteController#addRoute(edu.fudan.common.entity.RouteInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "request"
+      ],
+      "missing_types": {
+        "request": "RouteInfo"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/admin_route.js:95",
+      "body_fields": {
+        "stationList": "$scope.add_route_stations",
+        "distanceList": "$scope.add_route_distances",
+        "startStation": "$scope.add_route_start_station",
+        "endStation": "$scope.add_route_terminal_station"
+      },
+      "url": "\"/api/v1/adminrouteservice/adminroute\"",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "start or end station not include in stationList.",
+        "data": null
+      },
+      "causes": {
+        "request": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 5,
+      "action": "Add a price configuration for train type GaoTieSix on the new route: basic rate 0.5, first-class rate 1.2",
+      "entry": "method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#addPrice(adminbasic.entity.PriceInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "basicPriceRate",
+        "firstClassPriceRate",
+        "id",
+        "routeId"
+      ],
+      "missing_types": {
+        "basicPriceRate": "double",
+        "firstClassPriceRate": "double",
+        "id": "String",
+        "routeId": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/admin_price.js:131",
+      "body_fields": {},
+      "url": "\"/api/v1/adminbasicservice/adminbasic/prices\"",
+      "parameters": {
+        "trainType": "GaoTieSix"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Create success",
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "basicPriceRate": "field_absent_from_ui_body",
+        "firstClassPriceRate": "field_absent_from_ui_body",
+        "id": "field_absent_from_ui_body",
+        "routeId": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 6,
+      "action": "Add a new high-speed trip G9101 of type GaoTieSix on the new route from Shanghai via Suzhou to Ning Bo, departing 09:00 and arriving 12:00",
+      "entry": "method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#addContacts(edu.fudan.common.entity.Contacts,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "c"
+      ],
+      "missing_types": {
+        "c": "Contacts"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/admin_contacts.js:127",
+      "body_fields": {},
+      "url": "\"/api/v1/adminbasicservice/adminbasic/contacts\"",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "data": {
+          "unknown": true
+        },
+        "msg": {
+          "unknown": true
+        },
+        "status": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "c": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 9,
+      "action": "Open the details of the new trip found",
+      "entry": "method:ts-travel-service:travel.controller.TravelController#getTripAllDetailInfo(edu.fudan.common.entity.TripAllDetailInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "from",
+        "to",
+        "tripId"
+      ],
+      "missing_types": {
+        "from": "String",
+        "to": "String",
+        "tripId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {
+        "travelDate": "2026-10-01"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Trip not found",
+        "data": {
+          "__type__": "TripAllDetail",
+          "tripResponse": null,
+          "trip": null
+        }
+      },
+      "causes": {
+        "from": "no_linked_ui_request",
+        "to": "no_linked_ui_request",
+        "tripId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 10,
+      "action": "Open the contact book and take the first contact",
+      "entry": "method:ts-contacts-service:contacts.controller.ContactsController#getContactsByContactsId(java.lang.String,?HttpHeaders)",
+      "missing": [
+        "id"
+      ],
+      "missing_types": {
+        "id": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_ticket_book.js:56",
+      "body_fields": {},
+      "url": "\"/api/v1/contactservice/contacts/account/\" + sessionStorage.getItem(\"client_id\")",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": {
+          "unknown": true
+        },
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "id": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 11,
+      "action": "Book a first-class seat on the new trip for this contact, without food, assurance or consignment",
+      "entry": "method:ts-seat-service:seat.controller.SeatController#create(edu.fudan.common.entity.Seat,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "destStation",
+        "seatType",
+        "startStation",
+        "stations",
+        "totalNum",
+        "trainNumber"
+      ],
+      "missing_types": {
+        "destStation": "String",
+        "seatType": "int",
+        "startStation": "String",
+        "stations": "List<String>",
+        "totalNum": "int",
+        "trainNumber": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {
+        "travelDate": "2026-10-01"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Use a new seat number!",
+        "data": {
+          "__type__": "Ticket",
+          "destStation": {
+            "unknown": true
+          },
+          "seatNo": {
+            "unknown": true
+          },
+          "startStation": {
+            "unknown": true
+          }
+        }
+      },
+      "causes": {
+        "destStation": "no_linked_ui_request",
+        "seatType": "no_linked_ui_request",
+        "startStation": "no_linked_ui_request",
+        "stations": "no_linked_ui_request",
+        "totalNum": "no_linked_ui_request",
+        "trainNumber": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 12,
+      "action": "Refresh the list of orders",
+      "entry": "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "boughtDateEnd",
+        "boughtDateStart",
+        "enableBoughtDateQuery",
+        "enableStateQuery",
+        "enableTravelDateQuery",
+        "loginId",
+        "state",
+        "travelDateEnd",
+        "travelDateStart"
+      ],
+      "missing_types": {
+        "boughtDateEnd": "String",
+        "boughtDateStart": "String",
+        "enableBoughtDateQuery": "boolean",
+        "enableStateQuery": "boolean",
+        "enableTravelDateQuery": "boolean",
+        "loginId": "String",
+        "state": "int",
+        "travelDateEnd": "String",
+        "travelDateStart": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Query Orders For Refresh Success",
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "boughtDateEnd": "no_linked_ui_request",
+        "boughtDateStart": "no_linked_ui_request",
+        "enableBoughtDateQuery": "no_linked_ui_request",
+        "enableStateQuery": "no_linked_ui_request",
+        "enableTravelDateQuery": "no_linked_ui_request",
+        "loginId": "no_linked_ui_request",
+        "state": "no_linked_ui_request",
+        "travelDateEnd": "no_linked_ui_request",
+        "travelDateStart": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 13,
+      "action": "Pay for the order from the internal account balance",
+      "entry": "method:ts-order-service:order.controller.OrderController#payOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": null
+      },
+      "causes": {
+        "orderId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 3,
+      "action": "Open the contact book and take the first contact",
+      "entry": "method:ts-contacts-service:contacts.controller.ContactsController#getContactsByContactsId(java.lang.String,?HttpHeaders)",
+      "missing": [
+        "id"
+      ],
+      "missing_types": {
+        "id": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_ticket_book.js:56",
+      "body_fields": {},
+      "url": "\"/api/v1/contactservice/contacts/account/\" + sessionStorage.getItem(\"client_id\")",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": {
+          "unknown": true
+        },
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "id": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 4,
+      "action": "Book a first-class seat on the first trip found for this contact, with a luggage consignment of 3 kg to a consignee, without food or assurance",
+      "entry": "method:ts-seat-service:seat.controller.SeatController#create(edu.fudan.common.entity.Seat,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "destStation",
+        "seatType",
+        "startStation",
+        "stations",
+        "totalNum",
+        "trainNumber"
+      ],
+      "missing_types": {
+        "destStation": "String",
+        "seatType": "int",
+        "startStation": "String",
+        "stations": "List<String>",
+        "totalNum": "int",
+        "trainNumber": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {
+        "travelDate": "2026-10-01"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Use a new seat number!",
+        "data": {
+          "__type__": "Ticket",
+          "destStation": {
+            "unknown": true
+          },
+          "seatNo": {
+            "unknown": true
+          },
+          "startStation": {
+            "unknown": true
+          }
+        }
+      },
+      "causes": {
+        "destStation": "no_linked_ui_request",
+        "seatType": "no_linked_ui_request",
+        "startStation": "no_linked_ui_request",
+        "stations": "no_linked_ui_request",
+        "totalNum": "no_linked_ui_request",
+        "trainNumber": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 5,
+      "action": "Refresh the list of orders",
+      "entry": "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "boughtDateEnd",
+        "boughtDateStart",
+        "enableBoughtDateQuery",
+        "enableStateQuery",
+        "enableTravelDateQuery",
+        "loginId",
+        "state",
+        "travelDateEnd",
+        "travelDateStart"
+      ],
+      "missing_types": {
+        "boughtDateEnd": "String",
+        "boughtDateStart": "String",
+        "enableBoughtDateQuery": "boolean",
+        "enableStateQuery": "boolean",
+        "enableTravelDateQuery": "boolean",
+        "loginId": "String",
+        "state": "int",
+        "travelDateEnd": "String",
+        "travelDateStart": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Query Orders For Refresh Success",
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "boughtDateEnd": "no_linked_ui_request",
+        "boughtDateStart": "no_linked_ui_request",
+        "enableBoughtDateQuery": "no_linked_ui_request",
+        "enableStateQuery": "no_linked_ui_request",
+        "enableTravelDateQuery": "no_linked_ui_request",
+        "loginId": "no_linked_ui_request",
+        "state": "no_linked_ui_request",
+        "travelDateEnd": "no_linked_ui_request",
+        "travelDateStart": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 6,
+      "action": "Pay for the order from the internal account balance",
+      "entry": "method:ts-order-service:order.controller.OrderController#payOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": {
+          "unknown": true
+        },
+        "data": null
+      },
+      "causes": {
+        "orderId": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 7,
+      "action": "Collect the ticket for the order",
+      "entry": "method:ts-execute-service:execute.controller.ExecuteControlller#collectTicket(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_collect.js:104",
+      "body_fields": {},
+      "url": "\"/api/v1/executeservice/execute/collected/\" + executeInfo.orderId",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Order Not Found",
+        "data": null
+      },
+      "causes": {
+        "orderId": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 8,
+      "action": "Ask how much would be refunded for the collected order",
+      "entry": "method:ts-execute-service:execute.controller.ExecuteControlller#collectTicket(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_collect.js:104",
+      "body_fields": {},
+      "url": "\"/api/v1/executeservice/execute/collected/\" + executeInfo.orderId",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Order Not Found",
+        "data": null
+      },
+      "causes": {
+        "orderId": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 9,
+      "action": "Try to cancel the collected order (the system refuses)",
+      "entry": "method:ts-execute-service:execute.controller.ExecuteControlller#collectTicket(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_collect.js:104",
+      "body_fields": {},
+      "url": "\"/api/v1/executeservice/execute/collected/\" + executeInfo.orderId",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Order Not Found",
+        "data": null
+      },
+      "causes": {
+        "orderId": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 10,
+      "action": "Try to rebook the collected order onto the second high-speed trip found (the system refuses)",
+      "entry": "method:ts-execute-service:execute.controller.ExecuteControlller#collectTicket(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "orderId"
+      ],
+      "missing_types": {
+        "orderId": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_collect.js:104",
+      "body_fields": {},
+      "url": "\"/api/v1/executeservice/execute/collected/\" + executeInfo.orderId",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 0,
+        "msg": "Order Not Found",
+        "data": null
+      },
+      "causes": {
+        "orderId": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 11,
+      "action": "Look up the luggage consignment of the order",
+      "entry": "method:ts-consign-service:consign.controller.ConsignController#findByOrderId(java.lang.String,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "id"
+      ],
+      "missing_types": {
+        "id": "String"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_order_list.js:397",
+      "body_fields": {},
+      "url": "\"/api/v1/consignservice/consigns/order/\" + orderId",
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Find consign by order id success",
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "id": "field_absent_from_ui_body"
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 12,
+      "action": "Change the consignee's name and phone number in the consignment",
+      "entry": "method:ts-consign-service:consign.controller.ConsignController#updateConsign(consign.entity.Consign,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "consignee",
+        "from",
+        "handleDate",
+        "id",
+        "orderId",
+        "targetDate",
+        "to",
+        "weight"
+      ],
+      "missing_types": {
+        "consignee": "String",
+        "from": "String",
+        "handleDate": "String",
+        "id": "String",
+        "orderId": "String",
+        "targetDate": "String",
+        "to": "String",
+        "weight": "double"
+      },
+      "ui_site": "ts-ui-dashboard/static/assets/js/client_order_list.js:364",
+      "body_fields": {
+        "accountId": "sessionStorage.getItem(\"client_id\")",
+        "handleDate": "currentdate",
+        "targetDate": "buyghtDate",
+        "from": "from",
+        "to": "to",
+        "orderId": "orderId",
+        "consignee": "that.consignName",
+        "phone": "that.consignPhone",
+        "weight": "that.consignWeight",
+        "id": "that.consignId",
+        "isWithin": "false"
+      },
+      "url": "\"/api/v1/consignservice/consigns\"",
+      "parameters": {
+        "accountId": "4d2a46c7-71cb-4cf1-b5bb-b68406d9da6f",
+        "isWithin": false,
+        "phone": "number"
+      },
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "You have consigned successfully! The price is 8",
+        "data": {
+          "__type__": "ConsignRecord",
+          "id": "symbolic-1",
+          "orderId": {
+            "unknown": true
+          },
+          "accountId": "4d2a46c7-71cb-4cf1-b5bb-b68406d9da6f",
+          "handleDate": {
+            "unknown": true
+          },
+          "targetDate": {
+            "unknown": true
+          },
+          "from": {
+            "unknown": true
+          },
+          "to": {
+            "unknown": true
+          },
+          "consignee": {
+            "unknown": true
+          },
+          "phone": "number",
+          "weight": {
+            "unknown": true
+          },
+          "price": 8
+        }
+      },
+      "causes": {
+        "consignee": "ui_expression_unresolved",
+        "from": "ui_expression_unresolved",
+        "handleDate": "ui_expression_unresolved",
+        "id": "ui_expression_unresolved",
+        "orderId": "ui_expression_unresolved",
+        "targetDate": "ui_expression_unresolved",
+        "to": "ui_expression_unresolved",
+        "weight": "ui_expression_unresolved"
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 13,
+      "action": "Refresh the list of orders filtered by travel date (September — December 2026)",
+      "entry": "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "boughtDateEnd",
+        "boughtDateStart",
+        "enableBoughtDateQuery",
+        "enableStateQuery",
+        "enableTravelDateQuery",
+        "loginId",
+        "state",
+        "travelDateEnd",
+        "travelDateStart"
+      ],
+      "missing_types": {
+        "boughtDateEnd": "String",
+        "boughtDateStart": "String",
+        "enableBoughtDateQuery": "boolean",
+        "enableStateQuery": "boolean",
+        "enableTravelDateQuery": "boolean",
+        "loginId": "String",
+        "state": "int",
+        "travelDateEnd": "String",
+        "travelDateStart": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Query Orders For Refresh Success",
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "boughtDateEnd": "no_linked_ui_request",
+        "boughtDateStart": "no_linked_ui_request",
+        "enableBoughtDateQuery": "no_linked_ui_request",
+        "enableStateQuery": "no_linked_ui_request",
+        "enableTravelDateQuery": "no_linked_ui_request",
+        "loginId": "no_linked_ui_request",
+        "state": "no_linked_ui_request",
+        "travelDateEnd": "no_linked_ui_request",
+        "travelDateStart": "no_linked_ui_request"
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 14,
+      "action": "Refresh the list of orders filtered by purchase date (today)",
+      "entry": "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+      "missing": [
+        "boughtDateEnd",
+        "boughtDateStart",
+        "enableBoughtDateQuery",
+        "enableStateQuery",
+        "enableTravelDateQuery",
+        "loginId",
+        "state",
+        "travelDateEnd",
+        "travelDateStart"
+      ],
+      "missing_types": {
+        "boughtDateEnd": "String",
+        "boughtDateStart": "String",
+        "enableBoughtDateQuery": "boolean",
+        "enableStateQuery": "boolean",
+        "enableTravelDateQuery": "boolean",
+        "loginId": "String",
+        "state": "int",
+        "travelDateEnd": "String",
+        "travelDateStart": "String"
+      },
+      "ui_site": null,
+      "body_fields": {},
+      "url": null,
+      "parameters": {},
+      "result": {
+        "__type__": "edu.fudan.common.util.Response",
+        "status": 1,
+        "msg": "Query Orders For Refresh Success",
+        "data": {
+          "unknown": true
+        }
+      },
+      "causes": {
+        "boughtDateEnd": "no_linked_ui_request",
+        "boughtDateStart": "no_linked_ui_request",
+        "enableBoughtDateQuery": "no_linked_ui_request",
+        "enableStateQuery": "no_linked_ui_request",
+        "enableTravelDateQuery": "no_linked_ui_request",
+        "loginId": "no_linked_ui_request",
+        "state": "no_linked_ui_request",
+        "travelDateEnd": "no_linked_ui_request",
+        "travelDateStart": "no_linked_ui_request"
+      }
+    }
+  ]
+}

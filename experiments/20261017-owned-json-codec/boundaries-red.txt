@@ -1,0 +1,73 @@
+......FFFF..........F                                                    [100%]
+=================================== FAILURES ===================================
+___________ test_a_null_mapper_throws_before_the_next_project_method ___________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-640/test_a_null_mapper_throws_befo0')
+
+    def test_a_null_mapper_throws_before_the_next_project_method(tmp_path):
+        result,engine,ids=run(tmp_path,'''ObjectMapper mapper=null;try{
+          mapper.convertValue(null,Item.class);return after();}catch(NullPointerException failure){return caught();}''')
+>       assert result=='caught' and not engine.approximate
+E       AssertionError: assert ('wrong' == 'caught'
+E         
+E         - caught
+E         + wrong)
+
+code/tests/test_json_codec_boundaries.py:24: AssertionError
+_____________ test_enum_constant_value_qualifier_is_evaluated_once _____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-640/test_enum_constant_value_quali0')
+
+    def test_enum_constant_value_qualifier_is_evaluated_once(tmp_path):
+        result,engine,ids=run(tmp_path,'''ObjectMapper mapper=new ObjectMapper();
+          mapper.disable(feature().FAIL_ON_UNKNOWN_PROPERTIES);
+          return mapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);''',
+          extra='DeserializationFeature feature(){return null;}')
+        assert result is False and not engine.approximate
+>       assert ('', 'executes',ids['Api.feature']) in engine.edges
+E       AssertionError: assert ('', 'executes', 'method:service:Api#feature()') in {('', 'executes', 'method:service:Api#entry(boolean)')}
+E        +  where {('', 'executes', 'method:service:Api#entry(boolean)')} = <analyzer.engine.Engine object at 0x101c5ba10>.edges
+
+code/tests/test_json_codec_boundaries.py:34: AssertionError
+_____________ test_native_enum_constant_equals_preserves_identity ______________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-640/test_native_enum_constant_equa0')
+
+    def test_native_enum_constant_equals_preserves_identity(tmp_path):
+        result,engine,_=run(tmp_path,'''return DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES.equals(
+          DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES);''')
+>       assert result is True and not engine.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> is True)
+
+code/tests/test_json_codec_boundaries.py:40: AssertionError
+____ test_unknown_external_callee_invalidates_escaped_mapper_configuration _____
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-640/test_unknown_external_callee_i0')
+
+    def test_unknown_external_callee_invalidates_escaped_mapper_configuration(tmp_path):
+        result,engine,_=run(tmp_path,'''ObjectMapper mapper=new ObjectMapper();External.configure(mapper);
+          return mapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);''')
+>       assert result is U and engine.approximate
+E       AssertionError: assert (True is <Unknown.VALUE: 'unknown'>)
+
+code/tests/test_json_codec_boundaries.py:46: AssertionError
+__ test_failure_subclass_is_not_invented_when_another_property_is_unresolved ___
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-640/test_failure_subclass_is_not_i0')
+
+    def test_failure_subclass_is_not_invented_when_another_property_is_unresolved(tmp_path):
+        result,engine,_=run(tmp_path,'''Map input=new LinkedHashMap();input.put("value",unknown());input.put("extra","x");
+          try{new ObjectMapper().readValue(new ObjectMapper().writeValueAsString(input),Item.class);return after();}
+          catch(com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException failure){return "over-specific";}
+          catch(com.fasterxml.jackson.databind.JsonMappingException failure){return caught();}''',conservative=True)
+>       assert result is U and engine.approximate
+E       AssertionError: assert ('over-specific' is <Unknown.VALUE: 'unknown'>)
+
+code/tests/test_json_codec_boundaries.py:115: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_json_codec_boundaries.py::test_a_null_mapper_throws_before_the_next_project_method
+FAILED code/tests/test_json_codec_boundaries.py::test_enum_constant_value_qualifier_is_evaluated_once
+FAILED code/tests/test_json_codec_boundaries.py::test_native_enum_constant_equals_preserves_identity
+FAILED code/tests/test_json_codec_boundaries.py::test_unknown_external_callee_invalidates_escaped_mapper_configuration
+FAILED code/tests/test_json_codec_boundaries.py::test_failure_subclass_is_not_invented_when_another_property_is_unresolved
+5 failed, 16 passed in 0.11s

@@ -1,0 +1,1 @@
+import jakarta.persistence.*; @Entity @Table(name="books") class Book { @Id public String key; public String title; }

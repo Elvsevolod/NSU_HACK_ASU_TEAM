@@ -1,0 +1,1240 @@
+--- a/code/polygraph/cli.py
++++ b/code/polygraph/cli.py
+@@ -49,7 +49,7 @@
+     report = {"version": 13, "fingerprint": project.fingerprint, "projection_policy": args.policy,
+               "preparation_seconds": prepared, "model_calls": 0, "application_executed": False,
+               "context_warnings": warnings, "scenarios": {}, "environment": {"python": platform.python_version(),
+-              "platform": "-".join((platform.system(), platform.release(), platform.machine())), "packages": {name: importlib.metadata.version(name) for name in ["tree-sitter", "tree-sitter-java", "sqlglot", "libcst", "z3-solver"]}},
++              "platform": "-".join((platform.system(), platform.release(), platform.machine())), "packages": {name: importlib.metadata.version(name) for name in ["tree-sitter", "tree-sitter-java", "sqlglot", "libcst", "z3-solver", "rank-bm25", "numpy"]}},
+               "sql_dialect": args.sql_dialect, "smt_enabled": not args.no_smt, "smt_timeout_ms": args.smt_timeout_ms,
+               "budgets": {k: getattr(args, k) for k in ["path_limit", "loop_limit", "depth_limit", "step_limit"]},
+               "inputs": {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in input_paths}}
+@@ -63,6 +63,7 @@
+                    "elapsed_seconds": time.perf_counter() - start, "source_files": len(project.sources),
+                    "methods": len(project.methods), "endpoints": len(project.endpoints), "lowered_methods": project.lowered,
+                    "IR_cache_hits": project.cache_hits, "project_diagnostics": project.diagnostics,
++                   "source_framework_versions": project.framework_versions,
+                    "peak_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * (1 if sys.platform == "darwin" else 1024)})
+     args.output.parent.mkdir(parents=True, exist_ok=True)
+     args.output.write_text(json.dumps(submission, ensure_ascii=False, indent=2) + "\n")
+--- a/code/polygraph/grounding.py
++++ b/code/polygraph/grounding.py
+@@ -1,21 +1,32 @@
+ """Deterministic contract retrieval and input provenance, separate from execution."""
+ from collections import Counter
+-import math
+ import re
+ 
++from rank_bm25 import BM25Plus
++
++from .input_context import absence, facts, normalized
+ from .values import Unknown
+ 
+ 
+-STOP = set("the a an of to with from for on in by and their this that my our list show open please get request endpoint api using".split())
+-VERBS = {"read": "GET", "view": "GET", "show": "GET", "get": "GET", "list": "GET", "find": "GET", "retrieve": "GET",
+-         "create": "POST", "add": "POST", "register": "POST", "post": "POST",
+-         "update": "PUT", "edit": "PUT", "change": "PUT", "put": "PUT", "delete": "DELETE", "remove": "DELETE",
+-         "получить": "GET", "показать": "GET", "создать": "POST", "добавить": "POST", "изменить": "PUT", "удалить": "DELETE"}
+-
+-
++STOP = set("the a an of to with from for on in by and their this that my our please request endpoint api using controller service java string".split())
+ def tokens(text):
++    text = re.sub(r'\blog\s+in\b', 'login', text, flags=re.I)
+     text = re.sub(r"([a-zа-я])([A-ZА-Я])", r"\1 \2", text)
+-    return [word.rstrip("s") for word in re.findall(r"[^\W_]+", text.lower()) if word not in STOP]
++    words = re.findall(r"[^\W_]+", text.lower())
++    return [word[:-1] if len(word) > 3 and word.endswith('s') and not word.endswith(('ss', 'us', 'is')) else word
++            for word in words if word not in STOP]
++
++
++OPERATIONS = [set('get find query lookup search read view open show list refresh inspect fetch check browse look ask calculate compute estimate получить показать'.split()),
++              set('create add insert register save book reserve buy purchase создать добавить'.split()),
++              set('delete remove erase удалить'.split()),
++              set('update modify change edit amend alter revise replace rename изменить'.split()),
++              set('login signin authenticate'.split()), set('pay charge settle'.split())]
++
++
++def intent(text):
++    words = tokens(re.sub(r'\blog\s+in\b', 'login', text, flags=re.I))
++    return next((i for i, group in enumerate(OPERATIONS) if words and words[0] in group), None)
+ 
+ 
+ def reference(value, history):
+@@ -40,7 +51,7 @@
+ class Grounder:
+     def __init__(self, project):
+         self.p = project
+-        self.documents = []
++        self.documents, self.extra, self.operations = [], [], []
+         for endpoint in project.endpoints:
+             method = project.methods[endpoint.method]
+             owner = project.types.get(method.owner)
+@@ -49,39 +60,68 @@
+                 fields.extend([param.name, param.typ, param.alias])
+                 resolved = project.resolve_type(param.typ, method.module, method.span.file)
+                 fields.extend(project.type_fields(resolved))
+-            self.documents.append(Counter(tokens(" ".join([method.name, owner.name if owner else "", endpoint.path, method.doc, *fields]))))
+-        counts = Counter(token for document in self.documents for token in document)
+-        self.idf = {token: math.log(1 + len(self.documents) / count) for token, count in counts.items()}
++            self.documents.append(tokens(" ".join([method.name, owner.name if owner else "", endpoint.path, method.doc, *fields])) or ['__empty_contract__'])
++            source = project.sources.get(method.span.file, b'').decode('utf-8', errors='replace').splitlines()
++            raw = project.raw_methods[method.key]
++            end = raw.end_point.row + 1 if method.language == 'java' else raw.end_lineno
++            self.extra.append(tokens('\n'.join(source[max(0, method.span.line - 1):end])) or ['__empty_source__'])
++            self.operations.append(intent(method.name))
++        # delta=0 retains saturated TF and positive IDF without adding a score
++        # to documents that contain none of the query terms.
++        self.index = BM25Plus(self.documents, delta=0) if self.documents else None
++        self.source_index = BM25Plus(self.extra, delta=0) if self.extra else None
++        self.features = [(Counter(primary), Counter(source), operation) for primary, source, operation in zip(self.documents, self.extra, self.operations)]
+ 
+     def candidates(self, action):
+         query = tokens(action)
+-        verbs = [VERBS[word] for word in re.findall(r"\w+", action.lower()) if word in VERBS]
++        if not self.index:
++            return []
++        focus = tokens(re.split(r'\b(?:for|with|without|from|filtered|on|onto)\b', action, 1, flags=re.I)[0])
++        wanted = intent(action)
++        scores = self.index.get_scores(query)
++        secondary = self.source_index.get_scores(query)
+         ranked = []
+-        for index, (endpoint, document) in enumerate(zip(self.p.endpoints, self.documents)):
+-            score = sum(self.idf.get(token, 0) * min(document.get(token, 0), 2) for token in query)
+-            if verbs:
+-                score += 2 if endpoint.verb in {verbs[0], "*"} else -2
++        for index, document in enumerate(self.documents):
++            score = float(scores[index] + .12 * secondary[index])
++            score += sum(self.index.idf.get(word, 0) for word in focus if word in document)
++            actual = self.operations[index]
++            if wanted is not None and actual is not None:
++                score *= 1.8 if wanted == actual else .5
+             if score > 0:
+                 ranked.append((score, index))
+         ranked.sort(key=lambda item: (-item[0], item[1]))
+         if not ranked:
+             return []
+         # Keep close alternatives as hypotheses; score is not a calibrated probability.
+-        return [(i, s) for s, i in ranked if s >= ranked[0][0] - max(0.15, ranked[0][0] * 0.08)]
++        def signature(index):
++            primary, source, operation = self.features[index]
++            return operation, tuple((word, primary[word], source[word]) for word in sorted(set(query)))
++        equivalent = signature(ranked[0][1])
++        return [(i, s) for s, i in ranked if s >= ranked[0][0] - max(0.15, ranked[0][0] * 0.08) or signature(i) == equivalent]
+ 
+     @staticmethod
+     def extract(action, name, typ):
+-        pattern = r"\b" + re.escape(name) + r"\s*(?:=|:|is\b)?\s*(?:'([^']*)'|\"([^\"]*)\"|([-+]?\d+(?:\.\d+)?)\b|(true|false)\b)"
++        words = re.findall(r'[^\W_]+', re.sub(r'([a-z0-9])([A-Z])', r'\1 \2', name))
++        label = r'[ _-]*'.join(map(re.escape, words))
++        pattern = r"\b" + label + r"\s*(?:=|:|is\b)?\s*(?:'([^']*)'|\"([^\"]*)\"|([-+]?\d+(?:\.\d+)?)\b|(true|false)\b)"
+         match = re.search(pattern, action, re.I)
+         if not match:
++            if typ.split('.')[-1] in {'String', 'str', 'UUID'}:
++                text = re.search(r'\b' + label + r'\s*(?:=|:|is\b)\s*([\w@.+-]+)', action, re.I)
++                if text:
++                    return text[1]
+             return Unknown("no source-grounded scenario literal", typ, name)
+         if match[1] is not None or match[2] is not None:
+             return match[1] if match[1] is not None else match[2]
+         if match[4]:
+-            return match[4].lower() == "true"
++            return match[4] if typ.split('.')[-1] in {'String', 'str'} else match[4].lower() == "true"
++        if re.match(r'[./*]|,\d|[-–]\s*\d|\s+\d', action[match.end():]):
++            return Unknown('Numeric fragment has an unsupported continuation', typ, name)
+         unit = re.match(r"\s*(kg|grams?|kilograms?|g|lb|lbs|pounds?|km|cm|mm|ms|seconds?|minutes?|hours?)\b", action[match.end():], re.I)
+         if unit:
+             return Unknown("numeric literal carries units without a source-derived conversion", typ, name)
++        if typ.split('.')[-1] in {'String', 'str'}:
++            return match[3]
+         return float(match[3]) if "." in match[3] else int(match[3])
+ 
+     def bind(self, engine, scenario, step, history):
+@@ -92,7 +132,6 @@
+         direct = re.search(r"\b(GET|POST|PUT|PATCH|DELETE)\s+((?:https?://[^\s]+)?/[^\s]*)", action, re.I)
+         if direct:
+             return {"method": direct[1].upper(), "url": direct[2]}, {"kind": "literal-http", "literal": direct[0]}
+-        combined = action + " " + scenario.get("title", "") + " " + scenario.get("description", "")
+         candidates = self.candidates(action)
+         if not candidates:
+             engine.note("ungrounded-action", "No source contract matches the scenario action", action=action)
+@@ -106,26 +145,61 @@
+         index, score = candidates[choice]
+         endpoint = self.p.endpoints[index]
+         method = self.p.methods[endpoint.method]
++        engine.note('lexical-grounding', 'Execution is conditional on a lexical source-contract hypothesis', method.span, handler=method.skeleton_id, score=score)
+         request = {"method": endpoint.verb if endpoint.verb != "*" else "GET", "path": endpoint.path,
+-                   "module": endpoint.module, "body": {}, "query": {}, "path_params": {}}
++                   "module": endpoint.module, "body": {}, "query": {}, "path_params": {}, "headers": {}}
+         supplied = {**engine.context.get("inputs", {}), **scenario.get("inputs", {}), **step.get("inputs", {})}
++        context_facts, raw_context, limited = facts(self.p, engine.context)
++        if limited:
++            engine.note('context-span-budget', 'Only the first 192 context spans were retained', method.span)
+         provenance = []
++
++        def value_for(name, alias, typ):
++            if alias in supplied or name in supplied:
++                key = alias if alias in supplied else name
++                return reference(supplied[key], history), {'source': 'provided-input', 'reference': key}
++            value = self.extract(action, alias, typ)
++            if isinstance(value, Unknown) and alias != name and value.reason == 'no source-grounded scenario literal':
++                value = self.extract(action, name, typ)
++            if not isinstance(value, Unknown):
++                return value, {'source': 'scenario-literal', 'quote': action}
++            # Units must not be discarded in favour of a context default.
++            if value.reason != 'no source-grounded scenario literal':
++                return value, {'source': 'scenario-literal', 'quote': action}
++            found = context_facts.get(normalized(alias), context_facts.get(normalized(name)))
++            if found:
++                # An explicitly new value cannot inherit an old context credential.
++                if normalized(name) in {'username', 'password'} and re.search(r'\bnew\b', action, re.I):
++                    return Unknown('New credential has no supplied literal', typ, name), {'source': 'action', 'quote': action}
++                return found['value'], {k: v for k, v in found.items() if k != 'value'}
++            absent = absence(alias, raw_context)
++            if absent and typ.split('.')[-1] in {'String', 'str', 'boolean', 'Boolean', 'bool'}:
++                return (False if typ.split('.')[-1] in {'boolean', 'Boolean', 'bool'} else ''), {'source': 'context-absence', 'references': absent}
++            return value, {'source': 'unresolved'}
++
+         for param in method.params:
+             if param.dependency:
+                 continue
+             alias = param.alias or param.name
+             location = param.location or ("path" if "{" + alias + "}" in endpoint.path else "query")
+             resolved = self.p.resolve_type(param.typ, method.module, method.span.file)
++            if param.typ.split('.')[-1] in {'HttpHeaders', 'BindingResult', 'Principal'}:
++                continue
+             if location == "body" or (endpoint.framework == "fastapi" and resolved):
++                if not resolved:
++                    value, evidence = value_for(param.name, alias, param.typ)
++                    request['body'] = value
++                    provenance.append({'field': alias, **evidence, 'value': value})
++                    continue
+                 for field, (typ, default) in self.p.type_fields(resolved).items():
+-                    value = reference(supplied[field], history) if field in supplied else self.extract(combined, field, typ)
+-                    if not isinstance(value, Unknown) or default is None:
++                    value, evidence = value_for(field, field, typ)
++                    if not isinstance(value, Unknown) or default is None or evidence['source'] != 'unresolved':
+                         request["body"][field] = value
+-                    provenance.append({"field": field, "source": "provided-input" if field in supplied else "scenario-literal", "value": value, "entity": resolved})
++                    provenance.append({"field": field, **evidence, "value": value, "entity": resolved})
+             else:
+-                value = reference(supplied.get(alias), history) if alias in supplied else self.extract(combined, alias, param.typ)
+-                target = "path_params" if location == "path" else "query"
+-                if not isinstance(value, Unknown) or param.default is None:
++                value, evidence = value_for(param.name, alias, param.typ)
++                target = "path_params" if location == "path" else "headers" if location == 'header' else "query"
++                if not isinstance(value, Unknown) or param.default is None or evidence['source'] != 'unresolved':
+                     request[target][alias] = value
+-                provenance.append({"field": alias, "source": "provided-input" if alias in supplied else "scenario-literal", "value": value})
++                provenance.append({"field": alias, **evidence, "value": value})
+         return request, {"kind": "lexical-hypothesis", "handler": method.skeleton_id, "score": score, "provenance": provenance}
+--- a/code/polygraph/input_context.py
++++ b/code/polygraph/input_context.py
+@@ -0,0 +1,124 @@
++"""Context spans reused from variant 14, independent of either language adapter.
++
++The source snapshot and adaptation are recorded in development/reused-components.json.
++"""
++from datetime import datetime
++from itertools import zip_longest
++import re
++
++from .values import Unknown
++
++
++def dates_in(text):
++    result = []
++    patterns = (r'\b\d{4}-\d\d-\d\d(?:[ T]\d\d:\d\d(?::\d\d)?)?',
++                r'\b\d{1,2}\s+[A-Za-z]+\s+\d{4}\b')
++    for pattern in patterns:
++        for match in re.finditer(pattern, text):
++            raw = match[0]
++            for fmt in ('%Y-%m-%dT%H:%M:%S', '%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M', '%Y-%m-%d', '%d %B %Y'):
++                try:
++                    result.append(datetime.strptime(raw, fmt))
++                    break
++                except ValueError:
++                    pass
++    return result
++
++
++def context_spans(raw):
++    sources = raw.items() if isinstance(raw, dict) else [('context', raw)]
++    spans, seen, words, credential_pairs = {}, {}, [], []
++
++    def add(source, quote, value, typ, allowed):
++        key = (str(source), quote, typ)
++        if key not in seen:
++            seen[key] = 'X' + str(len(spans))
++            spans[seen[key]] = {'source': str(source), 'quote': quote, 'value': value,
++                                'type': typ, 'allowed_kinds': allowed}
++        return seen[key]
++
++    for source, value in sources:
++        text = str(value)
++        date_ranges = []
++        add(source, text, text, 'rule', ['choice'])
++        if re.search(r'\b(account|user|username|login|credentials?)\b', str(source) + ' ' + text, re.I):
++            for pair in re.finditer(r'([^\s/]+)\s+/\s+([^\s(),;]+)', text):
++                left, right = [part.strip('\"\'') for part in pair.groups()]
++                a = add(source, left, left, 'credential', ['credential'])
++                b = add(source, right, right, 'credential', ['credential'])
++                credential_pairs.append({'username': a, 'password': b})
++        for match in re.finditer(r'\b\d{4}-\d\d-\d\d(?:[ T]\d\d:\d\d(?::\d\d)?)?|\b\d{1,2}\s+[A-Za-z]+\s+\d{4}\b', text):
++            parsed = dates_in(match[0])
++            if parsed:
++                date_ranges.append(match.span())
++                dt = parsed[0]
++                iso = dt.isoformat() if dt.time() != datetime.min.time() else dt.date().isoformat()
++                key = add(source, match[0], iso, 'date', ['clock', 'default'])
++                spans[key]['label'] = re.split(r'[;.]', text[:match.start()])[-1][-40:] + match[0]
++        for match in re.finditer(r'(?<!\w)([\"\'])(.{1,128}?)\1(?!\w)', text):
++            add(source, match[2], match[2], 'text', ['default', 'credential', 'profile'])
++        for match in re.finditer(r'-?\d+(?:[ _]\d{3})*(?:\.\d+)?', text):
++            if any(start <= match.start() and match.end() <= end for start, end in date_ranges):
++                continue
++            number = re.sub(r'[ _]', '', match[0])
++            add(source, match[0], float(number) if '.' in number else int(number), 'number', ['default'])
++        tokens = list(dict.fromkeys(m[0].rstrip('.') for m in re.finditer(r'[\w@][\w@.+-]*', text)
++                                   if not any(start <= m.start() and m.end() <= end for start, end in date_ranges)))
++        for token in tokens:
++            if re.search(r'[0-9_@]', token):
++                add(source, token, token, 'text', ['default', 'credential', 'profile'])
++        words.append([(source, token) for token in tokens if token])
++    for group in zip_longest(*words):
++        for item in group:
++            if item:
++                add(item[0], item[1], item[1], 'text', ['default', 'credential', 'profile'])
++    limited = len(spans) > 192
++    return dict(list(spans.items())[:192]), limited, credential_pairs
++
++
++def normalized(name):
++    return re.sub(r'[^\w]', '', name).replace('_', '').lower()
++
++
++def facts(project, context):
++    """Only designated context supplies defaults; scenario descriptions are not inputs."""
++    raw = {**project.skeleton.get('context', {}), **context.get('narrative', {})}
++    spans, limited, pairs = context_spans(raw)
++    selected = {}
++    for name in ('username', 'password'):
++        values = {spans[pair[name]]['value'] for pair in pairs if pair[name] in spans}
++        if values:
++            refs = [pair[name] for pair in pairs if pair[name] in spans]
++            value = next(iter(values)) if len(values) == 1 else Unknown('Conflicting context credentials', origin=name)
++            selected[normalized(name)] = {'value': value, 'source': 'context', 'references': [spans[ref] for ref in refs]}
++    dates = {'clock': [], 'request_date': []}
++    for span in spans.values():
++        if span['type'] == 'date':
++            label = span.get('label', '')
++            role = 'clock' if re.search(r'\b(?:system\s+clock|current\s+(?:date|time)|today)\b', label, re.I) else 'request_date'
++            dates[role].append(span)
++    for name, refs in dates.items():
++        if refs:
++            values = {span['value'] for span in refs}
++            value = next(iter(values)) if len(values) == 1 else Unknown('Conflicting context dates', origin=name)
++            selected[normalized(name)] = {'value': value, 'source': 'context', 'references': refs}
++    for name, value in raw.items():
++        # Named scalar context values are explicit. Long narrative fragments
++        # cannot accidentally become strings for equally named request fields.
++        if value is None or type(value) in (bool, int, float) or isinstance(value, str) and len(value.split()) == 1:
++            selected[normalized(name)] = {'value': value, 'source': 'context', 'references': [{'source': name, 'quote': str(value)}]}
++    return selected, raw, limited
++
++
++def absence(name, raw):
++    words = re.findall(r'[^\W_]+', re.sub(r'([a-z0-9])([A-Z])', r'\1 \2', name).lower())
++    if not words:
++        return None
++    pattern = r'\b(?:no|without)\s+' + r'[ _-]*'.join(map(re.escape, words)) + r'\b'
++    matches = []
++    for source, value in raw.items():
++        found = re.search(pattern, str(value), re.I)
++        if found:
++            matches.append({'source': source, 'quote': found[0]})
++    return matches or None
++
+--- a/code/polygraph/java.py
++++ b/code/polygraph/java.py
+@@ -77,6 +77,8 @@
+                     value = text(node).removeprefix("import ").removeprefix("static ").rstrip(";").strip()
+                     if not value.endswith(".*"):
+                         imported[value.split(".")[-1]] = value
++                    else:
++                        self.p.import_wildcards[file].append(value[:-2])
+             module = self.p.module(file)
+             for node in walk(tree.root_node):
+                 if node.type not in {"class_declaration", "interface_declaration", "enum_declaration", "record_declaration"}:
+@@ -255,6 +257,12 @@
+             name = text(node.child_by_field_name("name"))
+             owner = self.owner if receiver is None else self.p.resolve_type(receiver.typ or (self.owner if receiver.value == "this" else text(obj)), self.p.module(self.file), self.file)
+             returns = {method.return_type for method in self.p.methods_of(owner, name, len(arguments))}
++            if not returns and receiver is not None:
++                from .java_contracts import RETURNS
++                raw_type = re.sub(r'<.*>', '', receiver.typ).strip()
++                canonical = raw_type if '.' in raw_type else self.p.resolve_import(raw_type, self.file) or 'java.lang.' + raw_type
++                if name in RETURNS.get(canonical, {}):
++                    returns.add(RETURNS[canonical][name])
+             if not owner and receiver is not None and receiver.op == "var":
+                 canonical = self.p.imports.get(self.file, {}).get(receiver.value, "java.lang." + receiver.value)
+                 primitive_returns = {("java.lang.Long", "parseLong"): "long", ("java.lang.Long", "valueOf"): "Long",
+--- a/code/polygraph/java_contracts.py
++++ b/code/polygraph/java_contracts.py
+@@ -0,0 +1,52 @@
++"""Signatures for modeled Java libraries, never names from the target project."""
++import re
++import xml.etree.ElementTree as ET
++
++RETURNS = {
++    'org.springframework.http.HttpHeaders': {'get': 'java.util.List<String>', 'getFirst': 'String', 'containsKey': 'boolean', 'isEmpty': 'boolean'},
++    'java.util.List': {'size': 'int', 'isEmpty': 'boolean', 'contains': 'boolean'},
++    'java.util.Collection': {'size': 'int', 'isEmpty': 'boolean', 'contains': 'boolean'},
++    'java.util.Map': {'size': 'int', 'isEmpty': 'boolean', 'containsKey': 'boolean'},
++    'java.lang.String': {'length': 'int', 'isEmpty': 'boolean', 'equals': 'boolean'},
++}
++TYPES = set(RETURNS) | {
++    'org.springframework.http.HttpMethod', 'org.springframework.http.HttpStatus',
++    'org.springframework.http.HttpEntity', 'org.springframework.http.ResponseEntity',
++    'org.springframework.web.client.RestTemplate', 'org.springframework.util.Assert',
++    'org.springframework.util.StringUtils', 'org.slf4j.LoggerFactory', 'org.slf4j.Logger',
++    'java.util.ArrayList', 'java.util.HashMap', 'java.util.LinkedList', 'java.util.LinkedHashMap',
++    'java.util.Optional', 'java.util.UUID',
++}
++
++
++def spring_versions(pom):
++    """Explicit dependency versions only; no Maven execution or guessed Boot BOM."""
++    root = ET.fromstring(pom)
++    for node in root.iter():
++        node.tag = node.tag.rsplit('}', 1)[-1]
++    props = {node.tag: node.text or '' for node in root.findall('./properties/*')}
++    versions = set()
++    for dependency in root.findall('./dependencies/dependency') + root.findall('./dependencyManagement/dependencies/dependency'):
++        if dependency.findtext('groupId') != 'org.springframework':
++            continue
++        version = dependency.findtext('version', '').strip()
++        for _ in range(len(props) + 1):
++            found = re.fullmatch(r'\$\{([^}]+)\}', version)
++            if not found or found[1] not in props:
++                break
++            version = props[found[1]].strip()
++        if re.fullmatch(r'\d+\.\d+\.\d+(?:[.-][\w.-]+)?', version):
++            versions.add(version)
++    return versions
++
++
++def entity_headers_readonly(engine, span):
++    module = engine.method.module if engine.method else engine.p.module(span.file)
++    supplied = engine.context.get('framework_versions', {}).get(module, {}).get('spring')
++    version = supplied or engine.p.framework_versions.get(module, {}).get('spring', '')
++    family = re.match(r'(\d+)\.(\d+)(?:\.|$)', version) if isinstance(version, str) else None
++    # These source contracts were checked against official upstream tags.
++    if family and tuple(map(int, family.groups())) in {(5, 3), (6, 2), (7, 0)}:
++        return True
++    engine.note('framework-version-unknown', 'HttpEntity header mutability is version-dependent; both contracts remain possible', span, module=module, spring_version=version or 'unspecified')
++    return engine.choose((True, False), 'HttpEntity headers readonly contract')
+--- a/code/polygraph/kernel.py
++++ b/code/polygraph/kernel.py
+@@ -333,7 +333,7 @@
+             value = self.definition_value(self.p.globals[global_key], global_key) if file.endswith(".py") else self.value(self.p.globals[global_key], {})
+             self.state.globals[global_key] = value
+             return value
+-        imported = bindings[0] if bindings else self.p.imports.get(file, {}).get(name)
++        imported = bindings[0] if bindings else self.p.resolve_import(name, file)
+         if imported:
+             if imported.startswith("builtins."):
+                 return TypeRef(imported.removeprefix("builtins."))
+@@ -579,6 +579,16 @@
+         if receiver is None and explicit_receiver:
+             raise Raised("NullPointerException" if self.language == "java" else "AttributeError")
+         if not explicit_receiver:
++            if self.language == 'java' and (self.method or isinstance(env.get('this'), Object)):
++                implicit = env.get('this')
++                owner = implicit.typ if isinstance(implicit, Object) else self.method.owner
++                targets = self.p.methods_of(owner, name, len(args))
++                if len(targets) == 1:
++                    return self.source_call(targets[0].key, args, kwargs, implicit, span)
++                if len(targets) > 1:
++                    return self.opaque('ambiguous source dispatch ' + name, span)
++                if name == 'getClass' and isinstance(implicit, Object):
++                    return TypeRef(implicit.typ)
+             resolved = self.resolve_name(name, env, span, bindings)
+             if isinstance(resolved, FunctionRef):
+                 return self.source_call(resolved.name, args, kwargs, span=span)
+@@ -586,12 +596,6 @@
+                 typ = self.p.resolve_type(resolved.name, self.method.module if self.method else "", span.file)
+                 if typ:
+                     return self.create(typ, args, kwargs, span)
+-            if isinstance(env.get("this"), Object):
+-                targets = self.p.methods_of(env["this"].typ, name, len(args))
+-                if len(targets) == 1:
+-                    return self.source_call(targets[0].key, args, kwargs, env["this"], span)
+-                if name == "getClass":
+-                    return TypeRef(env["this"].typ)
+             if isinstance(resolved, Unknown):
+                 return self.opaque("unresolved callable " + name, span)
+             receiver, name = None, resolved.name if isinstance(resolved, TypeRef) else name
+--- a/code/polygraph/models.py
++++ b/code/polygraph/models.py
+@@ -10,6 +10,7 @@
+ 
+ 
+ NOT_HANDLED = object()
++HTTP_HEADERS = {'spring.HttpHeaders', 'spring.ReadOnlyHttpHeaders'}
+ STATUSES = {"OK": 200, "CREATED": 201, "ACCEPTED": 202, "NO_CONTENT": 204,
+             "BAD_REQUEST": 400, "UNAUTHORIZED": 401, "FORBIDDEN": 403, "NOT_FOUND": 404,
+             "METHOD_NOT_ALLOWED": 405, "CONFLICT": 409, "UNPROCESSABLE_ENTITY": 422,
+@@ -49,8 +50,12 @@
+     short = simple(typ)
+     if short in {"ResponseEntity", "HttpEntity"}:
+         status = args[-1] if args and type(args[-1]) is int and short == "ResponseEntity" else 200
+-        body = args[0] if args and not (len(args) == 1 and type(args[0]) is int) else None
+-        return Response(body, status, args[-2] if len(args) > 2 and isinstance(args[-2], dict) else {})
++        body = args[0] if args and not (short == 'ResponseEntity' and len(args) == 1 and type(args[0]) is int) else None
++        header_arg = args[1] if len(args) >= (3 if short == 'ResponseEntity' else 2) else None
++        if short == 'HttpEntity' and len(args) == 1 and isinstance(body, Object) and body.typ in HTTP_HEADERS:
++            body, header_arg = None, body
++        headers = header_arg.fields.get('values') if isinstance(header_arg, Object) and header_arg.typ in HTTP_HEADERS else header_arg
++        return Response(body, status, headers if headers is not None else {})
+     if typ in {"fastapi.HTTPException", "starlette.exceptions.HTTPException", "HTTPException"}:
+         fields = dict(kwargs)
+         if args:
+@@ -62,7 +67,16 @@
+         if args and unknown(args[0]):
+             return Unknown("unknown collection constructor input")
+         return list(args[0]) if args and isinstance(args[0], (tuple, list)) else []
+-    if short in {"HashMap", "LinkedHashMap", "Map", "HttpHeaders"}:
++    if short == 'HttpHeaders':
++        if args and isinstance(args[0], Object) and args[0].typ in HTTP_HEADERS:
++            return engine.state.new(args[0].typ, {'values': args[0].fields.get('values')})
++        if args and unknown(args[0]):
++            return engine.state.new('spring.HttpHeaders', {'values': Unknown('Unknown initial HTTP headers')})
++        if args and not isinstance(args[0], dict):
++            return NOT_HANDLED
++        values = args[0] if args and isinstance(args[0], dict) else {}
++        return engine.state.new('spring.HttpHeaders', {'values': {str(k).lower(): list(v) if isinstance(v, list) else [v] for k, v in values.items()}})
++    if short in {"HashMap", "LinkedHashMap", "Map"}:
+         return dict(args[0]) if args and isinstance(args[0], dict) else {}
+     if short == "Session":
+         binding = args[0] if args else kwargs.get("bind")
+@@ -270,7 +284,7 @@
+     is_python = typ in {"requests", "httpx", "httpx.Client", "httpx.AsyncClient"}
+     if not is_java and not is_python:
+         return NOT_HANDLED
+-    method, body, url = "GET", {}, None
++    method, body, url, headers = "GET", {}, None, kwargs.get('headers', {})
+     if is_java:
+         if name in {"getForObject", "getForEntity"}:
+             url = args[0] if args else None
+@@ -285,6 +299,7 @@
+         else:
+             return NOT_HANDLED
+         if isinstance(body, Response):
++            headers = body.headers
+             body = body.body
+     elif name in {"get", "post", "put", "patch", "delete", "head", "options", "request"}:
+         if name == "request":
+@@ -301,7 +316,9 @@
+     body = wire(body)
+     if wire_incomplete(body):
+         engine.unsupported("HTTP body serialization requires an unmodeled cyclic/deep codec", span)
+-    response = engine.request({"method": method, "url": url, "body": body, "query": kwargs.get("params", {}), "headers": kwargs.get("headers", {})}, engine.method, span)
++    if not isinstance(headers, dict) or id(headers) in engine.state.tainted_containers:
++        engine.unsupported('HTTP request header map is unknown', span)
++    response = engine.request({"method": method, "url": url, "body": body, "query": kwargs.get("params", {}), "headers": headers}, engine.method, span)
+     if is_java:
+         status = response.status
+         if type(status) is int and status >= 400:
+@@ -313,6 +330,31 @@
+ 
+ 
+ def call(engine, receiver, name, args, kwargs, span):
++    if isinstance(receiver, Object) and receiver.typ in HTTP_HEADERS:
++        if receiver.typ == 'spring.ReadOnlyHttpHeaders' and name in {'set', 'add', 'put'}:
++            raise Raised('UnsupportedOperationException')
++        if receiver.typ == 'spring.ReadOnlyHttpHeaders' and name == 'get':
++            engine.unsupported('Read-only header list views are outside the modeled scalar header API', span)
++        values = receiver.fields.get('values')
++        if isinstance(values, Unknown) or args and unknown(args[0]):
++            if name in {'set', 'add', 'put'}:
++                receiver.fields['values'] = Unknown('Unknown header mutation')
++            return Unknown('Unknown HTTP headers operation')
++        key = str(args[0]).lower() if args else ''
++        if name in {'get', 'getFirst', 'containsKey'}:
++            found = values.get(key)
++            if isinstance(found, Unknown):
++                return found
++            return key in values if name == 'containsKey' else found[0] if name == 'getFirst' and found else None if name == 'getFirst' else found
++        if name in {'set', 'add', 'put'} and len(args) == 2:
++            previous = values.get(key)
++            if name == 'add':
++                values.setdefault(key, []).append(args[1])
++            else:
++                values[key] = args[1] if name == 'put' else [args[1]]
++            return previous if name == 'put' else None
++        if name == 'isEmpty':
++            return not values
+     if isinstance(receiver, Object) and receiver.typ in {"spring.JdbcTemplate", "spring.NamedParameterJdbcTemplate"} and name in {"queryForList", "queryForObject", "queryForMap"}:
+         from .sql_queries import evaluate
+         parameters = args[1] if len(args) > 1 and isinstance(args[1], (dict, list, tuple)) else args[2:] if name == "queryForObject" else args[1:]
+@@ -361,6 +403,11 @@
+     if isinstance(receiver, Response):
+         if name in {"getBody", "json"}:
+             return receiver.body
++        if name == 'getHeaders':
++            from .java_contracts import entity_headers_readonly
++            if receiver.headers_readonly is None:
++                receiver.headers_readonly = entity_headers_readonly(engine, span)
++            return engine.state.new('spring.ReadOnlyHttpHeaders' if receiver.headers_readonly else 'spring.HttpHeaders', {'values': receiver.headers})
+         if name in {"getStatusCodeValue", "getStatusCode"}:
+             return receiver.status
+         if name == "raise_for_status":
+--- a/code/polygraph/project.py
++++ b/code/polygraph/project.py
+@@ -29,8 +29,9 @@
+         for mid, node in self.nodes.items():
+             if node.get("kind") == "method":
+                 self.source_candidates[(node.get("file"), node.get("name"))].append((mid, node))
+-        self.method_by_id, self.types_by_name = {}, defaultdict(list)
++        self.method_by_id, self.types_by_name, self.types_by_fqn = {}, defaultdict(list), defaultdict(list)
+         self.imports, self.globals, self.aliases = {}, {}, {}
++        self.import_wildcards = defaultdict(list)
+         self.immutable_globals = set()
+         self.lexical_modules = {}
+         self.raw_methods, self.adapters, self.diagnostics = {}, {}, []
+@@ -39,6 +40,8 @@
+         self.tables = {k: v for k, v in self.nodes.items() if v.get("kind") == "data_resource"}
+         self.profiles = set(profiles)
+         self.config = {}
++        self.framework_versions = {}
++        build_sources, spring_candidates = {}, defaultdict(set)
+         self.sources = {}
+         self.lowered, self.cache_hits = 0, 0
+         self.cache_path = Path(cache) if cache else None
+@@ -55,19 +58,34 @@
+                 continue
+             if path.suffix in {".java", ".py"}:
+                 self.sources[relative.as_posix()] = path.read_bytes()
++            elif path.name == 'pom.xml':
++                from .java_contracts import spring_versions, ET
++                raw = path.read_bytes()
++                build_sources[relative.as_posix()] = raw
++                try:
++                    spring_candidates[self.module(relative.as_posix())].update(spring_versions(raw))
++                except ET.ParseError:
++                    self.warn('build-config-parse', 'Maven metadata cannot establish library versions', Span(relative.as_posix()))
+             elif path.name.startswith("application") and path.suffix in {".properties", ".yaml", ".yml"}:
+                 raw = path.read_text(errors="replace")
+                 for key, value in re.findall(r"(?m)^\s*([\w.-]+)\s*[=:]\s*([^\n#]+)", raw):
+                     self.config[key.strip()] = value.strip().strip('"\'')
++        for module, versions in spring_candidates.items():
++            if module and len(versions) == 1:
++                self.framework_versions[module] = {'spring': next(iter(versions))}
++            elif len(versions) > 1:
++                self.warn('framework-version-conflict', 'Explicit Spring dependency versions disagree; mutability is unknown', detail=module)
+         if not self.profiles:
+             self.profiles.update(p.strip() for p in self.config.get("spring.profiles.active", "").split(",") if p.strip())
+         digest = hashlib.sha256(self.MODEL_VERSION.encode())
+-        for package in ("tree-sitter", "tree-sitter-java", "libcst", "sqlglot", "z3-solver"):
++        for package in ("tree-sitter", "tree-sitter-java", "libcst", "sqlglot", "z3-solver", "rank-bm25", "numpy"):
+             digest.update((package + "=" + importlib.metadata.version(package)).encode())
+         digest.update(json.dumps(self.skeleton, sort_keys=True).encode())
+         digest.update(json.dumps(sorted(self.profiles)).encode())
+         digest.update(json.dumps(self.config, sort_keys=True).encode())
+         for file, content in self.sources.items():
++            digest.update(file.encode() + b"\0" + content)
++        for file, content in build_sources.items():
+             digest.update(file.encode() + b"\0" + content)
+         # A model/code change invalidates lowered IR even when source bytes stay equal.
+         for path in sorted(Path(__file__).parent.glob("*.py")):
+@@ -116,6 +134,7 @@
+     def add_type(self, info):
+         self.types[info.key] = info
+         self.types_by_name[info.name].append(info.key)
++        self.types_by_fqn[info.key.split(':', 1)[-1]].append(info.key)
+ 
+     def add_method(self, method, raw):
+         candidates = []
+@@ -174,13 +193,25 @@
+         raw = re.sub(r"<.*>|\[.*\]|\?", "", name).strip()
+         if raw in self.types:
+             return raw
+-        imported = self.imports.get(file, {}).get(raw, raw)
+-        candidates = [key for key, info in self.types.items() if key == imported or key.split(":", 1)[-1] == imported]
++        imported = self.resolve_import(raw, file) or raw
++        candidates = self.types_by_fqn.get(imported, [])
+         if not candidates:
+             candidates = self.types_by_name.get(raw.split(".")[-1], [])
+         local = [key for key in candidates if self.types[key].module == module]
+         selected = local or candidates
+         return selected[0] if len(selected) == 1 else ""
++
++    def resolve_import(self, name, file):
++        explicit = self.imports.get(file, {}).get(name)
++        if explicit:
++            return explicit
++        if file.endswith('.java'):
++            from .java_contracts import TYPES
++            candidates = [package + '.' + name for package in self.import_wildcards[file]
++                          if package + '.' + name in TYPES or package + '.' + name in self.types_by_fqn]
++            if len(set(candidates)) == 1:
++                return candidates[0]
++        return ''
+ 
+     def type_fields(self, key, seen=None):
+         seen = set() if seen is None else seen
+@@ -229,8 +260,12 @@
+         if target:
+             name = target + name[len(name.split(".")[0]):]
+         local_module = self.adapters["python"].module_names.get(file, "")
++        name = self.adapters["python"].scoped(name, file)
+         variants = {name, local_module + "." + name}
+-        matches = [m.key for m in self.methods.values() if m.language == "python" and (m.key in variants or (m.name == name and m.span.file == file))]
++        matches = [m.key for m in self.methods.values() if m.language == "python" and (m.key in variants or (m.owner not in self.types and m.name == name and m.span.file == file))]
++        scope = module or self.module(file)
++        local = [key for key in matches if self.methods[key].module == scope]
++        matches = local or matches
+         if len(matches) == 1:
+             return matches[0]
+         return ""
+--- a/code/polygraph/protocol.py
++++ b/code/polygraph/protocol.py
+@@ -193,12 +193,14 @@
+             resolved_type = engine.p.resolve_type(param.typ, method.module, method.span.file)
+             if location == "path" or alias in path_values:
+                 value = path_values.get(alias, Unknown("missing path variable", param.typ, alias))
++            elif param.typ.split(".")[-1] == "HttpHeaders":
++                value = engine.state.new('spring.HttpHeaders', {'values': {k: v if isinstance(v, list) else [v] for k, v in headers.items()}})
+             elif location == "header":
+                 value = headers.get(alias.lower(), Unknown("header not supplied", param.typ, alias))
++                if isinstance(value, list):
++                    value = value[0] if len(value) == 1 else Unknown('Multiple header values require an unmodeled scalar converter', param.typ, alias)
+             elif location == "body" or (endpoint.framework == "fastapi" and resolved_type):
+                 value = bind_body(engine, body, param.typ, method.span)
+-            elif param.typ.split(".")[-1] in {"HttpHeaders"}:
+-                value = headers
+             elif param.typ.split(".")[-1] == "BindingResult":
+                 value = engine.state.new("spring.BindingResult", {"errors": Unknown("validation has not been evaluated")})
+             elif param.typ.split(".")[-1] == "Principal":
+@@ -217,7 +219,9 @@
+         if isinstance(response.body, Awaitable):
+             engine.note("unawaited-response", "A returned coroutine is not a serializable HTTP body", method.span)
+             return Response(None, 500)
+-        response.body = wire(response.body)
++        # HTTP transfers values. Do not share the server's header map or its
++        # client-library view policy with a caller in another deployment.
++        response = Response(wire(response.body), response.status, wire(response.headers))
+         if wire_incomplete(response.body):
+             engine.note("serialization-unknown", "Response serialization may fail or require an unsupported codec", method.span)
+             response.status = Unknown("unmodeled serialization status")
+--- a/code/polygraph/python.py
++++ b/code/polygraph/python.py
+@@ -1,6 +1,7 @@
+ """Python AST -> shared IR, plus source-derived FastAPI contracts. No imports run."""
+ import ast
+ from pathlib import PurePosixPath
++from collections import defaultdict
+ from libcst import ParserSyntaxError
+ 
+ from .ir import Endpoint, Expr, Method, Parameter, Span, Stmt, TypeInfo
+@@ -30,6 +31,7 @@
+         self.file = ""
+         self.bindings = {}
+         self.node_files = {}
++        self.import_modules, self.deployments, self.scoped_modules = {}, {}, {}
+ 
+     def span(self, node):
+         return Span(self.file, getattr(node, "lineno", 0), getattr(node, "col_offset", 0) + 1)
+@@ -37,11 +39,23 @@
+     def qualified(self, value, file=None):
+         file = file or self.file
+         first = value.split(".")[0]
+-        return self.p.imports.get(file, {}).get(first, self.module_names.get(file, "") + "." + first) + value[len(first):]
++        target = self.p.imports.get(file, {}).get(first, self.module_names.get(file, "") + "." + first) + value[len(first):]
++        return self.scoped(target, file)
++
++    def scoped(self, value, file):
++        if ":" in value:
++            return value
++        parts = value.split(".")
++        for length in range(len(parts), 0, -1):
++            module = self.scoped_modules.get((self.deployments.get(file, ""), ".".join(parts[:length])))
++            if module:
++                return module + ("." + ".".join(parts[length:]) if length < len(parts) else "")
++        return value
+ 
+     def references(self, node):
+         file = self.node_files.get(id(node), self.file)
+-        return self.bindings.get(file, {}).get((getattr(node, "lineno", 0), getattr(node, "col_offset", 0), type(node).__name__), ())
++        values = self.bindings.get(file, {}).get((getattr(node, "lineno", 0), getattr(node, "col_offset", 0), type(node).__name__), ())
++        return tuple(self.scoped(value, file) for value in values)
+ 
+     def canonical(self, node):
+         references = self.references(node)
+@@ -52,10 +66,10 @@
+         return value.split(".")[-1] if value.startswith(("fastapi.", "typing.", "typing_extensions.", "sqlmodel.", "pydantic.", "pydantic_settings.")) and value.split(".")[-1] in choices else ""
+ 
+     def index(self):
+-        for file, source in self.p.sources.items():
++        owners = defaultdict(set)
++        for file in self.p.sources:
+             if not file.endswith(".py"):
+                 continue
+-            self.file = file
+             path = PurePosixPath(file)
+             # Recover the import package from __init__.py ancestry, not directory names.
+             parts = [path.stem] if path.stem != "__init__" else []
+@@ -63,12 +77,23 @@
+             while str(parent) != "." and (parent / "__init__.py").as_posix() in self.p.sources:
+                 parts.insert(0, parent.name)
+                 parent = parent.parent
+-            module = ".".join(parts) or path.parent.name
+-            self.module_names[file] = module
+-            self.p.lexical_modules[file] = module
++            raw_module = ".".join(parts) or path.parent.name
++            deployment = self.p.module(file)
++            self.import_modules[file], self.deployments[file] = raw_module, deployment
++            owners[raw_module].add(deployment)
++        for file, raw_module in self.import_modules.items():
++            deployment = self.deployments[file]
++            module = "py@" + deployment + ":" + raw_module if len(owners[raw_module]) > 1 else raw_module
++            self.module_names[file] = self.p.lexical_modules[file] = module
++            self.scoped_modules[deployment, raw_module] = module
++        for file, raw_module in self.import_modules.items():
++            source = self.p.sources[file]
++            self.file = file
++            path = PurePosixPath(file)
++            module = self.module_names[file]
+             try:
+-                package = module if path.stem == "__init__" else module.rpartition(".")[0]
+-                normalized, self.bindings[file], changed = parse_names(source, module, package)
++                package = raw_module if path.stem == "__init__" else raw_module.rpartition(".")[0]
++                normalized, self.bindings[file], changed = parse_names(source, raw_module, package)
+                 tree = ast.parse(normalized, filename=file)
+                 if changed:
+                     self.p.warn("python-syntax-normalized", "LibCST parenthesized exception tuples in memory for the host AST parser", Span(file))
+@@ -85,7 +110,7 @@
+                 elif isinstance(node, ast.ImportFrom):
+                     base = node.module or ""
+                     if node.level:
+-                        prefix = module.split(".") if path.stem == "__init__" else module.split(".")[:-1]
++                        prefix = raw_module.split(".") if path.stem == "__init__" else raw_module.split(".")[:-1]
+                         prefix = prefix[:len(prefix) - node.level + 1]
+                         base = ".".join(prefix + ([base] if base else []))
+                     for alias in node.names:
+--- a/code/polygraph/values.py
++++ b/code/polygraph/values.py
+@@ -71,6 +71,7 @@
+     body: object = None
+     status: object = 200
+     headers: dict = field(default_factory=dict)
++    headers_readonly: bool | None = None
+ 
+ 
+ @dataclass(frozen=True)
+@@ -222,6 +223,8 @@
+             return Unknown("wire cycle or depth requires an unmodeled serializer")
+         active = active | {id(value)}
+     if isinstance(value, Object):
++        if value.typ in {'spring.HttpHeaders', 'spring.ReadOnlyHttpHeaders'}:
++            return wire(value.fields.get('values'), active)
+         return {k: wire(v, active) for k, v in value.fields.items()}
+     if isinstance(value, dict):
+         return {k: wire(v, active) for k, v in value.items()}
+--- a/code/tests/test_input_contracts.py
++++ b/code/tests/test_input_contracts.py
+@@ -0,0 +1,289 @@
++"""Grounding oracles cover input origin, not just expected JSON shape."""
++import pytest
++
++from polygraph.analysis import analyze
++from polygraph.grounding import Grounder
++from polygraph.input_context import facts
++from polygraph.kernel import Kernel
++from polygraph.state import State
++from polygraph.values import Unknown
++from support import edge_set, fixture, scenario
++
++
++@pytest.mark.parametrize('language', ['java', 'python'])
++def test_narrative_credentials_and_absence_bind_for_both_stacks(tmp_path, language):
++    java = '''import org.springframework.web.bind.annotation.*;
++class Credentials {String username;String password;String verificationCode;}
++@RestController class Accounts {
++ @PostMapping("/login") String login(@RequestBody Credentials credentials){
++  if(credentials.username.equals("dana") && credentials.password.equals("0042") && credentials.verificationCode.equals(""))return accepted();
++  return rejected();
++ }
++ String accepted(){return "accepted";}
++ String rejected(){return "rejected";}
++}'''
++    python = '''from fastapi import FastAPI
++from sqlmodel import SQLModel
++app=FastAPI()
++class Credentials(SQLModel):
++    username:str
++    password:str
++    verificationCode:str
++def accepted():return "accepted"
++def rejected():return "rejected"
++@app.post("/login")
++def login(credentials:Credentials):
++    if credentials.username=="dana" and credentials.password=="0042" and credentials.verificationCode=="":return accepted()
++    return rejected()
++'''
++    p, store, ids = fixture(tmp_path, {'Accounts.java' if language == 'java' else 'accounts.py': java if language == 'java' else python})
++    p.skeleton['context'] = {'account': 'The pre-registered user is dana / 0042; no verification code at login.'}
++    block, detail = analyze(p, store, {}, {'id': 'credentials', 'steps': [{'action': 'Log in with username and password'}]})
++    owner = 'Accounts' if language == 'java' else 'accounts'
++    login, accepted = ids[owner + '.login'], ids[owner + '.accepted']
++    assert edge_set(block) == {('scenario:credentials', 'executes', login), ('scenario:credentials', 'executes', accepted), (login, 'calls', accepted)}
++    step = detail['paths'][0]['steps'][0]
++    assert step['response']['body'] == 'accepted'
++    assert step['request']['body'] == {'username': 'dana', 'password': '0042', 'verificationCode': ''}
++    assert all(binding['references'] for binding in step['grounding']['provenance'])
++
++
++def test_conflicting_credentials_are_unknown_and_new_credentials_do_not_reuse_old_ones(tmp_path):
++    p, store, _ = fixture(tmp_path, {'main.py': '''from fastapi import FastAPI
++app=FastAPI()
++@app.post("/login")
++def login(username:str,password:str):return username
++'''})
++    p.skeleton['context'] = {'account': 'User: dana / 0042 or lee / 0099'}
++    engine = Kernel(p, State(store)); engine.scenario_id = 'conflict'
++    request, _ = Grounder(p).bind(engine, {}, {'action': 'Log in'}, {})
++    assert isinstance(request['query']['username'], Unknown)
++    assert isinstance(request['query']['password'], Unknown)
++    p.skeleton['context'] = {'account': 'User: dana / 0042'}
++    request, _ = Grounder(p).bind(engine, {}, {'action': 'Log in with new username and password'}, {})
++    assert isinstance(request['query']['username'], Unknown)
++    assert isinstance(request['query']['password'], Unknown)
++
++
++def test_explicit_values_override_context_and_other_steps_cannot_supply_literals(tmp_path):
++    p, store, _ = fixture(tmp_path, {'main.py': '''from fastapi import FastAPI
++app=FastAPI()
++@app.get("/record")
++def read_record(record_id:int):return record_id
++'''})
++    engine = Kernel(p, State(store), context={'inputs': {'record_id': 17}})
++    engine.scenario_id = 'value'
++    request, binding = Grounder(p).bind(engine, {}, {'action': 'Read record', 'inputs': {'record_id': 23}}, {})
++    assert request['query']['record_id'] == 23
++    assert binding['provenance'][0]['source'] == 'provided-input'
++    engine.context = {}
++    request, _ = Grounder(p).bind(engine, {'description': 'Later read record_id=99'}, {'action': 'Read record'}, {})
++    assert isinstance(request['query']['record_id'], Unknown)
++
++
++def test_units_in_literal_cannot_fall_back_to_default_or_context(tmp_path):
++    p, store, _ = fixture(tmp_path, {'main.py': '''from fastapi import FastAPI
++app=FastAPI()
++@app.get("/mass")
++def read_mass(weightGrams:int=20):return weightGrams
++'''})
++    engine = Kernel(p, State(store), context={'narrative': {'weightGrams': 10}})
++    request, _ = Grounder(p).bind(engine, {}, {'action': 'Read mass with weight grams=5 kg'}, {})
++    assert isinstance(request['query']['weightGrams'], Unknown)
++
++
++def test_context_distinguishes_system_clock_request_date_and_invalid_dates(tmp_path):
++    p, _, _ = fixture(tmp_path, {})
++    p.skeleton['context'] = {'date': 'All requests use 2 November 2026; system clock is 2026-10-17.', 'invalid': '2026-02-31'}
++    selected, _, _ = facts(p, {})
++    assert selected['clock']['value'] == '2026-10-17'
++    assert selected['requestdate']['value'] == '2026-11-02'
++    p.skeleton['context'] = {'account': 'User profile is at http://example.test/users'}
++    assert 'username' not in facts(p, {})[0]
++
++
++def test_header_alias_is_bound_to_header_and_body_string_is_not_a_dictionary(tmp_path):
++    java = '''import org.springframework.web.bind.annotation.*;
++@RestController class Echo {
++ @PostMapping("/echo") String echo(@RequestHeader("X-Trace") String trace,@RequestBody String payload){return trace+":"+payload;}
++}'''
++    p, store, _ = fixture(tmp_path, {'Echo.java': java})
++    _, detail = analyze(p, store, {}, {'id': 'headers', 'steps': [{'action': 'Create echo with trace="ref-1", payload="hello"'}]})
++    step = detail['paths'][0]['steps'][0]
++    assert step['request']['headers'] == {'X-Trace': 'ref-1'}
++    assert step['request']['body'] == 'hello'
++    assert step['response']['body'] == 'ref-1:hello'
++
++
++def test_post_query_operation_is_retrieved_by_source_name_not_assumed_to_create(tmp_path):
++    java = '''import org.springframework.web.bind.annotation.*;
++@RestController class Invoice {
++ @PostMapping("/query") String findInvoices(){return "found";}
++ @PostMapping("/create") String createInvoice(){return "created";}
++}'''
++    p, store, ids = fixture(tmp_path, {'Invoice.java': java})
++    block, detail = analyze(p, store, {}, {'id': 'query', 'steps': [{'action': 'Find invoices'}]})
++    assert edge_set(block) == {('scenario:query', 'executes', ids['Invoice.findInvoices'])}
++    assert detail['paths'][0]['steps'][0]['response']['body'] == 'found'
++
++
++def test_identical_parameterless_contracts_stay_ambiguous_even_with_different_neighbours(tmp_path):
++    p, store, ids = fixture(tmp_path, {'main.py': '''from fastapi import FastAPI
++app=FastAPI()
++@app.post("/a/report")
++def create_report_a():return 1
++@app.post("/b/report")
++def create_report_b():return 2
++def unrelated():return "create report create report create report"
++'''})
++    block, detail = analyze(p, store, {}, {'id': 'ambiguous', 'steps': [{'action': 'Create report'}]})
++    assert len(detail['paths']) == 2
++    assert {e[2] for e in edge_set(block)} == {ids['main.create_report_a'], ids['main.create_report_b']}
++
++
++def test_implicit_method_dispatch_differs_in_java_and_python(tmp_path):
++    p, store, ids = fixture(tmp_path / 'python', {'main.py': '''class Counter:
++    def called(self):return 7
++    def read(self):return called()
++'''})
++    key = p.method_by_id[ids['main.read']]
++    engine = Kernel(p, State(store), decisions=('normal',)); engine.scenario_id = 'python'
++    receiver = engine.create('Counter')
++    engine.execute_method(key, receiver=receiver)
++    assert not any(target == ids['main.called'] for _, _, target in engine.edges)
++    java = '''import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++class Counter {
++ final Logger logger=LoggerFactory.getLogger(getClass());
++ static int called(){return 7;}
++ static int read(){return called();}
++}'''
++    p, store, ids = fixture(tmp_path / 'java', {'Counter.java': java})
++    engine = Kernel(p, State(store)); engine.scenario_id = 'java'
++    engine.create('Counter')
++    assert engine.execute_method(p.method_by_id[ids['Counter.read']]) == 7
++    assert (ids['Counter.read'], 'calls', ids['Counter.called']) in engine.edges
++    assert not any(d['code'] == 'unresolved-name' for d in engine.diagnostics)
++
++
++def test_http_headers_keep_case_insensitivity_multiplicity_and_cross_service_body(tmp_path):
++    java = '''import org.springframework.web.bind.annotation.*;
++import org.springframework.http.*;
++import org.springframework.web.client.RestTemplate;
++@RestController class Caller {
++ @PostMapping("/proxy") String proxy(@RequestHeader HttpHeaders input){
++  HttpHeaders outbound=new HttpHeaders();
++  outbound.set("X-Trace",input.getFirst("x-TRACE"));
++  outbound.add("X-Note","first");outbound.add("x-note","second");
++  if(outbound.get("X-NOTE").size()!=2)return "bad";
++  HttpEntity<String> entity=new HttpEntity<>("payload",outbound);
++  return new RestTemplate().exchange("http://backend/echo",HttpMethod.POST,entity,String.class).getBody();
++ }
++}'''
++    python = '''from fastapi import FastAPI,Header,Body
++app=FastAPI()
++@app.post("/echo")
++def echo(trace:str=Header(alias="X-Trace"),payload:str=Body()):return trace+":"+payload
++'''
++    p, store, ids = fixture(tmp_path, {'gateway/Caller.java': java, 'backend/main.py': python}, modules={'gateway': 'gateway', 'backend': 'backend'})
++    block, detail = analyze(p, store, {}, scenario({'method': 'POST', 'path': '/proxy', 'module': 'gateway', 'headers': {'X-TRACE': 'trace-7'}}))
++    caller, echo = ids['Caller.proxy'], ids['main.echo']
++    assert edge_set(block) == {('scenario:arbitrary', 'executes', caller), ('scenario:arbitrary', 'executes', echo), (caller, 'remote', echo)}
++    assert detail['paths'][0]['steps'][0]['response']['body'] == 'trace-7:payload'
++
++
++def test_headers_only_http_entity_has_empty_body_and_forwards_header(tmp_path):
++    java = '''import org.springframework.web.bind.annotation.*;
++import org.springframework.http.*;
++import org.springframework.web.client.RestTemplate;
++@RestController class Caller {
++ @GetMapping("/proxy") String proxy(){
++  HttpHeaders h=new HttpHeaders();h.set("X-Trace","t9");
++  return new RestTemplate().exchange("http://backend/echo",HttpMethod.GET,new HttpEntity<>(h),String.class).getBody();
++ }
++}'''
++    python = '''from fastapi import FastAPI,Header
++app=FastAPI()
++@app.get("/echo")
++def echo(trace:str=Header(alias="X-Trace")):return trace
++'''
++    p, store, ids = fixture(tmp_path, {'gateway/Caller.java': java, 'backend/main.py': python}, modules={'gateway': 'gateway', 'backend': 'backend'})
++    block, detail = analyze(p, store, {}, scenario({'path': '/proxy', 'module': 'gateway'}))
++    assert (ids['Caller.proxy'], 'remote', ids['main.echo']) in edge_set(block)
++    assert detail['paths'][0]['steps'][0]['response']['body'] == 't9'
++
++
++def test_repeated_login_words_in_an_unrelated_body_do_not_replace_login_contract(tmp_path):
++    unrelated = '\n'.join('    print("login username password")' for _ in range(80))
++    source = '''from fastapi import FastAPI
++app=FastAPI()
++@app.post("/login")
++def authenticate(username:str,password:str):return "ok"
++@app.delete("/leases/{id}")
++def cancel_lease(id:int):
++''' + unrelated + '\n    return "cancelled"\n'
++    p, _, ids = fixture(tmp_path, {'main.py': source})
++    ranked = Grounder(p).candidates('Log in with username and password')
++    assert [p.methods[p.endpoints[i].method].skeleton_id for i, _ in ranked] == [ids['main.authenticate']]
++
++
++@pytest.mark.parametrize('value', ['n=1,000', 'n=1/2', 'n=1.2.3', 'n=1-3', 'n=1 000'])
++def test_unparsed_numeric_continuation_does_not_become_a_concrete_fragment(value):
++    assert isinstance(Grounder.extract(value, 'n', 'int'), Unknown)
++
++
++@pytest.mark.parametrize('value', ['0042', 'false', 'True'])
++def test_string_literal_retains_zeros_and_boolean_spelling(value):
++    assert Grounder.extract('username=' + value, 'username', 'str') == value
++
++
++@pytest.mark.parametrize('version', ['5.3.4', '6.2.0', '7.0.0', ''])
++def test_http_entity_integer_body_and_versioned_header_view(tmp_path, version):
++    java = '''import org.springframework.http.*;
++import org.springframework.web.bind.annotation.*;
++@RestController class Echo {
++ @GetMapping("/entity") int read(){
++  HttpEntity<Integer> entity=new HttpEntity<>(42);
++  try {entity.getHeaders().set("X-Trace","forbidden");return 0;}
++  catch(UnsupportedOperationException error){return entity.getBody();}
++ }
++}'''
++    p, store, _ = fixture(tmp_path, {'Echo.java': java})
++    context = {'framework_versions': {'app': {'spring': version}}} if version else {}
++    _, detail = analyze(p, store, context, scenario({'path': '/entity'}))
++    assert {path['steps'][0]['response']['body'] for path in detail['paths']} == ({42} if version else {0, 42})
++    assert bool([d for path in detail['paths'] for d in path['diagnostics'] if d['code'] == 'framework-version-unknown']) == (not version)
++
++
++def test_maven_explicit_version_is_service_local_and_invalidates_ir_cache(tmp_path):
++    sources = {}
++    for service, version in [('left', '5.3.4'), ('right', '6.2.0')]:
++        sources[service + '/pom.xml'] = '<project xmlns="http://maven.apache.org/POM/4.0.0"><properties><framework>' + version + '</framework></properties><dependencies><dependency><groupId>org.springframework</groupId><artifactId>spring-web</artifactId><version>${framework}</version></dependency></dependencies></project>'
++        sources[service + '/Example.java'] = 'class Example {}'
++    p, _, _ = fixture(tmp_path, sources, modules={'left': 'left', 'right': 'right'})
++    assert p.framework_versions == {'left': {'spring': '5.3.4'}, 'right': {'spring': '6.2.0'}}
++    before = p.fingerprint
++    path = p.root / 'right/pom.xml'
++    path.write_text(path.read_text().replace('6.2.0', '7.0.0'))
++    from polygraph.project import Project
++    changed = Project(p.root, p.skeleton)
++    assert changed.framework_versions['right']['spring'] == '7.0.0'
++    assert changed.fingerprint != before
++
++
++def test_unsupported_read_only_header_list_does_not_expose_a_mutable_list(tmp_path):
++    java = '''import org.springframework.http.*;
++import org.springframework.web.bind.annotation.*;
++@RestController class Echo {
++ int after(){return 99;}
++ @GetMapping("/entity") int read(){
++  HttpHeaders h=new HttpHeaders();h.set("X","one");
++  HttpEntity<Integer> entity=new HttpEntity<>(42,h);
++  entity.getHeaders().get("X").add("two");return after();
++ }
++}'''
++    p, store, ids = fixture(tmp_path, {'Echo.java': java})
++    block, detail = analyze(p, store, {'framework_versions': {'app': {'spring': '5.3.4'}}}, scenario({'path': '/entity'}))
++    assert not any(target == ids['Echo.after'] for _, _, target in edge_set(block))
++    assert detail['status'] == 'partial' and detail['must'] == []
++    assert any(d['code'] == 'unsupported' and 'header list' in d['message'] for path in detail['paths'] for d in path['diagnostics'])
+--- a/code/tests/test_service_namespaces.py
++++ b/code/tests/test_service_namespaces.py
+@@ -0,0 +1,101 @@
++"""Different deployments can legitimately use identical Python package names."""
++import pytest
++
++from polygraph.analysis import analyze
++from support import edge_set, fixture, scenario
++
++
++def method_id(project, module, name):
++    matches = [key for key, node in project.nodes.items() if node.get("kind") == "method" and node.get("module") == module and node.get("name") == name]
++    assert len(matches) == 1
++    return matches[0]
++
++
++@pytest.mark.parametrize("package", ["", "app/"])
++def test_same_python_module_and_handler_in_two_services(tmp_path, package):
++    sources = {
++        "client/" + package + "main.py": '''from fastapi import FastAPI
++import requests
++app=FastAPI()
++@app.get("/call")
++def value():return requests.get("http://server/value").json()
++''',
++        "server/" + package + "main.py": '''from fastapi import FastAPI
++app=FastAPI()
++@app.get("/value")
++def value():return {"answer":42}
++''',
++    }
++    if package:
++        sources.update({"client/app/__init__.py": "", "server/app/__init__.py": ""})
++    p, store, _ = fixture(tmp_path, sources, modules={"client": "client", "server": "server"})
++    block, detail = analyze(p, store, {}, scenario({"path": "/call", "module": "client"}))
++    client, server = method_id(p, "client", "value"), method_id(p, "server", "value")
++    assert edge_set(block) == {("scenario:arbitrary", "executes", client), ("scenario:arbitrary", "executes", server), (client, "remote", server)}
++    assert detail["paths"][0]["steps"][0]["response"]["body"] == {"answer": 42}
++    assert len(p.methods) == 2
++
++
++def test_relative_imports_classes_and_globals_are_service_local(tmp_path):
++    sources = {}
++    for service, initial in [("client", 0), ("server", 10)]:
++        sources[service + "/app/__init__.py"] = ""
++        sources[service + "/app/helpers.py"] = f'''counter={{"n":{initial}}}
++class Counter:
++    def __init__(self,n):self.n=n
++    def read(self):return self.n
++def current():return Counter(counter["n"]).read()
++'''
++        sources[service + "/app/main.py"] = '''from fastapi import FastAPI
++from .helpers import counter,current
++app=FastAPI()
++@app.post("/inc")
++def increment():
++    counter["n"]=counter["n"]+1
++    return current()
++@app.get("/read")
++def read():return current()
++'''
++    p, store, _ = fixture(tmp_path, sources, modules={"client": "client", "server": "server"})
++    _, detail = analyze(p, store, {}, scenario({"method": "POST", "path": "/inc", "module": "client"}, {"path": "/read", "module": "server"}, {"method": "POST", "path": "/inc", "module": "client"}))
++    assert [step["response"]["body"] for step in detail["paths"][0]["steps"]] == [1, 10, 2]
++    _, fresh = analyze(p, store, {}, scenario({"path": "/read", "module": "client"}))
++    assert fresh["paths"][0]["steps"][0]["response"]["body"] == 0
++    assert len([info for info in p.types.values() if info.name == "Counter"]) == 2
++
++
++def test_same_package_names_keep_all_four_relations_and_separate_tables(tmp_path):
++    sources = {}
++    for service in ["client", "server"]:
++        sources[service + "/app/__init__.py"] = ""
++        sources[service + "/app/helpers.py"] = f'''from sqlmodel import SQLModel,Field,Session,create_engine
++class Item(SQLModel,table=True):
++    __tablename__="{service}_inventory"
++    id:int=Field(primary_key=True)
++    value:int
++def read():
++    return Session(create_engine("postgresql://user:pass@db/{service}")).get(Item,1).value
++'''
++    sources["client/app/main.py"] = '''from fastapi import FastAPI
++from .helpers import read
++import requests
++app=FastAPI()
++@app.get("/value")
++def value():return {"local":read(),"remote":requests.get("http://server/value").json()}
++'''
++    sources["server/app/main.py"] = '''from fastapi import FastAPI
++from .helpers import read
++app=FastAPI()
++@app.get("/value")
++def value():return read()
++'''
++    p, store, _ = fixture(tmp_path, sources, ["client_inventory", "server_inventory"], {"client_inventory": [{"id": 1, "value": 10}], "server_inventory": [{"id": 1, "value": 42}]}, modules={"client": "client", "server": "server"})
++    block, detail = analyze(p, store, {}, scenario({"path": "/value", "module": "client"}))
++    client, server = method_id(p, "client", "value"), method_id(p, "server", "value")
++    client_read, server_read = method_id(p, "client", "read"), method_id(p, "server", "read")
++    expected = {("scenario:arbitrary", "executes", key) for key in [client, server, client_read, server_read]}
++    expected |= {(client, "calls", client_read), (server, "calls", server_read), (client, "remote", server),
++                 (client_read, "data", "storage:client_inventory"), (server_read, "data", "storage:server_inventory")}
++    assert edge_set(block) == expected
++    assert detail["paths"][0]["steps"][0]["response"]["body"] == {"local": 10, "remote": 42}
++    assert all(edge_set(block, kind) for kind in ["executes", "calls", "remote", "data"])

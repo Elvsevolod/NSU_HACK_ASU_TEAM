@@ -1,0 +1,24 @@
+....................F......                                              [100%]
+=================================== FAILURES ===================================
+_ test_a_false_or_quoted_annotation_option_does_not_accept_unknown_properties[@JsonIgnoreProperties(/*(ignoreUnknown=true)*/ value="safe")] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-611/test_a_false_or_quoted_annotat3')
+annotation = '@JsonIgnoreProperties(/*(ignoreUnknown=true)*/ value="safe")'
+
+    @pytest.mark.parametrize('annotation',[
+        '@JsonIgnoreProperties',
+        '@JsonIgnoreProperties(ignoreUnknown=false)',
+        '@JsonIgnoreProperties(value="ignoreUnknown=true")',
+        '@JsonIgnoreProperties(/*(ignoreUnknown=true)*/ value="safe")',
+        '@Unrelated(value="ignoreUnknown=true")',
+    ])
+    def test_a_false_or_quoted_annotation_option_does_not_accept_unknown_properties(tmp_path,annotation):
+        decode,warnings,_=decoder(tmp_path,{'Schema.java':'import com.fasterxml.jackson.annotation.JsonIgnoreProperties;'+annotation+' class Item{public String code;}'})
+>       assert decode({'code':'known','undeclared':'wrong'},'Item') is U
+E       AssertionError: assert {'code': 'known', '__type__': 'Item', '__http_entity__': False} is <Unknown.VALUE: 'unknown'>
+E        +  where {'code': 'known', '__type__': 'Item', '__http_entity__': False} = <function decoder.<locals>.decode at 0x104414cc0>({'code': 'known', 'undeclared': 'wrong'}, 'Item')
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:172: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_a_false_or_quoted_annotation_option_does_not_accept_unknown_properties[@JsonIgnoreProperties(/*(ignoreUnknown=true)*/ value="safe")]
+1 failed, 26 passed in 0.09s

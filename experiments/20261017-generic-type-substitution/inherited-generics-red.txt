@@ -1,0 +1,151 @@
+FFFFFF.F.FF..F                                                           [100%]
+=================================== FAILURES ===================================
+_____________ test_concrete_subclass_binds_an_inherited_map_field ______________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-605/test_concrete_subclass_binds_a0')
+
+    def test_concrete_subclass_binds_an_inherited_map_field(tmp_path):
+        decode,warnings,_=decoder(tmp_path,{'Schema.java':'''import java.util.*;
+          class Parent<T>{public T payload;}class Child extends Parent<Map<String,String>>{}'''})
+        result=decode({'payload':{'key':'ready'}},'Child')
+>       assert isinstance(result['payload'],JavaMap) and result['payload'].mapping=={'key':'ready'}
+E       AssertionError: assert (False)
+E        +  where False = isinstance(<Unknown.VALUE: 'unknown'>, JavaMap)
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:35: AssertionError
+____ test_multilevel_substitution_composes_nested_arguments_and_same_names _____
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-605/test_multilevel_substitution_c0')
+
+    def test_multilevel_substitution_composes_nested_arguments_and_same_names(tmp_path):
+        decode,warnings,_=decoder(tmp_path,{'Schema.java':'''import java.util.*;
+          class Item{public String code;}class Base<T>{public T payload;}
+          class Middle<T> extends Base<Map<String,List<T>>>{}class Child<T> extends Middle<T>{}'''})
+        result=decode({'payload':{'one':[{'code':'ready'}]}},'Child<Item>')
+>       item=result['payload'].mapping['one'][0]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'Unknown' object has no attribute 'mapping'
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:44: AttributeError
+_____ test_generic_argument_keeps_its_original_imports_across_inheritance ______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-605/test_generic_argument_keeps_it0')
+
+    def test_generic_argument_keeps_its_original_imports_across_inheritance(tmp_path):
+        decode,warnings,_=decoder(tmp_path,{
+          'Base.java':'package schemas;public class Base<T>{public T payload;}',
+          'Map.java':'package middle;public class Map{}',
+          'Middle.java':'package middle;import schemas.Base;import java.util.List;public class Middle<T> extends Base<List<T>>{}',
+          'Child.java':'package client;import middle.Middle;import java.util.Map;public class Child extends Middle<Map<String,String>>{}',
+        })
+        result=decode({'payload':[{'key':'ready'}]},'client.Child')
+>       assert isinstance(result['payload'][0],JavaMap) and result['payload'][0].mapping=={'key':'ready'}
+                          ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'Unknown' object is not subscriptable
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:57: TypeError
+__________ test_source_type_named_map_is_not_replaced_by_a_native_map __________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-605/test_source_type_named_map_is_0')
+
+    def test_source_type_named_map_is_not_replaced_by_a_native_map(tmp_path):
+        decode,warnings,_=decoder(tmp_path,{
+          'Base.java':'package schemas;public class Base<T>{public T payload;}',
+          'Map.java':'package business;public class Map{public String code;}',
+          'Child.java':'package client;import schemas.Base;import business.Map;public class Child extends Base<Map>{}',
+        })
+        result=decode({'payload':{'code':'ready'}},'client.Child')
+>       assert isinstance(result['payload'],JavaRecord) and result['payload'].declared_type=='business.Map'
+E       AssertionError: assert (False)
+E        +  where False = isinstance(<Unknown.VALUE: 'unknown'>, JavaRecord)
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:68: AssertionError
+_____ test_raw_unbounded_parameter_becomes_object_without_guessing_string ______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-605/test_raw_unbounded_parameter_b0')
+
+    def test_raw_unbounded_parameter_becomes_object_without_guessing_string(tmp_path):
+        decode,warnings,_=decoder(tmp_path,{'Schema.java':'''class Base<String>{public String payload;}
+          class Child<T> extends Base<T>{}'''})
+        result=decode({'payload':{'key':'ready'}},'Child')
+>       assert isinstance(result['payload'],JavaMap) and result['payload'].mapping=={'key':'ready'}
+E       AssertionError: assert (False)
+E        +  where False = isinstance(<Unknown.VALUE: 'unknown'>, JavaMap)
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:76: AssertionError
+_________________ test_raw_bound_uses_the_declared_upper_type __________________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-605/test_raw_bound_uses_the_declar0')
+
+    def test_raw_bound_uses_the_declared_upper_type(tmp_path):
+        decode,warnings,_=decoder(tmp_path,{'Schema.java':'''class Item{public String code;}
+          class Base<T extends Item>{public T payload;}class Child extends Base{}'''})
+        result=decode({'payload':{'code':'ready'}},'Child')
+>       assert isinstance(result['payload'],JavaRecord) and result['payload'].declared_type=='Item'
+E       AssertionError: assert (False)
+E        +  where False = isinstance(<Unknown.VALUE: 'unknown'>, JavaRecord)
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:84: AssertionError
+__ test_inherited_parameter_named_string_is_substituted_before_native_lookup ___
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-605/test_inherited_parameter_named0')
+
+    def test_inherited_parameter_named_string_is_substituted_before_native_lookup(tmp_path):
+        decode,warnings,_=decoder(tmp_path,{'Schema.java':'''class Item{public String code;}
+          class Base<String>{public String payload;}class Child extends Base<Item>{}'''})
+        result=decode({'payload':{'code':'ready'}},'Child')
+>       assert isinstance(result['payload'],JavaRecord) and result['payload']['code']=='ready'
+E       AssertionError: assert (False)
+E        +  where False = isinstance(<Unknown.VALUE: 'unknown'>, JavaRecord)
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:99: AssertionError
+__________ test_raw_dependent_bounds_resolve_through_their_own_scope ___________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-605/test_raw_dependent_bounds_reso0')
+
+    def test_raw_dependent_bounds_resolve_through_their_own_scope(tmp_path):
+        decode,warnings,_=decoder(tmp_path,{'Schema.java':'''class Item{public String code;}
+          class Base<T extends Item,U extends T>{public U payload;}class Child extends Base{}'''})
+        result=decode({'payload':{'code':'ready'}},'Child')
+>       assert isinstance(result['payload'],JavaRecord) and result['payload']['code']=='ready'
+E       AssertionError: assert (False)
+E        +  where False = isinstance(<Unknown.VALUE: 'unknown'>, JavaRecord)
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:114: AssertionError
+_______ test_recursive_generic_bound_stays_finite_for_a_finite_json_tree _______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-605/test_recursive_generic_bound_s0')
+
+    def test_recursive_generic_bound_stays_finite_for_a_finite_json_tree(tmp_path):
+        decode,warnings,_=decoder(tmp_path,{'Schema.java':'''class Node<T>{public String code;public T next;}
+          class Base<T extends Node<T>>{public T payload;}class Child extends Base{}'''})
+        result=decode({'payload':{'code':'ready','next':None}},'Child')
+>       assert isinstance(result['payload'],JavaRecord) and result['payload']['code']=='ready'
+E       AssertionError: assert (False)
+E        +  where False = isinstance(<Unknown.VALUE: 'unknown'>, JavaRecord)
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:122: AssertionError
+______ test_interface_generic_parameters_are_extracted_in_their_own_scope ______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-605/test_interface_generic_paramet0')
+
+    def test_interface_generic_parameters_are_extracted_in_their_own_scope(tmp_path):
+        _,_,project=decoder(tmp_path,{'Schema.java':'interface Root<T>{}interface Left<T> extends Root<T>{}interface Right<U> extends Root<U>{}class Child implements Left<String>,Right<String>{}'})
+        left=next(tid for tid,node in project.nodes.items() if node.get('fqn')=='Left')
+>       assert list(project.type_variables[left])==['T']
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'type:service:Left'
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:136: KeyError
+=========================== short test summary info ============================
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_concrete_subclass_binds_an_inherited_map_field
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_multilevel_substitution_composes_nested_arguments_and_same_names
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_generic_argument_keeps_its_original_imports_across_inheritance
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_source_type_named_map_is_not_replaced_by_a_native_map
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_raw_unbounded_parameter_becomes_object_without_guessing_string
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_raw_bound_uses_the_declared_upper_type
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_inherited_parameter_named_string_is_substituted_before_native_lookup
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_raw_dependent_bounds_resolve_through_their_own_scope
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_recursive_generic_bound_stays_finite_for_a_finite_json_tree
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_interface_generic_parameters_are_extracted_in_their_own_scope
+10 failed, 4 passed in 0.11s

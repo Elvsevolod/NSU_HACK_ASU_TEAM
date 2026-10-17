@@ -1,0 +1,59 @@
+{
+  "scenario": {
+    "project": "public-python",
+    "id": "expired-token",
+    "steps": [
+      {
+        "action": "Explicit public source HTTP contract",
+        "request": {
+          "method": "GET",
+          "path": "/api/v1/items/30000000-0000-4000-8000-000000000001",
+          "headers": {
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjczNDc5OTksInN1YiI6IjEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.xwb1ttiKFL-48BdDCwILiubhIzdyiDWdlHSwEAOhYsI"
+          }
+        }
+      }
+    ]
+  },
+  "context": {
+    "clock": "2026-01-02T10:00:00Z",
+    "globals": {
+      "app.core.config.settings": {
+        "API_V1_STR": "/api/v1",
+        "SECRET_KEY": "public-fixture-only-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "ACCESS_TOKEN_EXPIRE_MINUTES": 15,
+        "DATABASE_URL": "postgresql+psycopg://fixture:fixture@database/portable",
+        "PROJECT_NAME": "Public source probe",
+        "FRONTEND_HOST": "http://localhost:5173",
+        "SENTRY_DSN": null,
+        "FASTAPI_ENV": null,
+        "FIRST_SUPERUSER": "reader@example.com",
+        "FIRST_SUPERUSER_PASSWORD": "fixture-password-39"
+      }
+    },
+    "sql_dialect": "postgres",
+    "framework_versions": {
+      "backend": {
+        "fastapi": "0.143.3",
+        "pydantic": "2.14.1",
+        "PyJWT": "2.15.1",
+        "pwdlib": "0.3.1"
+      }
+    }
+  },
+  "tables": {
+    "resource:user": [
+      {
+        "id": "10000000-0000-4000-8000-000000000001",
+        "email": "reader@example.com",
+        "is_active": true,
+        "is_superuser": false,
+        "full_name": "Reader",
+        "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$a5ob8Jpjttk0ZddzNtSWVg$it+a+kSJXAsgRfxHiLEzfnuAnklMl/uElvIHlXz6M0g",
+        "created_at": null,
+        "items": []
+      }
+    ],
+    "resource:item": []
+  }
+}

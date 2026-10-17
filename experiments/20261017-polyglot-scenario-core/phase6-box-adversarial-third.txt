@@ -1,0 +1,39 @@
+........................FF.                                              [100%]
+=================================== FAILURES ===================================
+___________ test_source_type_named_integer_keeps_its_source_contract ___________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-633/test_source_type_named_integer0')
+
+    def test_source_type_named_integer_keeps_its_source_contract(tmp_path):
+        _,detail,_=probe(tmp_path,'Integer value=new Integer(7);return read(value);',
+            'int read(Integer value){return value.number();}',
+            'class Integer {private int value;Integer(int value){this.value=value;}int number(){return value;}}')
+>       assert response(detail)==7
+               ^^^^^^^^^^^^^^^^
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+detail = {'evidence': {'opaque-method-1 | calls | opaque-method-3': [{'file': 'Endpoint.java', 'line': 7, 'reason': 'source sem...ue-method-1'}, {'relation': 'executes', 'source': 'scenario:arbitrary', 'target': 'opaque-method-3'}], 'must': [], ...}
+
+>   def response(detail):return detail['paths'][0]['steps'][0]['response']['body']
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   IndexError: list index out of range
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:21: IndexError
+_________ test_polluted_generic_stream_fails_before_primitive_callback _________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-633/test_polluted_generic_stream_f0')
+
+    def test_polluted_generic_stream_fails_before_primitive_callback(tmp_path):
+        block,detail,ids=probe(tmp_path,'List<Integer> typed=new ArrayList<Integer>();List raw=typed;raw.add(1L);try{return typed.stream().map(this::take).collect(Collectors.toList());}catch(ClassCastException e){return "cast";}',
+            'int take(int value){return value;}')
+>       assert response(detail)=='cast'
+E       AssertionError: assert [1] == 'cast'
+E        +  where [1] = response({'evidence': {'opaque-method-1 | calls | opaque-method-2': [{'file': 'Endpoint.java', 'line': 7, 'reason': 'source sem...rget': 'opaque-method-1'}, {'relation': 'executes', 'source': 'scenario:arbitrary', 'target': 'opaque-method-2'}], ...})
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py:87: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py::test_source_type_named_integer_keeps_its_source_contract
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_boxing.py::test_polluted_generic_stream_fails_before_primitive_callback
+2 failed, 25 passed in 0.47s

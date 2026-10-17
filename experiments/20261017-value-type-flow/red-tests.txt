@@ -1,0 +1,410 @@
+FFFFFFFFFFF..FF..FF.F                                                    [100%]
+=================================== FAILURES ===================================
+_____ test_expression_result_has_the_correct_boxed_key_type[-"id"+7-"id7"] _____
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-518/test_expression_result_has_the0')
+setup = '', key = '"id"+7', lookup = '"id7"'
+
+    @pytest.mark.parametrize('setup,key,lookup',[
+        ('','"id"+7','"id7"'),
+        ('','(("k"+1)+2)','"k12"'),
+        ('','2>1','true'),
+        ('','!(2>3)','true'),
+        ('','2==2 && 3!=4','true'),
+        ('String text="key-tail";','text.substring(0,3)','"key"'),
+        ('','"code".substring(0,2).substring(1)','"o"'),
+        ('','"xy".charAt(0)',"'x'"),
+        ('','true ? "left" : "right"','"left"'),
+        ('','true ? 1 : 2L','1L'),
+        ('','false ? 2L : 1','1L'),
+    ])
+    def test_expression_result_has_the_correct_boxed_key_type(tmp_path,setup,key,lookup):
+        source='import java.util.*;class Api {String entry(){'+setup+'Map map=new HashMap();map.put('+key+',"found");return (String)map.get('+lookup+');}}'
+        project,db,ids=build(tmp_path,{'Api.java':source})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='found'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'found'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106136950>.run
+
+solutions/—_value-type-flow/code/tests/test_expression_key_types.py:25: AssertionError
+__ test_expression_result_has_the_correct_boxed_key_type[-(("k"+1)+2)-"k12"] ___
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-518/test_expression_result_has_the1')
+setup = '', key = '(("k"+1)+2)', lookup = '"k12"'
+
+    @pytest.mark.parametrize('setup,key,lookup',[
+        ('','"id"+7','"id7"'),
+        ('','(("k"+1)+2)','"k12"'),
+        ('','2>1','true'),
+        ('','!(2>3)','true'),
+        ('','2==2 && 3!=4','true'),
+        ('String text="key-tail";','text.substring(0,3)','"key"'),
+        ('','"code".substring(0,2).substring(1)','"o"'),
+        ('','"xy".charAt(0)',"'x'"),
+        ('','true ? "left" : "right"','"left"'),
+        ('','true ? 1 : 2L','1L'),
+        ('','false ? 2L : 1','1L'),
+    ])
+    def test_expression_result_has_the_correct_boxed_key_type(tmp_path,setup,key,lookup):
+        source='import java.util.*;class Api {String entry(){'+setup+'Map map=new HashMap();map.put('+key+',"found");return (String)map.get('+lookup+');}}'
+        project,db,ids=build(tmp_path,{'Api.java':source})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='found'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'found'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106030410>.run
+
+solutions/—_value-type-flow/code/tests/test_expression_key_types.py:25: AssertionError
+_______ test_expression_result_has_the_correct_boxed_key_type[-2>1-true] _______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-518/test_expression_result_has_the2')
+setup = '', key = '2>1', lookup = 'true'
+
+    @pytest.mark.parametrize('setup,key,lookup',[
+        ('','"id"+7','"id7"'),
+        ('','(("k"+1)+2)','"k12"'),
+        ('','2>1','true'),
+        ('','!(2>3)','true'),
+        ('','2==2 && 3!=4','true'),
+        ('String text="key-tail";','text.substring(0,3)','"key"'),
+        ('','"code".substring(0,2).substring(1)','"o"'),
+        ('','"xy".charAt(0)',"'x'"),
+        ('','true ? "left" : "right"','"left"'),
+        ('','true ? 1 : 2L','1L'),
+        ('','false ? 2L : 1','1L'),
+    ])
+    def test_expression_result_has_the_correct_boxed_key_type(tmp_path,setup,key,lookup):
+        source='import java.util.*;class Api {String entry(){'+setup+'Map map=new HashMap();map.put('+key+',"found");return (String)map.get('+lookup+');}}'
+        project,db,ids=build(tmp_path,{'Api.java':source})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='found'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'found'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1060c3e90>.run
+
+solutions/—_value-type-flow/code/tests/test_expression_key_types.py:25: AssertionError
+_____ test_expression_result_has_the_correct_boxed_key_type[-!(2>3)-true] ______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-518/test_expression_result_has_the3')
+setup = '', key = '!(2>3)', lookup = 'true'
+
+    @pytest.mark.parametrize('setup,key,lookup',[
+        ('','"id"+7','"id7"'),
+        ('','(("k"+1)+2)','"k12"'),
+        ('','2>1','true'),
+        ('','!(2>3)','true'),
+        ('','2==2 && 3!=4','true'),
+        ('String text="key-tail";','text.substring(0,3)','"key"'),
+        ('','"code".substring(0,2).substring(1)','"o"'),
+        ('','"xy".charAt(0)',"'x'"),
+        ('','true ? "left" : "right"','"left"'),
+        ('','true ? 1 : 2L','1L'),
+        ('','false ? 2L : 1','1L'),
+    ])
+    def test_expression_result_has_the_correct_boxed_key_type(tmp_path,setup,key,lookup):
+        source='import java.util.*;class Api {String entry(){'+setup+'Map map=new HashMap();map.put('+key+',"found");return (String)map.get('+lookup+');}}'
+        project,db,ids=build(tmp_path,{'Api.java':source})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='found'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'found'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1060c1790>.run
+
+solutions/—_value-type-flow/code/tests/test_expression_key_types.py:25: AssertionError
+__ test_expression_result_has_the_correct_boxed_key_type[-2==2 && 3!=4-true] ___
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-518/test_expression_result_has_the4')
+setup = '', key = '2==2 && 3!=4', lookup = 'true'
+
+    @pytest.mark.parametrize('setup,key,lookup',[
+        ('','"id"+7','"id7"'),
+        ('','(("k"+1)+2)','"k12"'),
+        ('','2>1','true'),
+        ('','!(2>3)','true'),
+        ('','2==2 && 3!=4','true'),
+        ('String text="key-tail";','text.substring(0,3)','"key"'),
+        ('','"code".substring(0,2).substring(1)','"o"'),
+        ('','"xy".charAt(0)',"'x'"),
+        ('','true ? "left" : "right"','"left"'),
+        ('','true ? 1 : 2L','1L'),
+        ('','false ? 2L : 1','1L'),
+    ])
+    def test_expression_result_has_the_correct_boxed_key_type(tmp_path,setup,key,lookup):
+        source='import java.util.*;class Api {String entry(){'+setup+'Map map=new HashMap();map.put('+key+',"found");return (String)map.get('+lookup+');}}'
+        project,db,ids=build(tmp_path,{'Api.java':source})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='found'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'found'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1060c1850>.run
+
+solutions/—_value-type-flow/code/tests/test_expression_key_types.py:25: AssertionError
+_ test_expression_result_has_the_correct_boxed_key_type[String text="key-tail";-text.substring(0,3)-"key"] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-518/test_expression_result_has_the5')
+setup = 'String text="key-tail";', key = 'text.substring(0,3)', lookup = '"key"'
+
+    @pytest.mark.parametrize('setup,key,lookup',[
+        ('','"id"+7','"id7"'),
+        ('','(("k"+1)+2)','"k12"'),
+        ('','2>1','true'),
+        ('','!(2>3)','true'),
+        ('','2==2 && 3!=4','true'),
+        ('String text="key-tail";','text.substring(0,3)','"key"'),
+        ('','"code".substring(0,2).substring(1)','"o"'),
+        ('','"xy".charAt(0)',"'x'"),
+        ('','true ? "left" : "right"','"left"'),
+        ('','true ? 1 : 2L','1L'),
+        ('','false ? 2L : 1','1L'),
+    ])
+    def test_expression_result_has_the_correct_boxed_key_type(tmp_path,setup,key,lookup):
+        source='import java.util.*;class Api {String entry(){'+setup+'Map map=new HashMap();map.put('+key+',"found");return (String)map.get('+lookup+');}}'
+        project,db,ids=build(tmp_path,{'Api.java':source})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='found'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'found'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106093c10>.run
+
+solutions/—_value-type-flow/code/tests/test_expression_key_types.py:25: AssertionError
+_ test_expression_result_has_the_correct_boxed_key_type[-"code".substring(0,2).substring(1)-"o"] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-518/test_expression_result_has_the6')
+setup = '', key = '"code".substring(0,2).substring(1)', lookup = '"o"'
+
+    @pytest.mark.parametrize('setup,key,lookup',[
+        ('','"id"+7','"id7"'),
+        ('','(("k"+1)+2)','"k12"'),
+        ('','2>1','true'),
+        ('','!(2>3)','true'),
+        ('','2==2 && 3!=4','true'),
+        ('String text="key-tail";','text.substring(0,3)','"key"'),
+        ('','"code".substring(0,2).substring(1)','"o"'),
+        ('','"xy".charAt(0)',"'x'"),
+        ('','true ? "left" : "right"','"left"'),
+        ('','true ? 1 : 2L','1L'),
+        ('','false ? 2L : 1','1L'),
+    ])
+    def test_expression_result_has_the_correct_boxed_key_type(tmp_path,setup,key,lookup):
+        source='import java.util.*;class Api {String entry(){'+setup+'Map map=new HashMap();map.put('+key+',"found");return (String)map.get('+lookup+');}}'
+        project,db,ids=build(tmp_path,{'Api.java':source})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='found'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'found'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10613bb90>.run
+
+solutions/—_value-type-flow/code/tests/test_expression_key_types.py:25: AssertionError
+__ test_expression_result_has_the_correct_boxed_key_type[-"xy".charAt(0)-'x'] __
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-518/test_expression_result_has_the7')
+setup = '', key = '"xy".charAt(0)', lookup = "'x'"
+
+    @pytest.mark.parametrize('setup,key,lookup',[
+        ('','"id"+7','"id7"'),
+        ('','(("k"+1)+2)','"k12"'),
+        ('','2>1','true'),
+        ('','!(2>3)','true'),
+        ('','2==2 && 3!=4','true'),
+        ('String text="key-tail";','text.substring(0,3)','"key"'),
+        ('','"code".substring(0,2).substring(1)','"o"'),
+        ('','"xy".charAt(0)',"'x'"),
+        ('','true ? "left" : "right"','"left"'),
+        ('','true ? 1 : 2L','1L'),
+        ('','false ? 2L : 1','1L'),
+    ])
+    def test_expression_result_has_the_correct_boxed_key_type(tmp_path,setup,key,lookup):
+        source='import java.util.*;class Api {String entry(){'+setup+'Map map=new HashMap();map.put('+key+',"found");return (String)map.get('+lookup+');}}'
+        project,db,ids=build(tmp_path,{'Api.java':source})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='found'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'found'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106031a10>.run
+
+solutions/—_value-type-flow/code/tests/test_expression_key_types.py:25: AssertionError
+_ test_expression_result_has_the_correct_boxed_key_type[-true ? "left" : "right"-"left"] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-518/test_expression_result_has_the8')
+setup = '', key = 'true ? "left" : "right"', lookup = '"left"'
+
+    @pytest.mark.parametrize('setup,key,lookup',[
+        ('','"id"+7','"id7"'),
+        ('','(("k"+1)+2)','"k12"'),
+        ('','2>1','true'),
+        ('','!(2>3)','true'),
+        ('','2==2 && 3!=4','true'),
+        ('String text="key-tail";','text.substring(0,3)','"key"'),
+        ('','"code".substring(0,2).substring(1)','"o"'),
+        ('','"xy".charAt(0)',"'x'"),
+        ('','true ? "left" : "right"','"left"'),
+        ('','true ? 1 : 2L','1L'),
+        ('','false ? 2L : 1','1L'),
+    ])
+    def test_expression_result_has_the_correct_boxed_key_type(tmp_path,setup,key,lookup):
+        source='import java.util.*;class Api {String entry(){'+setup+'Map map=new HashMap();map.put('+key+',"found");return (String)map.get('+lookup+');}}'
+        project,db,ids=build(tmp_path,{'Api.java':source})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='found'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'found'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105f9b150>.run
+
+solutions/—_value-type-flow/code/tests/test_expression_key_types.py:25: AssertionError
+___ test_expression_result_has_the_correct_boxed_key_type[-true ? 1 : 2L-1L] ___
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-518/test_expression_result_has_the9')
+setup = '', key = 'true ? 1 : 2L', lookup = '1L'
+
+    @pytest.mark.parametrize('setup,key,lookup',[
+        ('','"id"+7','"id7"'),
+        ('','(("k"+1)+2)','"k12"'),
+        ('','2>1','true'),
+        ('','!(2>3)','true'),
+        ('','2==2 && 3!=4','true'),
+        ('String text="key-tail";','text.substring(0,3)','"key"'),
+        ('','"code".substring(0,2).substring(1)','"o"'),
+        ('','"xy".charAt(0)',"'x'"),
+        ('','true ? "left" : "right"','"left"'),
+        ('','true ? 1 : 2L','1L'),
+        ('','false ? 2L : 1','1L'),
+    ])
+    def test_expression_result_has_the_correct_boxed_key_type(tmp_path,setup,key,lookup):
+        source='import java.util.*;class Api {String entry(){'+setup+'Map map=new HashMap();map.put('+key+',"found");return (String)map.get('+lookup+');}}'
+        project,db,ids=build(tmp_path,{'Api.java':source})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='found'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'found'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106134410>.run
+
+solutions/—_value-type-flow/code/tests/test_expression_key_types.py:25: AssertionError
+__ test_expression_result_has_the_correct_boxed_key_type[-false ? 2L : 1-1L] ___
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-518/test_expression_result_has_the10')
+setup = '', key = 'false ? 2L : 1', lookup = '1L'
+
+    @pytest.mark.parametrize('setup,key,lookup',[
+        ('','"id"+7','"id7"'),
+        ('','(("k"+1)+2)','"k12"'),
+        ('','2>1','true'),
+        ('','!(2>3)','true'),
+        ('','2==2 && 3!=4','true'),
+        ('String text="key-tail";','text.substring(0,3)','"key"'),
+        ('','"code".substring(0,2).substring(1)','"o"'),
+        ('','"xy".charAt(0)',"'x'"),
+        ('','true ? "left" : "right"','"left"'),
+        ('','true ? 1 : 2L','1L'),
+        ('','false ? 2L : 1','1L'),
+    ])
+    def test_expression_result_has_the_correct_boxed_key_type(tmp_path,setup,key,lookup):
+        source='import java.util.*;class Api {String entry(){'+setup+'Map map=new HashMap();map.put('+key+',"found");return (String)map.get('+lookup+');}}'
+        project,db,ids=build(tmp_path,{'Api.java':source})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='found'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'found'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10612fb10>.run
+
+solutions/—_value-type-flow/code/tests/test_expression_key_types.py:25: AssertionError
+____ test_equal_python_values_do_not_erase_java_key_class[true ? 1 : 2L-1] _____
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-518/test_equal_python_values_do_no2')
+key = 'true ? 1 : 2L', wrong = '1'
+
+    @pytest.mark.parametrize('key,wrong',[("'x'",'"x"'),('1','1L'),('true ? 1 : 2L','1'),('"x".charAt(0)','"x"')])
+    def test_equal_python_values_do_not_erase_java_key_class(tmp_path,key,wrong):
+        source='import java.util.*;class Api {Object entry(){Map map=new HashMap();map.put('+key+',"found");return map.get('+wrong+');}}'
+        project,db,ids=build(tmp_path,{'Api.java':source})
+>       assert Engine(project,ScenarioState(db)).run(ids['Api.entry'],{}) is None
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> is None
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10624ecd0>.run
+E        +      where <analyzer.engine.Engine object at 0x10624ecd0> = Engine(<analyzer.project.Project object at 0x106255dd0>, <analyzer.state.ScenarioState object at 0x10624ef90>)
+E        +        where <analyzer.state.ScenarioState object at 0x10624ef90> = ScenarioState(<analyzer.state.Database object at 0x106257d90>)
+
+solutions/—_value-type-flow/code/tests/test_expression_key_types.py:33: AssertionError
+___ test_equal_python_values_do_not_erase_java_key_class["x".charAt(0)-"x"] ____
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-518/test_equal_python_values_do_no3')
+key = '"x".charAt(0)', wrong = '"x"'
+
+    @pytest.mark.parametrize('key,wrong',[("'x'",'"x"'),('1','1L'),('true ? 1 : 2L','1'),('"x".charAt(0)','"x"')])
+    def test_equal_python_values_do_not_erase_java_key_class(tmp_path,key,wrong):
+        source='import java.util.*;class Api {Object entry(){Map map=new HashMap();map.put('+key+',"found");return map.get('+wrong+');}}'
+        project,db,ids=build(tmp_path,{'Api.java':source})
+>       assert Engine(project,ScenarioState(db)).run(ids['Api.entry'],{}) is None
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> is None
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1060de710>.run
+E        +      where <analyzer.engine.Engine object at 0x1060de710> = Engine(<analyzer.project.Project object at 0x10624cf90>, <analyzer.state.ScenarioState object at 0x106030b90>)
+E        +        where <analyzer.state.ScenarioState object at 0x106030b90> = ScenarioState(<analyzer.state.Database object at 0x10624dfd0>)
+
+solutions/—_value-type-flow/code/tests/test_expression_key_types.py:33: AssertionError
+__ test_char_arithmetic_and_string_concatenation_use_operand_types['A'+1-66] ___
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-518/test_char_arithmetic_and_strin0')
+expression = "'A'+1", expected = 66
+
+    @pytest.mark.parametrize('expression,expected',[("'A'+1",66),("'A'+'B'",131),('"A"+1','A1'),("1+'A'",66)])
+    def test_char_arithmetic_and_string_concatenation_use_operand_types(tmp_path,expression,expected):
+        project,db,ids=build(tmp_path,{'Api.java':'class Api {Object entry(){return '+expression+';}}'})
+>       assert Engine(project,ScenarioState(db)).run(ids['Api.entry'],{})==expected
+E       AssertionError: assert 'A1' == 66
+E        +  where 'A1' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106226ad0>.run
+E        +      where <analyzer.engine.Engine object at 0x106226ad0> = Engine(<analyzer.project.Project object at 0x106245550>, <analyzer.state.ScenarioState object at 0x1062254d0>)
+E        +        where <analyzer.state.ScenarioState object at 0x1062254d0> = ScenarioState(<analyzer.state.Database object at 0x106245ed0>)
+
+solutions/—_value-type-flow/code/tests/test_expression_key_types.py:55: AssertionError
+_ test_char_arithmetic_and_string_concatenation_use_operand_types['A'+'B'-131] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-518/test_char_arithmetic_and_strin1')
+expression = "'A'+'B'", expected = 131
+
+    @pytest.mark.parametrize('expression,expected',[("'A'+1",66),("'A'+'B'",131),('"A"+1','A1'),("1+'A'",66)])
+    def test_char_arithmetic_and_string_concatenation_use_operand_types(tmp_path,expression,expected):
+        project,db,ids=build(tmp_path,{'Api.java':'class Api {Object entry(){return '+expression+';}}'})
+>       assert Engine(project,ScenarioState(db)).run(ids['Api.entry'],{})==expected
+E       AssertionError: assert 'AB' == 131
+E        +  where 'AB' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106224890>.run
+E        +      where <analyzer.engine.Engine object at 0x106224890> = Engine(<analyzer.project.Project object at 0x106226b90>, <analyzer.state.ScenarioState object at 0x106227d50>)
+E        +        where <analyzer.state.ScenarioState object at 0x106227d50> = ScenarioState(<analyzer.state.Database object at 0x106224550>)
+
+solutions/—_value-type-flow/code/tests/test_expression_key_types.py:55: AssertionError
+__ test_char_arithmetic_and_string_concatenation_use_operand_types[1+'A'-66] ___
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-518/test_char_arithmetic_and_strin3')
+expression = "1+'A'", expected = 66
+
+    @pytest.mark.parametrize('expression,expected',[("'A'+1",66),("'A'+'B'",131),('"A"+1','A1'),("1+'A'",66)])
+    def test_char_arithmetic_and_string_concatenation_use_operand_types(tmp_path,expression,expected):
+        project,db,ids=build(tmp_path,{'Api.java':'class Api {Object entry(){return '+expression+';}}'})
+>       assert Engine(project,ScenarioState(db)).run(ids['Api.entry'],{})==expected
+E       AssertionError: assert '1A' == 66
+E        +  where '1A' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106254a10>.run
+E        +      where <analyzer.engine.Engine object at 0x106254a10> = Engine(<analyzer.project.Project object at 0x105fa4d10>, <analyzer.state.ScenarioState object at 0x1062549d0>)
+E        +        where <analyzer.state.ScenarioState object at 0x1062549d0> = ScenarioState(<analyzer.state.Database object at 0x106222e10>)
+
+solutions/—_value-type-flow/code/tests/test_expression_key_types.py:55: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_value-type-flow/code/tests/test_expression_key_types.py::test_expression_result_has_the_correct_boxed_key_type[-"id"+7-"id7"]
+FAILED solutions/—_value-type-flow/code/tests/test_expression_key_types.py::test_expression_result_has_the_correct_boxed_key_type[-(("k"+1)+2)-"k12"]
+FAILED solutions/—_value-type-flow/code/tests/test_expression_key_types.py::test_expression_result_has_the_correct_boxed_key_type[-2>1-true]
+FAILED solutions/—_value-type-flow/code/tests/test_expression_key_types.py::test_expression_result_has_the_correct_boxed_key_type[-!(2>3)-true]
+FAILED solutions/—_value-type-flow/code/tests/test_expression_key_types.py::test_expression_result_has_the_correct_boxed_key_type[-2==2 && 3!=4-true]
+FAILED solutions/—_value-type-flow/code/tests/test_expression_key_types.py::test_expression_result_has_the_correct_boxed_key_type[String text="key-tail";-text.substring(0,3)-"key"]
+FAILED solutions/—_value-type-flow/code/tests/test_expression_key_types.py::test_expression_result_has_the_correct_boxed_key_type[-"code".substring(0,2).substring(1)-"o"]
+FAILED solutions/—_value-type-flow/code/tests/test_expression_key_types.py::test_expression_result_has_the_correct_boxed_key_type[-"xy".charAt(0)-'x']
+FAILED solutions/—_value-type-flow/code/tests/test_expression_key_types.py::test_expression_result_has_the_correct_boxed_key_type[-true ? "left" : "right"-"left"]
+FAILED solutions/—_value-type-flow/code/tests/test_expression_key_types.py::test_expression_result_has_the_correct_boxed_key_type[-true ? 1 : 2L-1L]
+FAILED solutions/—_value-type-flow/code/tests/test_expression_key_types.py::test_expression_result_has_the_correct_boxed_key_type[-false ? 2L : 1-1L]
+FAILED solutions/—_value-type-flow/code/tests/test_expression_key_types.py::test_equal_python_values_do_not_erase_java_key_class[true ? 1 : 2L-1]
+FAILED solutions/—_value-type-flow/code/tests/test_expression_key_types.py::test_equal_python_values_do_not_erase_java_key_class["x".charAt(0)-"x"]
+FAILED solutions/—_value-type-flow/code/tests/test_expression_key_types.py::test_char_arithmetic_and_string_concatenation_use_operand_types['A'+1-66]
+FAILED solutions/—_value-type-flow/code/tests/test_expression_key_types.py::test_char_arithmetic_and_string_concatenation_use_operand_types['A'+'B'-131]
+FAILED solutions/—_value-type-flow/code/tests/test_expression_key_types.py::test_char_arithmetic_and_string_concatenation_use_operand_types[1+'A'-66]
+16 failed, 5 passed in 0.09s

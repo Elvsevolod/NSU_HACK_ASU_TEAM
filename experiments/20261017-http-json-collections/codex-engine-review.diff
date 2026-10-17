@@ -1,0 +1,404 @@
+--- parent/analyzer/engine.py
++++ candidate/analyzer/engine.py
+@@ -18,6 +18,9 @@
+ from .java_exceptions import JavaThrow, assignable
+ from .symbolic_text import concat_text, http_text_parts
+ from .models import java_date_text, uuid_value, http_headers_type
++from .java_collections import JavaObject, JavaMap
++from .java_numbers import parse_integer
++from .http_json import decode_response
+ from datetime import datetime
+ 
+ 
+@@ -30,12 +33,34 @@
+     return next((v for k, v in obj.items() if re.sub(r'[^a-z0-9]', '', k.lower()) == normalized), U)
+ 
+ 
+-def merge(a, b):
+-    if a == b:
+-        return a
+-    if isinstance(a, dict) and isinstance(b, dict):
+-        return {key: merge(a.get(key, U), b.get(key, U)) for key in sorted(a.keys() | b.keys(), key=lambda k: (type(k).__name__, str(k)))}
+-    return U
++def merge(a, b, active=None):
++    if a is b:return a
++    if isinstance(a,JavaObject) or isinstance(b,JavaObject):
++        if not isinstance(a,JavaObject) or not isinstance(b,JavaObject) or a.java_type!=b.java_type:return U
++    active=set() if active is None else active
++    pair=(id(a),id(b))
++    if pair in active:return U
++    active.add(pair)
++    try:
++        if isinstance(a,JavaObject):
++            fields={key:merge(a.get(key,U),b.get(key,U),active) for key in sorted(a.keys()|b.keys())}
++            identity=a.java_identity if a.java_identity is b.java_identity else None
++            return JavaObject(a.java_type,fields,identity)
++        if isinstance(a,JavaMap) or isinstance(b,JavaMap):
++            if not isinstance(a,JavaMap) or not isinstance(b,JavaMap):return U
++            if not isinstance(a.mapping,dict) or not isinstance(b.mapping,dict) or a.mapping.keys()!=b.mapping.keys():
++                return JavaMap(U)
++            return JavaMap({key:merge(value,b.mapping[key],active) for key,value in a.mapping.items()})
++        if isinstance(a, dict) and isinstance(b, dict):
++            return {key: merge(a.get(key, U), b.get(key, U),active) for key in sorted(a.keys() | b.keys(), key=lambda k: (type(k).__name__, str(k)))}
++        if isinstance(a,list) and isinstance(b,list):
++            if len(a)!=len(b):return U
++            joined=[merge(left,right,active) for left,right in zip(a,b)]
++            return a if joined==a and joined==b else U
++        if type(a) is type(b) and a == b:return a
++        return U
++    finally:
++        active.remove(pair)
+ 
+ 
+ class AlternativeRequired(Exception):
+@@ -94,6 +119,14 @@
+         try:
+             args = [self.input_value(name, typ, params) for name, typ in self.p.parameters(entry)]
+             result,_ = self.http_invoke(entry, args, 'scenario request')
++            if any(entry==handler for handler,_,_ in self.p.ix.handlers):
++                try:wire(unwrap(result))
++                except JavaThrow as failure:
++                    if isinstance(failure.value,dict) and failure.value.get('__serialization_failure__'):
++                        self.outcome='HTTP serialization failure'
++                        self.warnings.add('default HTTP JSON serialization failed on cyclic object graph: '+entry)
++                        return U
++                    raise
+             if http_entity(result) and type(result.get('status')) is int and result['status']>=400:
+                 self.outcome='HTTP error response'
+         except JavaThrow as exc:
+@@ -303,6 +336,11 @@
+                     if rows is not None:
+                         self.state.database.invalidate(rows)
+ 
++    def execution_fork(self,state):
++        # Method execution never mutates completed request observations. Share
++        # their payloads, but own the journal list and all mutable execution data.
++        return deepcopy(state,{id(state.history):list(state.history)})
++
+     def execute(self, node, env):
+         if node is None:
+             return U, None
+@@ -336,22 +374,22 @@
+                                      self.variable_types, self.constraint_symbol)
+                     self.conditions[-1]['refined'] = refined
+                 return self.execute(node.child_by_field_name('consequence' if decision else 'alternative'), env)
+-            before_state = deepcopy(self.state)
++            before_state = self.state
+             left, right = deepcopy(env), deepcopy(env)
+-            self.uncertain += 1
+-            self.state = deepcopy(before_state)
++            self.state = self.execution_fork(before_state)
+             a, ac = self.execute(node.child_by_field_name('consequence'), left)
+             left_state = self.state
+-            self.state = deepcopy(before_state)
++            self.state = self.execution_fork(before_state)
+             b, bc = self.execute(node.child_by_field_name('alternative'), right)
+             right_state = self.state
+-            self.state = before_state
+-            # Changes on incompatible paths are not committed to a shared database.
++            self.state = left_state
++            # Keep agreed writes; conflicting contents are unavailable to queries.
+             self.state.database.unknown_tables.update(left_state.database.unknown_tables | right_state.database.unknown_tables)
+             for table in set(left_state.database.tables) | set(right_state.database.tables):
+                 if left_state.database.tables.get(table) != right_state.database.tables.get(table):
+                     self.state.database.unknown_tables.add(table)
+-            self.uncertain -= 1
++            self.state.symbol_sequence=max(left_state.symbol_sequence,right_state.symbol_sequence)
++            self.state.input_sequence=max(left_state.input_sequence,right_state.input_sequence)
+             env.update(merge(left, right))
+             return (merge(a, b), ac) if ac == bc and ac else (U, None)
+         if typ == 'enhanced_for_statement':
+@@ -818,6 +856,82 @@
+         self.warnings.add('unknown Java integer width; numeric result retained as unknown: '+self.method)
+         return U
+ 
++    def standard_type(self,name,fqn,meta=None):
++        """A source-proven JDK type, rather than an unrelated namesake."""
++        meta=self.p.methods[self.method] if meta is None else meta
++        if self.p.resolve_type(name,meta['module'],meta['file']):
++            return False
++        if name==fqn:return True
++        if name!=fqn.rsplit('.',1)[-1]:return False
++        imports=[match[1] for node in self.p.trees[meta['file']].root_node.named_children if node.type=='import_declaration'
++                 for match in [re.search(r'\bimport\s+(?:static\s+)?([\w.*]+)\s*;',text(node))] if match]
++        explicit=[item for item in imports if item.rsplit('.',1)[-1]==name]
++        if explicit:return explicit==[fqn]
++        return fqn.startswith('java.lang.') or fqn.rsplit('.',1)[0]+'.*' in imports
++
++    def method_modifiers(self,target):
++        source=self.p.ast.get(target)
++        flags={keyword.type for child in source.named_children if child.type=='modifiers'
++               for keyword in child.children if not keyword.is_named} if source is not None else set()
++        if source is not None and source.parent.parent.type=='interface_declaration' and 'private' not in flags:
++            flags.add('public')
++        return flags
++
++    def concrete_dispatch(self,owner,name,arity,targets,declared,reason):
++        """Refine the supplied declaration by class and parameter signature."""
++        anchors=[target for target in declared if target in self.p.methods] or targets
++        if any(self.method_modifiers(target) & {'static','private'} for target in anchors):return targets
++        ancestry,level=set(),[owner]
++        levels=[]
++        while level:
++            levels.append(set(level));ancestry.update(level)
++            level=sorted({parent for current in level for parent in self.p.type_parents.get(current,[]) if parent not in ancestry})
++        signatures={self.p.dispatch_signature(target) for target in anchors}
++        candidates=[target for target in self.p.by_name.get(name,[]) if self.p.methods[target]['owner'] in ancestry
++                    and len(self.p.parameters(target))==arity and not self.p.methods[target].get('abstract')
++                    and not self.method_modifiers(target) & {'static','private'}
++                    and self.p.ix.unit_of(self.method) in self.p.ix.units.get(self.p.methods[target]['module'],())]
++        if None in signatures or any(self.p.dispatch_signature(target) is None for target in candidates):
++            self.approximate=True
++            self.warnings.add('generic or unresolved dispatch signature; alternatives retained: '+reason)
++            return sorted(set(targets)|set(candidates))
++        selected=[]
++        parents={}
++        def ancestors(current):
++            if current not in parents:
++                found,pending=set(),list(self.p.type_parents.get(current,[]))
++                while pending:
++                    parent=pending.pop()
++                    if parent in found:continue
++                    found.add(parent);pending.extend(self.p.type_parents.get(parent,[]))
++                parents[current]=found
++            return parents[current]
++        def package(target):
++            return self.p.nodes[self.p.methods[target]['owner']]['fqn'].rpartition('.')[0]
++        for anchor in anchors:
++            if self.p.methods[anchor]['owner'] not in ancestry:
++                self.approximate=True
++                self.warnings.add('declared dispatch owner is not a proven receiver supertype: '+reason)
++                return targets
++            signature=self.p.dispatch_signature(anchor)
++            eligible={anchor}
++            matching=[target for target in candidates if self.p.dispatch_signature(target)==signature]
++            changed=True
++            while changed:
++                changed=False
++                for target in matching:
++                    if target in eligible:continue
++                    if any(self.p.methods[base]['owner'] in ancestors(self.p.methods[target]['owner'])
++                           and (self.method_modifiers(base) & {'public','protected'} or package(base)==package(target))
++                           for base in eligible):
++                        eligible.add(target);changed=True
++            for level in levels:
++                nearest=[target for target in matching if target in eligible and self.p.methods[target]['owner'] in level]
++                if nearest:
++                    selected.extend(nearest)
++                    break
++        return sorted(set(selected)) or targets
++
+     def call(self, node, env):
+         mid = self.method
+         site = self.p.site(mid, node)
+@@ -842,9 +956,12 @@
+         if not targets and not wiring.get('data_access'):
+             targets=self.p.source_targets(mid,node)
+         receiver_type = cs.get('receiver_type')
++        if name != '<init>' and isinstance(obj,JavaObject) and text(objnode) != 'super':
++            owner=self.p.resolve_type(obj.java_type,self.p.methods[mid]['module'],self.p.methods[mid]['file'])
++            if owner and targets:
++                targets=self.concrete_dispatch(owner,name,len(args),targets,wiring.get('calls',set()),reason)
+         if objnode is not None and obj is None:
+-            static = targets and all(any(c.type=='modifiers' and re.search(r'\bstatic\b',text(c))
+-                                         for c in self.p.ast[target].named_children) for target in targets if target in self.p.ast)
++            static = targets and all('static' in self.method_modifiers(target) for target in targets)
+             if not static:
+                 if targets or name in ('equals','equalsIgnoreCase','toString','length','isEmpty','isBlank','orElseThrow','getForObject','getForEntity','postForObject','postForEntity','exchange'):
+                     raise JavaThrow({'__type__':'NullPointerException'})
+@@ -868,7 +985,7 @@
+             # Abstract non-null encoding; no hashing or authentication is executed.
+             return 'encoded:' + args[0]
+         if not targets and isinstance(obj, dict) and (obj.get('__type__') or obj.get('__enum_type__')) and name != '<init>':
+-            runtime_type = self.p.nodes[obj['__enum_type__']]['fqn'] if obj.get('__enum_type__') else obj['__type__']
++            runtime_type = obj.java_type if isinstance(obj,JavaObject) else self.p.nodes[obj['__enum_type__']]['fqn'] if obj.get('__enum_type__') else obj['__type__']
+             runtime_owner=self.p.resolve_type(runtime_type,self.p.methods[mid]['module'],self.p.methods[mid]['file'])
+             targets = [m for m in self.p.inherited_methods(runtime_owner,name,len(args))
+                        if not self.p.methods[m].get('abstract')
+@@ -878,7 +995,7 @@
+             obj = {'__type__': typ}
+             tid = self.p.resolve_type(typ, self.p.methods[mid]['module'], self.p.methods[mid]['file'])
+             if tid:
+-                obj = {'__type__': self.p.nodes[tid]['fqn'], '__http_entity__': False}
++                obj = JavaObject(self.p.nodes[tid]['fqn'],{'__type__': self.p.nodes[tid]['fqn'], '__http_entity__': False})
+             for field, info in self.p.type_fields.get(tid, {}).items():
+                 default = info['default']
+                 if default is U and not info['has_initializer']:
+@@ -892,7 +1009,9 @@
+             if not tid and re.match(r'(ArrayList|LinkedList|List|HashSet|Set)', typ):
+                 obj = list(args[0]) if args and isinstance(args[0], list) else []
+         if name == '<init>':
+-            handled, value = construct(typ, args, self.state.now) if not tid and not targets else (False, U)
++            base=typ.split('<')[0]
++            unresolved_map=not tid and base.rsplit('.',1)[-1] in ('Map','HashMap','LinkedHashMap') and not self.standard_type(base,'java.util.'+base.rsplit('.',1)[-1])
++            handled, value = (True,U) if unresolved_map else construct(typ, args, self.state.now) if not tid and not targets else (False, U)
+             if handled:
+                 obj = value
+                 if value is U:
+@@ -900,7 +1019,7 @@
+                     self.warnings.add('unresolved modeled constructor: '+typ+' at '+reason)
+             elif not targets and receiver_type in self.p.all_args_types:
+                 fields = self.p.all_args_types[receiver_type]
+-                if len(fields) == len(args): obj = {'__type__': receiver_type, **{n: v for (n, _), v in zip(fields, args)}}
++                if len(fields) == len(args): obj = JavaObject(self.p.nodes[tid]['fqn'],{'__type__': receiver_type, **{n: v for (n, _), v in zip(fields, args)}}) if tid else {'__type__': receiver_type, **{n: v for (n, _), v in zip(fields, args)}}
+         if len(targets) > 1:
+             selected = self.choose(reason + ':dispatch', targets)
+             if selected is not None:
+@@ -1017,7 +1136,12 @@
+                     self.warnings.add('unknown HTTP response status: '+reason)
+                 elif status >= 400:
+                     raise JavaThrow({'__type__':'HttpClientErrorException' if status<500 else 'HttpServerErrorException','status':status})
+-                payload=wire(unwrap(response))
++                try:payload=wire(unwrap(response))
++                except JavaThrow as failure:
++                    if isinstance(failure.value,dict) and failure.value.get('__serialization_failure__'):
++                        self.warnings.add('default HTTP JSON serialization failed on cyclic object graph: '+reason)
++                        raise JavaThrow({'__type__':'HttpServerErrorException','status':500})
++                    raise
+                 class_index=3 if name=='exchange' else 2 if name.startswith('post') else 1
+                 class_nodes=[child for child in argnode.named_children if child.type not in ('line_comment','block_comment')] if argnode else []
+                 response_type=text(class_nodes[class_index]).removesuffix('.class') if len(class_nodes)>class_index and class_nodes[class_index].type=='class_literal' else None
+@@ -1025,6 +1149,11 @@
+                     payload={'__json__':payload}
+                 elif response_type not in ('String','java.lang.String') and isinstance(payload,dict) and '__json__' in payload:
+                     payload=payload['__json__']
++                if response_type and response_type not in ('String','java.lang.String'):
++                    def unresolved_json(message):
++                        self.approximate=True
++                        self.warnings.add(message+': '+reason)
++                    payload=decode_response(self.p,payload,response_type,self.p.methods[mid],self.standard_type,unresolved_json)
+                 results.append(payload)
+             value = results[0] if len(results) == 1 else U
+             return {'__type__': 'ResponseEntity', '__http_entity__': True, 'body': value,'status':status if len(results)==1 else U} if name in ('exchange', 'getForEntity', 'postForEntity') else value
+@@ -1034,15 +1163,45 @@
+             return obj
+         if not targets and isinstance(obj,list) and name in ('contains','indexOf') and len(args)==1:
+             return self.collection_membership(obj,args[0],name,reason)
+-        if not targets and name=='getClass' and not args and isinstance(obj,dict) and obj.get('__type__'):
+-            tid=self.p.resolve_type(obj['__type__'],self.p.methods[mid]['module'],self.p.methods[mid]['file'])
+-            return {'__java_class__':self.p.nodes[tid]['fqn'] if tid else obj['__type__']}
++        if not targets and name=='getClass' and not args and isinstance(obj,dict) and (isinstance(obj,JavaObject) or obj.get('__type__')):
++            actual=obj.java_type if isinstance(obj,JavaObject) else obj['__type__']
++            tid=self.p.resolve_type(actual,self.p.methods[mid]['module'],self.p.methods[mid]['file'])
++            return {'__java_class__':self.p.nodes[tid]['fqn'] if tid else actual}
++        if not targets and name=='equals' and len(args)==1 and isinstance(obj,JavaObject):
++            owner=self.p.resolve_type(obj.java_type,self.p.methods[mid]['module'],self.p.methods[mid]['file'])
++            pending,seen=[owner],set()
++            while pending:
++                current=pending.pop()
++                if current in seen:continue
++                seen.add(current)
++                node=self.p.nodes.get(current,{})
++                generated=any(a['name'].split('.')[-1] in ('Data','EqualsAndHashCode','Value') for a in node.get('annotations',[]))
++                parents=self.p.framework_types.get(current,set())
++                if generated or any(parent not in ('Object','java.lang.Object') and not self.p.resolve_type(parent,node.get('module'),node.get('file')) for parent in parents):
++                    self.approximate=True
++                    self.warnings.add('project or generated Object.equals implementation is unresolved: '+reason)
++                    return U
++                pending.extend(parent for parent in self.p.type_parents.get(current,[]) if parent not in seen)
++            other=args[0]
++            if obj is other:return True
++            if isinstance(other,JavaObject) and obj.java_identity is not None and other.java_identity is not None:
++                return obj.java_identity is other.java_identity
++            if other is None or type(other) in (str,int,float,bool):return False
++            self.approximate=True
++            self.warnings.add('Object.equals reference identity is unresolved: '+reason)
++            return U
+         if not targets:
+             handled, value = self.stream_call(name, obj, args, text(objnode), reason, env)
+             if handled:
+                 return value
+         handled, value = library(name, obj, args, text(objnode), self.state.now) if not targets else (False, U)
+         if handled:
++            if isinstance(obj,JavaMap) and value is U:
++                self.approximate=True
++                self.warnings.add('Java Map operation remains unresolved: '+name+' at '+reason)
++            if isinstance(obj,JavaMap) and (not isinstance(obj.mapping,dict) or name in ('put','get','containsKey') and args and type(args[0]) is not str):
++                self.approximate=True
++                self.warnings.add('Java Map non-string or unknown keys are not modeled: '+reason)
+             if isinstance(obj,dict) and obj.get('__type__') in ('SimpleDateFormat','DecimalFormat') and name in ('format','parse'):
+                 self.approximate=True
+                 self.warnings.add('formatter default locale/time zone not supplied; numeric date fields and dot decimal symbols modeled: '+reason)
+@@ -1097,7 +1256,20 @@
+         if name=='fromString' and text(objnode) in ('UUID','java.util.UUID') and args:
+             converted=uuid_value(args[0])
+             if converted is not U:return converted
+-        if name in ('parseInt', 'parseDouble', 'parseFloat') and args and args[0] is not U:
++        if name=='parseInt' and not self.source_type(objnode) and self.standard_type(text(objnode),'java.lang.Integer'):
++            if len(args) not in (1,2):
++                self.approximate=True
++                self.warnings.add('unsupported Integer.parseInt overload: '+reason)
++                return U
++            value=parse_integer(*args)
++            if value is U:
++                self.approximate=True
++                self.warnings.add('Integer.parseInt value, radix or Unicode digit rules are unresolved: '+reason)
++                valid=self.choose(reason+':parse-int-valid',[True,False])
++                if valid is False:raise JavaThrow({'__type__':'NumberFormatException'})
++                if valid is None:self.fallback(mid)
++            return value
++        if name in ('parseDouble', 'parseFloat') and args and args[0] is not U:
+             try:
+                 return int(args[0]) if name == 'parseInt' else float(args[0]) if name in ('parseDouble', 'parseFloat') else args[0]
+             except (ValueError, TypeError):
+@@ -1229,7 +1401,11 @@
+ 
+     def expand_http_template(self,url,args,name,reason):
+         variables=args[4 if name=='exchange' else 3 if name.startswith('post') else 2:]
+-        mapping=variables[0]['__map__'] if len(variables)==1 and isinstance(variables[0],dict) and '__map__' in variables[0] else None
++        mapping=variables[0].mapping if len(variables)==1 and isinstance(variables[0],JavaMap) else None
++        if mapping is not None and not isinstance(mapping,dict):
++            self.approximate=True
++            self.warnings.add('unresolved Java Map URI variables: '+reason)
++            return U
+         placeholders=list(re.finditer(r'\{([A-Za-z_]\w*)\}',url))
+         rest=re.sub(r'\{([A-Za-z_]\w*)\}','',url)
+         result,offset='',0
+@@ -1359,12 +1535,15 @@
+             query = self.p.repository_queries.get(query_key)
+             primary_keys = self.p.id_fields.get(rid, [])
+             pairs = []
++            comparisons = []
+             if declared_query:
+                 if query is None or any(int(index) > len(args) or int(index) < 1 for _, _, index in query):
+                     unknown_query = True
+                 else:
+                     from .state import camel
+-                    pairs = [(camel(field) + ('In' if op.lower() == 'in' else ''), args[int(index)-1]) for field, op, index in query]
++                    pairs = [(camel(field) + ('In' if op.lower() == 'in' else ''), args[int(index)-1])
++                             for field, op, index in query if op.lower() in ('=','in')]
++                    comparisons = [(camel(field),op,args[int(index)-1]) for field,op,index in query if op.lower() not in ('=','in')]
+             elif name == 'findAllById' and args and isinstance(args[0], list):
+                 if len(primary_keys) == 1:
+                     selected = [r for r in selected if r.get(primary_keys[0]) in args[0]]
+@@ -1390,6 +1569,8 @@
+                     def matches(row):
+                         nonlocal unknown_query
+                         stored = member(row, prop)
++                        if declared_query and (stored is None or value is None):
++                            return False
+                         if symbolic_query or isinstance(stored, dict) and '__symbol__' in stored:
+                             equal = key_equal(stored, value)
+                             if equal is U:
+@@ -1404,6 +1585,21 @@
+                             return equal is not False
+                         return stored in value if in_query and isinstance(value, list) else stored == value
+                     selected = [r for r in selected if matches(r)]
++            for field,op,value in comparisons:
++                kept=[]
++                for row in selected:
++                    stored=member(row,field)
++                    # A SQL comparison involving NULL is never TRUE in WHERE.
++                    if stored is None or value is None:
++                        continue
++                    numeric=all(type(item) in (int,float) and math.isfinite(item) for item in (stored,value))
++                    if not numeric:
++                        unknown_query=True
++                        kept.append(row)
++                        continue
++                    passed={'>':operator.gt,'>=':operator.ge,'<':operator.lt,'<=':operator.le,'!=':operator.ne,'<>':operator.ne}[op](stored,value)
++                    if passed:kept.append(row)
++                selected=kept
+             if (unknown_query and not declared_query and len(primary_keys)==1 and args and
+                     name in ('findById','getById','getReferenceById','existsById')):
+                 exact=[row for row in selected if key_equal(member(row,primary_keys[0]),args[0]) is True]
