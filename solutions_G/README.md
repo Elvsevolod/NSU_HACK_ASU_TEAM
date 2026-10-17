@@ -13,6 +13,7 @@
 | 3 | `docs/ideas.md` | Идеи к реализации (сейчас пусто) |
 | 4 | `docs/results.md` | Журнал результатов |
 | 5 | `../skills/solution-versions/SKILL.md` | Правила ведения вариантов нашей папки и фиксации оценки сайта |
-| 6 | `../tt-challenge/README.md`, `REFERENCE.md`, `context/README.md` | Сам кейс: граф, сценарии, начальное состояние |
+| 6 | `../skills/s0-check/SKILL.md`, `../skills/submission-pack/SKILL.md` | Проверка варианта и сборка посылки (подключены в `opencode.json`) |
+| 7 | `../tt-challenge/README.md`, `REFERENCE.md`, `context/README.md` | Сам кейс: граф, сценарии, начальное состояние |
 
 Варианты создаются как `solutions_G/—_<feature>/`; прочерк — символ `—` (U+2014). Сейчас вариантов нет — нумерация начнётся с 1.

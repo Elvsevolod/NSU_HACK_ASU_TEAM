@@ -54,7 +54,7 @@
 - Структурное изменение: ответ совпадает с родителем **побайтово**, S0 не сдвинулся, тесты зелёные.
 - Изменяющее ответ: новый вариант, новый `submission.json`, локальный S0 и формат-чек, README с бенчмарком. Оценка сайта — отдельно, только после скриншота.
 - Корневой вариант (без родителя): критерий тот же, что у изменяющего ответ; побайтово сверять не с чем.
-- Любой вариант ведётся по правилам `skills/solution-versions/SKILL.md`.
+- Любой вариант ведётся по правилам `skills/solution-versions/SKILL.md`; проверка — по `skills/s0-check`, сборка посылки — по `skills/submission-pack`.
 
 ## 8. Первоисточники
 
@@ -62,4 +62,5 @@
 - [tt-challenge/REFERENCE.md](../../tt-challenge/REFERENCE.md) — вершины и связи графа, как читать сценарий и состояние, формула оценки.
 - [tt-challenge/context/README.md](../../tt-challenge/context/README.md) — начальное состояние, аккаунт, дата, правила выбора «первого».
 - [skills/solution-versions/SKILL.md](../../skills/solution-versions/SKILL.md) — ведение вариантов, фиксация S0 и оценки сайта.
+- [skills/s0-check/SKILL.md](../../skills/s0-check/SKILL.md) — проверка варианта; [skills/submission-pack/SKILL.md](../../skills/submission-pack/SKILL.md) — сборка посылки.
 - [instructions.md](instructions.md) — процедура. [ideas.md](ideas.md) — идеи. [results.md](results.md) — журнал.
