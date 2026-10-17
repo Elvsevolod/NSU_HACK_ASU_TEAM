@@ -190,7 +190,7 @@ def test_unresolved_route_value_is_unknown_instead_of_a_fabricated_null(tmp_path
     project.edges[call]['remote_call'].add(ids['Api.get'])
     engine=Engine(project,ScenarioState(db))
     assert engine.run(ids['Caller.entry'],{}) is U
-    assert any('unresolved remote route parameter: key' in message for message in engine.warnings)
+    assert any('unresolved HTTP request binding: parameter presence or URL layout: key' in message for message in engine.warnings)
 
 
 def test_status_only_response_entity_has_no_body(tmp_path):

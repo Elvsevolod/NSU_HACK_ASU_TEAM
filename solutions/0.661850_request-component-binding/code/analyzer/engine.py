@@ -10,14 +10,15 @@ import json
 import operator
 import math
 import re
-from urllib.parse import urlsplit, parse_qsl, unquote
 
 from .project import text,walk
 from .state import U
 from .models import construct, library, known, unwrap, wire, key_equal, http_entity, optional_value, status_code, header_values
 from .constraints import assume, compare
 from .java_exceptions import JavaThrow, assignable, native_type, NATIVE_TYPES
-from .symbolic_text import concat_text, http_text_parts
+from .symbolic_text import concat_text
+from .request_url import request_address, client_template
+from .http_binding import bind_named, BindingFailure
 from .models import java_date_text, uuid_value, http_headers_type
 from .java_collections import JavaObject, JavaRecord, JavaMap, JavaMapView, JavaMapEntry, JavaMapIterator, JavaEnumValue, JavaTypeToken, JavaTypeFactory, JsonObject, JsonText, JavaJsonMapper, JacksonFeature, reference_equal, is_symbolic
 from .json_codec import operation as codec_operation, conversion as codec_conversion
@@ -195,7 +196,7 @@ class Engine:
         self.params = params
         self.entry = entry
         try:
-            args = [self.input_value(name, typ, params) for name, typ in self.p.parameters(entry)]
+            args = lambda: [self.input_value(name, typ, params) for name, typ in self.p.parameters(entry)]
             result,_ = self.http_invoke(entry, args, 'scenario request')
             if any(entry==handler for handler,_,_ in self.p.ix.handlers):
                 try:self.json_wire(unwrap(result),entry)
@@ -251,7 +252,7 @@ class Engine:
         try:
             self.continue_filter(len(self.filter_frames)-1,0)
             if frame['entered']:return frame['result'],True
-            if len(self.filter_frames)==1:self.outcome='request stopped by filter'
+            if len(self.filter_frames)==1:self.outcome='HTTP binding failure' if frame.get('binding_failed') else 'request stopped by filter'
             return {'__type__':'ResponseEntity','__http_entity__':True,'body':response['body'],'status':response['status']},False
         except JavaThrow as failure:
             failure.http_entered=frame['entered']
@@ -277,6 +278,8 @@ class Engine:
             seen.add(owner)
             custom|=any(a['name'].split('.')[-1]=='ResponseStatus' for a in self.p.nodes[owner].get('annotations',[]))
             pending.extend(self.p.type_parents.get(owner,()))
+        if not custom and isinstance(failure.value,dict) and '__http_binding_status__' in failure.value:
+            return failure.value['__http_binding_status__']
         if not custom and (assignable(thrown,'java.lang.Exception',self.p) is True or assignable(thrown,'java.lang.Error',self.p) is True):return 500
         self.json_issue('server exception status or custom exception resolver is not modeled',target)
         return U
@@ -284,8 +287,16 @@ class Engine:
     def continue_filter(self,frame_index,position):
         frame = self.filter_frames[frame_index]
         if position==len(frame['filters']):
+            try:
+                args=frame['args']() if callable(frame['args']) else frame['args']
+            except BindingFailure as failure:
+                frame['binding_failed']=True
+                self.warnings.add('HTTP binding rejected request: '+str(failure))
+                frame['response']['status']=self.server_error_status(frame['entry'],JavaThrow(
+                    {'__http_binding_status__':failure.status,'__type__':'ServletRequestBindingException'}))
+                return
             frame['entered']=True
-            frame['result']=self.invoke(frame['entry'],frame['args'],reason=frame['reason'])
+            frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'])
             return
         mid = frame['filters'][position]
         skips=self.p.methods_of(self.p.methods[mid]['owner'],'shouldNotFilter')
@@ -872,7 +883,14 @@ class Engine:
             if op == '||' and b is True:
                 return True
             if a is U or b is U:
-                return U
+                if op=='+' and any(self.standard_type(self.source_type(node.child_by_field_name(side)),'java.lang.String') or
+                                   is_symbolic(v) and v.get('__type__') in ('String','java.lang.String')
+                                   for side,v in zip(('left','right'),(a,b))):
+                    # String concatenation preserves its literal parts even
+                    # when one operand's text (including delimiters) is unknown.
+                    a={'__symbol__':self.constraint_symbol(),'__type__':'String'} if a is U else a
+                    b={'__symbol__':self.constraint_symbol(),'__type__':'String'} if b is U else b
+                else:return U
             # A Java char is represented by one UTF-16 code unit, but participates
             # in numeric promotion unless this is a source-typed String concat.
             operand_types=[self.numeric_type(node.child_by_field_name(side)) for side in ('left','right')]
@@ -1531,17 +1549,17 @@ class Engine:
         is_http_client=(not targets and name in ('exchange','getForEntity','postForEntity','getForObject','postForObject')
                         and any(self.standard_type(client_type or '',fqn) for fqn in
                                 ('org.springframework.web.client.RestTemplate','org.springframework.web.client.RestOperations')))
-        if is_http_client and isinstance(url,str) and ('{' in url or '}' in url):
+        if is_http_client and (isinstance(url,str) or is_symbolic(url)):
             url=self.expand_http_template(url,args,name,reason)
         address=self.request_address(url) if remote or is_http_client else None
         if isinstance(url,dict) and any(isinstance(part,dict) and part.get('__java_date_text__') for part in url.get('__text_parts__',[])):
             self.approximate=True
             self.warnings.add('Date URL path assumes a standard time zone abbreviation without path delimiters: '+reason)
-        if not remote and is_http_client and address and address['hostname']:
+        if not remote and is_http_client and address and address['hostname'] and address['segments'] is not None:
             remote = sorted(m for m in self.p.ix.handlers_for(http_verb, address['segments'], address['hostname'])
                             if self.p.enabled_type(self.p.methods[m]['owner']))
         if remote:
-            if address and address['hostname']:
+            if address and address['hostname'] and address['segments'] is not None:
                 matched = {m for m in self.p.ix.handlers_for(http_verb, address['segments'], address['hostname'])
                            if self.p.enabled_type(self.p.methods[m]['owner'])}
                 if http_verb is None:
@@ -1581,47 +1599,8 @@ class Engine:
                     if address['hostname'] not in declared_names:
                         self.approximate=True
                         self.warnings.add('HTTP host resolution uses a module-name heuristic: '+reason)
-                values = []
-                route_values = self.path_parameters(target, url)
-                parameters={parameter['name']:parameter for parameter in self.p.http_parameters(target)}
-                for par, typ in self.p.parameters(target):
-                    if par in route_values:
-                        values.append(self.coerce(route_values[par], typ))
-                    elif http_headers_type(typ):
-                        values.append({'__type__':'HttpHeaders','__http_headers__':True,'headers':deepcopy(headers)})
-                    elif parameters.get(par,{}).get('kind')=='RequestHeader':
-                        parameter=parameters[par]
-                        found=headers.get(parameter['wire_name'].lower(),U if headers.get('__rest_unknown__') else []) if isinstance(headers,dict) else U
-                        if found==[] and parameter['default'] is not U:
-                            value=parameter['default']
-                        elif found==[] and parameter['required']:
-                            self.warnings.add('HTTP binding rejected missing required header: '+parameter['wire_name'])
-                            raise JavaThrow({'__type__':'HttpClientErrorException','status':400})
-                        elif found==[]:value=None
-                        elif isinstance(found,list) and len(found)==1 and isinstance(found[0],str):value=self.coerce(found[0],typ)
-                        else:
-                            value=U
-                            self.approximate=True
-                            self.warnings.add('unresolved remote request header: '+parameter['wire_name'])
-                        values.append(value)
-                    elif parameters.get(par,{}).get('kind') in ('PathVariable','RequestParam'):
-                        values.append(U)
-                        self.approximate=True
-                        self.warnings.add('unresolved remote route parameter: '+par+' at '+reason)
-                    elif parameters.get(par,{}).get('kind')=='RequestBody':
-                        values.append(self.bind_http_body(body,typ,target,reason))
-                    else:
-                        decoded=body
-                        if typ.split('.')[-1]!='String' and isinstance(decoded,JsonText):
-                            decoded=decoded.payload
-                        target_type=self.p.resolve_type(typ,self.p.methods[target]['module'],self.p.methods[target]['file'])
-                        if target_type in self.p.type_fields and isinstance(decoded,dict) and '__symbol__' not in decoded:
-                            decoded={**self.p.request_body_defaults(target),**deepcopy(decoded)}
-                            if '__type__' not in self.p.type_fields[target_type]:decoded['__type__']=self.p.nodes[target_type]['fqn']
-                            if '__http_entity__' not in self.p.type_fields[target_type]:decoded['__http_entity__']=False
-                            decoded=JavaRecord(self.p.nodes[target_type]['fqn'],decoded,self.p.type_fields[target_type])
-                        values.append(decoded)
-                try:response,entered = self.http_invoke(target, values, reason)
+                try:response,entered = self.http_invoke(target,
+                    lambda: self.request_arguments(target,url,headers,body,reason),reason)
                 except JavaThrow as failure:
                     entered=getattr(failure,'http_entered',False)
                     response={'__type__':'ResponseEntity','__http_entity__':True,'body':U,
@@ -2123,47 +2102,38 @@ class Engine:
             self.approximate=True
             self.warnings.add('unresolved Java Map URI variables: '+reason)
             return U
-        placeholders=list(re.finditer(r'\{([A-Za-z_]\w*)\}',url))
-        rest=re.sub(r'\{([A-Za-z_]\w*)\}','',url)
-        result,offset='',0
-        for index,placeholder in enumerate(placeholders):
-            value=mapping.get(placeholder[1],U) if mapping is not None else variables[index] if index<len(variables) else U
-            if type(value) is bool:value=str(value).lower()
-            if type(value) is int:value=str(value)
-            supported=(isinstance(value,str) and re.fullmatch(r'[A-Za-z0-9._~-]*',value) is not None
-                       or isinstance(value,dict) and value.get('__uuid_text__') is True)
-            if not supported or '{' in rest or '}' in rest:
-                self.approximate=True
-                self.warnings.add('unresolved URI template expansion or encoding: '+reason)
-                return U
-            result=concat_text(concat_text(result,url[offset:placeholder.start()]),value)
-            offset=placeholder.end()
-        if not placeholders:
+        configuration=self.p.__dict__.setdefault('_custom_uri_template_units',None)
+        if configuration is None:
+            configuration={self.p.ix.unit_of(site['method']) for site in self.p.nodes.values()
+                           if site.get('kind')=='call_site' and site.get('callee') in ('setUriTemplateHandler','setEncodingMode','setParsePath','setDefaultUriVariables')
+                           and site.get('method') in self.p.methods}
+            self.p._custom_uri_template_units=configuration
+        if self.p.ix.unit_of(self.method) in configuration:
+            self.approximate=True
+            self.warnings.add('custom URI template handler or encoding mode is not modeled: '+reason)
+            return U
+        if isinstance(url,str) and ('{' in re.sub(r'\{([A-Za-z_]\w*)\}','',url) or '}' in re.sub(r'\{([A-Za-z_]\w*)\}','',url)):
             self.approximate=True
             self.warnings.add('unsupported URI template syntax: '+reason)
             return U
-        return concat_text(result,url[offset:])
+        position=0
+        def lookup(key):
+            nonlocal position
+            if mapping is not None and key not in mapping or mapping is None and position>=len(variables):
+                raise JavaThrow({'__type__':'IllegalArgumentException'})
+            value=mapping[key] if mapping is not None else variables[position]
+            position+=1
+            return value
+        def unknown():
+            self.approximate=True
+            self.warnings.add('unresolved URI template value: '+reason)
+            return {'__symbol__':self.constraint_symbol(),'__type__':'String'}
+        return client_template(url,lookup,unknown)
 
-    @staticmethod
-    def request_address(url):
-        if isinstance(url,str):
-            try:parsed=urlsplit(url)
-            except ValueError:return None
-            return {'hostname':parsed.hostname,'segments':parsed.path.strip('/').split('/') if parsed.path.strip('/') else [],
-                    'query':dict(parse_qsl(parsed.query,keep_blank_values=True))}
-        parsed=http_text_parts(url)
-        if parsed is None and isinstance(url,dict):
-            parts=url.get('__text_parts__',[])
-            if parts and isinstance(parts[0],str) and parts[0].startswith('/') and not parts[0].startswith('//'):
-                # Parsing base only; no concrete runtime URL or value is introduced.
-                parsed=http_text_parts(concat_text('http://relative.invalid',url))
-                if parsed:parsed['hostname']=None
-        return {**parsed,'query':{}} if parsed else None
+    request_address = staticmethod(request_address)
 
-    def path_parameters(self, target, url):
-        address=self.request_address(url)
-        if address is None:
-            return {}
+    def route_path_values(self,target,address):
+        if not address or address['segments'] is None:return None
         segments=address['segments']
         for mid, _, template in self.p.ix.handlers:
             if mid == target and len(template) == len(segments) and all(
@@ -2171,19 +2141,62 @@ class Engine:
                 if any(key.startswith('{') and ':' in key for key in template):
                     self.approximate=True
                     self.warnings.add('request route regular-expression constraints are not fully modeled: '+target)
-                values = {key[1:-1].split(':', 1)[0]: unquote(value) if isinstance(value,str) else deepcopy(value)
-                          for key, value in zip(template, segments) if key.startswith('{')}
-                query=address['query']
-                for par in self.p.http_parameters(target):
-                    source = values if par['kind'] == 'PathVariable' else query if par['kind'] == 'RequestParam' else {}
-                    if par['wire_name'] in source:
-                        values[par['name']] = source[par['wire_name']]
-                    elif par['kind'] == 'RequestParam' and par['default'] is not U:
-                        values[par['name']] = par['default']
-                    elif par['kind'] == 'RequestParam' and not par['required']:
-                        values[par['name']] = None
-                return values
-        return {}
+                return {key[1:-1].split(':',1)[0]:deepcopy(value)
+                        for key,value in zip(template,segments) if key.startswith('{')}
+        return None
+
+    def path_parameters(self, target, url):
+        # Raw values for source grounding; actual HTTP conversion is deferred
+        # until filters have admitted the request.
+        address=self.request_address(url)
+        values=self.route_path_values(target,address)
+        if values is None:return {}
+        path=dict(values)
+        for par in self.p.http_parameters(target):
+            if par['kind']=='PathVariable' and par['wire_name'] in path:
+                values[par['name']]=path[par['wire_name']]
+            elif par['kind']=='RequestParam':
+                found=address['query'].get(par['wire_name']) if address['query_complete'] else U
+                if found is U:values[par['name']]=U
+                elif found is None or found==['']:
+                    if par['default'] is not U:values[par['name']]=par['default']
+                    elif found is None and not par['required']:values[par['name']]=None
+                    elif found==['']:values[par['name']]=''
+                else:values[par['name']]=found[0] if len(found)==1 else found
+        return values
+
+    def request_arguments(self,target,url,headers,body,reason):
+        address=self.request_address(url)
+        path=self.route_path_values(target,address)
+        parameters={p['name']:p for p in self.p.http_parameters(target)}
+        values=[]
+        for name,typ in self.p.parameters(target):
+            parameter=parameters.get(name,{})
+            kind=parameter.get('kind')
+            if http_headers_type(typ):
+                value={'__type__':'HttpHeaders','__http_headers__':True,'headers':deepcopy(headers)}
+            elif kind in ('PathVariable','RequestParam','RequestHeader'):
+                wire_name=parameter['wire_name']
+                if kind=='PathVariable':found=U if path is None else [path[wire_name]] if wire_name in path else None
+                elif kind=='RequestParam':
+                    found=address['query'].get(wire_name) if address and address['query_complete'] else U
+                    media=headers.get('content-type',[]) if isinstance(headers,dict) else U
+                    if body is not None and (media is U or any('form' in value or 'multipart' in value for value in media if isinstance(value,str))):
+                        found=U
+                else:
+                    found=headers.get(wire_name.lower(),U if headers.get('__rest_unknown__') else None) if isinstance(headers,dict) else U
+                value=bind_named(self,target,parameter,found)
+            elif kind=='RequestBody':value=self.bind_http_body(body,typ,target,reason)
+            else:
+                value=body.payload if typ.split('.')[-1]!='String' and isinstance(body,JsonText) else body
+                target_type=self.p.resolve_type(typ,self.p.methods[target]['module'],self.p.methods[target]['file'])
+                if target_type in self.p.type_fields and isinstance(value,dict) and '__symbol__' not in value:
+                    value={**self.p.request_body_defaults(target),**deepcopy(value)}
+                    if '__type__' not in self.p.type_fields[target_type]:value['__type__']=self.p.nodes[target_type]['fqn']
+                    if '__http_entity__' not in self.p.type_fields[target_type]:value['__http_entity__']=False
+                    value=JavaRecord(self.p.nodes[target_type]['fqn'],value,self.p.type_fields[target_type])
+            values.append(value)
+        return values
 
     def authentication(self, mid, args, reason):
         module = self.p.methods[mid]['module']

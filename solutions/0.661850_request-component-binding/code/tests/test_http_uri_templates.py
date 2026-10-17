@@ -29,4 +29,6 @@ def test_unexpanded_uri_template_is_never_passed_as_a_known_identifier(tmp_path)
       @GetMapping("/items/{key}") String read(@PathVariable String key){return key;}}
       class Caller {RestTemplate rest;String entry(){return rest.getForObject("http://service/items/{key}",String.class);}}'''})
     engine=Engine(project,ScenarioState(db));assert engine.run(ids['Caller.entry'],{}) is U
-    assert engine.approximate and any('URI template' in warning for warning in engine.warnings)
+    assert engine.outcome=='uncaught application exception'
+    assert any('IllegalArgumentException' in warning for warning in engine.warnings)
+    assert ('','executes',ids['Api.read']) not in engine.edges

@@ -114,4 +114,5 @@ def test_symbolic_input_does_not_become_a_concrete_browser_url(tmp_path):
     state.browser['form']['key'] = state.fresh_input('key')
     url=frontend.evaluate('"/items/" + this.key', state)
     assert isinstance(url,dict) and url['__text_parts__'][-1]==state.browser['form']['key']
-    assert Engine(project,state).request_address(url) is None
+    address=Engine(project,state).request_address(url)
+    assert address['segments'] is None and address['query_complete'] is False

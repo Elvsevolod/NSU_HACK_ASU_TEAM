@@ -504,14 +504,19 @@ class Project:
                 continue
             name = text(par.child_by_field_name('name'))
             typ = text(par.child_by_field_name('type'))
-            annotation = re.search(r'@(RequestBody|PathVariable|RequestParam|RequestHeader)\b(?:\(([^)]*)\))?', text(par))
+            annotation = re.search(r'@(?:org\.springframework\.web\.bind\.annotation\.)?(RequestBody|PathVariable|RequestParam|RequestHeader)\b(?:\(([^)]*)\))?', text(par))
             kind, options = (annotation[1], annotation[2] or '') if annotation else ('', '')
             alias = re.search(r'^\s*"([^"]+)"|\b(?:value|name)\s*=\s*"([^"]+)"', options)
             default = re.search(r'\bdefaultValue\s*=\s*"([^"]*)"', options)
             result.append({'name': name, 'type': typ, 'kind': kind,
                            'wire_name': next((v for v in alias.groups() if v is not None), name) if alias else name,
                            'required': not bool(re.search(r'\brequired\s*=\s*false\b', options)) and default is None,
-                           'default': default[1] if default else U})
+                           'default': default[1] if default else U,
+                           'explicit_name': alias is not None,
+                           'custom_conversion': bool(re.search(r'@(?:[\w.]+\.)?(?:DateTimeFormat|NumberFormat)\b',text(par))),
+                           'binding_metadata_unknown': bool(
+                               re.search(r'\brequired\s*=(?!\s*(?:true|false)\b)',options) or
+                               'defaultValue' in options and default is None)})
         return result
 
     def request_body_defaults(self, mid):
