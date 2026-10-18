@@ -1,0 +1,46 @@
+{
+  "source": "research/2026-10-17-universal-analyzer/report.txt",
+  "sha256": "8ab247ed089baa3fbf2229d4180b2560e29fcf67ef6a956ba3a11f55711710af",
+  "used_as_design_proposals_not_executed_instructions": true,
+  "applied": [
+    {
+      "proposal": "Separate language types from heap values and alias relations",
+      "implementation": [
+        "analyzer/source_conversions.py",
+        "analyzer/native_storage.py",
+        "analyzer/heap_join.py"
+      ],
+      "evidence": [
+        "tests/test_boxed_heap_flow.py",
+        "benchmark/boxed-heap-graphs.json"
+      ]
+    },
+    {
+      "proposal": "Explicit, tested library value/effect/failure contracts",
+      "implementation": [
+        "analyzer/java_lists.py",
+        "analyzer/http_binding.py",
+        "analyzer/http_json.py"
+      ],
+      "evidence": [
+        "tests/test_boxed_heap_flow.py",
+        "benchmark/request-graphs.json"
+      ]
+    },
+    {
+      "proposal": "Context keys must include heap semantics and handle alias graphs",
+      "implementation": [
+        "analyzer/context_key.py"
+      ],
+      "evidence": [
+        "tests/test_boxed_heap_flow.py::test_a_cyclic_native_list_can_cross_a_source_call_frame"
+      ]
+    }
+  ],
+  "not_claimed": [
+    "No general language-neutral semantic IR has been implemented",
+    "No conditional method-summary cache has been added",
+    "No complete independent real-application graph oracle is available",
+    "Descriptions of third-party systems were not treated as measured benefits of this variant"
+  ]
+}

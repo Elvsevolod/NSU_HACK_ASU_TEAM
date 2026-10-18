@@ -1,0 +1,94 @@
+{
+  "parent": 23,
+  "runtime_diff_read": true,
+  "changed_files": [
+    "analyzer/boxed_values.py",
+    "analyzer/engine.py",
+    "analyzer/heap_join.py",
+    "analyzer/http_json.py",
+    "analyzer/java_collections.py",
+    "analyzer/source_generics.py",
+    "package_solution.py",
+    "tests/test_generic_member_flow.py",
+    "tests/test_review10_execution.py",
+    "tests/test_type_parameter_shadowing.py"
+  ],
+  "changes": [
+    "Source-only owner/member and bounded method substitution, including inheritance and namespaces",
+    "Source bindings survive calls and deferred callbacks; var takes its initializer or iteration element source type",
+    "Observed native reference kinds survive selected field/map/JSON/return boundaries; primitive return conversions determine later boxing",
+    "Known incompatible native reference casts throw before following source calls; unproven casts remain diagnosed",
+    "Raw generic field and JSON projections preserve payloads and guard unproven parameterizations",
+    "Generated accessor projection uses the same field guards; hidden field reads receive a diagnostic"
+  ],
+  "inherited_test_files_modified": [
+    "test_type_parameter_shadowing.py",
+    "test_review10_execution.py"
+  ],
+  "no_target_specific_rules": true,
+  "no_external_runtime_models": true,
+  "no_gold_read_by_predictor": true,
+  "rejected_intermediate": "iterations/pre-native-cast-guard contains measured code before an independent wrong confirmed Long cast was found",
+  "references": [
+    "https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.5.2",
+    "https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.8",
+    "https://docs.oracle.com/javase/specs/jls/se21/html/jls-5.html#jls-5.1.7",
+    "https://docs.oracle.com/javase/specs/jls/se21/html/jls-5.html#jls-5.5.3"
+  ],
+  "remaining_limits": [
+    "Missing authoritative user values remain unknown",
+    "No complete wildcard capture, least-upper-bound/overload or target typing inference",
+    "Native boxed metadata is not a complete heap domain: Object locals and raw/aliased plain lists remain separate work",
+    "Generic implicit JVM casts depend on erased consumer context; unresolved Map reads are not asserted guaranteed throws",
+    "General project-class narrowing casts, static storage, hidden declaring-class slots and covariant reference-array stores are not fully modeled",
+    "Generated accessors remain a bounded projection, not execution of arbitrary annotation processors",
+    "No full real-application graph oracle or complete JVM/Spring implementation"
+  ],
+  "open_counterexamples": {
+    "variant": 24,
+    "application_started": false,
+    "reference_fixed_before_prediction": true,
+    "scope": "Synthetic source-only boxed heap provenance; no target scenario inspected",
+    "cases": [
+      {
+        "case": "raw-list-boxing",
+        "source": "import java.util.*;class Api{Object entry(){List<Long> values=new ArrayList<Long>();\n List raw=values;raw.add(1);Long value=values.get(0);after();return value;}void after(){}}",
+        "source_sha256": "dfb6a4c77c3cf3c10d06af063b258a4c42ca2dfcf9af36ca3ac52a11cc7cedfc",
+        "reference": {
+          "outcome": "uncaught application exception",
+          "after_executes": false
+        },
+        "reference_sha256": "01179c4ef53a1c50f6868babad7b6250f71993ec14178d5c71f4f72e828ae603",
+        "actual": {
+          "result": "1",
+          "approximate": false,
+          "outcome": "returned",
+          "after_executes": true,
+          "warnings": []
+        },
+        "matches_reference": false
+      },
+      {
+        "case": "object-local-boxing",
+        "source": "class Api{Object entry(){Object value=1L;return (Long)value;}}",
+        "source_sha256": "0789c4332943651f3291170c7d18b682b60968acd1ee6eaf1630d1d09655cf37",
+        "reference": {
+          "result": "1",
+          "approximate": false,
+          "outcome": "returned"
+        },
+        "reference_sha256": "7d7c787febf487c15ddbe89b490ba3faf844f49f231d08ac5cdbeec9a1149e02",
+        "actual": {
+          "result": "Unknown.VALUE",
+          "approximate": true,
+          "outcome": "returned",
+          "after_executes": false,
+          "warnings": [
+            "native reference cast runtime kind is unresolved: (Long)value"
+          ]
+        },
+        "matches_reference": false
+      }
+    ]
+  }
+}

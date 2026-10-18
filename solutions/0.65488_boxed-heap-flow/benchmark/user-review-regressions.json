@@ -1,0 +1,104 @@
+{
+  "scope": "Existing independent tests for user-reported routing, failure, control-flow, UUID, units, formatting, SQL and context defects",
+  "source": "Final1396-test XML, not a new execution or a full framework proof",
+  "modules": [
+    {
+      "module": "test_reported_regressions",
+      "passing_cases": 5,
+      "case_names": [
+        "test_mapping_http_methods_and_only_path_attributes",
+        "test_class_and_method_request_method_sets_combine_by_union",
+        "test_list_entity_is_not_list_of_related_entity_types",
+        "test_repository_list_keeps_65th_row_and_correct_branch",
+        "test_plain_body_property_preserves_entity_across_steps"
+      ]
+    },
+    {
+      "module": "test_review10_execution",
+      "passing_cases": 35,
+      "case_names": [
+        "test_http_client_operation_preserves_the_verb[rest.getForObject(\"http://service/records\",String.class)-Api.get]",
+        "test_http_client_operation_preserves_the_verb[rest.postForObject(\"http://service/records\",\"payload\",String.class)-Api.post]",
+        "test_http_client_operation_preserves_the_verb[rest.exchange(\"http://service/records\",HttpMethod.GET,null,String.class)-Api.get]",
+        "test_guaranteed_value_failure_stops_following_calls[Optional.empty().orElseThrow()]",
+        "test_guaranteed_value_failure_stops_following_calls[Optional.empty().orElseThrow(()->new IllegalArgumentException())]",
+        "test_guaranteed_value_failure_stops_following_calls[((String)null).equals(\"x\")]",
+        "test_http_error_status_does_not_become_a_successful_body",
+        "test_filter_requires_a_source_call_to_the_chain[False]",
+        "test_filter_requires_a_source_call_to_the_chain[True]",
+        "test_switch_return_exits_the_method_and_default_does_not_shadow_a_case",
+        "test_typed_catch_selects_the_first_assignable_exception_handler",
+        "test_switch_fallthrough_break_and_arrow_expression",
+        "test_finally_runs_when_a_catch_throws_and_outer_catch_uses_that_type",
+        "test_source_exception_subclass_and_multicatch_are_resolved",
+        "test_controller_executes_inside_the_filter_chain_before_its_cleanup",
+        "test_failed_http_request_does_not_run_the_success_callback",
+        "test_java_integer_width_controls_overflow[int n=Integer.MAX_VALUE;return n+1;--2147483648]",
+        "test_java_integer_width_controls_overflow[long n=Long.MAX_VALUE;return n+1;--9223372036854775808]",
+        "test_java_integer_width_controls_overflow[long n=2147483647L;return n+1;-2147483648]",
+        "test_java_integer_width_controls_overflow[int n=Integer.MAX_VALUE;n++;return n;--2147483648]",
+        "test_java_integer_width_controls_overflow[int n=2147483647;n+=2L;return n;--2147483647]",
+        "test_java_integer_width_controls_overflow[int n=-2147483648;return n/-1;--2147483648]",
+        "test_guaranteed_integer_division_failure_is_catchable_and_stops_the_body",
+        "test_generated_uuid_has_uuid_string_structure_without_a_fake_runtime_value",
+        "test_a_null_expression_does_not_dereference_a_source_static_method",
+        "test_json_request_body_is_decoded_into_the_receiving_dto_type",
+        "test_unresolved_route_value_is_unknown_instead_of_a_fabricated_null",
+        "test_status_only_response_entity_has_no_body",
+        "test_a_required_header_is_not_filled_with_the_request_body",
+        "test_a_json_response_requested_as_string_remains_decodable_json",
+        "test_collection_element_types_survive_getter_chains[Integer-2147483647--2147483648]",
+        "test_collection_element_types_survive_getter_chains[Long-2147483647L-2147483648]",
+        "test_explicit_header_value_is_bound_case_insensitively",
+        "test_source_should_not_filter_bypasses_a_filter_that_would_stop_the_chain",
+        "test_custom_http_error_policy_is_not_silently_replaced_by_the_default"
+      ]
+    },
+    {
+      "module": "test_review10_inputs",
+      "passing_cases": 11,
+      "case_names": [
+        "test_mysql_insert_column_order_and_doubled_quote_are_preserved",
+        "test_unsupported_insert_is_not_silently_treated_as_an_empty_table",
+        "test_scenario_title_and_description_resolve_an_unqualified_action",
+        "test_minimum_and_maximum_language_choose_the_corresponding_source_operation",
+        "test_inactive_controller_is_excluded_from_contracts_and_request_execution",
+        "test_unsupported_browser_clients_and_sfc_syntax_are_visible",
+        "test_explicit_input_named_sample_is_allowed_but_reference_gold_stays_blocked",
+        "test_formatter_patterns_are_honored_or_explicitly_unsupported",
+        "test_mass_units_are_converted_from_field_contract_not_assumed",
+        "test_source_display_suffix_can_supply_a_unit_for_the_exact_request_control",
+        "test_a_date_only_scenario_input_does_not_invent_a_time_for_a_string_field"
+      ]
+    },
+    {
+      "module": "test_guaranteed_access_failures",
+      "passing_cases": 10,
+      "case_names": [
+        "test_guaranteed_null_and_bounds_failures_stop_following_source_calls[Item row=null;String unused=row.id;]",
+        "test_guaranteed_null_and_bounds_failures_stop_following_source_calls[Item row=null;row.id=\"new\";]",
+        "test_guaranteed_null_and_bounds_failures_stop_following_source_calls[int[] rows=null;int unused=rows[0];]",
+        "test_guaranteed_null_and_bounds_failures_stop_following_source_calls[int[] rows={1};int unused=rows[2];]",
+        "test_guaranteed_null_and_bounds_failures_stop_following_source_calls[List<String> rows=new ArrayList<>();rows.get(0);]",
+        "test_guaranteed_null_and_bounds_failures_stop_following_source_calls[List<String> rows=new ArrayList<>();rows.iterator().next();]",
+        "test_guaranteed_null_and_bounds_failures_stop_following_source_calls[\"a\".charAt(2);]",
+        "test_guaranteed_null_and_bounds_failures_stop_following_source_calls[\"a\".substring(-1);]",
+        "test_static_constant_access_through_a_null_reference_does_not_throw",
+        "test_java_string_length_counts_utf16_code_units"
+      ]
+    },
+    {
+      "module": "test_http_server_failures",
+      "passing_cases": 3,
+      "case_names": [
+        "test_uncaught_server_exception_uses_http_client_error_type",
+        "test_a_failed_remote_handler_still_has_an_executed_remote_edge",
+        "test_custom_server_exception_handlers_do_not_get_a_confirmed_default_status"
+      ]
+    }
+  ],
+  "limits": [
+    "Some unsupported mechanisms are diagnosed rather than fully modeled",
+    "Bounded regression success does not establish universal correctness"
+  ]
+}

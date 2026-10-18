@@ -1,0 +1,56 @@
+{
+  "sources": [
+    {
+      "contract": "named request parameters",
+      "url": "https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-methods/requestparam.html",
+      "used_for": "Required/optional parameters and repeated values bound to lists and arrays."
+    },
+    {
+      "contract": "default and empty",
+      "url": "https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/RequestParam.html",
+      "used_for": "defaultValue applies to missing or empty values; a default makes the parameter optional."
+    },
+    {
+      "contract": "resolver order",
+      "url": "https://raw.githubusercontent.com/spring-projects/spring-framework/v5.3.39/spring-web/src/main/java/org/springframework/web/method/annotation/AbstractNamedValueMethodArgumentResolver.java",
+      "used_for": "Named-value resolution, defaults, conversion, and missing-after-conversion checks precede method invocation."
+    },
+    {
+      "contract": "number conversion",
+      "url": "https://raw.githubusercontent.com/spring-projects/spring-framework/v5.3.39/spring-core/src/main/java/org/springframework/util/NumberUtils.java",
+      "used_for": "Native integer widths, whitespace removal, decimal and hex number parsing."
+    },
+    {
+      "contract": "boolean conversion",
+      "url": "https://raw.githubusercontent.com/spring-projects/spring-framework/v5.3.39/spring-core/src/main/java/org/springframework/core/convert/support/StringToBooleanConverter.java",
+      "used_for": "Boolean converter accepts true/on/yes/1 and false/off/no/0, with trimming."
+    },
+    {
+      "contract": "repeated scalar",
+      "url": "https://docs.spring.io/spring-framework/docs/5.1.13.RELEASE_to_5.1.14.RELEASE/Spring%20Framework%205.1.14.RELEASE/org/springframework/core/convert/support/ArrayToObjectConverter.html",
+      "used_for": "Array-to-scalar conversion uses the first occurrence."
+    },
+    {
+      "contract": "repeated String",
+      "url": "https://raw.githubusercontent.com/spring-projects/spring-framework/v5.3.39/spring-core/src/main/java/org/springframework/core/convert/support/ArrayToStringConverter.java",
+      "used_for": "Multiple String values become a comma-delimited string."
+    },
+    {
+      "contract": "single collection",
+      "url": "https://docs.spring.io/spring-framework/docs/5.0.17.RELEASE_to_5.0.18.RELEASE/Spring%20Framework%205.0.17.RELEASE/org/springframework/core/convert/support/StringToCollectionConverter.html",
+      "used_for": "A single string is comma-delimited for collection conversion."
+    },
+    {
+      "contract": "client URI encoding",
+      "url": "https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-uri-building.html",
+      "used_for": "RestTemplate retains URI_COMPONENT for compatibility; component encoding differs from strict variable encoding."
+    },
+    {
+      "contract": "path segment encoding",
+      "url": "https://raw.githubusercontent.com/spring-projects/spring-framework/v5.3.39/spring-web/src/main/java/org/springframework/web/util/DefaultUriBuilderFactory.java",
+      "used_for": "parsePath defaults true for URI_COMPONENT; slash in a template path variable is encoded."
+    }
+  ],
+  "verification": "Context7 and official Spring documentation/source. No framework/server was run.",
+  "scope": "Bounded default Spring MVC/RestTemplate semantics; detected custom configuration is unresolved."
+}

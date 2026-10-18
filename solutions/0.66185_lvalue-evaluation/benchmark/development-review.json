@@ -1,0 +1,42 @@
+{
+  "runtime_diff_read": true,
+  "runtime_changed_files": [
+    "analyzer/engine.py",
+    "analyzer/project.py",
+    "package_solution.py"
+  ],
+  "parent": 22,
+  "runtime_change": "Capture local, instance-field and array storage before RHS effects; update the same location once; use source numeric types and lexical binary nested names.",
+  "inherited_tests_modified": false,
+  "guards": [
+    "prefix/postfix ++ and --",
+    "field and primitive-array writes",
+    "receiver/index evaluation once",
+    "simple/compound assignment exception order",
+    "RHS name rebinding",
+    "aliases and input replay ownership",
+    "local shadowing",
+    "int/long/byte narrowing and UTF16 char",
+    "double promotion",
+    "diagnosed float rounding and unsupported conversions",
+    "static storage and reference array diagnostics",
+    "hidden-field storage diagnostics",
+    "comments in operands",
+    "binary nested owner disambiguation"
+  ],
+  "fixture_corrections": [
+    "The tree-sitter frontend rejects parenthesized simple assignment LHS; the test uses a supported plain field LHS. Such syntax is not claimed supported.",
+    "First declaration-name correction only compared short names; a second independent lexical-owner counterexample caught it before acceptance. The measured first iteration is preserved."
+  ],
+  "no_target_specific_rules": true,
+  "no_external_runtime_models": true,
+  "no_gold_read_by_predictor": true,
+  "remaining_limits": [
+    "Missing authoritative user inputs remain unknown",
+    "Static storage, covariant array store failure paths and separate hidden-field storage remain unsupported and diagnosed on writes",
+    "Float rounding and floating-to-integral compound conversions are diagnosed, not implemented",
+    "Compound operators beyond += and -= remain diagnosed",
+    "Full JVM, arbitrary callbacks/framework interception and complete independent real-app graph oracle are not provided",
+    "Cyclic invocation argument signatures and some branch-joined plain-container aliases remain separate existing limits"
+  ]
+}
