@@ -1,0 +1,660 @@
+--- parent11/analyzer/jsflow.py
++++ candidate12/analyzer/jsflow.py
+@@ -1,5 +1,6 @@
+ """Bounded expression propagation within a JavaScript request's lexical scope."""
+ import json
++import re
+ from tree_sitter import Language, Parser
+ import tree_sitter_javascript
+ 
+@@ -12,7 +13,19 @@
+ FUNCTIONS = {'function_expression', 'function_declaration', 'method_definition', 'arrow_function'}
+ 
+ 
+-def definitions_before(scope, limit, initial=None):
++def dom_access(node):
++    """A literal jQuery text/value property; selectors with escapes stay unsupported."""
++    if node is None or node.type != 'call_expression':
++        return None
++    function = text(node.child_by_field_name('function'))
++    match = re.fullmatch(r'''(?:\$|jQuery)\(\s*(["'])(\s*#[\w-]+\s*)\1\s*\)\.(text|val)''',function)
++    args = node.child_by_field_name('arguments')
++    if match is None or args is None:
++        return None
++    return '@dom|'+match[3]+'|'+match[2].strip(), args.named_children
++
++
++def definitions_before(scope, limit, initial=None, track_dom=False):
+     """Conditional writes become expressions, never the last visited branch's value.
+ 
+     Only assignments are modeled here. Loops, exception handlers and computed
+@@ -27,6 +40,8 @@
+         current = stack.pop()
+         if current.type == 'function_declaration':
+             local_functions[text(current.child_by_field_name('name'))] = current
++        elif track_dom and current.type == 'variable_declarator' and current.child_by_field_name('value') is not None and current.child_by_field_name('value').type in FUNCTIONS:
++            local_functions[text(current.child_by_field_name('name'))] = current.child_by_field_name('value')
+         elif current.type not in FUNCTIONS:
+             stack.extend(current.named_children)
+ 
+@@ -48,6 +63,9 @@
+         """Scalar reads use the value at this program point, not a later assignment."""
+         if node is None:
+             return 'undefined'
++        access = dom_access(node) if track_dom else None
++        if access and not access[1] and access[0] in target:
++            return '('+target[access[0]]+')'
+         if node.type == 'identifier' and text(node) in target:
+             owner = owner_of(text(node), target)
+             prior = target[owner]
+@@ -110,6 +128,17 @@
+                 callback_nodes.append(local_functions[fn])
+             arguments = node.child_by_field_name('arguments')
+             callback_nodes += [arg for arg in arguments.named_children if arg.type in FUNCTIONS] if arguments else []
++            if track_dom and arguments:
++                callback_nodes += [local_functions[text(arg)] for arg in arguments.named_children
++                                   if arg.type == 'identifier' and text(arg) in local_functions]
++                nested = list(arguments.named_children)
++                while nested:
++                    child = nested.pop()
++                    if child.type in FUNCTIONS:
++                        if child not in callback_nodes:
++                            callback_nodes.append(child)
++                    else:
++                        nested.extend(child.named_children)
+             for callback in callback_nodes:
+                 descendants = list(callback.named_children)
+                 while descendants:
+@@ -125,6 +154,9 @@
+                             owner = owner_of(text(lhs.child_by_field_name('object')), target)
+                             if owner in target:
+                                 invalidate_object(owner, target)
++                    access = dom_access(child) if track_dom else None
++                    if access and access[1]:
++                        target[access[0]] = UNKNOWN_EXPR
+                     descendants.extend(child.named_children)
+             pure = fn == 'JSON.stringify' or fn.startswith('console.')
+             if not pure:
+@@ -194,6 +226,13 @@
+             for arg in args.named_children if args else []:
+                 if arg.type not in FUNCTIONS:
+                     visit(arg, target, invalid)
++            access = dom_access(node) if track_dom else None
++            if access and access[1]:
++                rhs = access[1][0]
++                frozen = freeze(rhs,target)
++                target[access[0]] = (UNKNOWN_EXPR if invalid or len(access[1]) != 1 or rhs.type in FUNCTIONS
++                                    else '(('+frozen+")==null?'':(''+("+frozen+')))')
++                return
+             invalidate_calls(node, target)
+             return
+         if node.type == 'binary_expression' and text(node.child_by_field_name('operator')) in ('&&', '||', '??'):
+@@ -266,7 +305,11 @@
+             visit(yes, left)
+             visit(no, right)
+             for key in left.keys() | right.keys():
+-                a, b = left.get(key, 'undefined'), right.get(key, 'undefined')
++                fallback = 'undefined'
++                if track_dom and key.startswith('@dom|'):
++                    _,method,control = key.split('|',2)
++                    fallback = '$('+json.dumps(control)+').'+method+'()'
++                a, b = left.get(key, fallback), right.get(key, fallback)
+                 target[key] = a if a == b else '(' + condition + '?(' + a + '):(' + b + '))'
+             return
+         invalid = invalid or node.type in {'for_statement', 'for_in_statement', 'while_statement',
+--- parent11/analyzer/html_options.py
++++ candidate12/analyzer/html_options.py
+@@ -24,7 +24,72 @@
+             continue
+         for option in select.iter(HTML+'option'):
+             if 'value' in option.attrib and not any(key.startswith(('v-',':','@')) for key in option.attrib):
+-                label = ''.join(option.itertext()).strip()
+-                options.append({'control':control,'value':option.attrib['value'],'label':label,'space':'dom'})
++                raw = ''.join(option.itertext())
++                options.append({'control':control,'value':option.attrib['value'],'label':raw.strip(),
++                                'raw_text':raw,'space':'dom'})
+     diagnostics.extend('HTML fragment recovery: '+code for _,code,_ in parser.errors)
+     return options, diagnostics
++
++
++def document_options(source):
++    """Literal single-select options; raw text belongs to the HTML5 tree."""
++    parser = html5lib.HTMLParser(tree=html5lib.getTreeBuilder('etree'),strict=False)
++    root = parser.parse(source,scripting=True)
++    ids, output, diagnostics = {}, [], []
++    for node in root.iter():
++        if node.attrib.get('id'):
++            ids[node.attrib['id']] = ids.get(node.attrib['id'],0)+1
++
++    def visible(node, inert=False):
++        inert = inert or node.tag in (HTML+'template',HTML+'noscript') or 'v-for' in node.attrib
++        if inert or not isinstance(node.tag,str) or not node.tag.startswith(HTML):
++            return
++        if node.tag == HTML+'select':
++            control = node.attrib.get('id')
++            if (not control or ids.get(control) != 1 or 'multiple' in node.attrib
++                    or 'disabled' in node.attrib or any(k.startswith(('v-',':','@')) for k in node.attrib)):
++                if control:
++                    diagnostics.append('Unsupported or ambiguous native select: #'+control)
++                return
++            for option in node.iter(HTML+'option'):
++                if ('value' not in option.attrib or 'disabled' in option.attrib
++                        or any(k.startswith(('v-',':','@')) for k in option.attrib)):
++                    continue
++                parent_disabled = any('disabled' in group.attrib and option in group.iter()
++                                      for group in node.iter(HTML+'optgroup'))
++                if parent_disabled:
++                    continue
++                raw = ''.join(option.itertext())
++                output.append({'control':control,'value':option.attrib['value'],'label':raw.strip(),
++                               'raw_text':raw,'space':'dom'})
++            return
++        for child in node:
++            visible(child,inert)
++    visible(root)
++    return output, diagnostics
++
++
++def document_texts(source):
++    """Initial textContent for unique static elements, excluding dynamic subtrees."""
++    parser = html5lib.HTMLParser(tree=html5lib.getTreeBuilder('etree'),strict=False)
++    root = parser.parse(source,scripting=True)
++    ids, output = {}, {}
++    for node in root.iter():
++        if node.attrib.get('id'):
++            ids[node.attrib['id']] = ids.get(node.attrib['id'],0)+1
++    def dynamic(node):
++        return (node.tag in (HTML+'template',HTML+'noscript',HTML+'script',HTML+'style')
++                or 'contenteditable' in node.attrib
++                or any(k.startswith(('v-',':','@')) for k in node.attrib)
++                or '{{' in ''.join(node.itertext()))
++    def visit(node, uncertain=False):
++        if not isinstance(node.tag,str) or not node.tag.startswith(HTML):
++            return
++        uncertain = uncertain or dynamic(node)
++        control = node.attrib.get('id')
++        if control and ids[control] == 1 and not uncertain and not any(dynamic(child) for child in node.iter()):
++            output['#'+control] = ''.join(node.itertext())
++        for child in node:
++            visit(child,uncertain)
++    visit(root)
++    return output
+--- parent11/analyzer/frontend.py
++++ candidate12/analyzer/frontend.py
+@@ -12,12 +12,12 @@
+ from baseline_nlp import front_files
+ from .project import text, walk
+ from .state import U, JS_UNDEFINED
+-from .jsflow import definitions_before, url_cases, UNKNOWN_EXPR
++from .jsflow import definitions_before, url_cases, UNKNOWN_EXPR, dom_access
+ from .nl_inputs import control_polarity
+ from .option_sources import option_sources
+ from .html_rows import analyze_html_rows
+ from .form_flow import vue_form_flows
+-from .html_options import fragment_options
++from .html_options import fragment_options, document_options, document_texts
+ from .units import unit_name
+ from .response_arrays import summarize_array_copy
+ 
+@@ -64,6 +64,41 @@
+     if value is JS_UNDEFINED or value is None:
+         return False
+     return True if isinstance(value, (list, dict)) else bool(value)
++
++
++def primitive_equal(left, right, strict=False):
++    """The primitive JS equality slice; opaque coercions stay unknown."""
++    def category(value):
++        if value is U:return 'unknown'
++        if value is JS_UNDEFINED:return 'undefined'
++        if value is None:return 'null'
++        if type(value) is bool:return 'boolean'
++        if type(value) in (int,float):return 'number'
++        if isinstance(value,str) or isinstance(value,dict) and value.get('__type__') in ('String','java.lang.String') and '__symbol__' in value:return 'string'
++        if isinstance(value,(dict,list)):return 'object'
++        return 'unknown'
++    a,b = category(left),category(right)
++    if 'unknown' in (a,b):return U
++    if a == b:
++        if a == 'object':return left is right
++        if a == 'string' and (not isinstance(left,str) or not isinstance(right,str)):
++            if isinstance(left,dict) and isinstance(right,dict) and left['__symbol__'] == right['__symbol__']:return True
++            lengths = [len(value.encode('utf-16-le',errors='surrogatepass'))//2 if isinstance(value,str) else value.get('__length__') for value in (left,right)]
++            return False if all(type(n) is int for n in lengths) and lengths[0] != lengths[1] else U
++        return left == right
++    if strict:return False
++    if {a,b} <= {'null','undefined'}:return True
++    if a in ('null','undefined') or b in ('null','undefined'):return False
++    if a == 'boolean':return primitive_equal(int(left),right)
++    if b == 'boolean':return primitive_equal(left,int(right))
++    if {a,b} == {'number','string'}:
++        number,string = (left,right) if a == 'number' else (right,left)
++        if not isinstance(string,str):return U
++        string = string.strip()
++        if not string:return number == 0
++        if not re.fullmatch(r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?',string):return U
++        return number == float(string)
++    return U
+ 
+ 
+ def request_guards(node, scope):
+@@ -410,6 +445,10 @@
+             page.row_events = rows['facts']
+             page.editable_models = rows['editable_models']
+             page.containers = rows['containers']
++            native_options, option_warnings = document_options(content)
++            page.text_values = document_texts(content)
++            page.options = [option for option in page.options if 'collection' in option] + native_options
++            self.warnings.extend(str(path.relative_to(project.root))+': '+message for message in option_warnings)
+             self.warnings.extend(str(path.relative_to(project.root)) + ': ' + message for message in rows['diagnostics'])
+         for path in files:
+             if path.suffix != '.js':
+@@ -590,7 +629,7 @@
+                             if storage and len(values) >= 2 and isinstance(literal(values[0]), str):
+                                 effects.append({'space': 'storage', 'key': literal(values[0]), 'expr': text(values[1]), 'conditions': condition})
+                             elif dom and values:
+-                                effects.append({'space': 'dom', 'key': dom[2], 'expr': text(values[0]), 'conditions': condition})
++                                effects.append({'space': 'dom', 'mode':dom[3], 'key': dom[2], 'expr': text(values[0]), 'conditions': condition})
+                             containers = {key:tag for _,page in pages for key,tag in page.containers.items()}
+                             fragment = fragment_effect(node,success,containers)
+                             if fragment is not None:
+@@ -654,6 +693,7 @@
+                                    'conditional_fields': conditional_body, 'body_owner': body_owner,
+                                    'definitions': definitions, 'defaults': defaults,
+                                    'dom_defaults': {k: v for _, page in pages for k, v in page.values.items()},
++                                   'dom_text_defaults': {k:v for _,page in pages for k,v in page.text_values.items()},
+                                    'options': options,
+                                    'row_bindings': row_bindings,
+                                    'labels': ' '.join(label for _, page in pages for label in page.labels)[:1800],
+@@ -663,6 +703,7 @@
+                                    'effects': effects, 'response_name': response_name,
+                                    'response_aliases':response_aliases,'response_this':response_this,
+                                    'option_sources': option_sources(success, response_name),
++                                   'dom_preparation': self.dom_before(call,path),
+                                    'response_definitions': response_definitions}
+         for site in self.sites.values():
+             if not site['row_bindings']:
+@@ -676,6 +717,82 @@
+                 site['row_bindings'] = []
+                 self.warnings.append(site['id'] + ': ambiguous Vue component ownership for row event')
+         self.warnings.extend(self.unsupported)
++
++    def dom_before(self, call, path):
++        """Literal DOM property equations along the request's lexical windows.
++
++        Callback invocation and arbitrary plugin effects are hypotheses, recorded
++        by the binder. This does not bridge independent handlers or infer events.
++        """
++        if any(redeclares(self.trees[path].root_node,name,None) for name in ('$', 'jQuery')):
++            self.warnings.append(str(path.relative_to(self.project.root))+': shadowed jQuery DOM preparation')
++            return {}
++        scope = ancestor(call.parent,FUNCTIONS)
++        windows, limit = [], call
++        while scope is not None:
++            windows.append((scope,limit))
++            limit, scope = scope, ancestor(scope.parent,FUNCTIONS)
++        definitions, references, opaque = {}, [], []
++        for scope,limit in reversed(windows):
++            if any(redeclares(scope,name,None) for name in ('$', 'jQuery')):
++                self.warnings.append(str(path.relative_to(self.project.root))+': shadowed jQuery DOM preparation')
++                return {}
++            # A callback captures lexical variables by reference. Its invocation
++            # may follow further writes, unlike a preceding DOM setter's snapshot.
++            definitions = {key:expr if key.startswith('@dom|text|') else UNKNOWN_EXPR
++                           for key,expr in definitions.items()}
++            parameters = scope.child_by_field_name('parameters')
++            for parameter in parameters.named_children if parameters else []:
++                if parameter.type == 'identifier':
++                    definitions[text(parameter)] = UNKNOWN_EXPR
++            for node in walk(scope):
++                if node.start_byte >= limit.start_byte or ancestor(node.parent,FUNCTIONS) != scope:
++                    continue
++                access = dom_access(node)
++                if access and access[1]:
++                    references.append(str(path.relative_to(self.project.root))+':'+str(node.start_point.row+1))
++                if node.type == 'call_expression':
++                    _,name = callee_parts(node.child_by_field_name('function'))
++                    args = node.child_by_field_name('arguments')
++                    if args and (args.named_children or name in ('remove','empty')) and name in ('text','val','html','append','prepend','prop','attr','replaceWith','remove','empty') and access is None:
++                        opaque.append(str(node.start_point.row+1))
++                if node.type in ('assignment_expression','augmented_assignment_expression'):
++                    lhs = node.child_by_field_name('left')
++                    if lhs is not None and lhs.type == 'member_expression' and text(lhs.child_by_field_name('property')) in ('textContent','innerHTML','innerText','value'):
++                        opaque.append(str(node.start_point.row+1))
++            definitions,_ = definitions_before(scope,limit,definitions,track_dom=True)
++        properties = {key:expr for key,expr in definitions.items() if key.startswith('@dom|')}
++        if not properties:
++            return {}
++        if opaque:
++            properties = {key:UNKNOWN_EXPR for key in properties}
++            self.warnings.append(str(path.relative_to(self.project.root))+': Unsupported DOM mutation before request: '+','.join(sorted(set(opaque))))
++        return {'properties':properties,'definitions':definitions,'references':sorted(set(references))}
++
++    def prepared_dom_values(self, site, state):
++        summary = site.get('dom_preparation',{})
++        if not summary:
++            return {}
++        expressions = [site['url'],*site['body_fields'].values(),*site.get('conditional_fields',{}).values()]
++        needed = {'#'+control.strip() for expression in expressions
++                  for control in self.input_controls(expression,site['definitions'])['dom']}
++        output = {}
++        reference = ';'.join(summary['references']) or site['id']
++        for key,expression in summary['properties'].items():
++            _,method,control = key.split('|',2)
++            if control not in needed:
++                continue
++            value = self.evaluate(expression,state,site.get('event_values',{}),summary['definitions'])
++            if value is None:
++                value = ''
++            elif type(value) is bool:
++                value = str(value).lower()
++            elif type(value) is int and abs(value) <= 9007199254740991:
++                value = str(value)
++            elif not (isinstance(value,str) or isinstance(value,dict) and value.get('__type__') in ('String','java.lang.String') and '__symbol__' in value):
++                value = U
++            output[(method,control)] = value,reference
++        return output
+ 
+     def unit_hints(self,site,field):
+         key=site['id'],field
+@@ -895,7 +1012,8 @@
+         return output
+ 
+     def apply_absence(self, site, fields, action, state):
+-        """An explicit negative choice may take a source-proven empty-control branch."""
++        """A negative intent cannot prove that a display control was cleared."""
++        problems = []
+         expressions = [*site['body_fields'].values(), *site.get('conditional_fields', {}).values()]
+         for expression in expressions:
+             tree = self.parser.parse(('(' + expression + ');').encode())
+@@ -912,7 +1030,8 @@
+                     normalized = re.sub(r'[^a-z0-9]', '', control[2].lower())
+                     matches = [key for key in fields if normalized.endswith(re.sub(r'[^a-z0-9]', '', key.lower()))]
+                     if matches and any(control_polarity(action, re.sub(r'(?:Type|Mode)$', '', key)) is False for key in matches):
+-                        state.browser['dom'][control[2].strip()] = ''
++                        problems.append('Negative UI choice does not prove an empty display control: '+control[2].strip())
++        return sorted(set(problems))
+ 
+     def evaluate(self, expression, state, extra=None, definitions=None, local_calls=None):
+         if not expression:
+@@ -948,7 +1067,9 @@
+                     return U
+                 if key=='length' and isinstance(obj,dict) and obj.get('__type__') in ('String','java.lang.String') and '__symbol__' in obj:
+                     return obj.get('__length__',U)
+-                return obj.get(key, U) if isinstance(obj, dict) else len(obj) if key == 'length' and isinstance(obj, (str, list)) else U
++                if key == 'length' and isinstance(obj,str):
++                    return len(obj.encode('utf-16-le',errors='surrogatepass'))//2
++                return obj.get(key, U) if isinstance(obj, dict) else len(obj) if key == 'length' and isinstance(obj, list) else U
+             if kind == 'subscript_expression':
+                 obj, key = value(node.child_by_field_name('object')), value(node.child_by_field_name('index'))
+                 if isinstance(key, str) and key.startswith('__'):
+@@ -968,6 +1089,12 @@
+                         return left
+                     return value(node.child_by_field_name('right'))
+                 right = value(node.child_by_field_name('right'))
++                if op in ('==','===','!=','!=='):
++                    equal = primitive_equal(left,right,len(op) == 3)
++                    if equal is U:
++                        state.limitations.append('Unknown JavaScript equality/coercion: '+raw)
++                        return U
++                    return not equal if '!' in op else equal
+                 if left is U or right is U or left is JS_UNDEFINED or right is JS_UNDEFINED:
+                     return U
+                 if op=='+' and any(isinstance(v,dict) and '__symbol__' in v and
+@@ -997,9 +1124,6 @@
+                             return U
+                         return a + b
+                     return left + right
+-                if op in ('==', '===', '!=', '!=='):
+-                    equal = left == right or (op in ('==', '!=') and str(left) == str(right))
+-                    return not equal if '!' in op else equal
+                 if op in ('<', '<=', '>', '>=') and isinstance(left, (str, int, float)) and isinstance(right, type(left)):
+                     return {'<': lambda: left < right, '<=': lambda: left <= right,
+                             '>': lambda: left > right, '>=': lambda: left >= right}[op]()
+@@ -1013,6 +1137,8 @@
+             if kind == 'unary_expression':
+                 arg = value(node.child_by_field_name('argument'))
+                 condition = truth(arg)
++                if raw[:1] in ('+','-') and type(arg) in (int,float):
++                    return -arg if raw.startswith('-') else arg
+                 return not condition if raw.startswith('!') and condition is not U else U
+             if kind == 'call_expression':
+                 fn = text(node.child_by_field_name('function'))
+@@ -1041,18 +1167,45 @@
+                             return date_fields[method]
+                     if isinstance(receiver, str):
+                         if method == 'charAt' and len(vals) == 1 and isinstance(vals[0], int):
++                            if len(receiver.encode('utf-16-le',errors='surrogatepass'))//2 != len(receiver):
++                                state.limitations.append('Unsupported JavaScript UTF16 charAt: '+raw)
++                                return U
+                             return receiver[vals[0]] if 0 <= vals[0] < len(receiver) else ''
+                         if method == 'split' and len(vals) == 1 and isinstance(vals[0], str) and vals[0]:
+                             return receiver.split(vals[0])
+                         if method == 'replace' and len(vals) == 2 and all(isinstance(v, str) for v in vals):
+                             return receiver.replace(vals[0], vals[1], 1)
+                         if method == 'indexOf' and len(vals) == 1 and isinstance(vals[0], str):
+-                            return receiver.find(vals[0])
++                            index = receiver.find(vals[0])
++                            return -1 if index < 0 else len(receiver[:index].encode('utf-16-le',errors='surrogatepass'))//2
++                        if method in ('substr','substring') and 1 <= len(vals) <= 2 and all(type(v) is int for v in vals):
++                            if len(receiver.encode('utf-16-le',errors='surrogatepass'))//2 != len(receiver):
++                                state.limitations.append('Unsupported JavaScript UTF16 substring: '+raw)
++                                return U
++                            if method == 'substr':
++                                start = min(max(vals[0],0),len(receiver)) if vals[0] >= 0 else max(len(receiver)+vals[0],0)
++                                end = min(start+max(vals[1],0),len(receiver)) if len(vals) == 2 else len(receiver)
++                            else:
++                                start,end = sorted((min(max(vals[0],0),len(receiver)),min(max(vals[1],0),len(receiver)) if len(vals) == 2 else len(receiver)))
++                            return receiver[start:end]
+                     if isinstance(receiver, list) and method == 'concat' and all(isinstance(v, list) for v in vals):
+                         return receiver + [item for val in vals for item in val]
+-                selected = re.fullmatch(r"\$\(\s*([\"'])(.*?)\1\s*\)\.find\(\s*([\"'])option:selected\3\s*\)\.val", fn)
++                selected = re.fullmatch(r"\$\(\s*([\"'])(.*?)\1\s*\)\.find\(\s*([\"'])option:selected\3\s*\)\.(val|text)", fn)
+                 if selected:
+-                    return state.browser['dom'].get(selected[2].strip(), U)
++                    chosen = state.browser['dom'].get(selected[2].strip(), U)
++                    if selected[4] == 'val':
++                        return chosen
++                    if chosen is U:
++                        return U
++                    options = state.browser.get('source_options',[])+[
++                        option for group in state.browser.get('options',{}).values() if isinstance(group,list)
++                        for option in group]
++                    matching = [option for option in options if '#'+option['control'].lstrip('#') == selected[2].strip()
++                                and option['value'] == chosen]
++                    if len(matching) == 1 and 'raw_text' in matching[0]:
++                        return matching[0]['raw_text']
++                    state.limitations.append('Unknown or ambiguous native selected option text: '+selected[2].strip())
++                    return U
+                 if fn in ('parseInt', 'parseFloat') and vals:
+                     try:
+                         return int(vals[0]) if fn == 'parseInt' else float(vals[0])
+@@ -1060,7 +1213,10 @@
+                         return U
+                 dom = re.fullmatch(r'\$\(([\"\'].*?[\"\'])\)\.(?:val|text)', fn)
+                 if dom:
+-                    return state.browser['dom'].get(dom[1][1:-1].strip(), U)
++                    control = dom[1][1:-1].strip()
++                    if fn.endswith('.text'):
++                        return state.browser.get('dom_text',{}).get(control,U)
++                    return state.browser['dom'].get(control, U)
+                 checked = re.fullmatch(r'\$\(([\"\'].*?[\"\'])\)\.is', fn)
+                 if checked and vals == [':checked']:
+                     return state.browser['dom'].get(checked[1][1:-1].strip() + ':checked', U)
+@@ -1094,7 +1250,10 @@
+             dom = re.fullmatch(r'\$\(([\"\'])(.*?)\1\)\.(val|text)', fn)
+             if dom:
+                 stored = str(value).lower() if isinstance(value, bool) else str(value) if isinstance(value, (int, float)) else deepcopy(value)
+-                state.browser['dom'][dom[2].strip()] = stored
++                if dom[3] == 'text':
++                    state.browser.setdefault('dom_text',{})[dom[2].strip()] = deepcopy(stored)
++                else:
++                    state.browser['dom'][dom[2].strip()] = stored
+ 
+     def enter(self, site, state):
+         page = site['page']
+@@ -1102,20 +1261,26 @@
+         if page != active:
+             if isinstance(active, str):
+                 state.browser.setdefault('pages', {})[active] = {'form': state.browser['form'], 'dom': state.browser['dom'],
++                                                               'dom_text':state.browser.get('dom_text',{}),
+                                                                'options':state.browser.get('options',{})}
+             previous = state.browser.setdefault('pages', {}).get(page, {})
+             if not isinstance(previous, dict):
+                 previous = {'form': {key: U for key in site['defaults']},
+-                            'dom': {key: U for key in site['dom_defaults']}}
++                            'dom': {key: U for key in site['dom_defaults']},
++                            'dom_text': {key:U for key in site.get('dom_text_defaults',{})}}
+                 state.limitations.append('unknown prior browser page state: ' + page)
+             state.browser['form'] = deepcopy(previous.get('form', {}))
+             state.browser['dom'] = deepcopy(previous.get('dom', {}))
++            state.browser['dom_text'] = deepcopy(previous.get('dom_text',{}))
+             state.browser['options'] = deepcopy(previous.get('options',{}))
+             state.browser['active_page'] = page
+         for name, default in site['defaults'].items():
+             state.browser['form'].setdefault(name, deepcopy(default))
+         for name, default in site['dom_defaults'].items():
+             state.browser['dom'].setdefault(name, default)
++        for name,default in site.get('dom_text_defaults',{}).items():
++            state.browser.setdefault('dom_text',{}).setdefault(name,default)
++        state.browser['source_options'] = [option for option in site.get('options',[]) if option.get('space') == 'dom']
+ 
+     def apply_response(self, site, result, state):
+         env = {**site.get('event_values',{}),site['response_name']: result}
+@@ -1125,7 +1290,7 @@
+             env.update({alias:state.browser['form'] for alias in site['response_aliases']})
+         for effect in site['effects']:
+             definitions = effect.get('definitions',site['response_definitions'])
+-            conditions = [self.evaluate(c, state, env, definitions) for c in effect['conditions']]
++            conditions = [truth(self.evaluate(c, state, env, definitions)) for c in effect['conditions']]
+             if False in conditions:
+                 continue
+             val = self.evaluate(effect['expr'], state, env, definitions)
+@@ -1160,4 +1325,13 @@
+                     state.browser[effect['space']] = {key: U for key in state.browser[effect['space']] if isinstance(key, str)}
+                     state.limitations.append('unknown browser response key: ' + site['id'])
+                 else:
+-                    state.browser[effect['space']][key] = val
++                    if effect['space'] == 'dom':
++                        if effect.get('mode') == 'text':
++                            state.browser.setdefault('dom_text',{})[key] = deepcopy(val)
++                        elif effect.get('mode') == 'html':
++                            state.browser.setdefault('dom_text',{})[key] = U
++                            state.limitations.append('HTML replacement text requires DOM construction: '+site['id'])
++                        else:
++                            state.browser['dom'][key] = val
++                    else:
++                        state.browser[effect['space']][key] = val
+--- parent11/analyzer/contracts.py
++++ candidate12/analyzer/contracts.py
+@@ -14,7 +14,7 @@
+ from .request_semantics import filter_bindings, partial_url_parameters, enum_scalar_binding, generated_omissions, enum_ordinal_binding
+ from .nl_inputs import field_role, language_roles, canonical_ui_literal, introduced_value, control_polarity, intermediate_field
+ from .provenance import entity_words
+-from .frontend import json_value
++from .frontend import json_value, truth
+ from .scenario_literals import structured_bindings, canonical_reference
+ from .structured_literals import literal_value
+ from .context_choices import choice_rules, default_choices
+@@ -330,7 +330,7 @@
+                 env = dict((proposal['site'] or {}).get('event_values', {}))
+                 if candidate_site and candidate_site.get('body_owner'):
+                     env[candidate_site['body_owner']] = proposal['params']
+-                guards = [self.frontend.evaluate(c, proposal['state'], env, candidate_site['definitions']) for c in conditions]
++                guards = [truth(self.frontend.evaluate(c, proposal['state'], env, candidate_site['definitions'])) for c in conditions]
+                 if any(g is False for g in guards):
+                     continue
+                 if any(g is not True for g in guards):
+@@ -346,6 +346,8 @@
+         path_state = deepcopy(state)
+         fields = self.project.request_fields(mid)
+         params, bindings, unresolved_units = {}, {}, {}
++        dom_preparation = {}
++        absence_problems = []
+ 
+         def bind(key, value, source, reference, quote=''):
+             if value is not U:
+@@ -370,8 +372,9 @@
+             site = {**site,'options':site['options'] + rendered}
+             event_values, event_reference = self.frontend.event_values(site, action, path_state)
+             site = {**site, 'event_values': event_values, 'event_reference': event_reference}
+-            self.frontend.apply_absence(site, fields, action, path_state)
+-            expressions = ' '.join([*site['definitions'].values(), *site['body_fields'].values(), *site.get('conditional_fields', {}).values()])
++            absence_problems = self.frontend.apply_absence(site, fields, action, path_state)
++            expressions = ' '.join([*site['definitions'].values(), *site['body_fields'].values(), *site.get('conditional_fields', {}).values(),
++                                    *site.get('dom_preparation',{}).get('properties',{}).values()])
+             for _, selector, _ in re.findall(r'\$\(\s*([\"\'])([^\"\']+)\1\s*\)\.is\(\s*([\"\']):checked\3\s*\)', expressions):
+                 polarity = control_polarity(action, selector)
+                 if polarity is not None:
+@@ -379,11 +382,17 @@
+             choices = {}
+             for option in site['options']:
+                 label = set(tokens(option['label'])) if isinstance(option['label'], str) else set()
+-                if label and option_label_matches(option['label'], action) and option.get('space') == 'form':
+-                    choices.setdefault(option['control'], []).append(option['value'])
+-            for control, values in choices.items():
++                if label and option_label_matches(option['label'], action) and not option.get('reference'):
++                    space = 'form' if option.get('space') == 'form' else 'dom'
++                    control = option['control'] if space == 'form' else '#'+option['control'].lstrip('#')
++                    choices.setdefault((space,control), []).append(option['value'])
++            for (space,control), values in choices.items():
+                 if len(values) == 1:
+-                    path_state.browser['form'][control] = values[0]
++                    path_state.browser[space][control] = values[0]
++            dom_preparation = self.frontend.prepared_dom_values(site,path_state)
++            for (method,control),(value,_) in dom_preparation.items():
++                space = path_state.browser.setdefault('dom_text',{}) if method == 'text' else path_state.browser['dom']
++                space[control] = deepcopy(value)
+             for key, expression in {**site['body_fields'], **site.get('conditional_fields', {})}.items():
+                 if key in fields:
+                     value = self.frontend.evaluate(expression, path_state, extra=site['event_values'], definitions=site['definitions'])
+@@ -604,10 +613,14 @@
+         problems = ['Unknown input: ' + key for key, typ in fields.items()
+                     if (key not in params or contains_unknown(params[key])) and not http_headers_type(typ)]
+         problems.extend('Unknown input unit: '+key for key,binding in bindings.items() if binding.get('reference')=='unit:unresolved')
++        problems.extend(absence_problems)
+         if re.search(r'\bfilter(?:ed)?\b', action, re.I) and not lowered_filters:
+             problems.append('Unsupported request filter: ' + action)
+         if preparation:
+             problems.append('Inferred row-to-form preparation; event execution is unobserved: ' + ';'.join(sorted(set(preparation))))
++        if dom_preparation:
++            problems.append('Inferred DOM preparation; callback execution and plugin effects are unobserved: '+
++                            ';'.join(sorted({reference for _,reference in dom_preparation.values()})))
+         if site:
+             for key, value in params.items():
+                 binding = bindings.get(key, {})
+--- parent11/tests/test_dom_choices.py
++++ candidate12/tests/test_dom_choices.py
+@@ -25,7 +25,7 @@
+     assert choices[0]['params']=={'giftMode':73}
+ 
+ 
+-def test_explicit_absence_takes_source_empty_control_branch(tmp_path):
++def test_negative_intent_needs_source_evidence_for_empty_control_branch(tmp_path):
+     project, db, _ = build(tmp_path, {'Api.java': '''class Api {
+       @PostMapping("/parcels") int add(@RequestBody Parcel input){return input.giftType;}
+     } class Parcel {int giftType;String giftLabel;}'''})
+@@ -39,11 +39,22 @@
+     frontend=Frontend(project)
+     grounder=ContractGrounder(project,frontend,ContractIndex(project,frontend),None,{'facts':{}})
+     absent,_=grounder.step('Add parcel without gift',ScenarioState(db))
+-    assert absent[0]['params']=={'giftType':73,'giftLabel':None}
++    assert 'giftType' not in absent[0]['params']
++    assert any('does not prove an empty display' in issue for issue in absent[0]['unresolved'])
+     unspecified,_=grounder.step('Add parcel',ScenarioState(db))
+     assert 'giftType' not in unspecified[0]['params']
+     positive,_=grounder.step('Add parcel with gift',ScenarioState(db))
+     assert 'giftType' not in positive[0]['params']
++    (tmp_path/'page.html').write_text('<p id="summary_giftType"></p><script src="ui.js"></script>')
++    frontend=Frontend(project)
++    grounder=ContractGrounder(project,frontend,ContractIndex(project,frontend),None,{'facts':{}})
++    empty,_=grounder.step('Add parcel without gift',ScenarioState(db))
++    assert empty[0]['params']=={'giftType':73,'giftLabel':None}
++    (tmp_path/'page.html').write_text('<p id="summary_giftType" hidden>Existing</p><input id="gift_label" value="Label"><script src="ui.js"></script>')
++    frontend=Frontend(project)
++    grounder=ContractGrounder(project,frontend,ContractIndex(project,frontend),None,{'facts':{}})
++    existing,_=grounder.step('Add parcel without gift',ScenarioState(db))
++    assert existing[0]['params']=={'giftType':19,'giftLabel':'Label'}
+ 
+ 
+ def test_confirmation_callback_keeps_enclosing_create_or_update_action(tmp_path):

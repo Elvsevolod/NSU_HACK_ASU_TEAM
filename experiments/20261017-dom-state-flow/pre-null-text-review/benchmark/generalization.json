@@ -1,0 +1,2167 @@
+{
+  "scope": "independent microprojects, not evidence of general repository support",
+  "results": [
+    {
+      "project": "inventory",
+      "passed": true,
+      "scenario": {
+        "id": "independent-inventory",
+        "steps": [
+          {
+            "n": 1,
+            "action": "Reserve key \"r4\" with enabled true"
+          },
+          {
+            "n": 2,
+            "action": "Reserve key \"r5\" with enabled false"
+          }
+        ]
+      },
+      "answer": {
+        "edges": [
+          {
+            "source": "scenario:independent-inventory",
+            "relation": "executes",
+            "target": "method:inventory:Reservation#<init>(String)"
+          },
+          {
+            "source": "scenario:independent-inventory",
+            "relation": "executes",
+            "target": "method:inventory:StockController#reserve(StockRequest)"
+          },
+          {
+            "source": "scenario:independent-inventory",
+            "relation": "executes",
+            "target": "method:inventory:StockWorker#accept(String)"
+          },
+          {
+            "source": "scenario:independent-inventory",
+            "relation": "executes",
+            "target": "method:inventory:StockWorker#reject(String)"
+          },
+          {
+            "source": "method:inventory:StockController#reserve(StockRequest)",
+            "relation": "calls",
+            "target": "method:inventory:StockWorker#accept(String)"
+          },
+          {
+            "source": "method:inventory:StockController#reserve(StockRequest)",
+            "relation": "calls",
+            "target": "method:inventory:StockWorker#reject(String)"
+          },
+          {
+            "source": "method:inventory:StockWorker#accept(String)",
+            "relation": "calls",
+            "target": "method:inventory:Reservation#<init>(String)"
+          },
+          {
+            "source": "method:inventory:StockWorker#accept(String)",
+            "relation": "data",
+            "target": "res:table:inventory.reservations"
+          }
+        ]
+      },
+      "report": {
+        "analysis_status": "complete_in_supported_model",
+        "certainty_scope": "relative to supplied inputs, proposed bindings and supported semantics; not a runtime trace",
+        "confirmed": [
+          {
+            "source": "scenario:independent-inventory",
+            "relation": "executes",
+            "target": "method:inventory:Reservation#<init>(String)"
+          },
+          {
+            "source": "scenario:independent-inventory",
+            "relation": "executes",
+            "target": "method:inventory:StockController#reserve(StockRequest)"
+          },
+          {
+            "source": "scenario:independent-inventory",
+            "relation": "executes",
+            "target": "method:inventory:StockWorker#accept(String)"
+          },
+          {
+            "source": "scenario:independent-inventory",
+            "relation": "executes",
+            "target": "method:inventory:StockWorker#reject(String)"
+          },
+          {
+            "source": "method:inventory:StockController#reserve(StockRequest)",
+            "relation": "calls",
+            "target": "method:inventory:StockWorker#accept(String)"
+          },
+          {
+            "source": "method:inventory:StockController#reserve(StockRequest)",
+            "relation": "calls",
+            "target": "method:inventory:StockWorker#reject(String)"
+          },
+          {
+            "source": "method:inventory:StockWorker#accept(String)",
+            "relation": "calls",
+            "target": "method:inventory:Reservation#<init>(String)"
+          },
+          {
+            "source": "method:inventory:StockWorker#accept(String)",
+            "relation": "data",
+            "target": "res:table:inventory.reservations"
+          }
+        ],
+        "possible": [],
+        "unresolved": [],
+        "steps": [
+          {
+            "n": 1,
+            "action": "Reserve key \"r4\" with enabled true",
+            "selection": {
+              "candidates": [
+                "method:inventory:StockController#reserve(StockRequest)",
+                "method:inventory:StockController#inspect(String)",
+                "method:inventory:StockController#release(StockRequest)"
+              ],
+              "ranking": [
+                {
+                  "entry": "method:inventory:StockController#reserve(StockRequest)",
+                  "ui_site": null,
+                  "score": 1.1677070395254818
+                },
+                {
+                  "entry": "method:inventory:StockController#inspect(String)",
+                  "ui_site": null,
+                  "score": 0.02036159443327533
+                },
+                {
+                  "entry": "method:inventory:StockController#release(StockRequest)",
+                  "ui_site": null,
+                  "score": 0.016716833901163727
+                }
+              ],
+              "proposal": {
+                "hypotheses": []
+              },
+              "unresolved": [],
+              "grounding_status": "lexical_hypothesis",
+              "certainty_note": "Graph certainty is conditional on the selected source contract and validated bindings"
+            },
+            "alternatives": [
+              {
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "parameters": {
+                  "key": "r4",
+                  "enabled": true
+                },
+                "grounding_reason": "Highest weighted source/UI contract score: 1.1677070395254818",
+                "grounding_repairs": [],
+                "retrieval_candidates": [
+                  "method:inventory:StockController#reserve(StockRequest)",
+                  "method:inventory:StockController#inspect(String)",
+                  "method:inventory:StockController#release(StockRequest)"
+                ],
+                "ui_site": null,
+                "bindings": {
+                  "key": {
+                    "source": "literal",
+                    "reference": "action",
+                    "quote": "key \"r4\"",
+                    "resolved": true
+                  },
+                  "enabled": {
+                    "source": "literal",
+                    "reference": "action",
+                    "quote": "enabled true",
+                    "resolved": true
+                  }
+                },
+                "result": {
+                  "__type__": "Reservation",
+                  "__http_entity__": false,
+                  "key": "r4"
+                },
+                "created_objects": [
+                  {
+                    "__type__": "Reservation",
+                    "__http_entity__": false,
+                    "key": "r4",
+                    "__resource__": "res:table:inventory.reservations",
+                    "__persistence_observation__": "modeled_present"
+                  }
+                ],
+                "path_conditions": [
+                  {
+                    "method": "method:inventory:StockController#reserve(StockRequest)",
+                    "line": 6,
+                    "condition": "(input.enabled)",
+                    "value": true
+                  }
+                ],
+                "decisions": {},
+                "pruned_paths": [],
+                "outcome": "returned",
+                "unresolved": [],
+                "data_operations": [
+                  {
+                    "method": "method:inventory:StockWorker#accept(String)",
+                    "resource": "res:table:inventory.reservations",
+                    "operation": "save",
+                    "arguments": [
+                      {
+                        "__type__": "Reservation",
+                        "__http_entity__": false,
+                        "key": "r4"
+                      }
+                    ],
+                    "source_site": "call:method:inventory:StockWorker#accept(String)@5:92",
+                    "uncertain_write": false
+                  }
+                ],
+                "state_after": {
+                  "browser": {
+                    "storage": {},
+                    "form": {},
+                    "dom": {},
+                    "url": {},
+                    "options": {}
+                  },
+                  "history": [
+                    {
+                      "step": 1,
+                      "entry": "method:inventory:StockController#reserve(StockRequest)",
+                      "action": "Reserve key \"r4\" with enabled true"
+                    }
+                  ],
+                  "clock": {
+                    "unknown": true
+                  },
+                  "database_rows": {
+                    "inventory.reservations": 1
+                  },
+                  "unknown_tables": [],
+                  "analysis_assumptions": [],
+                  "limitations": []
+                },
+                "edges": [
+                  {
+                    "source": "scenario:independent-inventory",
+                    "relation": "executes",
+                    "target": "method:inventory:Reservation#<init>(String)"
+                  },
+                  {
+                    "source": "scenario:independent-inventory",
+                    "relation": "executes",
+                    "target": "method:inventory:StockController#reserve(StockRequest)"
+                  },
+                  {
+                    "source": "scenario:independent-inventory",
+                    "relation": "executes",
+                    "target": "method:inventory:StockWorker#accept(String)"
+                  },
+                  {
+                    "source": "method:inventory:StockController#reserve(StockRequest)",
+                    "relation": "calls",
+                    "target": "method:inventory:StockWorker#accept(String)"
+                  },
+                  {
+                    "source": "method:inventory:StockWorker#accept(String)",
+                    "relation": "calls",
+                    "target": "method:inventory:Reservation#<init>(String)"
+                  },
+                  {
+                    "source": "method:inventory:StockWorker#accept(String)",
+                    "relation": "data",
+                    "target": "res:table:inventory.reservations"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "n": 2,
+            "action": "Reserve key \"r5\" with enabled false",
+            "selection": {
+              "candidates": [
+                "method:inventory:StockController#reserve(StockRequest)",
+                "method:inventory:StockController#inspect(String)",
+                "method:inventory:StockController#release(StockRequest)"
+              ],
+              "ranking": [
+                {
+                  "entry": "method:inventory:StockController#reserve(StockRequest)",
+                  "ui_site": null,
+                  "score": 1.1677070395254818
+                },
+                {
+                  "entry": "method:inventory:StockController#inspect(String)",
+                  "ui_site": null,
+                  "score": 0.02036159443327533
+                },
+                {
+                  "entry": "method:inventory:StockController#release(StockRequest)",
+                  "ui_site": null,
+                  "score": 0.016716833901163727
+                }
+              ],
+              "proposal": {
+                "hypotheses": []
+              },
+              "unresolved": [],
+              "grounding_status": "lexical_hypothesis",
+              "certainty_note": "Graph certainty is conditional on the selected source contract and validated bindings"
+            },
+            "alternatives": [
+              {
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "parameters": {
+                  "key": "r5",
+                  "enabled": false
+                },
+                "grounding_reason": "Highest weighted source/UI contract score: 1.1677070395254818",
+                "grounding_repairs": [],
+                "retrieval_candidates": [
+                  "method:inventory:StockController#reserve(StockRequest)",
+                  "method:inventory:StockController#inspect(String)",
+                  "method:inventory:StockController#release(StockRequest)"
+                ],
+                "ui_site": null,
+                "bindings": {
+                  "key": {
+                    "source": "literal",
+                    "reference": "action",
+                    "quote": "key \"r5\"",
+                    "resolved": true
+                  },
+                  "enabled": {
+                    "source": "literal",
+                    "reference": "action",
+                    "quote": "enabled false",
+                    "resolved": true
+                  }
+                },
+                "result": null,
+                "created_objects": [],
+                "path_conditions": [
+                  {
+                    "method": "method:inventory:StockController#reserve(StockRequest)",
+                    "line": 6,
+                    "condition": "(input.enabled)",
+                    "value": false
+                  }
+                ],
+                "decisions": {},
+                "pruned_paths": [],
+                "outcome": "returned",
+                "unresolved": [],
+                "data_operations": [],
+                "state_after": {
+                  "browser": {
+                    "storage": {},
+                    "form": {},
+                    "dom": {},
+                    "url": {},
+                    "options": {}
+                  },
+                  "history": [
+                    {
+                      "step": 1,
+                      "entry": "method:inventory:StockController#reserve(StockRequest)",
+                      "action": "Reserve key \"r4\" with enabled true"
+                    },
+                    {
+                      "step": 2,
+                      "entry": "method:inventory:StockController#reserve(StockRequest)",
+                      "action": "Reserve key \"r5\" with enabled false"
+                    }
+                  ],
+                  "clock": {
+                    "unknown": true
+                  },
+                  "database_rows": {
+                    "inventory.reservations": 1
+                  },
+                  "unknown_tables": [],
+                  "analysis_assumptions": [],
+                  "limitations": []
+                },
+                "edges": [
+                  {
+                    "source": "scenario:independent-inventory",
+                    "relation": "executes",
+                    "target": "method:inventory:StockController#reserve(StockRequest)"
+                  },
+                  {
+                    "source": "scenario:independent-inventory",
+                    "relation": "executes",
+                    "target": "method:inventory:StockWorker#reject(String)"
+                  },
+                  {
+                    "source": "method:inventory:StockController#reserve(StockRequest)",
+                    "relation": "calls",
+                    "target": "method:inventory:StockWorker#reject(String)"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "edge": {
+              "source": "scenario:independent-inventory",
+              "relation": "executes",
+              "target": "method:inventory:Reservation#<init>(String)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:inventory:StockWorker#accept(String)@5:59"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockWorker.java",
+                    "line": 5,
+                    "call_site": "call:method:inventory:StockWorker#accept(String)@5:59"
+                  },
+                  {
+                    "file": "Reservation.java",
+                    "line": 1,
+                    "method": "method:inventory:Reservation#<init>(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "scenario:independent-inventory",
+              "relation": "executes",
+              "target": "method:inventory:StockController#reserve(StockRequest)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "scenario request"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockController.java",
+                    "line": 5,
+                    "method": "method:inventory:StockController#reserve(StockRequest)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              },
+              {
+                "step": 2,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "scenario request"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockController.java",
+                    "line": 5,
+                    "method": "method:inventory:StockController#reserve(StockRequest)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "scenario:independent-inventory",
+              "relation": "executes",
+              "target": "method:inventory:StockWorker#accept(String)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:inventory:StockController#reserve(StockRequest)@6:44"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockController.java",
+                    "line": 6,
+                    "call_site": "call:method:inventory:StockController#reserve(StockRequest)@6:44"
+                  },
+                  {
+                    "file": "StockWorker.java",
+                    "line": 5,
+                    "method": "method:inventory:StockWorker#accept(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "scenario:independent-inventory",
+              "relation": "executes",
+              "target": "method:inventory:StockWorker#reject(String)"
+            },
+            "grounds": [
+              {
+                "step": 2,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:inventory:StockController#reserve(StockRequest)@7:23"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockController.java",
+                    "line": 7,
+                    "call_site": "call:method:inventory:StockController#reserve(StockRequest)@7:23"
+                  },
+                  {
+                    "file": "StockWorker.java",
+                    "line": 6,
+                    "method": "method:inventory:StockWorker#reject(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:inventory:StockController#reserve(StockRequest)",
+              "relation": "calls",
+              "target": "method:inventory:StockWorker#accept(String)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:inventory:StockController#reserve(StockRequest)@6:44"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockController.java",
+                    "line": 6,
+                    "call_site": "call:method:inventory:StockController#reserve(StockRequest)@6:44"
+                  },
+                  {
+                    "file": "StockController.java",
+                    "line": 5,
+                    "method": "method:inventory:StockController#reserve(StockRequest)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:inventory:StockController#reserve(StockRequest)",
+              "relation": "calls",
+              "target": "method:inventory:StockWorker#reject(String)"
+            },
+            "grounds": [
+              {
+                "step": 2,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:inventory:StockController#reserve(StockRequest)@7:23"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockController.java",
+                    "line": 7,
+                    "call_site": "call:method:inventory:StockController#reserve(StockRequest)@7:23"
+                  },
+                  {
+                    "file": "StockController.java",
+                    "line": 5,
+                    "method": "method:inventory:StockController#reserve(StockRequest)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:inventory:StockWorker#accept(String)",
+              "relation": "calls",
+              "target": "method:inventory:Reservation#<init>(String)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:inventory:StockWorker#accept(String)@5:59"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockWorker.java",
+                    "line": 5,
+                    "call_site": "call:method:inventory:StockWorker#accept(String)@5:59"
+                  },
+                  {
+                    "file": "StockWorker.java",
+                    "line": 5,
+                    "method": "method:inventory:StockWorker#accept(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:inventory:StockWorker#accept(String)",
+              "relation": "data",
+              "target": "res:table:inventory.reservations"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:inventory:StockController#reserve(StockRequest)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:inventory:StockWorker#accept(String)@5:92"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "StockWorker.java",
+                    "line": 5,
+                    "call_site": "call:method:inventory:StockWorker#accept(String)@5:92"
+                  },
+                  {
+                    "file": "StockWorker.java",
+                    "line": 5,
+                    "method": "method:inventory:StockWorker#accept(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Spring Data repository operation with source entity and primary-key mapping"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "project": "library",
+      "passed": true,
+      "scenario": {
+        "id": "independent-library",
+        "steps": [
+          {
+            "n": 1,
+            "action": "Add book key \"b2\" title \"Second\""
+          },
+          {
+            "n": 2,
+            "action": "Lookup book key \"b2\""
+          },
+          {
+            "n": 3,
+            "action": "Lookup book key \"absent\""
+          }
+        ]
+      },
+      "answer": {
+        "edges": [
+          {
+            "source": "scenario:independent-library",
+            "relation": "executes",
+            "target": "method:library:BookController#add(Book)"
+          },
+          {
+            "source": "scenario:independent-library",
+            "relation": "executes",
+            "target": "method:library:BookController#available(Book)"
+          },
+          {
+            "source": "scenario:independent-library",
+            "relation": "executes",
+            "target": "method:library:BookController#lookup(String)"
+          },
+          {
+            "source": "scenario:independent-library",
+            "relation": "executes",
+            "target": "method:library:BookController#missing()"
+          },
+          {
+            "source": "method:library:BookController#add(Book)",
+            "relation": "data",
+            "target": "res:table:library.books"
+          },
+          {
+            "source": "method:library:BookController#lookup(String)",
+            "relation": "calls",
+            "target": "method:library:BookController#available(Book)"
+          },
+          {
+            "source": "method:library:BookController#lookup(String)",
+            "relation": "calls",
+            "target": "method:library:BookController#missing()"
+          },
+          {
+            "source": "method:library:BookController#lookup(String)",
+            "relation": "data",
+            "target": "res:table:library.books"
+          }
+        ]
+      },
+      "report": {
+        "analysis_status": "complete_in_supported_model",
+        "certainty_scope": "relative to supplied inputs, proposed bindings and supported semantics; not a runtime trace",
+        "confirmed": [
+          {
+            "source": "scenario:independent-library",
+            "relation": "executes",
+            "target": "method:library:BookController#add(Book)"
+          },
+          {
+            "source": "scenario:independent-library",
+            "relation": "executes",
+            "target": "method:library:BookController#available(Book)"
+          },
+          {
+            "source": "scenario:independent-library",
+            "relation": "executes",
+            "target": "method:library:BookController#lookup(String)"
+          },
+          {
+            "source": "scenario:independent-library",
+            "relation": "executes",
+            "target": "method:library:BookController#missing()"
+          },
+          {
+            "source": "method:library:BookController#add(Book)",
+            "relation": "data",
+            "target": "res:table:library.books"
+          },
+          {
+            "source": "method:library:BookController#lookup(String)",
+            "relation": "calls",
+            "target": "method:library:BookController#available(Book)"
+          },
+          {
+            "source": "method:library:BookController#lookup(String)",
+            "relation": "calls",
+            "target": "method:library:BookController#missing()"
+          },
+          {
+            "source": "method:library:BookController#lookup(String)",
+            "relation": "data",
+            "target": "res:table:library.books"
+          }
+        ],
+        "possible": [],
+        "unresolved": [],
+        "steps": [
+          {
+            "n": 1,
+            "action": "Add book key \"b2\" title \"Second\"",
+            "selection": {
+              "candidates": [
+                "method:library:BookController#add(Book)",
+                "method:library:BookController#lookup(String)",
+                "method:library:BookController#search(String)"
+              ],
+              "ranking": [
+                {
+                  "entry": "method:library:BookController#add(Book)",
+                  "ui_site": null,
+                  "score": 0.6481595293924044
+                },
+                {
+                  "entry": "method:library:BookController#lookup(String)",
+                  "ui_site": null,
+                  "score": 0.24963638953419212
+                },
+                {
+                  "entry": "method:library:BookController#search(String)",
+                  "ui_site": null,
+                  "score": 0.01602376711494271
+                }
+              ],
+              "proposal": {
+                "hypotheses": []
+              },
+              "unresolved": [],
+              "grounding_status": "lexical_hypothesis",
+              "certainty_note": "Graph certainty is conditional on the selected source contract and validated bindings"
+            },
+            "alternatives": [
+              {
+                "entry": "method:library:BookController#add(Book)",
+                "parameters": {
+                  "key": "b2",
+                  "title": "Second"
+                },
+                "grounding_reason": "Highest weighted source/UI contract score: 0.6481595293924044",
+                "grounding_repairs": [],
+                "retrieval_candidates": [
+                  "method:library:BookController#add(Book)",
+                  "method:library:BookController#lookup(String)",
+                  "method:library:BookController#search(String)"
+                ],
+                "ui_site": null,
+                "bindings": {
+                  "key": {
+                    "source": "literal",
+                    "reference": "action",
+                    "quote": "key \"b2\"",
+                    "resolved": true
+                  },
+                  "title": {
+                    "source": "literal",
+                    "reference": "action",
+                    "quote": "title \"Second\"",
+                    "resolved": true
+                  }
+                },
+                "result": {
+                  "__type__": "Book",
+                  "key": "b2",
+                  "title": "Second",
+                  "__http_entity__": false
+                },
+                "created_objects": [
+                  {
+                    "__type__": "Book",
+                    "key": "b2",
+                    "title": "Second",
+                    "__http_entity__": false,
+                    "__resource__": "res:table:library.books",
+                    "__persistence_observation__": "modeled_present"
+                  }
+                ],
+                "path_conditions": [],
+                "decisions": {},
+                "pruned_paths": [],
+                "outcome": "returned",
+                "unresolved": [],
+                "data_operations": [
+                  {
+                    "method": "method:library:BookController#add(Book)",
+                    "resource": "res:table:library.books",
+                    "operation": "save",
+                    "arguments": [
+                      {
+                        "__type__": "Book",
+                        "key": "b2",
+                        "title": "Second",
+                        "__http_entity__": false
+                      }
+                    ],
+                    "source_site": "call:method:library:BookController#add(Book)@13:77",
+                    "uncertain_write": false
+                  }
+                ],
+                "state_after": {
+                  "browser": {
+                    "storage": {},
+                    "form": {},
+                    "dom": {},
+                    "url": {},
+                    "options": {}
+                  },
+                  "history": [
+                    {
+                      "step": 1,
+                      "entry": "method:library:BookController#add(Book)",
+                      "action": "Add book key \"b2\" title \"Second\""
+                    }
+                  ],
+                  "clock": {
+                    "unknown": true
+                  },
+                  "database_rows": {
+                    "library.books": 1
+                  },
+                  "unknown_tables": [],
+                  "analysis_assumptions": [],
+                  "limitations": []
+                },
+                "edges": [
+                  {
+                    "source": "scenario:independent-library",
+                    "relation": "executes",
+                    "target": "method:library:BookController#add(Book)"
+                  },
+                  {
+                    "source": "method:library:BookController#add(Book)",
+                    "relation": "data",
+                    "target": "res:table:library.books"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "n": 2,
+            "action": "Lookup book key \"b2\"",
+            "selection": {
+              "candidates": [
+                "method:library:BookController#lookup(String)",
+                "method:library:BookController#search(String)",
+                "method:library:BookController#add(Book)"
+              ],
+              "ranking": [
+                {
+                  "entry": "method:library:BookController#lookup(String)",
+                  "ui_site": null,
+                  "score": 5.725128213596849
+                },
+                {
+                  "entry": "method:library:BookController#search(String)",
+                  "ui_site": null,
+                  "score": 0.24035650672414063
+                },
+                {
+                  "entry": "method:library:BookController#add(Book)",
+                  "ui_site": null,
+                  "score": 0.011497491094782857
+                }
+              ],
+              "proposal": {
+                "hypotheses": []
+              },
+              "unresolved": [],
+              "grounding_status": "lexical_hypothesis",
+              "certainty_note": "Graph certainty is conditional on the selected source contract and validated bindings"
+            },
+            "alternatives": [
+              {
+                "entry": "method:library:BookController#lookup(String)",
+                "parameters": {
+                  "key": "b2"
+                },
+                "grounding_reason": "Highest weighted source/UI contract score: 5.725128213596849",
+                "grounding_repairs": [],
+                "retrieval_candidates": [
+                  "method:library:BookController#lookup(String)",
+                  "method:library:BookController#search(String)",
+                  "method:library:BookController#add(Book)"
+                ],
+                "ui_site": null,
+                "bindings": {
+                  "key": {
+                    "source": "literal",
+                    "reference": "action",
+                    "quote": "key \"b2\"",
+                    "resolved": true
+                  }
+                },
+                "result": "Second",
+                "created_objects": [],
+                "path_conditions": [
+                  {
+                    "method": "method:library:BookController#lookup(String)",
+                    "line": 7,
+                    "condition": "(found == null)",
+                    "value": false
+                  }
+                ],
+                "decisions": {},
+                "pruned_paths": [],
+                "outcome": "returned",
+                "unresolved": [],
+                "data_operations": [
+                  {
+                    "method": "method:library:BookController#lookup(String)",
+                    "resource": "res:table:library.books",
+                    "operation": "findByKey",
+                    "arguments": [
+                      "b2"
+                    ],
+                    "source_site": "call:method:library:BookController#lookup(String)@6:33",
+                    "uncertain_write": false
+                  }
+                ],
+                "state_after": {
+                  "browser": {
+                    "storage": {},
+                    "form": {},
+                    "dom": {},
+                    "url": {},
+                    "options": {}
+                  },
+                  "history": [
+                    {
+                      "step": 1,
+                      "entry": "method:library:BookController#add(Book)",
+                      "action": "Add book key \"b2\" title \"Second\""
+                    },
+                    {
+                      "step": 2,
+                      "entry": "method:library:BookController#lookup(String)",
+                      "action": "Lookup book key \"b2\""
+                    }
+                  ],
+                  "clock": {
+                    "unknown": true
+                  },
+                  "database_rows": {
+                    "library.books": 1
+                  },
+                  "unknown_tables": [],
+                  "analysis_assumptions": [],
+                  "limitations": []
+                },
+                "edges": [
+                  {
+                    "source": "scenario:independent-library",
+                    "relation": "executes",
+                    "target": "method:library:BookController#available(Book)"
+                  },
+                  {
+                    "source": "scenario:independent-library",
+                    "relation": "executes",
+                    "target": "method:library:BookController#lookup(String)"
+                  },
+                  {
+                    "source": "method:library:BookController#lookup(String)",
+                    "relation": "calls",
+                    "target": "method:library:BookController#available(Book)"
+                  },
+                  {
+                    "source": "method:library:BookController#lookup(String)",
+                    "relation": "data",
+                    "target": "res:table:library.books"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "n": 3,
+            "action": "Lookup book key \"absent\"",
+            "selection": {
+              "candidates": [
+                "method:library:BookController#lookup(String)",
+                "method:library:BookController#search(String)",
+                "method:library:BookController#add(Book)"
+              ],
+              "ranking": [
+                {
+                  "entry": "method:library:BookController#lookup(String)",
+                  "ui_site": null,
+                  "score": 5.725128213596849
+                },
+                {
+                  "entry": "method:library:BookController#search(String)",
+                  "ui_site": null,
+                  "score": 0.24035650672414063
+                },
+                {
+                  "entry": "method:library:BookController#add(Book)",
+                  "ui_site": null,
+                  "score": 0.011497491094782857
+                }
+              ],
+              "proposal": {
+                "hypotheses": []
+              },
+              "unresolved": [],
+              "grounding_status": "lexical_hypothesis",
+              "certainty_note": "Graph certainty is conditional on the selected source contract and validated bindings"
+            },
+            "alternatives": [
+              {
+                "entry": "method:library:BookController#lookup(String)",
+                "parameters": {
+                  "key": "absent"
+                },
+                "grounding_reason": "Highest weighted source/UI contract score: 5.725128213596849",
+                "grounding_repairs": [],
+                "retrieval_candidates": [
+                  "method:library:BookController#lookup(String)",
+                  "method:library:BookController#search(String)",
+                  "method:library:BookController#add(Book)"
+                ],
+                "ui_site": null,
+                "bindings": {
+                  "key": {
+                    "source": "literal",
+                    "reference": "action",
+                    "quote": "key \"absent\"",
+                    "resolved": true
+                  }
+                },
+                "result": "absent",
+                "created_objects": [],
+                "path_conditions": [
+                  {
+                    "method": "method:library:BookController#lookup(String)",
+                    "line": 7,
+                    "condition": "(found == null)",
+                    "value": true
+                  }
+                ],
+                "decisions": {},
+                "pruned_paths": [],
+                "outcome": "returned",
+                "unresolved": [],
+                "data_operations": [
+                  {
+                    "method": "method:library:BookController#lookup(String)",
+                    "resource": "res:table:library.books",
+                    "operation": "findByKey",
+                    "arguments": [
+                      "absent"
+                    ],
+                    "source_site": "call:method:library:BookController#lookup(String)@6:33",
+                    "uncertain_write": false
+                  }
+                ],
+                "state_after": {
+                  "browser": {
+                    "storage": {},
+                    "form": {},
+                    "dom": {},
+                    "url": {},
+                    "options": {}
+                  },
+                  "history": [
+                    {
+                      "step": 1,
+                      "entry": "method:library:BookController#add(Book)",
+                      "action": "Add book key \"b2\" title \"Second\""
+                    },
+                    {
+                      "step": 2,
+                      "entry": "method:library:BookController#lookup(String)",
+                      "action": "Lookup book key \"b2\""
+                    },
+                    {
+                      "step": 3,
+                      "entry": "method:library:BookController#lookup(String)",
+                      "action": "Lookup book key \"absent\""
+                    }
+                  ],
+                  "clock": {
+                    "unknown": true
+                  },
+                  "database_rows": {
+                    "library.books": 1
+                  },
+                  "unknown_tables": [],
+                  "analysis_assumptions": [],
+                  "limitations": []
+                },
+                "edges": [
+                  {
+                    "source": "scenario:independent-library",
+                    "relation": "executes",
+                    "target": "method:library:BookController#lookup(String)"
+                  },
+                  {
+                    "source": "scenario:independent-library",
+                    "relation": "executes",
+                    "target": "method:library:BookController#missing()"
+                  },
+                  {
+                    "source": "method:library:BookController#lookup(String)",
+                    "relation": "calls",
+                    "target": "method:library:BookController#missing()"
+                  },
+                  {
+                    "source": "method:library:BookController#lookup(String)",
+                    "relation": "data",
+                    "target": "res:table:library.books"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "edge": {
+              "source": "scenario:independent-library",
+              "relation": "executes",
+              "target": "method:library:BookController#add(Book)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:library:BookController#add(Book)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "scenario request"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 13,
+                    "method": "method:library:BookController#add(Book)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "scenario:independent-library",
+              "relation": "executes",
+              "target": "method:library:BookController#available(Book)"
+            },
+            "grounds": [
+              {
+                "step": 2,
+                "entry": "method:library:BookController#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:library:BookController#lookup(String)@8:16"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 8,
+                    "call_site": "call:method:library:BookController#lookup(String)@8:16"
+                  },
+                  {
+                    "file": "BookController.java",
+                    "line": 11,
+                    "method": "method:library:BookController#available(Book)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "scenario:independent-library",
+              "relation": "executes",
+              "target": "method:library:BookController#lookup(String)"
+            },
+            "grounds": [
+              {
+                "step": 2,
+                "entry": "method:library:BookController#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "scenario request"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 5,
+                    "method": "method:library:BookController#lookup(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              },
+              {
+                "step": 3,
+                "entry": "method:library:BookController#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "scenario request"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 5,
+                    "method": "method:library:BookController#lookup(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "scenario:independent-library",
+              "relation": "executes",
+              "target": "method:library:BookController#missing()"
+            },
+            "grounds": [
+              {
+                "step": 3,
+                "entry": "method:library:BookController#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:library:BookController#lookup(String)@7:37"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 7,
+                    "call_site": "call:method:library:BookController#lookup(String)@7:37"
+                  },
+                  {
+                    "file": "BookController.java",
+                    "line": 10,
+                    "method": "method:library:BookController#missing()"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:library:BookController#add(Book)",
+              "relation": "data",
+              "target": "res:table:library.books"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:library:BookController#add(Book)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:library:BookController#add(Book)@13:77"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 13,
+                    "call_site": "call:method:library:BookController#add(Book)@13:77"
+                  },
+                  {
+                    "file": "BookController.java",
+                    "line": 13,
+                    "method": "method:library:BookController#add(Book)"
+                  }
+                ],
+                "applied_rules": [
+                  "Spring Data repository operation with source entity and primary-key mapping"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:library:BookController#lookup(String)",
+              "relation": "calls",
+              "target": "method:library:BookController#available(Book)"
+            },
+            "grounds": [
+              {
+                "step": 2,
+                "entry": "method:library:BookController#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:library:BookController#lookup(String)@8:16"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 8,
+                    "call_site": "call:method:library:BookController#lookup(String)@8:16"
+                  },
+                  {
+                    "file": "BookController.java",
+                    "line": 5,
+                    "method": "method:library:BookController#lookup(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:library:BookController#lookup(String)",
+              "relation": "calls",
+              "target": "method:library:BookController#missing()"
+            },
+            "grounds": [
+              {
+                "step": 3,
+                "entry": "method:library:BookController#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:library:BookController#lookup(String)@7:37"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 7,
+                    "call_site": "call:method:library:BookController#lookup(String)@7:37"
+                  },
+                  {
+                    "file": "BookController.java",
+                    "line": 5,
+                    "method": "method:library:BookController#lookup(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:library:BookController#lookup(String)",
+              "relation": "data",
+              "target": "res:table:library.books"
+            },
+            "grounds": [
+              {
+                "step": 2,
+                "entry": "method:library:BookController#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:library:BookController#lookup(String)@6:33"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 6,
+                    "call_site": "call:method:library:BookController#lookup(String)@6:33"
+                  },
+                  {
+                    "file": "BookController.java",
+                    "line": 5,
+                    "method": "method:library:BookController#lookup(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Spring Data repository operation with source entity and primary-key mapping"
+                ]
+              },
+              {
+                "step": 3,
+                "entry": "method:library:BookController#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:library:BookController#lookup(String)@6:33"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "BookController.java",
+                    "line": 6,
+                    "call_site": "call:method:library:BookController#lookup(String)@6:33"
+                  },
+                  {
+                    "file": "BookController.java",
+                    "line": 5,
+                    "method": "method:library:BookController#lookup(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Spring Data repository operation with source entity and primary-key mapping"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "project": "remote",
+      "passed": true,
+      "scenario": {
+        "id": "independent-remote",
+        "steps": [
+          {
+            "n": 1,
+            "action": "Place order sku \"item-7\""
+          },
+          {
+            "n": 2,
+            "action": "Lookup charge key \"item-7\""
+          }
+        ]
+      },
+      "answer": {
+        "edges": [
+          {
+            "source": "scenario:independent-remote",
+            "relation": "executes",
+            "target": "method:ledger:Ledger#charge(Charge)"
+          },
+          {
+            "source": "scenario:independent-remote",
+            "relation": "executes",
+            "target": "method:ledger:Ledger#lookup(String)"
+          },
+          {
+            "source": "scenario:independent-remote",
+            "relation": "executes",
+            "target": "method:shop:Charge#<init>(String)"
+          },
+          {
+            "source": "scenario:independent-remote",
+            "relation": "executes",
+            "target": "method:shop:Shop#place(Request)"
+          },
+          {
+            "source": "method:ledger:Ledger#charge(Charge)",
+            "relation": "data",
+            "target": "res:table:ledger.charges"
+          },
+          {
+            "source": "method:ledger:Ledger#lookup(String)",
+            "relation": "data",
+            "target": "res:table:ledger.charges"
+          },
+          {
+            "source": "method:shop:Shop#place(Request)",
+            "relation": "calls",
+            "target": "method:shop:Charge#<init>(String)"
+          },
+          {
+            "source": "method:shop:Shop#place(Request)",
+            "relation": "remote",
+            "target": "method:ledger:Ledger#charge(Charge)"
+          }
+        ]
+      },
+      "report": {
+        "analysis_status": "complete_in_supported_model",
+        "certainty_scope": "relative to supplied inputs, proposed bindings and supported semantics; not a runtime trace",
+        "confirmed": [
+          {
+            "source": "scenario:independent-remote",
+            "relation": "executes",
+            "target": "method:ledger:Ledger#charge(Charge)"
+          },
+          {
+            "source": "scenario:independent-remote",
+            "relation": "executes",
+            "target": "method:ledger:Ledger#lookup(String)"
+          },
+          {
+            "source": "scenario:independent-remote",
+            "relation": "executes",
+            "target": "method:shop:Charge#<init>(String)"
+          },
+          {
+            "source": "scenario:independent-remote",
+            "relation": "executes",
+            "target": "method:shop:Shop#place(Request)"
+          },
+          {
+            "source": "method:ledger:Ledger#charge(Charge)",
+            "relation": "data",
+            "target": "res:table:ledger.charges"
+          },
+          {
+            "source": "method:ledger:Ledger#lookup(String)",
+            "relation": "data",
+            "target": "res:table:ledger.charges"
+          },
+          {
+            "source": "method:shop:Shop#place(Request)",
+            "relation": "calls",
+            "target": "method:shop:Charge#<init>(String)"
+          },
+          {
+            "source": "method:shop:Shop#place(Request)",
+            "relation": "remote",
+            "target": "method:ledger:Ledger#charge(Charge)"
+          }
+        ],
+        "possible": [],
+        "unresolved": [],
+        "steps": [
+          {
+            "n": 1,
+            "action": "Place order sku \"item-7\"",
+            "selection": {
+              "candidates": [
+                "method:shop:Shop#place(Request)"
+              ],
+              "ranking": [
+                {
+                  "entry": "method:shop:Shop#place(Request)",
+                  "ui_site": null,
+                  "score": 3.6847005333521783
+                }
+              ],
+              "proposal": {
+                "hypotheses": []
+              },
+              "unresolved": [],
+              "grounding_status": "lexical_hypothesis",
+              "certainty_note": "Graph certainty is conditional on the selected source contract and validated bindings"
+            },
+            "alternatives": [
+              {
+                "entry": "method:shop:Shop#place(Request)",
+                "parameters": {
+                  "sku": "item-7"
+                },
+                "grounding_reason": "Highest weighted source/UI contract score: 3.6847005333521783",
+                "grounding_repairs": [],
+                "retrieval_candidates": [
+                  "method:shop:Shop#place(Request)"
+                ],
+                "ui_site": null,
+                "bindings": {
+                  "sku": {
+                    "source": "literal",
+                    "reference": "action",
+                    "quote": "sku \"item-7\"",
+                    "resolved": true
+                  }
+                },
+                "result": {
+                  "__type__": "Charge",
+                  "key": "item-7"
+                },
+                "created_objects": [
+                  {
+                    "__type__": "Charge",
+                    "key": "item-7",
+                    "__resource__": "res:table:ledger.charges",
+                    "__persistence_observation__": "modeled_present"
+                  }
+                ],
+                "path_conditions": [],
+                "decisions": {},
+                "pruned_paths": [],
+                "outcome": "returned",
+                "unresolved": [],
+                "data_operations": [
+                  {
+                    "method": "method:ledger:Ledger#charge(Charge)",
+                    "resource": "res:table:ledger.charges",
+                    "operation": "save",
+                    "arguments": [
+                      {
+                        "__type__": "Charge",
+                        "key": "item-7"
+                      }
+                    ],
+                    "source_site": "call:method:ledger:Ledger#charge(Charge)@3:90",
+                    "uncertain_write": false
+                  }
+                ],
+                "state_after": {
+                  "browser": {
+                    "storage": {},
+                    "form": {},
+                    "dom": {},
+                    "url": {},
+                    "options": {}
+                  },
+                  "history": [
+                    {
+                      "step": 1,
+                      "entry": "method:shop:Shop#place(Request)",
+                      "action": "Place order sku \"item-7\""
+                    }
+                  ],
+                  "clock": {
+                    "unknown": true
+                  },
+                  "database_rows": {
+                    "ledger.charges": 1
+                  },
+                  "unknown_tables": [],
+                  "analysis_assumptions": [],
+                  "limitations": []
+                },
+                "edges": [
+                  {
+                    "source": "scenario:independent-remote",
+                    "relation": "executes",
+                    "target": "method:ledger:Ledger#charge(Charge)"
+                  },
+                  {
+                    "source": "scenario:independent-remote",
+                    "relation": "executes",
+                    "target": "method:shop:Charge#<init>(String)"
+                  },
+                  {
+                    "source": "scenario:independent-remote",
+                    "relation": "executes",
+                    "target": "method:shop:Shop#place(Request)"
+                  },
+                  {
+                    "source": "method:ledger:Ledger#charge(Charge)",
+                    "relation": "data",
+                    "target": "res:table:ledger.charges"
+                  },
+                  {
+                    "source": "method:shop:Shop#place(Request)",
+                    "relation": "calls",
+                    "target": "method:shop:Charge#<init>(String)"
+                  },
+                  {
+                    "source": "method:shop:Shop#place(Request)",
+                    "relation": "remote",
+                    "target": "method:ledger:Ledger#charge(Charge)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "n": 2,
+            "action": "Lookup charge key \"item-7\"",
+            "selection": {
+              "candidates": [
+                "method:ledger:Ledger#lookup(String)",
+                "method:ledger:Ledger#charge(Charge)",
+                "method:shop:Shop#place(Request)"
+              ],
+              "ranking": [
+                {
+                  "entry": "method:ledger:Ledger#lookup(String)",
+                  "ui_site": null,
+                  "score": 0.7543190124179403
+                },
+                {
+                  "entry": "method:ledger:Ledger#charge(Charge)",
+                  "ui_site": null,
+                  "score": 0.01771022972232124
+                },
+                {
+                  "entry": "method:shop:Shop#place(Request)",
+                  "ui_site": null,
+                  "score": 0.0019555632943532154
+                }
+              ],
+              "proposal": {
+                "hypotheses": []
+              },
+              "unresolved": [],
+              "grounding_status": "lexical_hypothesis",
+              "certainty_note": "Graph certainty is conditional on the selected source contract and validated bindings"
+            },
+            "alternatives": [
+              {
+                "entry": "method:ledger:Ledger#lookup(String)",
+                "parameters": {
+                  "key": "item-7"
+                },
+                "grounding_reason": "Highest weighted source/UI contract score: 0.7543190124179403",
+                "grounding_repairs": [],
+                "retrieval_candidates": [
+                  "method:ledger:Ledger#lookup(String)",
+                  "method:ledger:Ledger#charge(Charge)",
+                  "method:shop:Shop#place(Request)"
+                ],
+                "ui_site": null,
+                "bindings": {
+                  "key": {
+                    "source": "literal",
+                    "reference": "action",
+                    "quote": "key \"item-7\"",
+                    "resolved": true
+                  }
+                },
+                "result": {
+                  "__type__": "Charge",
+                  "key": "item-7"
+                },
+                "created_objects": [],
+                "path_conditions": [],
+                "decisions": {},
+                "pruned_paths": [],
+                "outcome": "returned",
+                "unresolved": [],
+                "data_operations": [
+                  {
+                    "method": "method:ledger:Ledger#lookup(String)",
+                    "resource": "res:table:ledger.charges",
+                    "operation": "findByKey",
+                    "arguments": [
+                      "item-7"
+                    ],
+                    "source_site": "call:method:ledger:Ledger#lookup(String)@4:101",
+                    "uncertain_write": false
+                  }
+                ],
+                "state_after": {
+                  "browser": {
+                    "storage": {},
+                    "form": {},
+                    "dom": {},
+                    "url": {},
+                    "options": {}
+                  },
+                  "history": [
+                    {
+                      "step": 1,
+                      "entry": "method:shop:Shop#place(Request)",
+                      "action": "Place order sku \"item-7\""
+                    },
+                    {
+                      "step": 2,
+                      "entry": "method:ledger:Ledger#lookup(String)",
+                      "action": "Lookup charge key \"item-7\""
+                    }
+                  ],
+                  "clock": {
+                    "unknown": true
+                  },
+                  "database_rows": {
+                    "ledger.charges": 1
+                  },
+                  "unknown_tables": [],
+                  "analysis_assumptions": [],
+                  "limitations": []
+                },
+                "edges": [
+                  {
+                    "source": "scenario:independent-remote",
+                    "relation": "executes",
+                    "target": "method:ledger:Ledger#lookup(String)"
+                  },
+                  {
+                    "source": "method:ledger:Ledger#lookup(String)",
+                    "relation": "data",
+                    "target": "res:table:ledger.charges"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "edge": {
+              "source": "scenario:independent-remote",
+              "relation": "executes",
+              "target": "method:ledger:Ledger#charge(Charge)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:shop:Shop#place(Request)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:shop:Shop#place(Request)@4:25"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "shop/Shop.java",
+                    "line": 4,
+                    "call_site": "call:method:shop:Shop#place(Request)@4:25"
+                  },
+                  {
+                    "file": "ledger/Ledger.java",
+                    "line": 3,
+                    "method": "method:ledger:Ledger#charge(Charge)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "scenario:independent-remote",
+              "relation": "executes",
+              "target": "method:ledger:Ledger#lookup(String)"
+            },
+            "grounds": [
+              {
+                "step": 2,
+                "entry": "method:ledger:Ledger#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "scenario request"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "ledger/Ledger.java",
+                    "line": 4,
+                    "method": "method:ledger:Ledger#lookup(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "scenario:independent-remote",
+              "relation": "executes",
+              "target": "method:shop:Charge#<init>(String)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:shop:Shop#place(Request)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:shop:Shop#place(Request)@4:79"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "shop/Shop.java",
+                    "line": 4,
+                    "call_site": "call:method:shop:Shop#place(Request)@4:79"
+                  },
+                  {
+                    "file": "shop/Shop.java",
+                    "line": 9,
+                    "method": "method:shop:Charge#<init>(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "scenario:independent-remote",
+              "relation": "executes",
+              "target": "method:shop:Shop#place(Request)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:shop:Shop#place(Request)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "scenario request"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "shop/Shop.java",
+                    "line": 3,
+                    "method": "method:shop:Shop#place(Request)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:ledger:Ledger#charge(Charge)",
+              "relation": "data",
+              "target": "res:table:ledger.charges"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:shop:Shop#place(Request)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:ledger:Ledger#charge(Charge)@3:90"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "ledger/Ledger.java",
+                    "line": 3,
+                    "call_site": "call:method:ledger:Ledger#charge(Charge)@3:90"
+                  },
+                  {
+                    "file": "ledger/Ledger.java",
+                    "line": 3,
+                    "method": "method:ledger:Ledger#charge(Charge)"
+                  }
+                ],
+                "applied_rules": [
+                  "Spring Data repository operation with source entity and primary-key mapping"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:ledger:Ledger#lookup(String)",
+              "relation": "data",
+              "target": "res:table:ledger.charges"
+            },
+            "grounds": [
+              {
+                "step": 2,
+                "entry": "method:ledger:Ledger#lookup(String)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:ledger:Ledger#lookup(String)@4:101"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "ledger/Ledger.java",
+                    "line": 4,
+                    "call_site": "call:method:ledger:Ledger#lookup(String)@4:101"
+                  },
+                  {
+                    "file": "ledger/Ledger.java",
+                    "line": 4,
+                    "method": "method:ledger:Ledger#lookup(String)"
+                  }
+                ],
+                "applied_rules": [
+                  "Spring Data repository operation with source entity and primary-key mapping"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:shop:Shop#place(Request)",
+              "relation": "calls",
+              "target": "method:shop:Charge#<init>(String)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:shop:Shop#place(Request)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:shop:Shop#place(Request)@4:79"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "shop/Shop.java",
+                    "line": 4,
+                    "call_site": "call:method:shop:Shop#place(Request)@4:79"
+                  },
+                  {
+                    "file": "shop/Shop.java",
+                    "line": 3,
+                    "method": "method:shop:Shop#place(Request)"
+                  }
+                ],
+                "applied_rules": [
+                  "Source method invocation or scenario HTTP entry"
+                ]
+              }
+            ]
+          },
+          {
+            "edge": {
+              "source": "method:shop:Shop#place(Request)",
+              "relation": "remote",
+              "target": "method:ledger:Ledger#charge(Charge)"
+            },
+            "grounds": [
+              {
+                "step": 1,
+                "entry": "method:shop:Shop#place(Request)",
+                "ui_site": null,
+                "alternative": 0,
+                "source_sites": [
+                  "call:method:shop:Shop#place(Request)@4:25"
+                ],
+                "approximate": false,
+                "source_locations": [
+                  {
+                    "file": "shop/Shop.java",
+                    "line": 4,
+                    "call_site": "call:method:shop:Shop#place(Request)@4:25"
+                  },
+                  {
+                    "file": "shop/Shop.java",
+                    "line": 3,
+                    "method": "method:shop:Shop#place(Request)"
+                  }
+                ],
+                "applied_rules": [
+                  "Static HTTP wiring refined by declared Spring route and URL when known"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

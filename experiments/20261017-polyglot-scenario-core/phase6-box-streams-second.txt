@@ -1,0 +1,26 @@
+..................F........                                              [100%]
+=================================== FAILURES ===================================
+_____ test_source_hashcode_and_collision_equals_callbacks_are_not_skipped ______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-627/test_source_hashcode_and_colli0')
+
+    def test_source_hashcode_and_collision_equals_callbacks_are_not_skipped(tmp_path):
+        block,detail,ids=probe(tmp_path,'java.util.Set<Item> items=Arrays.asList("FB","Ea","FB").stream().map(this::item).collect(Collectors.toSet());return Arrays.asList(items.size(),hashes,comparisons);',
+            'private int hashes=0;private int comparisons=0;Item item(String title){return new Item(title,this);}void hashed(){hashes++;}void compared(){comparisons++;}',
+            'class Item {private String title;private Endpoint owner;Item(String title,Endpoint owner){this.title=title;this.owner=owner;}public int hashCode(){owner.hashed();return title.hashCode();}public boolean equals(Object other){owner.compared();return title.equals(((Item)other).title);}}')
+>       assert response(detail)==[2,3,2]
+               ^^^^^^^^^^^^^^^^
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+detail = {'evidence': {'opaque-method-1 | calls | opaque-method-2': [{'file': 'Endpoint.java', 'line': 7, 'reason': 'source sem...que-method-3'}, {'relation': 'calls', 'source': 'opaque-method-7', 'target': 'opaque-method-4'}, ...], 'must': [], ...}
+
+>   def response(detail):return detail['paths'][0]['steps'][0]['response']['body']
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   IndexError: list index out of range
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:21: IndexError
+=========================== short test summary info ============================
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py::test_source_hashcode_and_collision_equals_callbacks_are_not_skipped
+1 failed, 26 passed in 0.48s

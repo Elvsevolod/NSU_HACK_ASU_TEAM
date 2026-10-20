@@ -1,0 +1,86 @@
+F.F..........                                                            [100%]
+=================================== FAILURES ===================================
+_ test_actual_jwt_claim_order_options_and_explicit_clock[claims0-options0-ExpiredSignatureError] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-536/test_actual_jwt_claim_order_op0')
+claims = {'exp': 1767348900}, options = {}, expected = 'ExpiredSignatureError'
+
+    @pytest.mark.parametrize('claims,options,expected',[
+        ({'exp':1767348900},{},'ExpiredSignatureError'),
+        ({'exp':1767352500,'nbf':1767352500},{},'ImmatureSignatureError'),
+        ({'exp':1767348900,'aud':'wrong'},{},'ExpiredSignatureError'),
+        ({'exp':1767352500,'aud':'wrong'},{},'InvalidAudienceError'),
+        ({'sub':17},{},'InvalidSubjectError'),
+        ({'exp':1767348900},{'verify_exp':False},None),
+        ({},{'require':['exp']},'MissingRequiredClaimError'),
+    ])
+    def test_actual_jwt_claim_order_options_and_explicit_clock(tmp_path,claims,options,expected):
+        p,_,_=fixture(tmp_path,{'main.py':'def unused():pass\n'})
+        engine=Kernel(p,context={'clock':CLOCK})
+        encoded=jwt.encode(claims,SECRET,algorithm='HS256')
+        args=(encoded,SECRET,['HS256'],options)  # Positional options are an upstream contract too.
+        if expected:
+>           with pytest.raises(getattr(jwt.exceptions,expected)):decode(engine,args,{},Span())
+E           Failed: DID NOT RAISE <class 'jwt.exceptions.ExpiredSignatureError'>
+
+solutions/—_polyglot-scenario-core/code/tests/test_native_security.py:35: Failed
+_ test_actual_jwt_claim_order_options_and_explicit_clock[claims2-options2-ExpiredSignatureError] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-536/test_actual_jwt_claim_order_op2')
+claims = {'aud': 'wrong', 'exp': 1767348900}, options = {}
+expected = 'ExpiredSignatureError'
+
+    @pytest.mark.parametrize('claims,options,expected',[
+        ({'exp':1767348900},{},'ExpiredSignatureError'),
+        ({'exp':1767352500,'nbf':1767352500},{},'ImmatureSignatureError'),
+        ({'exp':1767348900,'aud':'wrong'},{},'ExpiredSignatureError'),
+        ({'exp':1767352500,'aud':'wrong'},{},'InvalidAudienceError'),
+        ({'sub':17},{},'InvalidSubjectError'),
+        ({'exp':1767348900},{'verify_exp':False},None),
+        ({},{'require':['exp']},'MissingRequiredClaimError'),
+    ])
+    def test_actual_jwt_claim_order_options_and_explicit_clock(tmp_path,claims,options,expected):
+        p,_,_=fixture(tmp_path,{'main.py':'def unused():pass\n'})
+        engine=Kernel(p,context={'clock':CLOCK})
+        encoded=jwt.encode(claims,SECRET,algorithm='HS256')
+        args=(encoded,SECRET,['HS256'],options)  # Positional options are an upstream contract too.
+        if expected:
+>           with pytest.raises(getattr(jwt.exceptions,expected)):decode(engine,args,{},Span())
+                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_polyglot-scenario-core/code/tests/test_native_security.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_polyglot-scenario-core/code/polygraph/security_models.py:73: in decode
+    return ScenarioJWT().decode(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/nsu-polygraph-venv/lib/python3.11/site-packages/jwt/api_jwt.py:370: in decode
+    decoded = self.decode_complete(
+/private/tmp/nsu-polygraph-venv/lib/python3.11/site-packages/jwt/api_jwt.py:277: in decode_complete
+    self._validate_claims(
+/private/tmp/nsu-polygraph-venv/lib/python3.11/site-packages/jwt/api_jwt.py:416: in _validate_claims
+    self._validate_aud(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <polygraph.security_models.decode.<locals>.ScenarioJWT object at 0x107f96650>
+payload = {'aud': 'wrong', 'exp': 1767348900}, audience = None
+
+    def _validate_aud(
+        self,
+        payload: dict[str, Any],
+        audience: str | Iterable[str] | None,
+        *,
+        strict: bool = False,
+    ) -> None:
+        if audience is None:
+            if "aud" not in payload or not payload["aud"]:
+                return
+            # Application did not specify an audience, but
+            # the token has the 'aud' claim
+>           raise InvalidAudienceError("Invalid audience")
+E           jwt.exceptions.InvalidAudienceError: Invalid audience
+
+/private/tmp/nsu-polygraph-venv/lib/python3.11/site-packages/jwt/api_jwt.py:527: InvalidAudienceError
+=========================== short test summary info ============================
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_native_security.py::test_actual_jwt_claim_order_options_and_explicit_clock[claims0-options0-ExpiredSignatureError]
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_native_security.py::test_actual_jwt_claim_order_options_and_explicit_clock[claims2-options2-ExpiredSignatureError]
+2 failed, 11 passed in 0.39s

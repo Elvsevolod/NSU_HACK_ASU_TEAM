@@ -1,0 +1,36 @@
+{
+  "project": "public-java",
+  "id": "invalid-body-before-handler",
+  "steps": [
+    {
+      "action": "Explicit conditional public-source HTTP request",
+      "request": {
+        "module": "account-service",
+        "path": "/accounts/current",
+        "method": "PUT",
+        "body": {
+          "incomes": [
+            {
+              "title": "Salary",
+              "amount": "20",
+              "currency": "USD",
+              "period": "DAY",
+              "icon": "salary.png"
+            }
+          ],
+          "expenses": [
+            {
+              "title": "Rent",
+              "amount": "8",
+              "currency": "EUR",
+              "period": "DAY",
+              "icon": "rent.png"
+            }
+          ],
+          "saving": null,
+          "note": "Changed"
+        }
+      }
+    }
+  ]
+}

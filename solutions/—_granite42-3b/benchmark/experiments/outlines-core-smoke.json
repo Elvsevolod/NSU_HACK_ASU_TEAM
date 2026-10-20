@@ -1,0 +1,418 @@
+{
+  "passed": true,
+  "basic_result": {
+    "ok": true
+  },
+  "seconds": 114.70957720799925,
+  "context": {
+    "facts": {
+      "system_clock": {
+        "name": "system_clock",
+        "kind": "clock",
+        "reference": "X13",
+        "value": "2026-09-15",
+        "quote": "15 September 2026",
+        "source": "date",
+        "value_type": "date"
+      },
+      "username": {
+        "name": "username",
+        "kind": "credential",
+        "reference": "X2",
+        "value": "fdse_microservice",
+        "quote": "fdse_microservice",
+        "source": "account",
+        "value_type": "credential"
+      },
+      "password": {
+        "name": "password",
+        "kind": "credential",
+        "reference": "X3",
+        "value": "111111",
+        "quote": "111111",
+        "source": "account",
+        "value_type": "credential"
+      },
+      "date": {
+        "name": "date",
+        "kind": "default",
+        "reference": "X13",
+        "value": "2026-09-15",
+        "quote": "15 September 2026",
+        "source": "date",
+        "value_type": "date"
+      }
+    },
+    "clock": "2026-09-15T00:00:00",
+    "unresolved": [
+      "profile",
+      "date",
+      "state",
+      "response"
+    ]
+  },
+  "first_step": {
+    "n": 1,
+    "action": "Log in with username and password"
+  },
+  "proposal_count": 1,
+  "grounding": {
+    "candidates": [
+      "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+      "method:ts-admin-user-service:adminuser.controller.AdminUserController#addUser(adminuser.dto.UserDto,org.springframework.http.HttpHeaders)",
+      "method:ts-admin-user-service:adminuser.controller.AdminUserController#updateUser(adminuser.dto.UserDto,org.springframework.http.HttpHeaders)",
+      "method:ts-user-service:user.controller.UserController#registerUser(user.dto.UserDto,org.springframework.http.HttpHeaders)",
+      "method:ts-admin-user-service:adminuser.controller.AdminUserController#getAllUsers(org.springframework.http.HttpHeaders)",
+      "method:ts-auth-service:auth.controller.AuthController#createDefaultUser(auth.dto.AuthDto)"
+    ],
+    "proposal": {
+      "hypotheses": [
+        {
+          "handler": "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+          "ui_site": "ts-ui-dashboard/static/assets/js/adminlogin.js:9",
+          "reason": "User credentials provided match login endpoint URL and parameters.",
+          "bindings": [
+            {
+              "parameter": "username",
+              "source": "context",
+              "reference": "username",
+              "value": null,
+              "quote": ""
+            },
+            {
+              "parameter": "password",
+              "source": "context",
+              "reference": "password",
+              "value": null,
+              "quote": ""
+            }
+          ]
+        },
+        {
+          "handler": "method:ts-admin-user-service:adminuser.controller.AdminUserController#addUser(adminuser.dto.UserDto,org.springframework.http.HttpHeaders)",
+          "ui_site": "ts-ui-dashboard/static/assets/js/adminlogin.js:9",
+          "reason": "Securely logs in using provided credentials.",
+          "bindings": [
+            {
+              "parameter": "username",
+              "source": "context",
+              "reference": "F1",
+              "value": null,
+              "quote": ""
+            },
+            {
+              "parameter": "password",
+              "source": "context",
+              "reference": "F2",
+              "value": null,
+              "quote": ""
+            }
+          ]
+        }
+      ],
+      "unresolved": []
+    },
+    "raw_proposal": {
+      "hypotheses": [
+        {
+          "handler": "H0",
+          "ui_site": "U3",
+          "reason": "User credentials provided match login endpoint URL and parameters.",
+          "bindings": [
+            {
+              "parameter": "username",
+              "source": "context",
+              "reference": "F1",
+              "value": null,
+              "quote": ""
+            },
+            {
+              "parameter": "password",
+              "source": "context",
+              "reference": "F2",
+              "value": null,
+              "quote": ""
+            }
+          ]
+        },
+        {
+          "handler": "H1",
+          "ui_site": "U3",
+          "reason": "Securely logs in using provided credentials.",
+          "bindings": [
+            {
+              "parameter": "username",
+              "source": "context",
+              "reference": "F1",
+              "value": null,
+              "quote": ""
+            },
+            {
+              "parameter": "password",
+              "source": "context",
+              "reference": "F2",
+              "value": null,
+              "quote": ""
+            }
+          ]
+        }
+      ],
+      "unresolved": []
+    },
+    "unresolved": [
+      "Rejected UI site not linked to the selected handler"
+    ],
+    "repairs": [
+      {
+        "previous_proposal": {
+          "hypotheses": [
+            {
+              "handler": "H0",
+              "ui_site": "U3",
+              "reason": "User credentials provided match login endpoint URL and parameters.",
+              "bindings": [
+                {
+                  "parameter": "username",
+                  "source": "context",
+                  "reference": "F1",
+                  "value": null,
+                  "quote": ""
+                },
+                {
+                  "parameter": "password",
+                  "source": "context",
+                  "reference": "F2",
+                  "value": null,
+                  "quote": ""
+                }
+              ]
+            }
+          ],
+          "unresolved": [
+            "value",
+            "source",
+            "reference",
+            "quote"
+          ]
+        },
+        "validation_errors": [
+          "value",
+          "source",
+          "reference",
+          "quote",
+          "Unknown input: verificationCode"
+        ]
+      }
+    ]
+  },
+  "model_calls": [
+    {
+      "seconds": 2.6657705000034184,
+      "schema_seconds": 0.009343083002022468,
+      "task_sha256": "1046b0d8113661ba3ab38c26fe32004a399c3d3c9e91064b292ca6e78fd4df70",
+      "input_sha256": "6bc0da1f42f96fc37b8bd7ed20ba57606d2a0da5cda2b135c7854fbdc985b8a3",
+      "schema_sha256": "da3f34710aa07e058da23290319cf1a93a06f48fd29593884338aa38c397c495",
+      "input_tokens": 95,
+      "generation_budget": 1800,
+      "generated_tokens": 7,
+      "finish_reason": "stop",
+      "prompt_tps": 40.580007189293326,
+      "generation_tps": 51.888253576581434,
+      "peak_memory_bytes": 2373080750.0,
+      "params": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 0,
+        "seed": 0
+      },
+      "model": {
+        "backend": "mlx-lm",
+        "repo": "ibm-granite/granite-4.2-3b-q4-mlx",
+        "revision": "0c6f39b1827afd5eb2c1c3b13751929857434953"
+      },
+      "response": {
+        "ok": true
+      }
+    },
+    {
+      "seconds": 15.084287459001644,
+      "schema_seconds": 5.5255933750013355,
+      "task_sha256": "f4bafe6376f2ddc2e399f189d8fe798ff974624dc699bcf577dfdd3cf2d0df43",
+      "input_sha256": "543dff16e71a06f23dadc36144201951ee010c6f8067e87d709d3606952fcc99",
+      "schema_sha256": "844bfd323286ff622ceb70d51d7a017d5a8bb12b846fc4df9d0f3a42d92b0853",
+      "input_tokens": 3478,
+      "generation_budget": 1800,
+      "generated_tokens": 80,
+      "finish_reason": "stop",
+      "prompt_tps": 469.21751372476115,
+      "generation_tps": 38.35726464340534,
+      "peak_memory_bytes": 2987709588.0,
+      "params": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 0,
+        "seed": 0
+      },
+      "model": {
+        "backend": "mlx-lm",
+        "repo": "ibm-granite/granite-4.2-3b-q4-mlx",
+        "revision": "0c6f39b1827afd5eb2c1c3b13751929857434953"
+      },
+      "response": {
+        "clock": "X13",
+        "credentials": [
+          {
+            "parameter": "username",
+            "reference": "X2"
+          },
+          {
+            "parameter": "password",
+            "reference": "X3"
+          }
+        ],
+        "defaults": [
+          {
+            "parameter": "date",
+            "reference": "X13"
+          }
+        ],
+        "rules": [],
+        "unresolved": [
+          "profile",
+          "date",
+          "state",
+          "response"
+        ]
+      }
+    },
+    {
+      "seconds": 42.89425195899821,
+      "schema_seconds": 28.455305124996812,
+      "task_sha256": "3dac8118e37407788f2679d971007ed3eac5d49242e5a0580c5fd2ae7b052cc0",
+      "input_sha256": "94db24432adf41655b32487315b245108d077a07f3e423202ddb8e19db6c3204",
+      "schema_sha256": "49b47cf563663386b68b4530821a1a0ea33bd38e52a6920bc949f2418249138b",
+      "input_tokens": 4986,
+      "generation_budget": 1800,
+      "generated_tokens": 128,
+      "finish_reason": "stop",
+      "prompt_tps": 452.53491365002355,
+      "generation_tps": 37.986570309269176,
+      "peak_memory_bytes": 3047838902.0,
+      "params": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 0,
+        "seed": 0
+      },
+      "model": {
+        "backend": "mlx-lm",
+        "repo": "ibm-granite/granite-4.2-3b-q4-mlx",
+        "revision": "0c6f39b1827afd5eb2c1c3b13751929857434953"
+      },
+      "response": {
+        "hypotheses": [
+          {
+            "handler": "H0",
+            "ui_site": "U3",
+            "reason": "User credentials provided match login endpoint URL and parameters.",
+            "bindings": [
+              {
+                "parameter": "username",
+                "source": "context",
+                "reference": "F1",
+                "value": null,
+                "quote": ""
+              },
+              {
+                "parameter": "password",
+                "source": "context",
+                "reference": "F2",
+                "value": null,
+                "quote": ""
+              }
+            ]
+          }
+        ],
+        "unresolved": [
+          "value",
+          "source",
+          "reference",
+          "quote"
+        ]
+      }
+    },
+    {
+      "seconds": 46.103807999999844,
+      "schema_seconds": 28.67564112499531,
+      "task_sha256": "72e36ab5ab4335babbcc909ef898ea4e102ccaec172e3f999b6b951a9870292f",
+      "input_sha256": "1e5e50469e8a2d20206aacba42977730ca0f4d1d5a5db08eaf972e42ad7736a6",
+      "schema_sha256": "49b47cf563663386b68b4530821a1a0ea33bd38e52a6920bc949f2418249138b",
+      "input_tokens": 5156,
+      "generation_budget": 1800,
+      "generated_tokens": 202,
+      "finish_reason": "stop",
+      "prompt_tps": 447.5785812250378,
+      "generation_tps": 36.15704894758626,
+      "peak_memory_bytes": 3047838902.0,
+      "params": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 0,
+        "seed": 0
+      },
+      "model": {
+        "backend": "mlx-lm",
+        "repo": "ibm-granite/granite-4.2-3b-q4-mlx",
+        "revision": "0c6f39b1827afd5eb2c1c3b13751929857434953"
+      },
+      "response": {
+        "hypotheses": [
+          {
+            "handler": "H0",
+            "ui_site": "U3",
+            "reason": "User credentials provided match login endpoint URL and parameters.",
+            "bindings": [
+              {
+                "parameter": "username",
+                "source": "context",
+                "reference": "F1",
+                "value": null,
+                "quote": ""
+              },
+              {
+                "parameter": "password",
+                "source": "context",
+                "reference": "F2",
+                "value": null,
+                "quote": ""
+              }
+            ]
+          },
+          {
+            "handler": "H1",
+            "ui_site": "U3",
+            "reason": "Securely logs in using provided credentials.",
+            "bindings": [
+              {
+                "parameter": "username",
+                "source": "context",
+                "reference": "F1",
+                "value": null,
+                "quote": ""
+              },
+              {
+                "parameter": "password",
+                "source": "context",
+                "reference": "F2",
+                "value": null,
+                "quote": ""
+              }
+            ]
+          }
+        ],
+        "unresolved": []
+      }
+    }
+  ],
+  "peak_rss_bytes": 3265626112
+}

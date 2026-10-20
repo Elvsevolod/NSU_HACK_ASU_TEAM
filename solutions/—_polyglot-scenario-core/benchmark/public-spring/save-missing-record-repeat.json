@@ -1,0 +1,35 @@
+{
+  "project": "public-java",
+  "scenarios": {
+    "save-missing-record": {
+      "method": "polyglot-ir-may",
+      "edges": [
+        {
+          "source": "method:account-service:com.piggymetrics.account.controller.AccountController#saveCurrentAccount(Principal,Account)",
+          "relation": "calls",
+          "target": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#saveChanges(String,Account)"
+        },
+        {
+          "source": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#saveChanges(String,Account)",
+          "relation": "data",
+          "target": "resource:accounts"
+        },
+        {
+          "source": "scenario:save-missing-record",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.controller.AccountController#saveCurrentAccount(Principal,Account)"
+        },
+        {
+          "source": "scenario:save-missing-record",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.controller.ErrorHandler#processValidationError(IllegalArgumentException)"
+        },
+        {
+          "source": "scenario:save-missing-record",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#saveChanges(String,Account)"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,61 @@
+...............FFFF                                                      [100%]
+=================================== FAILURES ===================================
+_____________ test_contradiction_inside_one_conjunction_is_pruned ______________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-26/test_contradiction_inside_one_0')
+
+    def test_contradiction_inside_one_conjunction_is_pruned(tmp_path):
+        paths = execute(tmp_path, 'if (x > 5 && x < 6) { return 99; } return 1;')
+>       assert {p['result'] for p in paths} == {1}
+E       assert {1, 99} == {1}
+E         
+E         Extra items in the left set:
+E         99
+E         Use -v to get more diff
+
+solutions/—_predicate-state-analysis/code/tests/test_constraints.py:113: AssertionError
+____________ test_equality_in_a_conjunction_does_not_erase_a_bound _____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-26/test_equality_in_a_conjunction0')
+
+    def test_equality_in_a_conjunction_does_not_erase_a_bound(tmp_path):
+        paths = execute(tmp_path, 'if (x > 5 && x == 3) { return 99; } return 1;')
+>       assert {p['result'] for p in paths} == {1}
+E       assert {1, 99} == {1}
+E         
+E         Extra items in the left set:
+E         99
+E         Use -v to get more diff
+
+solutions/—_predicate-state-analysis/code/tests/test_constraints.py:118: AssertionError
+___________ test_numeric_promotion_does_not_lose_a_possible_integer ____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-26/test_numeric_promotion_does_no0')
+
+    def test_numeric_promotion_does_not_lose_a_possible_integer(tmp_path):
+        # 16777219F rounds to 16777220; x=16777220 takes the second return in Java.
+        paths = execute(tmp_path, 'if (x > 16777219F) { return 1; } if (x == 16777220) { return 2; } return 3;')
+>       assert {p['result'] for p in paths} == {1, 2, 3}
+E       assert {1, 3} == {1, 2, 3}
+E         
+E         Extra items in the right set:
+E         2
+E         Use -v to get more diff
+
+solutions/—_predicate-state-analysis/code/tests/test_constraints.py:124: AssertionError
+_______ test_mutation_in_a_compound_guard_does_not_refine_the_old_value ________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-26/test_mutation_in_a_compound_gu0')
+
+    def test_mutation_in_a_compound_guard_does_not_refine_the_old_value(tmp_path):
+        paths = execute(tmp_path, 'if (x > 5 && --x < 6) { if (x == 5) { return 1; } return 3; } return 2;')
+>       assert 1 in {p['result'] for p in paths}
+E       assert 1 in {2, 3}
+
+solutions/—_predicate-state-analysis/code/tests/test_constraints.py:129: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_predicate-state-analysis/code/tests/test_constraints.py::test_contradiction_inside_one_conjunction_is_pruned
+FAILED solutions/—_predicate-state-analysis/code/tests/test_constraints.py::test_equality_in_a_conjunction_does_not_erase_a_bound
+FAILED solutions/—_predicate-state-analysis/code/tests/test_constraints.py::test_numeric_promotion_does_not_lose_a_possible_integer
+FAILED solutions/—_predicate-state-analysis/code/tests/test_constraints.py::test_mutation_in_a_compound_guard_does_not_refine_the_old_value
+4 failed, 15 passed in 0.06s

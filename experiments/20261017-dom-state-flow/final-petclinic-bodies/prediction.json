@@ -1,0 +1,174 @@
+[
+  {
+    "request": 1,
+    "method": "GET",
+    "url": "/api/pettypes/7",
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+      ],
+      [
+        "",
+        "executes",
+        "method:clinic:PetTypeRestController#getPetType(int)"
+      ],
+      [
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)",
+        "data",
+        "res:table:clinic.types"
+      ],
+      [
+        "method:clinic:PetTypeRestController#getPetType(int)",
+        "calls",
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+      ]
+    ],
+    "result": {
+      "__type__": "org.springframework.samples.petclinic.model.PetType",
+      "id": 7,
+      "name": "canine"
+    },
+    "outcome": "returned",
+    "warnings": [
+      "framework method interception is not fully modeled: PreAuthorize at method:clinic:PetTypeRestController#getPetType(int)",
+      "transaction dirty checking is not fully modeled: method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+    ],
+    "approximate": true,
+    "state_types": [
+      {
+        "id": 7,
+        "name": "canine"
+      }
+    ]
+  },
+  {
+    "request": 2,
+    "method": "PUT",
+    "url": "/api/pettypes/7",
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+      ],
+      [
+        "",
+        "executes",
+        "method:clinic:ClinicServiceImpl#savePetType(PetType)"
+      ],
+      [
+        "",
+        "executes",
+        "method:clinic:NamedEntity#getName()"
+      ],
+      [
+        "",
+        "executes",
+        "method:clinic:NamedEntity#setName(String)"
+      ],
+      [
+        "",
+        "executes",
+        "method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)"
+      ],
+      [
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)",
+        "data",
+        "res:table:clinic.types"
+      ],
+      [
+        "method:clinic:ClinicServiceImpl#savePetType(PetType)",
+        "data",
+        "res:table:clinic.types"
+      ],
+      [
+        "method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)",
+        "calls",
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+      ],
+      [
+        "method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)",
+        "calls",
+        "method:clinic:ClinicServiceImpl#savePetType(PetType)"
+      ],
+      [
+        "method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)",
+        "calls",
+        "method:clinic:NamedEntity#getName()"
+      ],
+      [
+        "method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)",
+        "calls",
+        "method:clinic:NamedEntity#setName(String)"
+      ]
+    ],
+    "result": {
+      "__type__": "org.springframework.samples.petclinic.model.PetType",
+      "id": 7,
+      "name": "hound"
+    },
+    "outcome": "returned",
+    "warnings": [
+      "framework method interception is not fully modeled: PreAuthorize at method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)",
+      "request bean validation is not fully modeled: method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)",
+      "transaction dirty checking is not fully modeled: method:clinic:ClinicServiceImpl#findPetTypeById(int)",
+      "transaction dirty checking is not fully modeled: method:clinic:ClinicServiceImpl#savePetType(PetType)",
+      "unsupported instance initializer: type:clinic:BindingErrorsResponse.bindingErrors"
+    ],
+    "approximate": true,
+    "state_types": [
+      {
+        "id": 7,
+        "name": "hound",
+        "__type__": "org.springframework.samples.petclinic.model.PetType"
+      }
+    ]
+  },
+  {
+    "request": 3,
+    "method": "GET",
+    "url": "/api/pettypes/7",
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+      ],
+      [
+        "",
+        "executes",
+        "method:clinic:PetTypeRestController#getPetType(int)"
+      ],
+      [
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)",
+        "data",
+        "res:table:clinic.types"
+      ],
+      [
+        "method:clinic:PetTypeRestController#getPetType(int)",
+        "calls",
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+      ]
+    ],
+    "result": {
+      "__type__": "org.springframework.samples.petclinic.model.PetType",
+      "id": 7,
+      "name": "hound"
+    },
+    "outcome": "returned",
+    "warnings": [
+      "framework method interception is not fully modeled: PreAuthorize at method:clinic:PetTypeRestController#getPetType(int)",
+      "transaction dirty checking is not fully modeled: method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+    ],
+    "approximate": true,
+    "state_types": [
+      {
+        "id": 7,
+        "name": "hound",
+        "__type__": "org.springframework.samples.petclinic.model.PetType"
+      }
+    ]
+  }
+]

@@ -1,0 +1,54 @@
+......................FFF                                                [100%]
+=================================== FAILURES ===================================
+____________ test_annotation_text_cannot_inject_a_source_superclass ____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-609/test_annotation_text_cannot_in0')
+
+    def test_annotation_text_cannot_inject_a_source_superclass(tmp_path):
+        decode,warnings,project=decoder(tmp_path,{'Schema.java':'''class Fake{public Integer foreign;}
+          class Base<T>{public T payload;}@SuppressWarnings("extends Fake {") class Child extends Base<String>{}'''})
+        child=next(tid for tid,node in project.nodes.items() if node.get('fqn')=='Child')
+>       assert set(project.type_fields[child])=={'payload'}
+E       AssertionError: assert {'foreign'} == {'payload'}
+E         
+E         Extra items in the left set:
+E         'foreign'
+E         Extra items in the right set:
+E         'payload'
+E         Use -v to get more diff
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:190: AssertionError
+_________________ test_all_source_superinterfaces_are_retained _________________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-609/test_all_source_superinterface0')
+
+    def test_all_source_superinterfaces_are_retained(tmp_path):
+        _,_,project=decoder(tmp_path,{'Schema.java':'interface First<T>{}interface Second<T>{}interface Child<T> extends First<T>,Second<T>{}'})
+        child=next(tid for tid,node in project.nodes.items() if node.get('fqn')=='Child')
+>       assert {project.nodes[tid]['fqn'] for tid in project.type_parents[child]}=={'First','Second'}
+E       AssertionError: assert {'First'} == {'First', 'Second'}
+E         
+E         Extra items in the right set:
+E         'Second'
+E         Use -v to get more diff
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:197: AssertionError
+_______ test_annotated_method_type_variable_still_shadows_a_native_class _______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-609/test_annotated_method_type_var0')
+
+    def test_annotated_method_type_variable_still_shadows_a_native_class(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{
+          <@Mark String> Object entry(String input){Map map=new HashMap();map.put(input,"wrong-known");return map.get("x");}}'''})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{'input':'x'}) is U
+E       AssertionError: assert 'wrong-known' is <Unknown.VALUE: 'unknown'>
+E        +  where 'wrong-known' = run('method:service:Api#entry(String)', {'input': 'x'})
+E        +    where run = <analyzer.engine.Engine object at 0x101c82310>.run
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:204: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_annotation_text_cannot_inject_a_source_superclass
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_all_source_superinterfaces_are_retained
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_annotated_method_type_variable_still_shadows_a_native_class
+3 failed, 22 passed in 0.11s

@@ -1,0 +1,16 @@
+Рабочая директория: /Users/vsevolod/Desktop/NSU_HACK_ASU_TEAM. Пользователь явно разрешил передавать DeepSeek любые файлы этой директории и делегировал разработку вариантов.
+
+Ограниченная реализация для решения №7. Разрешено менять ТОЛЬКО:
+solutions/—_evidence-contract-grounding/code/analyzer/frontend.py
+solutions/—_evidence-contract-grounding/code/tests/test_frontend_contracts.py (новый файл).
+Все остальные файлы только читать. Не меняй №6, он редактируется другим чатом. Не запускай shell, других агентов или исследуемый Java/JS код. Готовый анализатор Python, только статическое чтение через tree-sitter. Gold, прежние ответы и benchmark не читать. Перед первой правкой обязательно успешный нативный skill karpathy-guidelines, проверяем по журналу.
+
+Цель: минимально улучшить извлечение тела запроса в существующем Frontend, где уже есть request_contexts для direct same-file wrappers. Требуется корректно разобрать обёртки вида:
+function send(path, payload) { $.ajax({url:path,type:"POST",data:JSON.stringify(payload)}); }
+function add() { var body={key:"b2",title:"Example"}; send("/books",body); }
+Без выполнения JS, с поддержкой скобок, локальных alias и вложенного helper до существующей границы. Два вызова helper с разными URL/телами нельзя смешивать. Динамический URL и неоднозначное тело должны остаться неизвестными с диагностикой. Имена сущностей/сервисов/полей и данные не хардкодить. Сохраняй поведение прямых $.ajax и существующих 62 тестов.
+
+Сначала прочитай frontend.py и test_contracts.py. Добавь независимые тесты (строитель tests/builders.py принимает только Java sources, JS нужно записывать отдельно после build). Для JSON.stringify(payload) с подстановкой (body) сейчас regex не раскрывает аргумент и теряет body_fields. Устрани причину через AST или минимальную безопасную нормализацию; не добавляй большой JS-интерпретатор.
+
+Проверку запустит Codex: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH='solutions/—_evidence-contract-grounding/code' /private/tmp/nsu-alternatives-venv/bin/python -B -m pytest 'solutions/—_evidence-contract-grounding/code/tests' -q -p no:cacheprovider
+В конце перечисли изменения и оставшиеся ограничения. Не утверждай, что тесты прошли, если сам их не запускал. Работа по skills/deepseek-delegation/SKILL.md; skills/solution-versions/SKILL.md прочитан управляющим, бенчмарк и README ты не меняешь.

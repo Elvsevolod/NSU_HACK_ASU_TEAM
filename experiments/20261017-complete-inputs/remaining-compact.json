@@ -1,0 +1,487 @@
+[
+  {
+    "scenario": "S1",
+    "step": 6,
+    "action": "Book one first-class seat on the trip for this contact, with food on the train, assurance (insurance) of the first type and luggage consignment of 2 kg to a consignee",
+    "entry": "method:ts-preserve-service:preserve.controller.PreserveController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "assurance",
+      "stationName",
+      "storeName",
+      "foodName",
+      "foodPrice",
+      "consigneeName",
+      "consigneePhone"
+    ]
+  },
+  {
+    "scenario": "S1",
+    "step": 9,
+    "action": "Check the price of the order",
+    "entry": "method:ts-order-service:order.controller.OrderController#getOrderPrice(java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "orderId"
+    ]
+  },
+  {
+    "scenario": "S1",
+    "step": 11,
+    "action": "Collect the ticket for the order",
+    "entry": "method:ts-execute-service:execute.controller.ExecuteControlller#collectTicket(java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "orderId"
+    ]
+  },
+  {
+    "scenario": "S1",
+    "step": 12,
+    "action": "Enter the station (board the train) with the order",
+    "entry": "method:ts-execute-service:execute.controller.ExecuteControlller#executeTicket(java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "orderId"
+    ]
+  },
+  {
+    "scenario": "S1",
+    "step": 13,
+    "action": "Look up the luggage consignment record of the order",
+    "entry": "method:ts-consign-service:consign.controller.ConsignController#findByOrderId(java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "id"
+    ]
+  },
+  {
+    "scenario": "S1",
+    "step": 14,
+    "action": "Look up the assurance (insurance) record of the order",
+    "entry": "method:ts-assurance-service:assurance.controller.AssuranceController#findAssuranceByOrderId(java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "orderId"
+    ]
+  },
+  {
+    "scenario": "S2",
+    "step": 2,
+    "action": "Search regular trains (the 'Other' train type, not high-speed) from Shanghai to Nanjing departing on 1 October 2026",
+    "entry": "method:ts-order-other-service:other.controller.OrderOtherController#getTicketListByDateAndTripId(edu.fudan.common.entity.Seat,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "trainNumber",
+      "seatType",
+      "totalNum",
+      "stations"
+    ]
+  },
+  {
+    "scenario": "S2",
+    "step": 3,
+    "action": "Open the details of the first trip found",
+    "entry": "method:ts-travel-service:travel.controller.TravelController#getTripAllDetailInfo(edu.fudan.common.entity.TripAllDetailInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "tripId",
+      "from",
+      "to"
+    ]
+  },
+  {
+    "scenario": "S2",
+    "step": 4,
+    "action": "Browse the food stores at Suzhou station",
+    "entry": "method:ts-food-service:foodsearch.controller.FoodController#getAllFood(java.lang.String,java.lang.String,java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "startStation",
+      "endStation",
+      "tripId"
+    ]
+  },
+  {
+    "scenario": "S2",
+    "step": 6,
+    "action": "Book one first-class seat on the regular train for this contact, with food from a station store, no assurance (insurance) and no luggage consignment",
+    "entry": "method:ts-preserve-service:preserve.controller.PreserveController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "tripId",
+      "date",
+      "from",
+      "to",
+      "assurance",
+      "foodType",
+      "stationName",
+      "storeName",
+      "foodName",
+      "foodPrice"
+    ]
+  },
+  {
+    "scenario": "S2",
+    "step": 9,
+    "action": "Ask how much would be refunded if the order were cancelled",
+    "entry": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "loginId"
+    ]
+  },
+  {
+    "scenario": "S2",
+    "step": 10,
+    "action": "Cancel the order",
+    "entry": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "loginId"
+    ]
+  },
+  {
+    "scenario": "S2",
+    "step": 11,
+    "action": "Book another first-class seat on the same regular train for the same contact with the same station food",
+    "entry": "method:ts-preserve-service:preserve.controller.PreserveController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "tripId",
+      "date",
+      "from",
+      "to",
+      "assurance",
+      "stationName",
+      "storeName",
+      "foodName",
+      "foodPrice"
+    ]
+  },
+  {
+    "scenario": "S2",
+    "step": 14,
+    "action": "Rebook the paid ticket to a second-class seat on the same regular train (the cheaper ticket: the difference is refunded to the internal balance)",
+    "entry": "method:ts-rebook-service:rebook.controller.RebookController#payDifference(rebook.entity.RebookInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "loginId"
+    ]
+  },
+  {
+    "scenario": "S3",
+    "step": 6,
+    "action": "Add a new contact (a companion with an ID card) to the contact book",
+    "entry": "method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#addContacts(edu.fudan.common.entity.Contacts,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "name",
+      "documentType",
+      "documentNumber",
+      "phoneNumber"
+    ]
+  },
+  {
+    "scenario": "S3",
+    "step": 7,
+    "action": "Book a first-class seat on the trip for the first contact, with food from a station store, assurance (insurance) of the first type and a luggage consignment of 0.5 kg to a consignee",
+    "entry": "method:ts-preserve-service:preserve.controller.PreserveController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "assurance",
+      "stationName",
+      "storeName",
+      "foodName",
+      "foodPrice",
+      "consigneeName",
+      "consigneePhone"
+    ]
+  },
+  {
+    "scenario": "S3",
+    "step": 8,
+    "action": "Book a second-class seat on the same trip for the new contact, without food, assurance or consignment",
+    "entry": "method:ts-preserve-service:preserve.controller.PreserveController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "seatType",
+      "assurance",
+      "foodType",
+      "stationName",
+      "storeName",
+      "foodName",
+      "foodPrice"
+    ]
+  },
+  {
+    "scenario": "S3",
+    "step": 14,
+    "action": "Check what a 0.5 kg consignment within the region costs",
+    "entry": "method:ts-consign-price-service:consignprice.controller.ConsignPriceController#getPriceByWeightAndRegion(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "isWithinRegion"
+    ]
+  },
+  {
+    "scenario": "S4",
+    "step": 1,
+    "action": "Register a new passenger account (username, password, gender, ID document, e-mail)",
+    "entry": "method:ts-user-service:user.controller.UserController#registerUser(user.dto.UserDto,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "userId",
+      "gender",
+      "documentType",
+      "documentNum",
+      "email"
+    ]
+  },
+  {
+    "scenario": "S4",
+    "step": 3,
+    "action": "Add a contact (the passenger themselves) to the empty contact book",
+    "entry": "method:ts-contacts-service:contacts.controller.ContactsController#createNewContacts(contacts.entity.Contacts,?HttpHeaders)",
+    "absent": [
+      "name",
+      "documentType",
+      "documentNumber",
+      "phoneNumber"
+    ]
+  },
+  {
+    "scenario": "S4",
+    "step": 7,
+    "action": "Book a first-class seat on the trip for the new contact, with food on the train and assurance (insurance) of the first type, without consignment",
+    "entry": "method:ts-preserve-service:preserve.controller.PreserveController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "accountId",
+      "contactsId",
+      "assurance",
+      "stationName",
+      "storeName",
+      "foodName",
+      "foodPrice"
+    ]
+  },
+  {
+    "scenario": "S4",
+    "step": 8,
+    "action": "Refresh the list of orders",
+    "entry": "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "loginId"
+    ]
+  },
+  {
+    "scenario": "S4",
+    "step": 9,
+    "action": "Open the new order",
+    "entry": "method:ts-order-other-service:other.controller.OrderOtherController#queryOrdersForRefresh(other.entity.QueryInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "loginId"
+    ]
+  },
+  {
+    "scenario": "S4",
+    "step": 10,
+    "action": "Check the price of the order",
+    "entry": "method:ts-order-service:order.controller.OrderController#getOrderPrice(java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "orderId"
+    ]
+  },
+  {
+    "scenario": "S4",
+    "step": 12,
+    "action": "Ask how much would be refunded if the paid order were cancelled",
+    "entry": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "loginId"
+    ]
+  },
+  {
+    "scenario": "S4",
+    "step": 13,
+    "action": "Cancel the paid order (the refund goes back to the internal balance)",
+    "entry": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "loginId"
+    ]
+  },
+  {
+    "scenario": "S4",
+    "step": 14,
+    "action": "Refresh the list of orders filtered by the 'Cancel' status",
+    "entry": "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "loginId",
+      "state"
+    ]
+  },
+  {
+    "scenario": "S5",
+    "step": 5,
+    "action": "Ask for trips with a transfer at Suzhou (Shanghai \u2014 Suzhou \u2014 Nanjing) on 1 October 2026",
+    "entry": "method:ts-travel-plan-service:travelplan.controller.TravelPlanController#getTransferResult(travelplan.entity.TransferTravelInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "startStation",
+      "viaStation",
+      "endStation",
+      "trainType"
+    ]
+  },
+  {
+    "scenario": "S5",
+    "step": 8,
+    "action": "Book a first-class seat on the cheapest (regular) trip for this contact, without food, assurance or consignment",
+    "entry": "method:ts-preserve-other-service:preserveOther.controller.PreserveOtherController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "date",
+      "assurance",
+      "foodType",
+      "stationName",
+      "storeName",
+      "foodName",
+      "foodPrice"
+    ]
+  },
+  {
+    "scenario": "S5",
+    "step": 11,
+    "action": "Collect the ticket for the order",
+    "entry": "method:ts-execute-service:execute.controller.ExecuteControlller#collectTicket(java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "orderId"
+    ]
+  },
+  {
+    "scenario": "S5",
+    "step": 12,
+    "action": "Enter the station (board the train) with the order",
+    "entry": "method:ts-execute-service:execute.controller.ExecuteControlller#executeTicket(java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "orderId"
+    ]
+  },
+  {
+    "scenario": "S6",
+    "step": 3,
+    "action": "Add a new train type GaoTieSix with 100 second-class and 30 first-class seats and an average speed of 300",
+    "entry": "method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#addTrain(edu.fudan.common.entity.TrainType,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "economyClass",
+      "confortClass"
+    ]
+  },
+  {
+    "scenario": "S6",
+    "step": 4,
+    "action": "Add a new route Shanghai \u2014 Suzhou \u2014 Ning Bo with distances 0, 100 and 250",
+    "entry": "method:ts-admin-route-service:adminroute.controller.AdminRouteController#addRoute(edu.fudan.common.entity.RouteInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "startStation",
+      "endStation",
+      "stationList",
+      "distanceList",
+      "id"
+    ]
+  },
+  {
+    "scenario": "S6",
+    "step": 5,
+    "action": "Add a price configuration for train type GaoTieSix on the new route: basic rate 0.5, first-class rate 1.2",
+    "entry": "method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#addPrice(adminbasic.entity.PriceInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "routeId",
+      "basicPriceRate",
+      "firstClassPriceRate"
+    ]
+  },
+  {
+    "scenario": "S6",
+    "step": 6,
+    "action": "Add a new high-speed trip G9101 of type GaoTieSix on the new route from Shanghai via Suzhou to Ning Bo, departing 09:00 and arriving 12:00",
+    "entry": "method:ts-travel-service:travel.controller.TravelController#createTrip(edu.fudan.common.entity.TravelInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "loginId",
+      "trainTypeName",
+      "routeId",
+      "stationsName",
+      "startTime",
+      "endTime"
+    ]
+  },
+  {
+    "scenario": "S6",
+    "step": 11,
+    "action": "Book a first-class seat on the new trip for this contact, without food, assurance or consignment",
+    "entry": "method:ts-preserve-service:preserve.controller.PreserveController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "assurance",
+      "foodType",
+      "stationName",
+      "storeName",
+      "foodName",
+      "foodPrice"
+    ]
+  },
+  {
+    "scenario": "S7",
+    "step": 4,
+    "action": "Book a first-class seat on the first trip found for this contact, with a luggage consignment of 3 kg to a consignee, without food or assurance",
+    "entry": "method:ts-preserve-service:preserve.controller.PreserveController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "date",
+      "assurance",
+      "foodType",
+      "stationName",
+      "storeName",
+      "foodName",
+      "foodPrice",
+      "consigneeName",
+      "consigneePhone"
+    ]
+  },
+  {
+    "scenario": "S7",
+    "step": 7,
+    "action": "Collect the ticket for the order",
+    "entry": "method:ts-execute-service:execute.controller.ExecuteControlller#collectTicket(java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "orderId"
+    ]
+  },
+  {
+    "scenario": "S7",
+    "step": 8,
+    "action": "Ask how much would be refunded for the collected order",
+    "entry": "method:ts-execute-service:execute.controller.ExecuteControlller#collectTicket(java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "orderId"
+    ]
+  },
+  {
+    "scenario": "S7",
+    "step": 9,
+    "action": "Try to cancel the collected order (the system refuses)",
+    "entry": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "loginId"
+    ]
+  },
+  {
+    "scenario": "S7",
+    "step": 10,
+    "action": "Try to rebook the collected order onto the second high-speed trip found (the system refuses)",
+    "entry": "method:ts-rebook-service:rebook.controller.RebookController#payDifference(rebook.entity.RebookInfo,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "loginId",
+      "seatType"
+    ]
+  },
+  {
+    "scenario": "S7",
+    "step": 11,
+    "action": "Look up the luggage consignment of the order",
+    "entry": "method:ts-consign-service:consign.controller.ConsignController#findByOrderId(java.lang.String,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "id"
+    ]
+  },
+  {
+    "scenario": "S7",
+    "step": 12,
+    "action": "Change the consignee's name and phone number in the consignment",
+    "entry": "method:ts-consign-service:consign.controller.ConsignController#updateConsign(consign.entity.Consign,org.springframework.http.HttpHeaders)",
+    "absent": [
+      "id",
+      "orderId",
+      "targetDate",
+      "consignee",
+      "weight"
+    ]
+  }
+]

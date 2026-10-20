@@ -1,0 +1,60 @@
+{
+  "runtime_diff_independently_read": true,
+  "parent": 20,
+  "status": "measured negative experiment; not promoted or uploaded",
+  "research_reference": "research/2026-10-17-universal-analyzer/report.txt and design-cases.json C13",
+  "corrected_cases": [
+    "mutable DTO and nested aliases",
+    "unknown collection shape without fake size",
+    "Map/view/iterator mutation",
+    "source body absent",
+    "normal versus unknown-typed throw",
+    "catch and finally continuations",
+    "caller aliases across conservative environment copies",
+    "arguments evaluated before a nested mutation",
+    "business metadata fields and cycles",
+    "immutable serialized text",
+    "unreachable literal branch is not added from closure"
+  ],
+  "inherited_tests_adapted": {
+    "reason": "Direct Engine checks now request conservative joining for newly explicit normal/throw alternatives; original semantic assertions retained.",
+    "tests": [
+      "test_collection_state_boundaries.py::test_unknown_uri_variable_map_does_not_crash_or_bind_an_internal_marker",
+      "test_collection_state_boundaries.py::test_a_business_field_cannot_forge_uri_template_variables",
+      "test_http_map_values.py::test_an_imported_unresolved_namesake_is_not_a_native_java_map",
+      "test_http_type_boundaries.py::test_an_unresolved_foreign_namesake_does_not_create_an_http_request",
+      "test_java_date_text.py::test_invalid_numeric_date_prefix_throws_but_lenient_cases_stay_unknown",
+      "test_java_parse_integer.py::test_an_unresolved_dependency_named_integer_is_not_assumed_to_be_the_jdk",
+      "test_java_parse_integer.py::test_a_receiver_variable_named_integer_is_not_a_jdk_type",
+      "test_json_uuid_values.py::test_a_foreign_uuid_factory_is_not_replaced_by_the_jdk_model",
+      "test_operation_diagnostics.py::test_unknown_receiver_is_not_misreported_as_a_missing_collection_method",
+      "test_request_components.py::test_custom_uri_handler_never_claims_default_encoding",
+      "test_review10_inputs.py::test_formatter_patterns_are_honored_or_explicitly_unsupported",
+      "test_scalar_record_boundaries.py::test_an_enum_business_field_does_not_forge_its_runtime_class",
+      "test_json_codec_boundaries.py::test_unknown_external_callee_invalidates_escaped_mapper_configuration",
+      "test_json_codec_boundaries.py::test_literal_metadata_cannot_forge_a_native_mapper"
+    ]
+  },
+  "additional_test_changes": "Two existing state/collection checks now compare normal continuations separately and require possible uncaught failure; original normal results retained.",
+  "fixture_correction": {
+    "changed_after_inference": [
+      "code/tests/test_opaque_call_effects.py"
+    ],
+    "runtime_code_unchanged": true,
+    "reason": "Supply a non-null interface instance as an explicit entry parameter instead of an uninitialised field; no inference runtime or input dataset changed.",
+    "full_tests_log": "experiments/20261018-opaque-call-effects/full-after-fixture.txt"
+  },
+  "rejected_generalizations": [
+    "A logging method name proves purity",
+    "SLF4J facade proves all providers and toString callbacks are pure",
+    "A possible opaque throw justifies a whole-method closure",
+    "Lower unknown count alone proves improvement"
+  ],
+  "remaining_limits": [
+    "Unbounded external writes over-widen all modeled tables",
+    "Only final unsupported-call and absent-body boundaries are covered; other unsupported construction/library paths remain incomplete",
+    "Budget may leave exceptional continuations unexplored; explicit diagnostic, no complete claim",
+    "Reflection, JVM/global lifecycle, concurrent callbacks and general streams remain incomplete",
+    "Independent real projects here have bounded route/body probes, not full HTTP/security or opaque-effect graph oracles"
+  ]
+}

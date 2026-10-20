@@ -1,0 +1,6 @@
+cases.append({'name':'null_unboxing_before_later_argument','family':'null_unboxing_failure','entry':'Api.entry','sources':{
+ 'Api.java':'''class Api{String entry(){try{Integer value=null;consume(value,side());return after();}
+  catch(NullPointerException failure){return failed();}}void consume(int value,int later){}
+  int side(){return 1;}String after(){return "wrong";}String failed(){return "caught";}}'''},
+ 'methods':['Api.failed'],'calls':[('Api.entry','Api.failed')]})
+

@@ -1,0 +1,242 @@
+{
+  "catalog64": {
+    "expected_result": "small",
+    "actual": {
+      "status": "complete_in_supported_model",
+      "unresolved": [],
+      "confirmed_methods": [
+        "method:catalog64:CatalogController#inspect()",
+        "method:catalog64:CatalogController#small()"
+      ],
+      "steps": [
+        {
+          "selected": "method:catalog64:CatalogController#inspect()",
+          "parameters": {},
+          "result": "small",
+          "unresolved": []
+        }
+      ]
+    }
+  },
+  "catalog65": {
+    "expected_result": "large",
+    "actual": {
+      "status": "complete_in_supported_model",
+      "unresolved": [],
+      "confirmed_methods": [
+        "method:catalog65:CatalogController#inspect()",
+        "method:catalog65:CatalogController#small()"
+      ],
+      "steps": [
+        {
+          "selected": "method:catalog65:CatalogController#inspect()",
+          "parameters": {},
+          "result": "small",
+          "unresolved": []
+        }
+      ]
+    }
+  },
+  "memotext": {
+    "expected_first_result": {
+      "__type__": "Memo",
+      "key": "m4",
+      "text": "Hello"
+    },
+    "expected_second_parameters": {
+      "memoId": "m4"
+    },
+    "expected_second_result": "found",
+    "actual": {
+      "status": "complete_in_supported_model",
+      "unresolved": [],
+      "confirmed_methods": [
+        "method:memotext:MemoController#create(Memo)",
+        "method:memotext:MemoController#found()",
+        "method:memotext:MemoController#inspect(String)"
+      ],
+      "steps": [
+        {
+          "selected": "method:memotext:MemoController#create(Memo)",
+          "parameters": {
+            "key": "m4",
+            "text": "Hello"
+          },
+          "result": {
+            "__type__": "Memo",
+            "key": "m4",
+            "text": "Hello"
+          },
+          "unresolved": []
+        },
+        {
+          "selected": "method:memotext:MemoController#inspect(String)",
+          "parameters": {
+            "memoId": "m4"
+          },
+          "result": "found",
+          "unresolved": []
+        }
+      ]
+    }
+  },
+  "memobody": {
+    "expected_first_result": {
+      "__type__": "Memo",
+      "key": "m4",
+      "body": "Hello"
+    },
+    "expected_second_parameters": {
+      "memoId": "m4"
+    },
+    "expected_second_result": "found",
+    "actual": {
+      "status": "partial",
+      "unresolved": [
+        "Unknown input: memoId"
+      ],
+      "confirmed_methods": [
+        "method:memobody:MemoController#create(Memo)"
+      ],
+      "steps": [
+        {
+          "selected": "method:memobody:MemoController#create(Memo)",
+          "parameters": {
+            "key": "m4",
+            "body": "Hello"
+          },
+          "result": "Hello",
+          "unresolved": []
+        },
+        {
+          "selected": "method:memobody:MemoController#inspect(String)",
+          "parameters": {},
+          "result": "found",
+          "unresolved": [
+            "Unknown input: memoId"
+          ]
+        }
+      ]
+    }
+  },
+  "petclinic": {
+    "route_probes": [
+      {
+        "verb": "GET",
+        "path": "/api/pets/12",
+        "expected_method_name": "getPet",
+        "actual": [
+          "method:clinic:PetRestController#deletePet(int)",
+          "method:clinic:PetRestController#getPet(int)",
+          "method:clinic:PetRestController#updatePet(int,Pet,BindingResult)"
+        ],
+        "passed": false
+      },
+      {
+        "verb": "PUT",
+        "path": "/api/pets/12",
+        "expected_method_name": "updatePet",
+        "actual": [
+          "method:clinic:PetRestController#deletePet(int)",
+          "method:clinic:PetRestController#getPet(int)",
+          "method:clinic:PetRestController#updatePet(int,Pet,BindingResult)"
+        ],
+        "passed": false
+      },
+      {
+        "verb": "DELETE",
+        "path": "/api/pets/12",
+        "expected_method_name": "deletePet",
+        "actual": [
+          "method:clinic:PetRestController#deletePet(int)",
+          "method:clinic:PetRestController#getPet(int)",
+          "method:clinic:PetRestController#updatePet(int,Pet,BindingResult)"
+        ],
+        "passed": false
+      }
+    ],
+    "language_probes": [
+      {
+        "action": "Get pet petId 12",
+        "expected_method_name": "getPet",
+        "actual": "method:clinic:PetRestController#getPet(int)",
+        "entry_correct": true,
+        "parameters": {
+          "petId": 12
+        },
+        "unresolved": []
+      },
+      {
+        "action": "Show the pet whose identifier is 12",
+        "expected_method_name": "getPet",
+        "actual": "method:clinic:PetRestController#getPet(int)",
+        "entry_correct": true,
+        "parameters": {},
+        "unresolved": [
+          "Unknown input: petId"
+        ]
+      },
+      {
+        "action": "View pet number 12",
+        "expected_method_name": "getPet",
+        "actual": "method:clinic:PetRestController#getPet(int)",
+        "entry_correct": true,
+        "parameters": {},
+        "unresolved": [
+          "Unknown input: petId"
+        ]
+      },
+      {
+        "action": "Remove pet petId 12",
+        "expected_method_name": "deletePet",
+        "actual": "method:clinic:PetRestController#deletePet(int)",
+        "entry_correct": true,
+        "parameters": {
+          "petId": 12
+        },
+        "unresolved": []
+      },
+      {
+        "action": "Delete pet petId 12",
+        "expected_method_name": "deletePet",
+        "actual": "method:clinic:PetRestController#deletePet(int)",
+        "entry_correct": true,
+        "parameters": {
+          "petId": 12
+        },
+        "unresolved": []
+      },
+      {
+        "action": "Add a new pet named Luna",
+        "expected_method_name": "addPet",
+        "actual": "method:clinic:PetRestController#addPet(Pet,BindingResult,UriComponentsBuilder)",
+        "entry_correct": true,
+        "parameters": {},
+        "unresolved": [
+          "Unknown input: birthDate",
+          "Unknown input: type",
+          "Unknown input: owner",
+          "Unknown input: visits",
+          "Unknown input: bindingResult",
+          "Unknown input: ucBuilder"
+        ]
+      },
+      {
+        "action": "List all pets",
+        "expected_method_name": "getPets",
+        "actual": "method:clinic:PetTypeRestController#getAllPetTypes()",
+        "entry_correct": false,
+        "parameters": {},
+        "unresolved": []
+      },
+      {
+        "action": "Show all pets",
+        "expected_method_name": "getPets",
+        "actual": "method:clinic:PetTypeRestController#getAllPetTypes()",
+        "entry_correct": false,
+        "parameters": {},
+        "unresolved": []
+      }
+    ]
+  }
+}

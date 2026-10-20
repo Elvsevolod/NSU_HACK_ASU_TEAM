@@ -1,0 +1,604 @@
+{
+  "passed": true,
+  "exact_graphs": 4,
+  "cases": [
+    {
+      "case": "repeated-query",
+      "passed": true,
+      "relations": {
+        "executes": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "iou": 1.0,
+          "exact": true
+        },
+        "calls": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "iou": 1.0,
+          "exact": true
+        },
+        "remote": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "iou": 1.0,
+          "exact": true
+        },
+        "data": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "iou": 1.0,
+          "exact": true
+        }
+      },
+      "reference_sha256": "a8dda74d89460026afb9742cc8f6f5c72f281c3b13225fb1807dd88e5c76a646",
+      "sources_sha256": {
+        "Caller.java": "77f8c3222304aa102386e9786e276b10ac3d1c59fffa505619f195e88feb01d5",
+        "Api.java": "77c2807fd8fced74d2c008950e88cd5bf739ea194c09c94617f38e0f88b34ea6",
+        "Gate.java": "bc64ac17fb1b4af3d7f513037fd1d995d291d3738a757439caaa058773d87b6d"
+      },
+      "reference": {
+        "edges": [
+          [
+            "",
+            "executes",
+            "method:service:Api#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Api#reserve(String,int,List<String>)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Caller#start()"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Gate#after()"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Gate#before()"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+          ],
+          [
+            "method:service:Api#read(String)",
+            "data",
+            "res:table:service.holds"
+          ],
+          [
+            "method:service:Api#reserve(String,int,List<String>)",
+            "data",
+            "res:table:service.holds"
+          ],
+          [
+            "method:service:Caller#start()",
+            "remote",
+            "method:service:Api#read(String)"
+          ],
+          [
+            "method:service:Caller#start()",
+            "remote",
+            "method:service:Api#reserve(String,int,List<String>)"
+          ],
+          [
+            "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+            "calls",
+            "method:service:Gate#after()"
+          ],
+          [
+            "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+            "calls",
+            "method:service:Gate#before()"
+          ]
+        ],
+        "result": "found:2",
+        "rows": 1
+      },
+      "predicted_edges": [
+        [
+          "",
+          "executes",
+          "method:service:Api#read(String)"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Api#reserve(String,int,List<String>)"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Caller#start()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Gate#after()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Gate#before()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "method:service:Api#read(String)",
+          "data",
+          "res:table:service.holds"
+        ],
+        [
+          "method:service:Api#reserve(String,int,List<String>)",
+          "data",
+          "res:table:service.holds"
+        ],
+        [
+          "method:service:Caller#start()",
+          "remote",
+          "method:service:Api#read(String)"
+        ],
+        [
+          "method:service:Caller#start()",
+          "remote",
+          "method:service:Api#reserve(String,int,List<String>)"
+        ],
+        [
+          "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+          "calls",
+          "method:service:Gate#after()"
+        ],
+        [
+          "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+          "calls",
+          "method:service:Gate#before()"
+        ]
+      ],
+      "results": [
+        "found:2"
+      ],
+      "row_counts": [
+        1
+      ],
+      "warnings": [
+        "request filter registration is assumed from source classes; full bean registration is not modeled"
+      ]
+    },
+    {
+      "case": "missing",
+      "passed": true,
+      "relations": {
+        "executes": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "iou": 1.0,
+          "exact": true
+        },
+        "calls": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "iou": 1.0,
+          "exact": true
+        },
+        "remote": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "iou": null,
+          "exact": true
+        },
+        "data": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "iou": null,
+          "exact": true
+        }
+      },
+      "reference_sha256": "9d9c4ba02b3384fa7e02a762f1503e8d14bac8750f27a01c1dffd6f187a28f3d",
+      "sources_sha256": {
+        "Caller.java": "88cae8a77c4e974e9279c738777724cee3f36f115c7de35618ebcd71fe34b005",
+        "Api.java": "77c2807fd8fced74d2c008950e88cd5bf739ea194c09c94617f38e0f88b34ea6",
+        "Gate.java": "bc64ac17fb1b4af3d7f513037fd1d995d291d3738a757439caaa058773d87b6d"
+      },
+      "reference": {
+        "edges": [
+          [
+            "",
+            "executes",
+            "method:service:Caller#rejected()"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Caller#start()"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Gate#after()"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Gate#before()"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+          ],
+          [
+            "method:service:Caller#start()",
+            "calls",
+            "method:service:Caller#rejected()"
+          ],
+          [
+            "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+            "calls",
+            "method:service:Gate#after()"
+          ],
+          [
+            "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+            "calls",
+            "method:service:Gate#before()"
+          ]
+        ],
+        "result": "rejected",
+        "rows": 0
+      },
+      "predicted_edges": [
+        [
+          "",
+          "executes",
+          "method:service:Caller#rejected()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Caller#start()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Gate#after()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Gate#before()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "method:service:Caller#start()",
+          "calls",
+          "method:service:Caller#rejected()"
+        ],
+        [
+          "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+          "calls",
+          "method:service:Gate#after()"
+        ],
+        [
+          "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+          "calls",
+          "method:service:Gate#before()"
+        ]
+      ],
+      "results": [
+        "rejected"
+      ],
+      "row_counts": [
+        0
+      ],
+      "warnings": [
+        "HTTP binding rejected request: missing required RequestParam: quantity",
+        "request filter registration is assumed from source classes; full bean registration is not modeled"
+      ]
+    },
+    {
+      "case": "overflow",
+      "passed": true,
+      "relations": {
+        "executes": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "iou": 1.0,
+          "exact": true
+        },
+        "calls": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "iou": 1.0,
+          "exact": true
+        },
+        "remote": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "iou": null,
+          "exact": true
+        },
+        "data": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "iou": null,
+          "exact": true
+        }
+      },
+      "reference_sha256": "9d9c4ba02b3384fa7e02a762f1503e8d14bac8750f27a01c1dffd6f187a28f3d",
+      "sources_sha256": {
+        "Caller.java": "8b7be7553edb9e57415a44e6ccdaea3f852bf9ca4550e87100a271a1414cb46d",
+        "Api.java": "77c2807fd8fced74d2c008950e88cd5bf739ea194c09c94617f38e0f88b34ea6",
+        "Gate.java": "bc64ac17fb1b4af3d7f513037fd1d995d291d3738a757439caaa058773d87b6d"
+      },
+      "reference": {
+        "edges": [
+          [
+            "",
+            "executes",
+            "method:service:Caller#rejected()"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Caller#start()"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Gate#after()"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Gate#before()"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+          ],
+          [
+            "method:service:Caller#start()",
+            "calls",
+            "method:service:Caller#rejected()"
+          ],
+          [
+            "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+            "calls",
+            "method:service:Gate#after()"
+          ],
+          [
+            "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+            "calls",
+            "method:service:Gate#before()"
+          ]
+        ],
+        "result": "rejected",
+        "rows": 0
+      },
+      "predicted_edges": [
+        [
+          "",
+          "executes",
+          "method:service:Caller#rejected()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Caller#start()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Gate#after()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Gate#before()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "method:service:Caller#start()",
+          "calls",
+          "method:service:Caller#rejected()"
+        ],
+        [
+          "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+          "calls",
+          "method:service:Gate#after()"
+        ],
+        [
+          "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+          "calls",
+          "method:service:Gate#before()"
+        ]
+      ],
+      "results": [
+        "rejected"
+      ],
+      "row_counts": [
+        0
+      ],
+      "warnings": [
+        "HTTP binding rejected request: integer out of range: quantity",
+        "request filter registration is assumed from source classes; full bean registration is not modeled"
+      ]
+    },
+    {
+      "case": "malformed",
+      "passed": true,
+      "relations": {
+        "executes": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "iou": 1.0,
+          "exact": true
+        },
+        "calls": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "iou": 1.0,
+          "exact": true
+        },
+        "remote": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "iou": null,
+          "exact": true
+        },
+        "data": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "iou": null,
+          "exact": true
+        }
+      },
+      "reference_sha256": "9d9c4ba02b3384fa7e02a762f1503e8d14bac8750f27a01c1dffd6f187a28f3d",
+      "sources_sha256": {
+        "Caller.java": "8752defe2a9f94cc738a6bb8fae7acbd3e6358f1a7ae3d6329c06e78634489da",
+        "Api.java": "77c2807fd8fced74d2c008950e88cd5bf739ea194c09c94617f38e0f88b34ea6",
+        "Gate.java": "bc64ac17fb1b4af3d7f513037fd1d995d291d3738a757439caaa058773d87b6d"
+      },
+      "reference": {
+        "edges": [
+          [
+            "",
+            "executes",
+            "method:service:Caller#rejected()"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Caller#start()"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Gate#after()"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Gate#before()"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+          ],
+          [
+            "method:service:Caller#start()",
+            "calls",
+            "method:service:Caller#rejected()"
+          ],
+          [
+            "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+            "calls",
+            "method:service:Gate#after()"
+          ],
+          [
+            "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+            "calls",
+            "method:service:Gate#before()"
+          ]
+        ],
+        "result": "rejected",
+        "rows": 0
+      },
+      "predicted_edges": [
+        [
+          "",
+          "executes",
+          "method:service:Caller#rejected()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Caller#start()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Gate#after()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Gate#before()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "method:service:Caller#start()",
+          "calls",
+          "method:service:Caller#rejected()"
+        ],
+        [
+          "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+          "calls",
+          "method:service:Gate#after()"
+        ],
+        [
+          "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+          "calls",
+          "method:service:Gate#before()"
+        ]
+      ],
+      "results": [
+        "rejected"
+      ],
+      "row_counts": [
+        0
+      ],
+      "warnings": [
+        "HTTP binding rejected request: invalid integer: quantity",
+        "request filter registration is assumed from source classes; full bean registration is not modeled"
+      ]
+    }
+  ],
+  "reference_fixed_before_prediction": true,
+  "application_started": false,
+  "limits": [
+    "Synthetic two-service warehouse; not a representative corpus",
+    "Filter registration is assumed by the inherited core",
+    "Security, custom codecs and general ORM lifecycle are outside this panel"
+  ]
+}

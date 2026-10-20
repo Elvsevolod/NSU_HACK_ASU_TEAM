@@ -1,0 +1,120 @@
+{
+  "cases": 45,
+  "families": 40,
+  "exact_before": 38,
+  "exact_after": 43,
+  "changes": [
+    {
+      "name": "inherited_map_http",
+      "change": {
+        "executes": [
+          0.75,
+          1.0
+        ],
+        "calls": [
+          0.5,
+          1.0
+        ]
+      }
+    },
+    {
+      "name": "nested_inherited_value_drives_table",
+      "change": {
+        "executes": [
+          0.75,
+          1.0
+        ],
+        "calls": [
+          0.5,
+          1.0
+        ],
+        "data": [
+          0.5,
+          1.0
+        ]
+      }
+    },
+    {
+      "name": "raw_upper_bound",
+      "change": {
+        "executes": [
+          0.6666666666666666,
+          1.0
+        ],
+        "calls": [
+          0.5,
+          1.0
+        ]
+      }
+    },
+    {
+      "name": "raw_parameter_named_string",
+      "change": {
+        "executes": [
+          0.6666666666666666,
+          1.0
+        ],
+        "calls": [
+          0.5,
+          1.0
+        ]
+      }
+    },
+    {
+      "name": "raw_dependent_bound",
+      "change": {
+        "executes": [
+          0.6666666666666666,
+          1.0
+        ],
+        "calls": [
+          0.5,
+          1.0
+        ]
+      }
+    }
+  ],
+  "limits": [
+    {
+      "name": "generic_shadowing_conservative",
+      "missing": [],
+      "extra": [
+        [
+          "",
+          "executes",
+          "method:service:Api#wrong()"
+        ],
+        [
+          "method:service:Api#entry()",
+          "calls",
+          "method:service:Api#wrong()"
+        ]
+      ],
+      "warnings": [
+        "Java Map operation remains unresolved: get at call:method:service:Api#entry()@3:24",
+        "Java Map operation remains unresolved: put at call:method:service:Api#entry()@2:85"
+      ]
+    },
+    {
+      "name": "view_stream_limit",
+      "missing": [
+        [
+          "",
+          "executes",
+          "method:service:Api#accepted()"
+        ],
+        [
+          "method:service:Api#entry()",
+          "calls",
+          "method:service:Api#accepted()"
+        ]
+      ],
+      "extra": [],
+      "warnings": [
+        "Java Map operation remains unresolved: stream at call:method:service:Api#entry()@1:160",
+        "unsupported call: call:method:service:Api#entry()@1:169 map",
+        "unsupported call: call:method:service:Api#entry()@1:192 collect"
+      ]
+    }
+  ]
+}

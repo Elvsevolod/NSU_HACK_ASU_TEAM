@@ -1,0 +1,88 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+__________________ test_joined_map_aliases_share_later_writes __________________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-567/test_joined_map_aliases_share_0')
+
+    def test_joined_map_aliases_share_later_writes(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{Object entry(boolean flag){
+          Map map=new HashMap();Map alias=map;if(flag){map.put("key","same");}else{map.put("key","same");}
+          alias.put("later","visible");return map.get("later");}}'''})
+>       assert Engine(project,ScenarioState(db),conservative=True).run(ids['Api.entry'],{'flag':U})=='visible'
+E       AssertionError: assert None == 'visible'
+E        +  where None = run('method:service:Api#entry(boolean)', {'flag': <Unknown.VALUE: 'unknown'>})
+E        +    where run = <analyzer.engine.Engine object at 0x10403e790>.run
+E        +      where <analyzer.engine.Engine object at 0x10403e790> = Engine(<analyzer.project.Project object at 0x1032df790>, <analyzer.state.ScenarioState object at 0x103db5210>, conservative=True)
+E        +        where <analyzer.state.ScenarioState object at 0x103db5210> = ScenarioState(<analyzer.state.Database object at 0x103db5590>)
+
+solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py:10: AssertionError
+_______________ test_joined_map_writes_are_visible_to_the_caller _______________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-567/test_joined_map_writes_are_vis0')
+
+    def test_joined_map_writes_are_visible_to_the_caller(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{Object entry(boolean flag){
+          Map map=new HashMap();update(map,flag);return map.get("key");}
+          void update(Map input,boolean flag){if(flag){input.put("key","same");}else{input.put("key","same");}}}'''})
+>       assert Engine(project,ScenarioState(db),conservative=True).run(ids['Api.entry'],{'flag':U})=='same'
+E       AssertionError: assert None == 'same'
+E        +  where None = run('method:service:Api#entry(boolean)', {'flag': <Unknown.VALUE: 'unknown'>})
+E        +    where run = <analyzer.engine.Engine object at 0x103db55d0>.run
+E        +      where <analyzer.engine.Engine object at 0x103db55d0> = Engine(<analyzer.project.Project object at 0x103eaae90>, <analyzer.state.ScenarioState object at 0x103df1790>, conservative=True)
+E        +        where <analyzer.state.ScenarioState object at 0x103df1790> = ScenarioState(<analyzer.state.Database object at 0x103da6c10>)
+
+solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py:17: AssertionError
+______ test_original_map_mutation_survives_reassigning_a_local_parameter _______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-567/test_original_map_mutation_sur0')
+
+    def test_original_map_mutation_survives_reassigning_a_local_parameter(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{Object entry(boolean flag){
+          Map map=new HashMap();update(map,flag);return map.get("key");}
+          void update(Map input,boolean flag){if(flag){input.put("key","same");input=new HashMap();}
+          else{input.put("key","same");input=new HashMap();}}}'''})
+>       assert Engine(project,ScenarioState(db),conservative=True).run(ids['Api.entry'],{'flag':U})=='same'
+E       AssertionError: assert None == 'same'
+E        +  where None = run('method:service:Api#entry(boolean)', {'flag': <Unknown.VALUE: 'unknown'>})
+E        +    where run = <analyzer.engine.Engine object at 0x103d8c3d0>.run
+E        +      where <analyzer.engine.Engine object at 0x103d8c3d0> = Engine(<analyzer.project.Project object at 0x103ebc810>, <analyzer.state.ScenarioState object at 0x103e68310>, conservative=True)
+E        +        where <analyzer.state.ScenarioState object at 0x103e68310> = ScenarioState(<analyzer.state.Database object at 0x103ebddd0>)
+
+solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py:25: AssertionError
+____________ test_caller_observes_agreed_source_object_field_writes ____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-567/test_caller_observes_agreed_so0')
+
+    def test_caller_observes_agreed_source_object_field_writes(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''class Item{String value="old";}
+          class Api{Object entry(boolean flag){Item item=new Item();update(item,flag);return item.value;}
+          void update(Item item,boolean flag){if(flag){item.value="same";}else{item.value="same";}}}'''})
+>       assert Engine(project,ScenarioState(db),conservative=True).run(ids['Api.entry'],{'flag':U})=='same'
+E       AssertionError: assert 'old' == 'same'
+E         
+E         - same
+E         + old
+
+solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py:32: AssertionError
+__________ test_conditional_alias_is_widened_before_a_later_mutation ___________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-567/test_conditional_alias_is_wide0')
+
+    def test_conditional_alias_is_widened_before_a_later_mutation(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{Object entry(boolean flag){
+          Map original=new HashMap();original.put("key","same");Map chosen=original;
+          if(flag){chosen=new HashMap();chosen.put("key","same");}chosen.clear();return original.isEmpty();}}'''})
+        engine=Engine(project,ScenarioState(db),conservative=True)
+>       assert engine.run(ids['Api.entry'],{'flag':U}) is U
+E       AssertionError: assert False is <Unknown.VALUE: 'unknown'>
+E        +  where False = run('method:service:Api#entry(boolean)', {'flag': <Unknown.VALUE: 'unknown'>})
+E        +    where run = <analyzer.engine.Engine object at 0x103d6a050>.run
+
+solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py:40: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py::test_joined_map_aliases_share_later_writes
+FAILED solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py::test_joined_map_writes_are_visible_to_the_caller
+FAILED solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py::test_original_map_mutation_survives_reassigning_a_local_parameter
+FAILED solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py::test_caller_observes_agreed_source_object_field_writes
+FAILED solutions/—_backed-collection-views/code/tests/test_heap_alias_join.py::test_conditional_alias_is_widened_before_a_later_mutation
+5 failed in 0.06s

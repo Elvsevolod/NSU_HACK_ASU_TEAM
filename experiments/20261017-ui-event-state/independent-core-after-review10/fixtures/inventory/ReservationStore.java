@@ -1,0 +1,1 @@
+import org.springframework.data.jpa.repository.JpaRepository; interface ReservationStore extends JpaRepository<Reservation, String> { Reservation save(Reservation item); }

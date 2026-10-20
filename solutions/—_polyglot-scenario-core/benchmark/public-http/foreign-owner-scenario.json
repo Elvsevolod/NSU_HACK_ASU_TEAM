@@ -1,0 +1,34 @@
+{
+  "project": "public-python",
+  "id": "foreign-owner",
+  "steps": [
+    {
+      "action": "Explicit public source HTTP contract",
+      "request": {
+        "method": "POST",
+        "path": "/api/v1/login/access-token",
+        "form": {
+          "username": "reader@example.com",
+          "password": "fixture-password-39"
+        }
+      }
+    },
+    {
+      "action": "Explicit public source HTTP contract",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/items/30000000-0000-4000-8000-000000000001",
+        "headers": {
+          "Authorization": {
+            "$concat": [
+              "Bearer ",
+              {
+                "$ref": "steps.1.body.access_token"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

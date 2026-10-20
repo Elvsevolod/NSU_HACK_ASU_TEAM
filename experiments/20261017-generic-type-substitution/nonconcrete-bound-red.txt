@@ -1,0 +1,48 @@
+.................................FFF..                                   [100%]
+=================================== FAILURES ===================================
+_ test_an_abstract_raw_bound_never_invents_a_default_concrete_instance[abstract class Item{public String code;}] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-618/test_an_abstract_raw_bound_nev0')
+declaration = 'abstract class Item{public String code;}'
+
+    @pytest.mark.parametrize('declaration',[
+        'abstract class Item{public String code;}',
+        'interface Item{}',
+    ])
+    def test_an_abstract_raw_bound_never_invents_a_default_concrete_instance(tmp_path,declaration):
+        decode,warnings,_=decoder(tmp_path,{'Schema.java':declaration+'class Base<T extends Item>{public T payload;}class Child extends Base{}'})
+>       assert decode({'payload':{}},'Child')['payload'] is U
+E       AssertionError: assert {'__type__': 'Item', '__http_entity__': False} is <Unknown.VALUE: 'unknown'>
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:267: AssertionError
+_ test_an_abstract_raw_bound_never_invents_a_default_concrete_instance[interface Item{}] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-618/test_an_abstract_raw_bound_nev1')
+declaration = 'interface Item{}'
+
+    @pytest.mark.parametrize('declaration',[
+        'abstract class Item{public String code;}',
+        'interface Item{}',
+    ])
+    def test_an_abstract_raw_bound_never_invents_a_default_concrete_instance(tmp_path,declaration):
+        decode,warnings,_=decoder(tmp_path,{'Schema.java':declaration+'class Base<T extends Item>{public T payload;}class Child extends Base{}'})
+>       assert decode({'payload':{}},'Child')['payload'] is U
+E       AssertionError: assert {'__type__': 'Item', '__http_entity__': False} is <Unknown.VALUE: 'unknown'>
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:267: AssertionError
+______ test_a_nonstatic_member_class_needs_its_enclosing_instance_context ______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-618/test_a_nonstatic_member_class_0')
+
+    def test_a_nonstatic_member_class_needs_its_enclosing_instance_context(tmp_path):
+        decode,warnings,_=decoder(tmp_path,{'Schema.java':'class Outer<String>{class Inner{public String payload;}}'})
+>       assert decode({'payload':'wrong-known'},'Outer.Inner') is U
+E       AssertionError: assert {'payload': 'wrong-known', '__type__': 'Outer.Inner', '__http_entity__': False} is <Unknown.VALUE: 'unknown'>
+E        +  where {'payload': 'wrong-known', '__type__': 'Outer.Inner', '__http_entity__': False} = <function decoder.<locals>.decode at 0x100ff4b80>({'payload': 'wrong-known'}, 'Outer.Inner')
+
+solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py:273: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_an_abstract_raw_bound_never_invents_a_default_concrete_instance[abstract class Item{public String code;}]
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_an_abstract_raw_bound_never_invents_a_default_concrete_instance[interface Item{}]
+FAILED solutions/—_generic-type-substitution/code/tests/test_inherited_json_generics.py::test_a_nonstatic_member_class_needs_its_enclosing_instance_context
+3 failed, 35 passed in 0.12s

@@ -1,0 +1,1027 @@
+--- a/code/polygraph/cli.py
++++ b/code/polygraph/cli.py
+@@ -10,9 +10,10 @@
+ 
+ from .analysis import analyze, validate
+ from .grounding import Grounder
+-from .project import Project, read_json
++from .project import Project, RUNTIME_PACKAGES, read_json
+ from .state import load_context
+ from .ui_extract.native import statistics as js_statistics
++from .security_models import CALLS as native_security_calls
+ 
+ 
+ def main():
+@@ -35,7 +36,13 @@
+         parser.error("Budgets must be positive")
+     start = time.perf_counter()
+     js_before = js_statistics()
+-    project = Project(args.source, args.skeleton, args.cache, args.profile)
++    security_before=dict(native_security_calls)
++    context_path=args.context
++    if context_path and context_path.is_dir():
++        candidates=[path for path in context_path.iterdir() if path.suffix in {'.json','.sql','.gz'}]
++        context_path=candidates[0] if len(candidates)==1 else None
++    source_globals=read_json(context_path).get('globals',{}) if context_path and context_path.suffix=='.json' else {}
++    project = Project(args.source, args.skeleton, args.cache, args.profile,source_globals)
+     initial, context, warnings = load_context(args.context, project, args.sql_dialect)
+     context = {**context, "sql_dialect": args.sql_dialect}
+     grounder = Grounder(project)
+@@ -51,7 +58,7 @@
+     report = {"version": 13, "fingerprint": project.fingerprint, "projection_policy": args.policy,
+               "preparation_seconds": prepared, "model_calls": 0, "application_executed": False,
+               "context_warnings": warnings, "scenarios": {}, "environment": {"python": platform.python_version(),
+-              "platform": "-".join((platform.system(), platform.release(), platform.machine())), "packages": {name: importlib.metadata.version(name) for name in ["tree-sitter", "tree-sitter-java", "tree-sitter-javascript", "sqlglot", "libcst", "z3-solver", "rank-bm25", "numpy", "html5lib", "quickjs-ng"]}},
++              "platform": "-".join((platform.system(), platform.release(), platform.machine())), "packages": {name: importlib.metadata.version(name) for name in RUNTIME_PACKAGES}},
+               "sql_dialect": args.sql_dialect, "smt_enabled": not args.no_smt, "smt_timeout_ms": args.smt_timeout_ms,
+               "budgets": {k: getattr(args, k) for k in ["path_limit", "loop_limit", "depth_limit", "step_limit"]},
+               "inputs": {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in input_paths}}
+@@ -70,6 +77,7 @@
+                    "IR_cache_hits": project.cache_hits, "project_diagnostics": project.diagnostics,
+                    "source_framework_versions": project.framework_versions,
+                    "frontend":grounder.ui.summary(), "native_javascript":js_after,
++                   "native_security":{k:native_security_calls[k]-security_before[k] for k in native_security_calls},
+                    "peak_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * (1 if sys.platform == "darwin" else 1024)})
+     args.output.parent.mkdir(parents=True, exist_ok=True)
+     args.output.write_text(json.dumps(submission, ensure_ascii=False, indent=2) + "\n")
+--- a/code/polygraph/definition_models.py
++++ b/code/polygraph/definition_models.py
+@@ -0,0 +1,40 @@
++"""Allowlisted declaration-time library factories, without app initialization."""
++
++def source_defined(project,name):
++    while name:
++        if name in project.methods or name in project.types or name in project.globals:return True
++        name=name.rpartition('.')[0]
++    return False
++
++
++def qualified(project,expr):
++    if len(expr.bindings)==1 and not expr.bindings[0].startswith('local:'):
++        return expr.bindings[0]
++    receiver,_,_=expr.args
++    if receiver is None:
++        return project.resolve_import(expr.value,expr.span.file) or expr.value
++    if receiver.op=='var':
++        return (project.resolve_import(receiver.value,expr.span.file) or receiver.value)+'.'+expr.value
++    return ''
++
++
++def supported(engine,expr,seen=frozenset()):
++    from .security_models import PURE_FACTORIES
++    if expr.op in {'const','type'}:return True
++    if expr.op=='var':
++        imported=engine.p.resolve_import(expr.value,expr.span.file)
++        key=imported or engine.p.lexical_modules.get(expr.span.file,'')+'.'+expr.value
++        if key in engine.context.get('globals',{}):return True
++        if key in PURE_FACTORIES and not source_defined(engine.p,key):return True
++        return key not in seen and key in engine.p.globals and supported(engine,engine.p.globals[key],seen|{key})
++    if expr.op=='call':
++        key=qualified(engine.p,expr)
++        if key not in PURE_FACTORIES or source_defined(engine.p,key):return False
++        _,args,named=expr.args
++        return all(supported(engine,value,seen) for value in args) and all(key is not None and supported(engine,value,seen) for key,value in named)
++    if expr.op=='field':return supported(engine,expr.args[0],seen)
++    if expr.op in {'bin','unary','format','list','dict'}:
++        def safe(value):
++            return supported(engine,value,seen) if hasattr(value,'op') else all(safe(v) for v in value) if isinstance(value,(tuple,list)) else True
++        return safe(expr.args)
++    return False
+--- a/code/polygraph/fastapi_dependencies.py
++++ b/code/polygraph/fastapi_dependencies.py
+@@ -0,0 +1,61 @@
++"""Execute only allowlisted FastAPI dependency primitives on supplied data."""
++import asyncio
++from functools import lru_cache
++
++from fastapi import HTTPException
++from fastapi.dependencies.utils import get_dependant, request_body_to_args
++from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, OAuth2PasswordRequestFormStrict
++from starlette.datastructures import FormData
++from starlette.requests import Request
++
++from .models import NOT_HANDLED
++from .values import Object, Raised, Unknown, unknown
++from .native_contracts import check
++
++
++FORMS={'fastapi.security.OAuth2PasswordRequestForm':OAuth2PasswordRequestForm,
++       'fastapi.security.OAuth2PasswordRequestFormStrict':OAuth2PasswordRequestFormStrict}
++BEARERS={'fastapi.security.OAuth2PasswordBearer':OAuth2PasswordBearer}
++
++
++def public_name(name):
++    return name.replace('fastapi.security.oauth2.','fastapi.security.')
++
++
++@lru_cache(maxsize=8)
++def form_fields(name):return get_dependant(path='/',call=FORMS[name]).body_params
++
++
++def construct(engine,name,args,kwargs,span):
++    name=public_name(name)
++    if name not in BEARERS:return NOT_HANDLED
++    return engine.state.new(name,{'args':args,'kwargs':kwargs})
++
++
++def dependency(engine,key,span):
++    key=public_name(key)
++    if key in FORMS:
++        check(engine,'fastapi',span)
++        form=engine.request_input.get('form',{})
++        if any(unknown(value) for value in form.values()):
++            engine.unsupported('Native OAuth2 form validation needs concrete field values',span)
++        values,errors=asyncio.run(request_body_to_args(body_fields=form_fields(key),received_body=FormData(form),embed_body_fields=True))
++        if errors:raise Raised('RequestValidationError',errors)
++        native=FORMS[key](**values)
++        return engine.state.new(key,vars(native))
++    value=engine.state.globals.get(key)
++    if key in engine.p.globals and value is None:
++        value=engine.definition_value(engine.p.globals[key],key);engine.state.globals[key]=value
++    if not isinstance(value,Object) or value.typ not in BEARERS:return NOT_HANDLED
++    check(engine,'fastapi',span)
++    headers=[]
++    for name,items in engine.request_input.get('headers',{}).items():
++        for item in items if isinstance(items,list) else [items]:
++            if not isinstance(item,str):engine.unsupported('Bearer header value is not concrete text',span)
++            headers.append((name.encode('latin-1'),item.encode('latin-1')))
++    request=Request({'type':'http','method':engine.request_input.get('method','GET'),'path':'/','headers':headers})
++    try:
++        native=BEARERS[value.typ](*value.fields['args'],**value.fields['kwargs'])
++        return asyncio.run(native(request))
++    except HTTPException as exc:
++        raise Raised('HTTPException',engine.state.new('HTTPException',{'status_code':exc.status_code,'detail':exc.detail,'headers':exc.headers or {}})) from None
+--- a/code/polygraph/grounding.py
++++ b/code/polygraph/grounding.py
+@@ -31,6 +31,14 @@
+ 
+ 
+ def reference(value, history):
++    if isinstance(value, dict) and set(value) == {'$concat'} and isinstance(value['$concat'],list):
++        parts=[reference(part,history) for part in value['$concat']]
++        if all(isinstance(part,str) for part in parts):
++            return ''.join(parts)
++        from .values import Symbol, Text
++        if all(isinstance(part,(str,Text)) or isinstance(part,Symbol) and part.typ.split('.')[-1] in {'str','String','UUID'} for part in parts):
++            return Text(tuple(item for part in parts for item in (part.parts if isinstance(part,Text) else (part,))))
++        return Unknown('History string composition contains a nonstring or unknown value')
+     if isinstance(value, dict) and set(value) == {"$ref"}:
+         path = str(value["$ref"]).split(".")
+         current = history
+--- a/code/polygraph/ir.py
++++ b/code/polygraph/ir.py
+@@ -86,6 +86,7 @@
+     status: int = 200
+     dependencies: list = field(default_factory=list)
+     conditions: dict = field(default_factory=dict)
++    response_type: str = ""
+ 
+ 
+ def pack(value):
+--- a/code/polygraph/kernel.py
++++ b/code/polygraph/kernel.py
+@@ -43,6 +43,9 @@
+         self.dependency_cache = {}
+         self.resolving_dependencies = set()
+         self.unknown_teardown = False
++        self.request_input = {}
++        self.dependency_exits = []
++        self.safe_generators = set()
+         self.initialization_language = ""
+         self.solver = PathSolver(smt, smt_timeout_ms)
+         self.state.immutable_globals.update(project.immutable_globals)
+@@ -177,18 +180,31 @@
+     def dependency(self, key, typ="", span=Span()):
+         if key in self.dependency_cache:
+             return self.dependency_cache[key]
++        if key not in self.p.methods and key not in self.p.types and (key.startswith('fastapi.') or key in self.p.globals):
++            from .fastapi_dependencies import dependency
++            from .models import NOT_HANDLED
++            native=dependency(self,key,span)
++            if native is not NOT_HANDLED:
++                self.dependency_cache[key]=native
++                return native
+         resolved = key if key in self.p.methods else self.p.resolve_function(key, span.file)
+         if not resolved:
+             return self.opaque("unresolved dependency " + key, span)
+         if key in self.resolving_dependencies:
+             self.unsupported("cyclic framework dependency", span)
+         self.resolving_dependencies.add(key)
++        body=self.p.lower(resolved)
++        safe_generator=(len(body)==1 and body[0].op=='with' and len(body[0].body)==1 and body[0].body[0].op=='yield'
++                        and len(body[0].args)==1 and body[0].args[0][1] is not None and body[0].args[0][1].op=='var'
++                        and body[0].body[0].args[0].op=='var' and body[0].args[0][1].value==body[0].body[0].args[0].value)
++        if safe_generator:self.safe_generators.add(resolved)
+         try:
+             values = {p.name: self.dependency(p.dependency, p.typ, self.p.methods[resolved].span)
+                       for p in self.p.methods[resolved].params if p.dependency}
+             value = self.execute_method(resolved, kwargs=values, span=span)
+         finally:
+             self.resolving_dependencies.remove(key)
++            self.safe_generators.discard(resolved)
+         self.dependency_cache[key] = value
+         return value
+ 
+@@ -293,6 +309,9 @@
+ 
+         if literal_tree(expr):
+             return self.value(expr, {})
++        from .definition_models import supported
++        if supported(self,expr):
++            return self.value(expr,{})
+         self.note("definition-time-value", "A nonliteral Python module/default value was evaluated before the scenario; its value is not supplied", expr.span, binding=key)
+         return Unknown("definition-time Python value not supplied", expr.typ, key)
+ 
+@@ -570,7 +589,29 @@
+             receiver_expr, positional, named = args
+             receiver = self.value(receiver_expr, env) if receiver_expr is not None else None
+             values = tuple(self.value(a, env) for a in positional)
+-            kwargs = {name: self.value(value, env) for name, value in named}
++            kwargs, index = {}, 0
++            while index < len(named):
++                name, expression = named[index]
++                if name is None:
++                    group = self.value(expression, env)
++                    index += 1
++                    if unknown(group):
++                        self.unsupported('unknown keyword mapping', span)
++                    if not isinstance(group, dict):
++                        raise Raised('TypeError', 'keyword expansion requires a mapping')
++                else:
++                    # Python evaluates an adjacent explicit-keyword group
++                    # before merging it with an earlier **mapping.
++                    group = {}
++                    while index < len(named) and named[index][0] is not None:
++                        name, expression = named[index]
++                        group[name] = self.value(expression, env)
++                        index += 1
++                if kwargs.keys() & group.keys():
++                    raise Raised('TypeError', 'duplicate keyword argument')
++                kwargs.update(group)
++            if any(not isinstance(name,str) for name in kwargs):
++                raise Raised('TypeError', 'keyword names must be strings')
+             return self.call(receiver, expr.value, values, kwargs, span, env, receiver_expr is not None, expr.bindings)
+         self.unsupported(str(expr.value or op), span)
+ 
+@@ -623,6 +664,15 @@
+         return self.opaque("unmodeled call " + name, span) if result is NOT_HANDLED else result
+ 
+     def matches_type(self, actual, expected):
++        if actual.startswith(('jwt.','pwdlib.','argon2.','pydantic.')):
++            from .security_models import exception_matches
++            for candidate in re.split(r'[|,]',expected.strip('() ')):
++                candidate=candidate.strip()
++                if candidate=='*':return True
++                if self.method and self.p.resolve_type(candidate,self.method.module,self.method.span.file):continue
++                resolved=self.p.resolve_import(candidate,self.method.span.file) if self.method else ''
++                if exception_matches(actual,resolved or candidate):return True
++            return False
+         names = [v.strip().split(".")[-1] for v in re.split(r"[|,]", expected.strip("() "))]
+         short = actual.split(".")[-1].split(":")[-1]
+         if "*" in names or short in names:
+@@ -673,7 +723,7 @@
+         elif op == "global":
+             env[GLOBAL_NAMES].update(stmt.value)
+         elif op in {"return", "yield"}:
+-            if op == "yield":
++            if op == "yield" and self.method.key not in self.safe_generators:
+                 self.note("dependency-cleanup", "Generator dependency setup is modeled; teardown is not", span)
+                 self.unknown_teardown = True
+             return Completion(op, self.value(args[0], env))
+@@ -746,6 +796,8 @@
+                     for value in reversed(managers):
+                         if value.typ in {"sqlmodel.Session", "sqlalchemy.orm.Session"}:
+                             call(self, value, "close", (), {}, span)
++                elif self.method.key in self.safe_generators:
++                    self.dependency_exits.append((self.frames[-1],managers,span))
+         elif op == "switch":
+             value, groups = self.value(args[0], env), args[1]
+             selected, default = None, None
+--- a/code/polygraph/models.py
++++ b/code/polygraph/models.py
+@@ -330,6 +330,16 @@
+ 
+ 
+ def call(engine, receiver, name, args, kwargs, span):
++    prefix=receiver.name if isinstance(receiver,TypeRef) else receiver.typ if isinstance(receiver,Object) else name
++    if prefix.startswith(('jwt','datetime','pwdlib')):
++        from .security_models import call as security_call
++        result=security_call(engine,receiver,name,args,kwargs,span)
++        if result is not NOT_HANDLED:return result
++    qualified=receiver.name+'.'+name if isinstance(receiver,TypeRef) else name
++    if qualified.startswith('fastapi.security.'):
++        from .fastapi_dependencies import construct as security_construct
++        result=security_construct(engine,qualified,args,kwargs,span)
++        if result is not NOT_HANDLED:return result
+     if isinstance(receiver, Object) and receiver.typ in HTTP_HEADERS:
+         if receiver.typ == 'spring.ReadOnlyHttpHeaders' and name in {'set', 'add', 'put'}:
+             raise Raised('UnsupportedOperationException')
+--- a/code/polygraph/native_contracts.py
++++ b/code/polygraph/native_contracts.py
+@@ -0,0 +1,15 @@
++"""Do not apply a pinned native contract to a conflicting supplied version."""
++from functools import lru_cache
++from importlib.metadata import version
++
++
++@lru_cache(maxsize=None)
++def installed(package):return version(package)
++
++
++def check(engine,package,span):
++    module=engine.method.module if engine.method else engine.p.module(span.file)
++    supplied=engine.context.get('framework_versions',{}).get(module,{})
++    declared=next((v for k,v in supplied.items() if k.lower().replace('_','-')==package.lower().replace('_','-')),None)
++    if declared is not None and declared!=installed(package):
++        engine.unsupported('Native '+package+' contract is pinned to '+installed(package)+'; supplied '+str(declared),span)
+--- a/code/polygraph/project.py
++++ b/code/polygraph/project.py
+@@ -6,8 +6,15 @@
+ import json
+ from pathlib import Path
+ import re
++import builtins
+ 
+ from .ir import Span, pack, unpack
++
++RUNTIME_PACKAGES=('tree-sitter','tree-sitter-java','tree-sitter-javascript','libcst','sqlglot','z3-solver',
++                  'rank-bm25','numpy','PyYAML','html5lib','quickjs-ng','six','webencodings',
++                  'fastapi','starlette','pydantic','pydantic-core','python-multipart','email-validator',
++                  'PyJWT','pwdlib','argon2-cffi','argon2-cffi-bindings','bcrypt','anyio','cffi','pycparser',
++                  'typing-extensions','typing-inspection','annotated-doc','annotated-types','opentelemetry-api','dnspython','idna')
+ 
+ 
+ def read_json(path):
+@@ -18,8 +25,9 @@
+ class Project:
+     MODEL_VERSION = "polygraph-13-models-1"
+ 
+-    def __init__(self, root, skeleton, cache=None, profiles=()):
++    def __init__(self, root, skeleton, cache=None, profiles=(), source_globals=None):
+         self.root = Path(root).resolve()
++        self.source_globals=source_globals or {}
+         self.skeleton = read_json(skeleton) if not isinstance(skeleton, dict) else skeleton
+         self.nodes = self.skeleton["nodes"]
+         if not isinstance(self.nodes, dict):
+@@ -81,11 +89,12 @@
+         if not self.profiles:
+             self.profiles.update(p.strip() for p in self.config.get("spring.profiles.active", "").split(",") if p.strip())
+         digest = hashlib.sha256(self.MODEL_VERSION.encode())
+-        for package in ("tree-sitter", "tree-sitter-java", "tree-sitter-javascript", "libcst", "sqlglot", "z3-solver", "rank-bm25", "numpy", "PyYAML", "html5lib", "quickjs-ng", "six", "webencodings"):
++        for package in RUNTIME_PACKAGES:
+             digest.update((package + "=" + importlib.metadata.version(package)).encode())
+         digest.update(json.dumps(self.skeleton, sort_keys=True).encode())
+         digest.update(json.dumps(sorted(self.profiles)).encode())
+         digest.update(json.dumps(self.config, sort_keys=True).encode())
++        digest.update(json.dumps(self.source_globals,sort_keys=True).encode())
+         digest.update(json.dumps(self.frontend_hashes, sort_keys=True).encode())
+         for file, content in self.sources.items():
+             digest.update(file.encode() + b"\0" + content)
+@@ -197,9 +206,14 @@
+         raw = re.sub(r"<.*>|\[.*\]|\?", "", name).strip()
+         if raw in self.types:
+             return raw
+-        imported = self.resolve_import(raw, file) or raw
++        local_key=self.lexical_modules.get(file,'')+'.'+raw
++        if file.endswith('.py') and local_key in self.types:return local_key
++        explicit=self.resolve_import(raw,file)
++        imported = explicit or raw
+         candidates = self.types_by_fqn.get(imported, [])
+         if not candidates:
++            if explicit or '.' in raw or file.endswith('.py') and isinstance(getattr(builtins,raw,None),type):
++                return ''
+             candidates = self.types_by_name.get(raw.split(".")[-1], [])
+         local = [key for key in candidates if self.types[key].module == module]
+         selected = local or candidates
+@@ -209,6 +223,9 @@
+         explicit = self.imports.get(file, {}).get(name)
+         if explicit:
+             return explicit
++        if file.endswith('.py') and '.' in name:
++            head,tail=name.split('.',1)
++            if head in self.imports.get(file,{}):return self.imports[file][head]+'.'+tail
+         if file.endswith('.java'):
+             from .java_contracts import TYPES
+             candidates = [package + '.' + name for package in self.import_wildcards[file]
+--- a/code/polygraph/protocol.py
++++ b/code/polygraph/protocol.py
+@@ -58,6 +58,9 @@
+         return value
+     if not isinstance(value, dict):
+         raise Raised("RequestValidationError")
++    if engine.p.types[resolved].language=='python' and engine.p.types[resolved].annotations.get('model'):
++        from .pydantic_models import bind_body as native_body
++        return native_body(engine,resolved,value,span)
+     fields = engine.p.type_fields(resolved)
+     kwargs = {}
+     for name, (ftype, default) in fields.items():
+@@ -196,6 +199,9 @@
+         form = {}
+     old_dependencies = engine.dependency_cache
+     old_teardown = engine.unknown_teardown
++    old_input,old_exits=engine.request_input,engine.dependency_exits
++    engine.request_input={'method':verb,'headers':headers,'body':body,'query':query,'form':form,'path_params':path_values}
++    engine.dependency_exits=[]
+     engine.unknown_teardown = False
+     outer_frames = engine.frames
+     engine.frames = []
+@@ -251,6 +257,10 @@
+         receiver = engine.create(method.owner, span=method.span, bean=True) if method.owner in engine.p.types else None
+         result = engine.execute_method(method.key, kwargs=values, receiver=receiver, span=span)
+         response = result if isinstance(result, Response) else Response(result, endpoint.status)
++        response_model=engine.p.resolve_type(endpoint.response_type,method.module,method.span.file) if endpoint.response_type else ''
++        if endpoint.framework=='fastapi' and response_model and engine.p.types[response_model].annotations.get('model'):
++            from .pydantic_models import project_response
++            response.body=project_response(engine,response.body,response_model,endpoint.conditions,method.span)
+         if isinstance(response.body, Awaitable):
+             engine.note("unawaited-response", "A returned coroutine is not a serializable HTTP body", method.span)
+             return Response(None, 500)
+@@ -265,17 +275,27 @@
+         return response
+     except Raised as exc:
+         if exc.typ in {"HTTPException", "fastapi.HTTPException", "starlette.exceptions.HTTPException"} and isinstance(exc.value, Object):
+-            return Response(exc.value.fields.get("detail"), exc.value.fields.get("status_code", 500))
++            detail=exc.value.fields.get('detail')
++            return Response({'detail':detail} if endpoint.framework=='fastapi' else detail, exc.value.fields.get("status_code", 500),exc.value.fields.get('headers',{}))
+         if exc.typ == "RequestValidationError":
+-            return Response(None, 422 if endpoint.framework == "fastapi" else 400)
++            return Response({'detail':exc.value} if endpoint.framework=='fastapi' and isinstance(exc.value,list) else None, 422 if endpoint.framework == "fastapi" else 400)
+         if exc.typ == 'UnsupportedMediaType':
+             return Response(None, 415)
++        if exc.typ == 'ResponseValidationError':return Response(None,500)
+         engine.note("unhandled-exception", "Request stops at an exception; HTTP error mapping may be incomplete", method.span, exception=exc.typ)
+         return Response(Unknown("unhandled server exception"), 500)
+     finally:
++        from .models import call
++        for frame,managers,manager_span in reversed(engine.dependency_exits):
++            engine.frames.append(frame)
++            try:
++                for manager in reversed(managers):
++                    if manager.typ in {'sqlmodel.Session','sqlalchemy.orm.Session'}:call(engine,manager,'close',(),{},manager_span)
++            finally:engine.frames.pop()
+         if engine.unknown_teardown:
+             engine.state.havoc()
+             engine.note("teardown-effects-unknown", "Unmodeled generator teardown invalidates state for later requests", method.span)
+         engine.unknown_teardown = old_teardown
++        engine.request_input,engine.dependency_exits=old_input,old_exits
+         engine.dependency_cache = old_dependencies
+         engine.frames = outer_frames
+--- a/code/polygraph/pydantic_models.py
++++ b/code/polygraph/pydantic_models.py
+@@ -0,0 +1,197 @@
++"""Native Pydantic schemas from bounded source facts, never target classes."""
++import ast
++import json
++from contextvars import ContextVar
++from copy import deepcopy
++from datetime import date,datetime,timedelta
++from decimal import Decimal
++import types
++from typing import Annotated,Any,Union,get_args,get_origin
++from uuid import UUID
++
++from pydantic import ConfigDict,EmailStr,Field,TypeAdapter,ValidationError,create_model
++
++from .values import Object,Symbol,Text,Raised,unknown,wire,serial
++from .native_contracts import check
++
++ACTIVE_ENGINE=ContextVar('polygraph_pydantic_engine',default=None)
++
++
++def factory_callback(project,expression):
++    target=project.resolve_function(expression.value,expression.span.file) if expression.op=='call' else ''
++    method=project.methods.get(target)
++    required_data=method is not None and len(method.params)==1 and method.params[0].default is None
++    if required_data:
++        def factory(validated_data):
++            engine=ACTIVE_ENGINE.get()
++            return engine.execute_method(target,(normalize(validated_data),),span=expression.span)
++    else:
++        def factory():return ACTIVE_ENGINE.get().value(expression,{})
++    return factory
++
++
++def lineage(project,key,seen=frozenset()):
++    if key in seen:return []
++    info=project.types[key];result=[]
++    for parent in info.parents:
++        resolved=project.resolve_type(parent,info.module,info.span.file)
++        if resolved:result.extend(lineage(project,resolved,seen|{key}))
++    return result+[info]
++
++
++def typename(node):
++    return node.id if isinstance(node,ast.Name) else typename(node.value)+'.'+node.attr if isinstance(node,ast.Attribute) else ''
++
++
++def annotation(engine,text,info):
++    def convert(node):
++        if isinstance(node,ast.Constant) and node.value is None:return type(None)
++        if isinstance(node,ast.BinOp) and isinstance(node.op,ast.BitOr):return Union[convert(node.left),convert(node.right)]
++        if isinstance(node,ast.Subscript):
++            base=typename(node.value).split('.')[-1]
++            parts=node.slice.elts if isinstance(node.slice,ast.Tuple) else [node.slice]
++            if base in {'Optional','Union'}:
++                values=tuple(convert(value) for value in parts)
++                return Union[values+(type(None),)] if base=='Optional' else Union[values]
++            if base in {'list','List'}:return list[convert(parts[0])]
++            if base in {'dict','Dict'}:return dict[convert(parts[0]),convert(parts[1])]
++            raise ValueError('unsupported annotation '+text)
++        raw=typename(node);qualified=engine.p.resolve_import(raw,info.span.file) or raw
++        resolved=engine.p.resolve_type(raw,info.module,info.span.file)
++        if resolved:return schema(engine,resolved)[0]
++        builtin={'str':str,'int':int,'float':float,'bool':bool,'bytes':bytes,'Any':Any,'typing.Any':Any,
++                 'uuid.UUID':UUID,'datetime.datetime':datetime,'datetime.date':date,'datetime.timedelta':timedelta,
++                 'decimal.Decimal':Decimal,'pydantic.EmailStr':EmailStr}
++        builtin.update({'builtins.'+name:value for name,value in list(builtin.items()) if '.' not in name})
++        if qualified in builtin:return builtin[qualified]
++        raise ValueError('unresolved annotation '+text)
++    return convert(ast.parse(text,mode='eval').body)
++
++
++def schema(engine,key):
++    check(engine,'pydantic',engine.p.types[key].span)
++    cache=getattr(engine.p,'native_schemas',None)
++    if cache is None:cache=engine.p.native_schemas={}
++    cache_key=(key,json.dumps(serial(engine.context.get('globals',{})),sort_keys=True))
++    if cache_key in cache:return cache[cache_key]
++    if key in getattr(engine,'building_schemas',set()):engine.unsupported('recursive native schema',engine.p.types[key].span)
++    if not hasattr(engine,'building_schemas'):engine.building_schemas=set()
++    engine.building_schemas.add(key)
++    info=engine.p.types[key];options={};factories=set();config={};declarations={}
++    # Schema metadata belongs to application initialization. Runtime writes in
++    # one scenario must not change a subsequently materialized native schema.
++    from .kernel import Kernel
++    metadata=Kernel(engine.p,context={'globals':deepcopy(engine.context.get('globals',{}))},smt=False)
++    def initial_value(expression,binding):
++        value=metadata.definition_value(expression,binding)
++        if unknown(value):engine.unsupported('Pydantic schema initialization value is unresolved',expression.span)
++        return value
++    try:
++        for parent in lineage(engine.p,key):
++            declarations.update({name:parent for name in parent.fields})
++            if parent.annotations.get('model_config_unknown') or any(engine.p.methods[m].annotations.get('validation_hook') for m in parent.methods):
++                engine.unsupported('Source Pydantic validators/serializers/configuration need an additional interpreter contract',parent.span)
++            factories.update(parent.annotations.get('default_factories',[]))
++            for field,values in parent.annotations.get('field_options',{}).items():
++                options[field]={k:initial_value(v,'schema:'+key+':'+field+':'+str(k)) for k,v in values.items()}
++            config.update({k:initial_value(v,'schema:'+key+':config:'+str(k)) for k,v in parent.annotations.get('model_config',{}).items()})
++        if any(unknown(value) for values in options.values() for value in values.values()) or any(unknown(value) for value in config.values()):
++            engine.unsupported('Pydantic schema options are unresolved',info.span)
++        fields={}
++        for name,(typ,default) in engine.p.type_fields(key).items():
++            if name.startswith('_'):continue
++            value=... if default is None or name in factories else initial_value(default,'schema:'+key+':default:'+name)
++            if unknown(value):engine.unsupported('Pydantic nonliteral field default is unresolved',info.span)
++            field=Field(default_factory=factory_callback(engine.p,default),**options.get(name,{})) if name in factories else Field(default=value,**options.get(name,{}))
++            fields[name]=(annotation(engine,typ,declarations[name]),field)
++        native=create_model('Source_'+info.name,__config__=ConfigDict(**config),**fields)
++        cache[cache_key]=(native,factories)
++        return cache[cache_key]
++    except (ValueError,TypeError) as exc:
++        engine.unsupported('Pydantic schema outside supported facts: '+str(exc),info.span)
++    finally:engine.building_schemas.discard(key)
++
++
++def abstract(value,active=frozenset()):
++    if unknown(value):return True
++    if isinstance(value,Object):value=value.fields
++    if isinstance(value,(dict,list,tuple)):
++        if id(value) in active:return True
++        return any(abstract(v,active|{id(value)}) for v in (value.values() if isinstance(value,dict) else value))
++    return False
++
++
++def normalize(value):
++    if isinstance(value,UUID):return str(value)
++    if isinstance(value,dict):return {k:normalize(v) for k,v in value.items()}
++    if isinstance(value,(list,tuple)):return [normalize(v) for v in value]
++    if hasattr(value,'model_dump'):return normalize(value.model_dump())
++    return value
++
++
++def proven_symbol(value,typ,metadata):
++    if metadata:return False
++    types_=get_args(typ) if get_origin(typ) in {Union,types.UnionType} else (typ,)
++    if isinstance(value,Text):return str in types_ or Any in types_
++    if not isinstance(value,Symbol):return False
++    if not value.nonnull and type(None) not in types_:return False
++    short=value.typ.split('.')[-1]
++    return Any in types_ or UUID in types_ and short=='UUID' or str in types_ and short in {'str','String'} or int in types_ and value.sort in {'int','bv32','bv64'} or bool in types_ and value.sort=='bool'
++
++
++def validated(engine,key,data,response=False):
++    native,factories=schema(engine,key)
++    if not isinstance(data,dict):raise Raised('ResponseValidationError' if response else 'RequestValidationError')
++    if not abstract(data):
++        token=ACTIVE_ENGINE.set(engine)
++        try:
++            result=native.model_validate(data)
++            values={name:normalize(getattr(result,name)) for name in native.model_fields}
++            if result.model_extra:values.update(normalize(result.model_extra))
++            return values,result.model_fields_set
++        except ValidationError as exc:
++            raise Raised('ResponseValidationError' if response else 'RequestValidationError',exc.errors(include_url=False)) from None
++        finally:ACTIVE_ENGINE.reset(token)
++    result={};provided=set()
++    for name,field in native.model_fields.items():
++        alias=field.validation_alias or field.alias or name
++        if not isinstance(alias,str):engine.unsupported('Complex validation alias with abstract values',engine.p.types[key].span)
++        source=alias if alias in data else name if native.model_config.get('populate_by_name') and name in data else None
++        if source is None:
++            if field.is_required():raise Raised('ResponseValidationError' if response else 'RequestValidationError')
++            token=ACTIVE_ENGINE.set(engine)
++            try:result[name]=normalize(field.get_default(call_default_factory=True,validated_data=result))
++            finally:ACTIVE_ENGINE.reset(token)
++            continue
++        provided.add(name);value=data[source]
++        if unknown(value) and proven_symbol(value,field.annotation,field.metadata):result[name]=value;continue
++        if abstract(value):engine.unsupported('Native validation of a constrained/unknown abstract field',engine.p.types[key].span)
++        try:result[name]=normalize(TypeAdapter(Annotated[field.annotation,field]).validate_python(value))
++        except ValidationError as exc:raise Raised('ResponseValidationError' if response else 'RequestValidationError',exc.errors(include_url=False)) from None
++    return result,provided
++
++
++def bind_body(engine,key,value,span):
++    values,provided=validated(engine,key,value)
++    obj=engine.create(key,kwargs=values,span=span)
++    obj.provided=set(provided)
++    return obj
++
++
++def project_response(engine,value,key,flags,span):
++    native,_=schema(engine,key)
++    if isinstance(value,Object):
++        if value.typ==key:data=dict(value.fields)
++        else:
++            names={name for name in native.model_fields}|{field.alias for field in native.model_fields.values() if isinstance(field.alias,str)}
++            data={name:field for name,field in value.fields.items() if name in names}
++    else:data=value
++    values,provided=validated(engine,key,data,response=True)
++    output={}
++    for name,field in native.model_fields.items():
++        value=values[name]
++        if field.exclude or flags.get('response_model_exclude_none') and value is None or flags.get('response_model_exclude_unset') and name not in provided:continue
++        if flags.get('response_model_exclude_defaults') and not field.is_required() and value==field.default:continue
++        alias=field.serialization_alias or field.alias or name
++        output[alias if flags.get('response_model_by_alias',True) else name]=wire(value)
++    return output
+--- a/code/polygraph/python.py
++++ b/code/polygraph/python.py
+@@ -133,6 +133,8 @@
+         info = TypeInfo(key, node.name, self.p.module(self.file), "python", self.span(node), parents=[name(b) for b in node.bases])
+         info.annotations["model"] = any(self.framework(b, {"SQLModel", "BaseModel", "BaseSettings"}) for b in node.bases)
+         info.annotations["custom_metaclass"] = any(k.arg == "metaclass" for k in node.keywords)
++        info.annotations['field_options']={}
++        info.annotations['default_factories']=[]
+         self.p.add_type(info)
+         is_table = any(k.arg == "table" and literal(k.value) is True for k in node.keywords)
+         for field in node.body:
+@@ -143,10 +145,13 @@
+                 default = self.expr(field.value) if field.value else None
+                 if isinstance(field.value, ast.Call) and self.framework(field.value.func, {"Field"}):
+                     options = {k.arg: k.value for k in field.value.keywords}
++                    checked={'alias','serialization_alias','validation_alias','exclude','gt','ge','lt','le','min_length','max_length','pattern','strict','allow_inf_nan','multiple_of','max_digits','decimal_places'}
++                    info.annotations['field_options'][field.target.id]={key:self.expr(value) for key,value in options.items() if key in checked}
+                     if literal(options.get("primary_key")) is True:
+                         info.primary_key = field.target.id
+                     factory = name(options.get("default_factory"))
+                     if factory:
++                        info.annotations['default_factories'].append(field.target.id)
+                         info.generated_key = True
+                         default = Expr("fresh", value="UUID", span=self.span(field)) if factory.endswith(("uuid4", "uuid1")) else Expr("call", (None, (), ()), factory, self.span(field))
+                     elif "default" in options:
+@@ -160,6 +165,13 @@
+                 for target in field.targets:
+                     if isinstance(target, ast.Name) and target.id == "__tablename__":
+                         info.table = self.p.table_id(literal(field.value, ""))
++                    if isinstance(target,ast.Name) and target.id=='model_config':
++                        value=field.value
++                        if isinstance(value,ast.Call) and self.framework(value.func,{'ConfigDict','SettingsConfigDict'}):
++                            info.annotations['model_config']={k.arg:self.expr(k.value) for k in value.keywords}
++                        elif isinstance(value,ast.Dict):
++                            info.annotations['model_config']={literal(k):self.expr(v) for k,v in zip(value.keys,value.values)}
++                        else:info.annotations['model_config_unknown']=True
+         if is_table and not info.table:
+             info.table = self.p.table_id(node.name.lower())
+         info.annotations["table"] = is_table
+@@ -178,6 +190,8 @@
+             for item in elements[1:]:
+                 if isinstance(item, ast.Call) and self.framework(item.func, {"Depends", "Security"}) and item.args:
+                     default_dep = self.canonical(item.args[0])
++                elif isinstance(item,ast.Call) and self.framework(item.func,{'Depends','Security'}):
++                    default_dep = self.canonical(elements[0])
+             raw = elements[0]
+         return (ast.unparse(raw) if raw else ""), default_dep, metadata
+ 
+@@ -200,6 +214,9 @@
+                 if short in {"Depends", "Security"} and marker.args:
+                     dep = self.canonical(marker.args[0])
+                     default = None
++                elif short in {'Depends','Security'}:
++                    dep=self.qualified(typ)
++                    default=None
+                 elif short in {"Query", "Path", "Header", "Body", "Cookie", "Form"}:
+                     location = short.lower()
+                     options = {k.arg: k.value for k in marker.keywords}
+@@ -210,6 +227,7 @@
+         annotations = {"async": isinstance(node, ast.AsyncFunctionDef)}
+         annotations["generator"] = any(isinstance(n, (ast.Yield, ast.YieldFrom)) for n in ast.walk(node))
+         annotations["property"] = any(name(d) == "property" for d in node.decorator_list)
++        annotations['validation_hook']=any(self.framework(d.func if isinstance(d,ast.Call) else d,{'field_validator','model_validator','computed_field','field_serializer','model_serializer'}) for d in node.decorator_list)
+         annotations["keyword_only"] = [a.arg for a in node.args.kwonlyargs]
+         annotations["positional_only"] = [a.arg for a in node.args.posonlyargs]
+         if any(isinstance(d, ast.Call) and isinstance(d.func, ast.Attribute) and d.func.attr == "middleware" for d in node.decorator_list):
+@@ -230,7 +248,9 @@
+                 options = {k.arg: k.value for k in decorator.keywords}
+                 verbs = literal(options.get("methods"), [decorator.func.attr.upper()])
+                 deps = self.dependencies(options.get("dependencies"))
+-                self.routes.append((self.qualified(name(decorator.func.value)), method.key, route, verbs, literal(options.get("status_code"), 200), deps))
++                response=(self.qualified(name(options['response_model'])) if name(options.get('response_model')) else '') if 'response_model' in options else method.return_type
++                flags={key:literal(value) for key,value in options.items() if key in {'response_model_by_alias','response_model_exclude_none','response_model_exclude_defaults','response_model_exclude_unset'}}
++                self.routes.append((self.qualified(name(decorator.func.value)), method.key, route, verbs, literal(options.get("status_code"), 200), deps,response,flags))
+ 
+     def dependencies(self, node):
+         return [self.canonical(item.args[0]) for item in (node.elts if isinstance(node, (ast.List, ast.Tuple)) else [])
+@@ -246,6 +266,10 @@
+             a, b = self.constant(node.left, file, seen), self.constant(node.right, file, seen)
+             return a + b if isinstance(a, str) and isinstance(b, str) else None
+         key = self.qualified(name(node), file)
++        if key in self.p.source_globals:return self.p.source_globals[key]
++        if isinstance(node,ast.Attribute):
++            parent=self.constant(node.value,file,set(seen))
++            if isinstance(parent,dict) and node.attr in parent:return parent[node.attr]
+         if key in seen:
+             return None
+         seen.add(key)
+@@ -300,13 +324,13 @@
+                 if child == router and extra is not None:
+                     result.extend((path + extra + prefix, inherited + outer + deps, unknown or conditional) for path, inherited, unknown in mounted(parent, seen | {router}))
+             return result
+-        for router, mid, path, verbs, status, deps in self.routes:
++        for router, mid, path, verbs, status, deps,response,flags in self.routes:
+             mounts = mounted(router, set())
+             if not mounts:
+                 self.p.warn("unmounted-router", "FastAPI router is not statically connected to an application", self.p.methods[mid].span, router)
+             for mount_index, (prefix, outer_deps, conditional) in enumerate(mounts):
+                 for verb in verbs:
+-                    self.p.endpoints.append(Endpoint(mid, verb.upper(), prefix + path, self.p.methods[mid].module, "fastapi", status, outer_deps + deps, {"mount_unknown": conditional, "registration_group": (router, mount_index)}))
++                    self.p.endpoints.append(Endpoint(mid, verb.upper(), prefix + path, self.p.methods[mid].module, "fastapi", status, outer_deps + deps, {"mount_unknown": conditional, "registration_group": (router, mount_index),**flags},response))
+         for info in self.p.types.values():
+             if info.language == "python" and not info.table:
+                 for parent in info.parents:
+@@ -334,8 +358,6 @@
+         if isinstance(node, ast.Call):
+             receiver = self.expr(node.func.value) if isinstance(node.func, ast.Attribute) else None
+             callee = node.func.attr if isinstance(node.func, ast.Attribute) else name(node.func)
+-            if any(k.arg is None for k in node.keywords):
+-                return Expr("unsupported", value="dynamic keyword expansion", span=s)
+             return Expr("call", (receiver, tuple(self.expr(a) for a in node.args), tuple((k.arg, self.expr(k.value)) for k in node.keywords)), callee, s, bindings=self.references(node.func))
+         if isinstance(node, ast.BinOp):
+             return Expr("bin", (self.expr(node.left), self.expr(node.right)), self.operator(node.op), s)
+--- a/code/polygraph/security_models.py
++++ b/code/polygraph/security_models.py
+@@ -0,0 +1,160 @@
++"""Trusted PyJWT/pwdlib primitives and explicit analysis time; no app imports."""
++from datetime import datetime, timedelta, timezone
++from copy import deepcopy
++import time
++import inspect
++
++import jwt
++from pwdlib import PasswordHash
++from pwdlib.hashers.argon2 import Argon2Hasher
++from pwdlib.hashers.bcrypt import BcryptHasher
++from argon2 import extract_parameters
++
++from .values import Object, OpaqueString, Raised, TypeRef, Unknown, unknown
++from .models import NOT_HANDLED
++from .native_contracts import check
++import builtins
++
++HASHERS={'pwdlib.hashers.argon2.Argon2Hasher':Argon2Hasher,'pwdlib.hashers.bcrypt.BcryptHasher':BcryptHasher}
++PURE_FACTORIES={*HASHERS,'pwdlib.PasswordHash','pwdlib.PasswordHash.recommended',
++                'sqlmodel.create_engine','sqlalchemy.create_engine','fastapi.security.OAuth2PasswordBearer',
++                'datetime.timedelta','builtins.str','str'}
++CALLS={'count':0,'seconds':0.}
++
++
++def concrete(value):
++    if unknown(value):return False
++    if isinstance(value,dict):return all(isinstance(k,str) and concrete(v) for k,v in value.items())
++    if isinstance(value,(tuple,list)):return all(concrete(v) for v in value)
++    return value is None or type(value) in {str,bytes,bool,int,float,datetime,timedelta}
++
++
++def clock(engine):
++    value=engine.context.get('clock')
++    if isinstance(value,str) and 'T' in value:
++        try:
++            parsed=datetime.fromisoformat(value.replace('Z','+00:00'))
++            if parsed.tzinfo is not None:return parsed
++        except ValueError:pass
++    engine.note('clock-unknown','A timezone-aware analysis instant was not supplied')
++    return Unknown('analysis clock is unspecified','datetime')
++
++
++def native_type(name):
++    if not name.startswith(('jwt.','pwdlib.','argon2.')):return None
++    from pwdlib import exceptions as password_errors
++    from argon2 import exceptions as argon_errors
++    modules={'jwt':jwt,'jwt.exceptions':jwt.exceptions,'pwdlib.exceptions':password_errors,'argon2.exceptions':argon_errors}
++    prefix,_,short=name.rpartition('.')
++    value=getattr(modules.get(prefix),short,None)
++    return value if isinstance(value,type) and issubclass(value,Exception) else None
++
++
++def exception_matches(actual,expected):
++    source=native_type(actual)
++    if source is None:return False
++    target=native_type(expected)
++    if target is None and ('.' not in expected or expected.startswith('builtins.')):
++        target=getattr(builtins,expected.removeprefix('builtins.'),None)
++    return isinstance(target,type) and issubclass(target,Exception) and issubclass(source,target) or expected in {'BaseException','builtins.BaseException'}
++
++
++def decode(engine,args,kwargs,span):
++    check(engine,'PyJWT',span)
++    def instant():
++        now=clock(engine)
++        if isinstance(now,Unknown):engine.unsupported('JWT temporal validation requires an explicit analysis instant',span)
++        return now.timestamp()
++    # Preserve upstream ordering, option merging, argument binding and errors.
++    # The host-clock argument in these three hooks is deliberately discarded.
++    # No global monkeypatch or target Python callable is involved.
++    class ScenarioJWT(jwt.PyJWT):
++        def _validate_iat(self,payload,now,leeway):return super()._validate_iat(payload,instant(),leeway)
++        def _validate_nbf(self,payload,now,leeway):return super()._validate_nbf(payload,instant(),leeway)
++        def _validate_exp(self,payload,now,leeway):return super()._validate_exp(payload,instant(),leeway)
++    return ScenarioJWT().decode(*args,**kwargs)
++
++
++def password_policy(value):
++    if value.fields.get('recommended'):return PasswordHash.recommended()
++    hashers=[]
++    for hasher in value.fields.get('hashers',[]):
++        if not isinstance(hasher,Object) or hasher.typ not in HASHERS:return None
++        parameters=hasher.fields
++        if not concrete(parameters):return None
++        if hasher.typ.endswith('Argon2Hasher') and (parameters.get('memory_cost',65536)>131072 or parameters.get('time_cost',3)>6 or parameters.get('parallelism',4)>8):return None
++        if hasher.typ.endswith('BcryptHasher') and parameters.get('rounds',12)>14:return None
++        hashers.append(HASHERS[hasher.typ](**parameters))
++    return PasswordHash(tuple(hashers)) if hashers else None
++
++
++def invoke(engine,receiver,name,args,kwargs,span):
++    qualified=receiver.name+'.'+name if isinstance(receiver,TypeRef) else name
++    if isinstance(receiver,Object) and receiver.typ=='pwdlib.PasswordHash':
++        if name not in {'hash','verify','verify_and_update'}:return NOT_HANDLED
++        check(engine,'pwdlib',span)
++        args=tuple(engine.state.opaque_values.get(v.identity,Unknown('opaque digest unavailable')) if isinstance(v,OpaqueString) else v for v in args)
++        kwargs={k:engine.state.opaque_values.get(v.identity,Unknown('opaque digest unavailable')) if isinstance(v,OpaqueString) else v for k,v in kwargs.items()}
++        if not concrete((args,kwargs)):
++            engine.unsupported('Password operation has an unresolved input and completion',span)
++        policy=password_policy(receiver)
++        if policy is None:
++            engine.unsupported('Password policy is unsupported or exceeds native resource bounds',span)
++        bound=inspect.signature(getattr(policy,name)).bind(*args,**kwargs).arguments
++        encoded=bound.get('hash')
++        if isinstance(encoded,bytes):encoded=encoded.decode('ascii',errors='replace')
++        if isinstance(encoded,str):
++            if encoded.startswith('$argon2'):
++                parameters=extract_parameters(encoded)
++                if parameters.memory_cost>131072 or parameters.time_cost>6 or parameters.parallelism>8:
++                    engine.unsupported('Encoded password hash exceeds native resource bounds',span)
++            elif encoded.startswith(('$2a$','$2b$','$2y$')) and int(encoded.split('$')[2])>14:
++                engine.unsupported('Encoded BCrypt work factor exceeds native resource bounds',span)
++        result=getattr(policy,name)(*args,**kwargs)
++        if name=='hash':return engine.state.opaque_string(result)
++        if name=='verify_and_update':return result[0],engine.state.opaque_string(result[1]) if result[1] is not None else None
++        return result
++    if qualified in HASHERS:
++        if args:engine.unsupported('Positional hasher configuration not modeled',span)
++        return engine.state.new(qualified,deepcopy(kwargs))
++    if qualified=='pwdlib.PasswordHash':
++        return engine.state.new(qualified,{'hashers':args[0] if args else kwargs.get('hashers',[])})
++    if qualified=='pwdlib.PasswordHash.recommended':
++        return engine.state.new('pwdlib.PasswordHash',{'recommended':True})
++    if qualified=='datetime.timedelta':
++        return timedelta(*args,**kwargs) if concrete((args,kwargs)) else Unknown('duration input unknown','timedelta')
++    if qualified in {'datetime.datetime.now','datetime.datetime.utcnow','datetime.datetime.today'}:
++        now=clock(engine)
++        if isinstance(now,Unknown):return now
++        if name=='utcnow':return now.astimezone(timezone.utc).replace(tzinfo=None)
++        zone=args[0] if args else kwargs.get('tz')
++        if isinstance(zone,TypeRef) and zone.name in {'datetime.UTC','datetime.timezone.utc'}:return now.astimezone(timezone.utc)
++        if zone is not None:return Unknown('unsupported timezone','datetime')
++        if engine.context.get('timezone')=='UTC':return now.astimezone(timezone.utc).replace(tzinfo=None)
++        engine.note('clock-zone-unknown','A local wall-clock operation needs a supplied timezone',span)
++        return Unknown('local timezone unspecified','datetime')
++    if qualified in {'jwt.encode','jwt.decode'}:
++        check(engine,'PyJWT',span)
++        if not concrete((args,kwargs)):
++            engine.unsupported('JWT operation has unresolved inputs and completion',span)
++        available=jwt.algorithms.get_default_algorithms()
++        algorithms=[kwargs.get('algorithm','HS256')] if qualified=='jwt.encode' else kwargs.get('algorithms',[])
++        if isinstance(algorithms,list) and any(algorithm not in available for algorithm in algorithms):
++            engine.unsupported('Requested JWT algorithm is not available in the pinned native build',span)
++        return jwt.encode(*args,**kwargs) if qualified=='jwt.encode' else decode(engine,args,kwargs,span)
++    return NOT_HANDLED
++
++
++def call(engine,receiver,name,args,kwargs,span):
++    qualified=receiver.name+'.'+name if isinstance(receiver,TypeRef) else name
++    if not (isinstance(receiver,Object) and receiver.typ=='pwdlib.PasswordHash' and name in {'hash','verify','verify_and_update'} or qualified in PURE_FACTORIES or qualified in {'datetime.datetime.now','datetime.datetime.utcnow','datetime.datetime.today','jwt.encode','jwt.decode'}):return NOT_HANDLED
++    started=time.perf_counter()
++    try:return invoke(engine,receiver,name,args,kwargs,span)
++    except (jwt.PyJWTError,ValueError,TypeError,OverflowError) as exc:
++        raise Raised(type(exc).__module__+'.'+type(exc).__name__,str(exc)) from None
++    except Exception as exc:
++        if type(exc).__module__.startswith(('pwdlib.','argon2.')):
++            raise Raised(type(exc).__module__+'.'+type(exc).__name__,str(exc)) from None
++        raise
++    finally:
++        CALLS['count']+=1;CALLS['seconds']+=time.perf_counter()-started
+--- a/code/polygraph/state.py
++++ b/code/polygraph/state.py
+@@ -3,7 +3,7 @@
+ import gzip
+ import json
+ 
+-from .values import Object, Symbol, Unknown
++from .values import Object, Symbol, OpaqueString, Unknown
+ 
+ 
+ class Store:
+@@ -49,6 +49,7 @@
+         self.globals_unknown = False
+         self.immutable_globals = set()
+         self.browser = None
++        self.opaque_values = {}
+ 
+     def new(self, typ, fields=None):
+         self.sequence += 1
+@@ -59,6 +60,12 @@
+     def symbol(self, typ, sort=""):
+         self.sequence += 1
+         return Symbol(f"fresh:{self.sequence}", typ, sort=sort)
++
++    def opaque_string(self, value):
++        self.sequence += 1
++        symbol=OpaqueString(f'fresh:{self.sequence}','str')
++        self.opaque_values[symbol.identity]=value
++        return symbol
+ 
+     def havoc(self, roots=()):
+         self.store.havoc()
+--- a/code/polygraph/values.py
++++ b/code/polygraph/values.py
+@@ -1,5 +1,6 @@
+ """Explicit uncertainty and object identity shared by both language adapters."""
+ from dataclasses import dataclass, field
++from datetime import date, datetime, time, timedelta
+ from decimal import Decimal
+ import math
+ import operator
+@@ -21,6 +22,12 @@
+     typ: str
+     nonnull: bool = True
+     sort: str = ""
++
++
++@dataclass(frozen=True)
++class OpaqueString(Symbol):
++    """A generated string whose actual random bytes are not source facts."""
++    nonempty: bool = True
+ 
+ 
+ @dataclass(frozen=True)
+@@ -124,6 +131,8 @@
+ 
+ 
+ def truth(value, language="python"):
++    if isinstance(value,OpaqueString) and language == 'python' and value.nonempty:
++        return True
+     if isinstance(value, (Unknown, Text, Formula)):
+         return None
+     if isinstance(value, Symbol):
+@@ -218,6 +227,9 @@
+ 
+ 
+ def wire(value, active=frozenset()):
++    if type(value) in {datetime,date,time,timedelta}:
++        from pydantic_core import to_jsonable_python
++        return to_jsonable_python(value)
+     if isinstance(value, (Object, dict, list, tuple)):
+         if id(value) in active or len(active) >= 128:
+             return Unknown("wire cycle or depth requires an unmodeled serializer")
+@@ -240,6 +252,9 @@
+ 
+ 
+ def serial(value, active=frozenset()):
++    if type(value) in {datetime,date,time,timedelta}:
++        from pydantic_core import to_jsonable_python
++        return to_jsonable_python(value)
+     if isinstance(value, (dict, list, tuple, set)) or hasattr(value, "__dataclass_fields__"):
+         if id(value) in active or len(active) >= 128:
+             return {"kind": "Unknown", "reason": "diagnostic cycle or depth limit"}

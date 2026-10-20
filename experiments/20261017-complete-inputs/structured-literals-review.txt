@@ -1,0 +1,6 @@
+Same session review after Codex read both full files and independently ran all tests (192 passed including your 5). Fix only these acceptance defects in the two allowed files:
+1 literal_value("temperature 10 and temperature unknown", "temperature", "int") currently returns10 by skipping the malformed second labelled occurrence. Multiple explicit occurrences, one malformed, cannot be claimed uniquely known. ReturnU. Handle duplicate overlapping field+label patterns by deduping spans, not treating their empty gap as malformed.
+2 literal_value("temperatures 1, 2 and", "temperatures", "List<Integer>") returns[1,2] by stripping dangling and. Reject dangling separators. You may strip and only when it separates two repeated labelled occurrences.
+3 Accept the ordinary scalar connector 'of': 'stay time of5' (with proper whitespace 'stay time of 5 minutes') for stayTime int ->5.
+4 Floats must be finite; huge digit string that converts to inf must not become known JSON numeric.
+Add targeted tests and minimalfix, no further parser expansion. Preserve all currenttests and publicfunction. Codex rerunsindependently. No shell/toolpermissions added. Report actualremaininglimits.

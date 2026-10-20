@@ -1,0 +1,33 @@
+{
+  "runtime_diff_read": true,
+  "runtime_changed_files": [
+    "analyzer/paths.py"
+  ],
+  "parent": 20,
+  "runtime_change": "Jointly clone(state,params) for every replay and conservative restart, sharing immutable AST leaves.",
+  "inherited_tests_modified": false,
+  "guards": [
+    "DTO/list/Map input ownership",
+    "normal and exception alternatives",
+    "conservative restart",
+    "parameter aliases",
+    "input/state cross-root aliases",
+    "HTTP body copy boundary",
+    "immutable AST callback leaf",
+    "cycle snapshot helper",
+    "direct Engine reference semantics retained"
+  ],
+  "fixture_corrections": [
+    "Prebranch write uses supported explicit field assignment; field ++ is an unrelated old semantic limit.",
+    "Cycles tested in ownership snapshots; arbitrary cyclic entry args hit a preexisting JSON context-signature limit and are not claimed supported."
+  ],
+  "no_target_specific_rules": true,
+  "no_external_runtime_models": true,
+  "no_gold_read_by_predictor": true,
+  "remaining_limits": [
+    "Missing authoritative user inputs remain unknown",
+    "Known grounding/framework/JSON and library boundaries remain",
+    "C13 broad-havoc experiment21 was not inherited",
+    "No full independent real-project HTTP/security/4-relation oracle"
+  ]
+}

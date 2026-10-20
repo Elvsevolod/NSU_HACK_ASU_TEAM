@@ -1,0 +1,233 @@
+{
+  "passed": false,
+  "exact_graphs": 1,
+  "cases": [
+    {
+      "case": "mutable-argument",
+      "passed": false,
+      "relations": {
+        "executes": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 3,
+          "iou": 0.625,
+          "nonempty": true
+        },
+        "calls": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 2,
+          "iou": 0.6,
+          "nonempty": true
+        },
+        "remote": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 1,
+          "iou": 0.5,
+          "nonempty": true
+        },
+        "data": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 1,
+          "iou": 0.5,
+          "nonempty": true
+        }
+      },
+      "returns": [
+        "negative"
+      ],
+      "uncaught_possible": false,
+      "database_snapshot_unknown": false,
+      "initial_state_preserved": true,
+      "reference_sha256": "cf88b4ce77cd636d09328f554c7462249b113c766b09126a805add0bf1411ddc",
+      "source_sha256": {
+        "Caller.java": "bb77e6e5117680711738b2dbb3507a16d98be90f16ca77e450cc953d4b1f34f8",
+        "Warehouse.java": "20c26e28ef31aebf713ab3e61c7693303e1dd585b4c38d3569d2a01d90b25851"
+      },
+      "missing": [
+        [
+          "",
+          "executes",
+          "method:service:Caller#caught()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Caller#positive()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Warehouse#positive()"
+        ],
+        [
+          "method:service:Caller#entry()",
+          "calls",
+          "method:service:Caller#caught()"
+        ],
+        [
+          "method:service:Caller#entry()",
+          "calls",
+          "method:service:Caller#positive()"
+        ],
+        [
+          "method:service:Caller#positive()",
+          "remote",
+          "method:service:Warehouse#positive()"
+        ],
+        [
+          "method:service:Warehouse#positive()",
+          "data",
+          "res:table:service.parts"
+        ]
+      ],
+      "extra": [],
+      "paths": 1,
+      "opaque_effects": 0
+    },
+    {
+      "case": "name-is-not-a-model",
+      "passed": false,
+      "relations": {
+        "executes": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 3,
+          "iou": 0.625,
+          "nonempty": true
+        },
+        "calls": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 2,
+          "iou": 0.6,
+          "nonempty": true
+        },
+        "remote": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 1,
+          "iou": 0.5,
+          "nonempty": true
+        },
+        "data": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 1,
+          "iou": 0.5,
+          "nonempty": true
+        }
+      },
+      "returns": [
+        "negative"
+      ],
+      "uncaught_possible": false,
+      "database_snapshot_unknown": false,
+      "initial_state_preserved": true,
+      "reference_sha256": "cf88b4ce77cd636d09328f554c7462249b113c766b09126a805add0bf1411ddc",
+      "source_sha256": {
+        "Caller.java": "3302039a240f3cc86acc90914f5dddfd89fd5b0223412bd01865d78383a1c70a",
+        "Warehouse.java": "20c26e28ef31aebf713ab3e61c7693303e1dd585b4c38d3569d2a01d90b25851"
+      },
+      "missing": [
+        [
+          "",
+          "executes",
+          "method:service:Caller#caught()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Caller#positive()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Warehouse#positive()"
+        ],
+        [
+          "method:service:Caller#entry()",
+          "calls",
+          "method:service:Caller#caught()"
+        ],
+        [
+          "method:service:Caller#entry()",
+          "calls",
+          "method:service:Caller#positive()"
+        ],
+        [
+          "method:service:Caller#positive()",
+          "remote",
+          "method:service:Warehouse#positive()"
+        ],
+        [
+          "method:service:Warehouse#positive()",
+          "data",
+          "res:table:service.parts"
+        ]
+      ],
+      "extra": [],
+      "paths": 1,
+      "opaque_effects": 0
+    },
+    {
+      "case": "known-source-contract",
+      "passed": true,
+      "relations": {
+        "executes": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "iou": 1.0,
+          "nonempty": true
+        },
+        "calls": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "iou": 1.0,
+          "nonempty": true
+        },
+        "remote": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "iou": 1.0,
+          "nonempty": true
+        },
+        "data": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "iou": 1.0,
+          "nonempty": true
+        }
+      },
+      "returns": [
+        "positive"
+      ],
+      "uncaught_possible": false,
+      "database_snapshot_unknown": false,
+      "initial_state_preserved": true,
+      "reference_sha256": "0f8f1eb2357ef1320a5b6e4ddfa030c17fcf9a6024efdc3e47adb91a3c39d769",
+      "source_sha256": {
+        "Caller.java": "7db71b79d8a34f0c66b37af99bd7abb7ea54895aa2ad60c62e69048ded4dac42",
+        "Warehouse.java": "20c26e28ef31aebf713ab3e61c7693303e1dd585b4c38d3569d2a01d90b25851"
+      },
+      "missing": [],
+      "extra": [],
+      "paths": 1,
+      "opaque_effects": 0
+    }
+  ],
+  "reference_fixed_before_prediction": true,
+  "application_started": false,
+  "scope": "Visible continuation graphs under an opaque effect contract; no invented dependency-internal edges",
+  "limits": [
+    "Small synthetic Java/Spring graph; not an independent real-project accuracy score",
+    "An opaque dependency may have further unobserved effects/calls outside the supplied skeleton",
+    "Four relation kinds are nonempty; exceptional coverage requires the stated path budget"
+  ]
+}

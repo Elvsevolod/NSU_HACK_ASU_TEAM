@@ -1,0 +1,354 @@
+FFFFFFFFF.F..                                                            [100%]
+=================================== FAILURES ===================================
+_ test_null_unboxing_stops_execution_before_the_next_statement[Integer input=null;int result=input+side();] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-541/test_null_unboxing_stops_execu0')
+body = 'Integer input=null;int result=input+side();'
+
+    @pytest.mark.parametrize('body',[
+     'Integer input=null;int result=input+side();',
+     'Integer input=null;int result=side()+input;',
+     'Integer input=null;boolean result=input==1;',
+     'Character input=null;int result=input+1;',
+     'Boolean input=null;if(input){after();}',
+     'Boolean input=null;boolean result=input&&sideBool();',
+     'Boolean input=null;boolean result=!input;',
+     'Boolean input=null;String result=input?"yes":"no";',
+     'Boolean input=null;while(input){after();}',
+    ])
+    def test_null_unboxing_stops_execution_before_the_next_statement(tmp_path,body):
+        source='''class Api{String entry(){try{'''+body+'''return after();}catch(NullPointerException failure){return failed();}}
+        int side(){return 1;}boolean sideBool(){return true;}String after(){return "wrong";}String failed(){return "caught";}}'''
+        project,db,ids=build(tmp_path,{'Api.java':source});engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='caught'
+E       AssertionError: assert 'wrong' == 'caught'
+E         
+E         - caught
+E         + wrong
+
+solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py:22: AssertionError
+_ test_null_unboxing_stops_execution_before_the_next_statement[Integer input=null;int result=side()+input;] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-541/test_null_unboxing_stops_execu1')
+body = 'Integer input=null;int result=side()+input;'
+
+    @pytest.mark.parametrize('body',[
+     'Integer input=null;int result=input+side();',
+     'Integer input=null;int result=side()+input;',
+     'Integer input=null;boolean result=input==1;',
+     'Character input=null;int result=input+1;',
+     'Boolean input=null;if(input){after();}',
+     'Boolean input=null;boolean result=input&&sideBool();',
+     'Boolean input=null;boolean result=!input;',
+     'Boolean input=null;String result=input?"yes":"no";',
+     'Boolean input=null;while(input){after();}',
+    ])
+    def test_null_unboxing_stops_execution_before_the_next_statement(tmp_path,body):
+        source='''class Api{String entry(){try{'''+body+'''return after();}catch(NullPointerException failure){return failed();}}
+        int side(){return 1;}boolean sideBool(){return true;}String after(){return "wrong";}String failed(){return "caught";}}'''
+        project,db,ids=build(tmp_path,{'Api.java':source});engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='caught'
+E       AssertionError: assert 'wrong' == 'caught'
+E         
+E         - caught
+E         + wrong
+
+solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py:22: AssertionError
+_ test_null_unboxing_stops_execution_before_the_next_statement[Integer input=null;boolean result=input==1;] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-541/test_null_unboxing_stops_execu2')
+body = 'Integer input=null;boolean result=input==1;'
+
+    @pytest.mark.parametrize('body',[
+     'Integer input=null;int result=input+side();',
+     'Integer input=null;int result=side()+input;',
+     'Integer input=null;boolean result=input==1;',
+     'Character input=null;int result=input+1;',
+     'Boolean input=null;if(input){after();}',
+     'Boolean input=null;boolean result=input&&sideBool();',
+     'Boolean input=null;boolean result=!input;',
+     'Boolean input=null;String result=input?"yes":"no";',
+     'Boolean input=null;while(input){after();}',
+    ])
+    def test_null_unboxing_stops_execution_before_the_next_statement(tmp_path,body):
+        source='''class Api{String entry(){try{'''+body+'''return after();}catch(NullPointerException failure){return failed();}}
+        int side(){return 1;}boolean sideBool(){return true;}String after(){return "wrong";}String failed(){return "caught";}}'''
+        project,db,ids=build(tmp_path,{'Api.java':source});engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='caught'
+E       AssertionError: assert 'wrong' == 'caught'
+E         
+E         - caught
+E         + wrong
+
+solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py:22: AssertionError
+_ test_null_unboxing_stops_execution_before_the_next_statement[Character input=null;int result=input+1;] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-541/test_null_unboxing_stops_execu3')
+body = 'Character input=null;int result=input+1;'
+
+    @pytest.mark.parametrize('body',[
+     'Integer input=null;int result=input+side();',
+     'Integer input=null;int result=side()+input;',
+     'Integer input=null;boolean result=input==1;',
+     'Character input=null;int result=input+1;',
+     'Boolean input=null;if(input){after();}',
+     'Boolean input=null;boolean result=input&&sideBool();',
+     'Boolean input=null;boolean result=!input;',
+     'Boolean input=null;String result=input?"yes":"no";',
+     'Boolean input=null;while(input){after();}',
+    ])
+    def test_null_unboxing_stops_execution_before_the_next_statement(tmp_path,body):
+        source='''class Api{String entry(){try{'''+body+'''return after();}catch(NullPointerException failure){return failed();}}
+        int side(){return 1;}boolean sideBool(){return true;}String after(){return "wrong";}String failed(){return "caught";}}'''
+        project,db,ids=build(tmp_path,{'Api.java':source});engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='caught'
+E       AssertionError: assert 'wrong' == 'caught'
+E         
+E         - caught
+E         + wrong
+
+solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py:22: AssertionError
+_ test_null_unboxing_stops_execution_before_the_next_statement[Boolean input=null;if(input){after();}] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-541/test_null_unboxing_stops_execu4')
+body = 'Boolean input=null;if(input){after();}'
+
+    @pytest.mark.parametrize('body',[
+     'Integer input=null;int result=input+side();',
+     'Integer input=null;int result=side()+input;',
+     'Integer input=null;boolean result=input==1;',
+     'Character input=null;int result=input+1;',
+     'Boolean input=null;if(input){after();}',
+     'Boolean input=null;boolean result=input&&sideBool();',
+     'Boolean input=null;boolean result=!input;',
+     'Boolean input=null;String result=input?"yes":"no";',
+     'Boolean input=null;while(input){after();}',
+    ])
+    def test_null_unboxing_stops_execution_before_the_next_statement(tmp_path,body):
+        source='''class Api{String entry(){try{'''+body+'''return after();}catch(NullPointerException failure){return failed();}}
+        int side(){return 1;}boolean sideBool(){return true;}String after(){return "wrong";}String failed(){return "caught";}}'''
+        project,db,ids=build(tmp_path,{'Api.java':source});engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='caught'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_value-type-flow/code/analyzer/engine.py:155: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_value-type-flow/code/analyzer/engine.py:208: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+solutions/—_value-type-flow/code/analyzer/engine.py:244: in continue_filter
+    frame['result']=self.invoke(frame['entry'],frame['args'],reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_value-type-flow/code/analyzer/engine.py:382: in invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_value-type-flow/code/analyzer/engine.py:442: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_value-type-flow/code/analyzer/engine.py:540: in execute
+    result, control = self.execute(node.child_by_field_name('body'), env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_value-type-flow/code/analyzer/engine.py:442: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_value-type-flow/code/analyzer/engine.py:462: in execute
+    decision = self.choose(self.method + ':' + str(node.start_point.row + 1), [True, False])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x101bb0850>
+label = 'method:service:Api#entry():1', choices = [True, False]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:method:service:Api#entry():1', [True, False])
+
+solutions/—_value-type-flow/code/analyzer/engine.py:130: AlternativeRequired
+_ test_null_unboxing_stops_execution_before_the_next_statement[Boolean input=null;boolean result=input&&sideBool();] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-541/test_null_unboxing_stops_execu5')
+body = 'Boolean input=null;boolean result=input&&sideBool();'
+
+    @pytest.mark.parametrize('body',[
+     'Integer input=null;int result=input+side();',
+     'Integer input=null;int result=side()+input;',
+     'Integer input=null;boolean result=input==1;',
+     'Character input=null;int result=input+1;',
+     'Boolean input=null;if(input){after();}',
+     'Boolean input=null;boolean result=input&&sideBool();',
+     'Boolean input=null;boolean result=!input;',
+     'Boolean input=null;String result=input?"yes":"no";',
+     'Boolean input=null;while(input){after();}',
+    ])
+    def test_null_unboxing_stops_execution_before_the_next_statement(tmp_path,body):
+        source='''class Api{String entry(){try{'''+body+'''return after();}catch(NullPointerException failure){return failed();}}
+        int side(){return 1;}boolean sideBool(){return true;}String after(){return "wrong";}String failed(){return "caught";}}'''
+        project,db,ids=build(tmp_path,{'Api.java':source});engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='caught'
+E       AssertionError: assert 'wrong' == 'caught'
+E         
+E         - caught
+E         + wrong
+
+solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py:22: AssertionError
+_ test_null_unboxing_stops_execution_before_the_next_statement[Boolean input=null;boolean result=!input;] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-541/test_null_unboxing_stops_execu6')
+body = 'Boolean input=null;boolean result=!input;'
+
+    @pytest.mark.parametrize('body',[
+     'Integer input=null;int result=input+side();',
+     'Integer input=null;int result=side()+input;',
+     'Integer input=null;boolean result=input==1;',
+     'Character input=null;int result=input+1;',
+     'Boolean input=null;if(input){after();}',
+     'Boolean input=null;boolean result=input&&sideBool();',
+     'Boolean input=null;boolean result=!input;',
+     'Boolean input=null;String result=input?"yes":"no";',
+     'Boolean input=null;while(input){after();}',
+    ])
+    def test_null_unboxing_stops_execution_before_the_next_statement(tmp_path,body):
+        source='''class Api{String entry(){try{'''+body+'''return after();}catch(NullPointerException failure){return failed();}}
+        int side(){return 1;}boolean sideBool(){return true;}String after(){return "wrong";}String failed(){return "caught";}}'''
+        project,db,ids=build(tmp_path,{'Api.java':source});engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='caught'
+E       AssertionError: assert 'wrong' == 'caught'
+E         
+E         - caught
+E         + wrong
+
+solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py:22: AssertionError
+_ test_null_unboxing_stops_execution_before_the_next_statement[Boolean input=null;String result=input?"yes":"no";] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-541/test_null_unboxing_stops_execu7')
+body = 'Boolean input=null;String result=input?"yes":"no";'
+
+    @pytest.mark.parametrize('body',[
+     'Integer input=null;int result=input+side();',
+     'Integer input=null;int result=side()+input;',
+     'Integer input=null;boolean result=input==1;',
+     'Character input=null;int result=input+1;',
+     'Boolean input=null;if(input){after();}',
+     'Boolean input=null;boolean result=input&&sideBool();',
+     'Boolean input=null;boolean result=!input;',
+     'Boolean input=null;String result=input?"yes":"no";',
+     'Boolean input=null;while(input){after();}',
+    ])
+    def test_null_unboxing_stops_execution_before_the_next_statement(tmp_path,body):
+        source='''class Api{String entry(){try{'''+body+'''return after();}catch(NullPointerException failure){return failed();}}
+        int side(){return 1;}boolean sideBool(){return true;}String after(){return "wrong";}String failed(){return "caught";}}'''
+        project,db,ids=build(tmp_path,{'Api.java':source});engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='caught'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_value-type-flow/code/analyzer/engine.py:155: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_value-type-flow/code/analyzer/engine.py:208: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+solutions/—_value-type-flow/code/analyzer/engine.py:244: in continue_filter
+    frame['result']=self.invoke(frame['entry'],frame['args'],reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_value-type-flow/code/analyzer/engine.py:382: in invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_value-type-flow/code/analyzer/engine.py:442: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_value-type-flow/code/analyzer/engine.py:540: in execute
+    result, control = self.execute(node.child_by_field_name('body'), env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_value-type-flow/code/analyzer/engine.py:442: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_value-type-flow/code/analyzer/engine.py:582: in execute
+    env[name] = self.value(child.child_by_field_name('value'), env)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_value-type-flow/code/analyzer/engine.py:875: in value
+    decision = self.choose(self.method + ':ternary:' + str(node.start_point.row + 1), [True, False])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x101b615d0>
+label = 'method:service:Api#entry():ternary:1', choices = [True, False]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:method:service:Api#entry():ternary:1', [True, False])
+
+solutions/—_value-type-flow/code/analyzer/engine.py:130: AlternativeRequired
+_ test_null_unboxing_stops_execution_before_the_next_statement[Boolean input=null;while(input){after();}] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-541/test_null_unboxing_stops_execu8')
+body = 'Boolean input=null;while(input){after();}'
+
+    @pytest.mark.parametrize('body',[
+     'Integer input=null;int result=input+side();',
+     'Integer input=null;int result=side()+input;',
+     'Integer input=null;boolean result=input==1;',
+     'Character input=null;int result=input+1;',
+     'Boolean input=null;if(input){after();}',
+     'Boolean input=null;boolean result=input&&sideBool();',
+     'Boolean input=null;boolean result=!input;',
+     'Boolean input=null;String result=input?"yes":"no";',
+     'Boolean input=null;while(input){after();}',
+    ])
+    def test_null_unboxing_stops_execution_before_the_next_statement(tmp_path,body):
+        source='''class Api{String entry(){try{'''+body+'''return after();}catch(NullPointerException failure){return failed();}}
+        int side(){return 1;}boolean sideBool(){return true;}String after(){return "wrong";}String failed(){return "caught";}}'''
+        project,db,ids=build(tmp_path,{'Api.java':source});engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})=='caught'
+E       AssertionError: assert 'wrong' == 'caught'
+E         
+E         - caught
+E         + wrong
+
+solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py:22: AssertionError
+_ test_concat_reference_equality_and_short_circuit_do_not_unbox[Integer input=null;String text=null;return text+input;-nullnull] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-541/test_concat_reference_equality1')
+body = 'Integer input=null;String text=null;return text+input;'
+expected = 'nullnull'
+
+    @pytest.mark.parametrize('body,expected',[
+     ('Integer input=null;return "prefix"+input;','prefixnull'),
+     ('Integer input=null;String text=null;return text+input;','nullnull'),
+     ('Boolean input=null;return false&&input;',False),
+     ('Integer left=null;Integer right=null;return left==right;',True),
+    ])
+    def test_concat_reference_equality_and_short_circuit_do_not_unbox(tmp_path,body,expected):
+        project,db,ids=build(tmp_path,{'Api.java':'class Api{Object entry(){'+body+'}}'})
+>       assert Engine(project,ScenarioState(db)).run(ids['Api.entry'],{})==expected
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'nullnull'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x101c117d0>.run
+E        +      where <analyzer.engine.Engine object at 0x101c117d0> = Engine(<analyzer.project.Project object at 0x101c13fd0>, <analyzer.state.ScenarioState object at 0x101c11890>)
+E        +        where <analyzer.state.ScenarioState object at 0x101c11890> = ScenarioState(<analyzer.state.Database object at 0x101b29210>)
+
+solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py:36: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py::test_null_unboxing_stops_execution_before_the_next_statement[Integer input=null;int result=input+side();]
+FAILED solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py::test_null_unboxing_stops_execution_before_the_next_statement[Integer input=null;int result=side()+input;]
+FAILED solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py::test_null_unboxing_stops_execution_before_the_next_statement[Integer input=null;boolean result=input==1;]
+FAILED solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py::test_null_unboxing_stops_execution_before_the_next_statement[Character input=null;int result=input+1;]
+FAILED solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py::test_null_unboxing_stops_execution_before_the_next_statement[Boolean input=null;if(input){after();}]
+FAILED solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py::test_null_unboxing_stops_execution_before_the_next_statement[Boolean input=null;boolean result=input&&sideBool();]
+FAILED solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py::test_null_unboxing_stops_execution_before_the_next_statement[Boolean input=null;boolean result=!input;]
+FAILED solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py::test_null_unboxing_stops_execution_before_the_next_statement[Boolean input=null;String result=input?"yes":"no";]
+FAILED solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py::test_null_unboxing_stops_execution_before_the_next_statement[Boolean input=null;while(input){after();}]
+FAILED solutions/—_value-type-flow/code/tests/test_null_unboxing_flow.py::test_concat_reference_equality_and_short_circuit_do_not_unbox[Integer input=null;String text=null;return text+input;-nullnull]
+10 failed, 3 passed in 0.27s

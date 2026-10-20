@@ -1,0 +1,38 @@
+# New references isolate expression typing before each relation measurement.
+cases.extend([
+ {'name':'expression_key_table_selection','family':'expression_key_data','entry':'Api.entry','sources':{
+ 'Api.java':'''import java.util.*;class Api {Store stock;AuditStore audit;String entry(){
+  Map map=new HashMap();map.put("key"+7,"ready");
+  if("ready".equals(map.get("key7"))){stock.findAll();return accepted();}
+  audit.findAll();return rejected();}String accepted(){return "ok";}String rejected(){return "bad";}}
+  @Entity @Table(name="items") class Item {@Id String id;}
+  @Entity @Table(name="events") class Event {@Id String id;}
+  interface Store extends JpaRepository<Item,String>{List<Item> findAll();}
+  interface AuditStore extends JpaRepository<Event,String>{List<Event> findAll();}'''},
+ 'rows':{'items':[],'events':[]},'methods':['Api.accepted'],'calls':[('Api.entry','Api.accepted')],
+ 'data':[('Api.entry','items')]},
+ {'name':'boolean_expression_key','family':'expression_key_boolean','entry':'Api.entry','sources':{
+ 'Api.java':'''import java.util.*;class Api {String entry(){Map map=new HashMap();map.put(2>1,"ready");
+  if("ready".equals(map.get(true))){return accepted();}return rejected();}
+  String accepted(){return "ok";}String rejected(){return "bad";}}'''},
+ 'methods':['Api.accepted'],'calls':[('Api.entry','Api.accepted')]},
+ {'name':'numeric_conditional_boxing','family':'expression_key_numeric','entry':'Api.entry','sources':{
+ 'Api.java':'''import java.util.*;class Api {String entry(){Map map=new HashMap();map.put(true?1:2L,"ready");
+  if("ready".equals(map.get(1L)) && map.get(1)==null){return accepted();}return rejected();}
+  String accepted(){return "ok";}String rejected(){return "bad";}}'''},
+ 'methods':['Api.accepted'],'calls':[('Api.entry','Api.accepted')]},
+ {'name':'char_numeric_promotion','family':'expression_char_promotion','entry':'Api.entry','sources':{
+ 'Api.java':'''class Api {String entry(){if('A'+1==66){return accepted();}return rejected();}
+  String accepted(){return "ok";}String rejected(){return "bad";}}'''},
+ 'methods':['Api.accepted'],'calls':[('Api.entry','Api.accepted')]},
+ {'name':'string_return_key_remote_selection','family':'expression_key_remote','entry':'Client.entry','sources':{
+ 'Client.java':'''import java.util.*;import org.springframework.web.client.RestTemplate;
+ class Client {RestTemplate rest;String entry(){String part="mode-tail";Map map=new HashMap();
+  map.put(part.substring(0,4),"ready");
+  if("ready".equals(map.get("mode"))){return rest.getForObject("http://stock/alive",String.class);}
+  return rest.getForObject("http://stock/wrong",String.class);}}''',
+ 'Stock.java':'''class Api {@GetMapping("/alive") String alive(){return "ok";}
+  @GetMapping("/wrong") String wrong(){return "bad";}}'''},
+ 'remote_units':True,'methods':['Api.alive'],'remote':[('Client.entry','Api.alive')]}
+])
+

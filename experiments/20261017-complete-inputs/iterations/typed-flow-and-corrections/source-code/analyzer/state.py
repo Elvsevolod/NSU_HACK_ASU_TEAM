@@ -1,0 +1,158 @@
+"""Read a MySQL dump as text, retaining independent state for each scenario."""
+from copy import deepcopy
+from enum import Enum
+import gzip
+import re
+
+
+class Unknown(Enum):
+    VALUE = 'unknown'
+
+
+U = Unknown.VALUE
+
+
+def camel(name):
+    return re.sub(r'_([a-z])', lambda m: m[1].upper(), name)
+
+
+def sql_rows(source):
+    """Tokenize the dump's VALUES tuples, including escaped quotes and commas."""
+    token, row, quoted, escaped, quoted_value = '', [], False, False, False
+    for char in source:
+        if escaped:
+            token += {'n': '\n', 'r': '\r', 't': '\t', '0': '\0'}.get(char, char)
+            escaped = False
+        elif quoted:
+            if char == '\\':
+                escaped = True
+            elif char == "'":
+                quoted = False
+            else:
+                token += char
+        elif char == "'":
+            quoted = quoted_value = True
+        elif char in ',)':
+            if token.strip() or quoted_value:
+                value = token if quoted_value else token.strip()
+                if not quoted_value:
+                    if value == 'NULL':
+                        value = None
+                    elif re.fullmatch(r'-?\d+', value):
+                        value = int(value)
+                    elif re.fullmatch(r'-?\d+\.\d+', value):
+                        value = float(value)
+                row.append(value)
+                token, quoted_value = '', False
+            if char == ')':
+                yield row
+                row = []
+        elif char not in '(':
+            token += char
+
+
+class Database:
+    def __init__(self, path):
+        self.tables = {}
+        self.schemas = {}
+        self.unknown_tables = set()
+        db = None
+        opener = gzip.open if str(path).endswith('.gz') else open
+        with opener(path, 'rt', encoding='utf-8', errors='surrogateescape') as stream:
+            content = stream.read()
+        columns = {}
+        for statement in re.finditer(r'USE `([^`]+)`;|CREATE TABLE `([^`]+)` \((.*?)\) ENGINE|INSERT INTO `([^`]+)` VALUES (.*?);\s*(?:\n|$)', content, re.S):
+            use, create, fields, insert, values = statement.groups()
+            if use:
+                db = use
+            elif create:
+                columns[(db, create)] = re.findall(r'^\s*`([^`]+)`', fields, re.M)
+                self.tables[(db, create)] = []
+            elif insert:
+                names = columns[(db, insert)]
+                for row in sql_rows(values):
+                    if len(row) != len(names):
+                        raise ValueError(f'Dump row length mismatch: {db}.{insert}')
+                    self.tables[(db, insert)].append({camel(k): v for k, v in zip(names, row)})
+
+    def materialize(self, resource, row, aliases=None, collections=None, primary_field=None):
+        record = deepcopy(row)
+        for column, field in (aliases or {}).items():
+            if column in record and field not in record:
+                record[field] = record[column]
+        db = self.schemas.get(resource.get('schema', ''), resource.get('schema', ''))
+        if (db, resource['name']) not in self.tables:
+            candidates = [schema for schema, table in self.tables if table == resource['name']]
+            if len(candidates) == 1:
+                db = candidates[0]
+        for prop, table, foreign, *columns in collections or []:
+            if prop not in record:
+                norm = lambda value: re.sub(r'[^a-z0-9]', '', value.lower())
+                def get(row, column):
+                    return next((value for key, value in row.items() if norm(key) == norm(column)), U)
+                rows = self.tables.get((db, table))
+                if rows is None or (db, table) in self.unknown_tables:
+                    record[prop] = U
+                    continue
+                selected = [r for r in rows if primary_field and get(r, foreign) == record.get(primary_field)]
+                if columns:
+                    value_column, order_column = columns
+                    if order_column:
+                        positions = [get(r, order_column) for r in selected]
+                        if any(not isinstance(index, int) or isinstance(index, bool) for index in positions) or len(set(positions)) != len(positions):
+                            record[prop] = U
+                            continue
+                        selected = sorted(selected, key=lambda r: get(r, order_column))
+                    record[prop] = [get(r, value_column) for r in selected]
+                else:
+                    record[prop] = [{k: v for k, v in r.items() if k != foreign} for r in selected]
+        return record
+
+    def copy(self):
+        return deepcopy(self)
+
+    def invalidate(self, rows):
+        for key, existing in self.tables.items():
+            if existing is rows:
+                self.unknown_tables.add(key)
+
+    def rows(self, resource):
+        schema = resource.get('schema', '')
+        db = self.schemas.get(schema, schema)
+        key = (db, resource['name'])
+        if key in self.unknown_tables:
+            return None
+        if key in self.tables:
+            return self.tables[key]
+        matches = [rows for (_, table), rows in self.tables.items() if table == resource['name']]
+        return matches[0] if len(matches) == 1 else None
+
+    def summary(self):
+        return {db + '.' + table: len(rows) for (db, table), rows in sorted(self.tables.items())}
+
+
+class ScenarioState:
+    """Generic path-local database, browser state and response journal."""
+    def __init__(self, database, context=None):
+        self.database = database.copy()
+        self.context = deepcopy(context or {})
+        self.now = self.context.get('clock', U)
+        self.browser = {'storage': {}, 'form': {}, 'dom': {}, 'url': {}}
+        self.history = []
+        self.symbol_sequence = 0
+        self.input_sequence = 0
+        self.limitations = []
+
+    def fresh_input(self, label, typ='String'):
+        existing = {str(v) for rows in self.database.tables.values() for row in rows for v in row.values()}
+        while True:
+            self.input_sequence += 1
+            value = 'symbolic-input-' + label + '-' + str(self.input_sequence)
+            if value not in existing:
+                return {'__symbol__': value, '__type__': typ, '__constraints__': ['non_null', 'fresh_unique']}
+
+    def snapshot(self):
+        return {'browser': deepcopy(self.browser),
+                'history': [{k: item.get(k) for k in ('step', 'entry', 'action')} for item in self.history],
+                'clock': self.now, 'database_rows': self.database.summary(),
+                'limitations': list(self.limitations)}

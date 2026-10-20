@@ -1,0 +1,122 @@
+{
+  "model": "opencode/deepseek-v4.1-flash-free",
+  "variant": "max",
+  "permissions": {
+    "edit": "deny",
+    "bash": "deny",
+    "task": "deny",
+    "external_directory": "deny"
+  },
+  "architecture_session": "ses_eb7465225ffexISXa5PKMf06o1",
+  "architecture_review": "completed after resuming bounded read-only session",
+  "reference_session": "ses_eb7378375ffea7jbG6ou7vpPYG",
+  "reference_review": "unavailable; HTTP403 FreeTierError; no replacement model",
+  "errors": [
+    {
+      "type": "error",
+      "timestamp": 1792222465495,
+      "sessionID": "ses_eb7378375ffea7jbG6ou7vpPYG",
+      "error": {
+        "name": "APIError",
+        "data": {
+          "message": "OpenCode's free tier can only be used from within OpenCode. Download it at https://opencode.ai and keep building.",
+          "statusCode": 403,
+          "isRetryable": false,
+          "responseHeaders": {
+            "cf-placement": "remote-IAD",
+            "cf-ray": "a4bd9ee83b4c939a-EWR",
+            "connection": "keep-alive",
+            "content-encoding": "br",
+            "content-type": "application/json",
+            "date": "Sat, 17 Oct 2026 07:34:25 GMT",
+            "server": "cloudflare",
+            "transfer-encoding": "chunked",
+            "x-opencode-log-id": "c99de5e1-3401-4e53-97e6-d878cf9a54f5"
+          },
+          "responseBody": "{\"type\":\"error\",\"error\":{\"type\":\"FreeTierError\",\"message\":\"OpenCode's free tier can only be used from within OpenCode. Download it at https://opencode.ai and keep building.\"}}",
+          "metadata": {
+            "url": "https://opencode.ai/inference/openai/v1/chat/completions"
+          }
+        }
+      }
+    }
+  ],
+  "files_changed_by_deepseek": [],
+  "raw_logs_directory": "experiments/20261017-polyglot-scenario-core",
+  "raw_sha256": {
+    "deepseek.jsonl": "9aee704f2e2594e22b0a276dba04f4da1243323104fb0a0b97519de943ba2798",
+    "deepseek-resume.jsonl": "2be076bcc7b87060855d5f7a149f59921b8026e8dc9ff6e428614cad297e8375",
+    "reference.jsonl": "4f8d73033c651f3cb77d6e53c45e270ae21c00832385f2337b70e70534d9293b",
+    "oss-review.jsonl": "2e8f0b826c4f7a22c4ff2f9e77e3c4eed1770b1eb4f057790b921c0689f46117",
+    "oss-review-resume.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "phase3-consult.jsonl": "080e2ce88c4b570bc8a3544624478a9de19c45556d211792946947f39e52f784",
+    "phase3-consult.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "phase3-consult-status.json": "b9093c960dcd0df441f1bc1162157a6623fbcc0196145feee70d7b1334b885c2",
+    "phase5-consult.jsonl": "1a03c451d0e3176769336408edc597216a298457476cf6db97ffd73ec627dbf3",
+    "phase5-consult.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "phase5-consult-status.json": "ccec6378bf0e5e9e85eee944a9f88c718cefc945662f464653990a088df8cf93",
+    "phase6-consult.jsonl": "c82c8d39e3c2236d096ca2c9159eefa575aac683600e4f86e3e560c797bb8572",
+    "phase6-consult.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "phase6-consult-status.json": "0ce32ae82535b1f66a3ca0febce30f0ea362e8d037b8552f1912c3d1bfdcd964"
+  },
+  "response_cost_reported": 0,
+  "codex_usage_cost_measured": false,
+  "OSS_review": {
+    "status": "incomplete; first bounded call read files, resumed call made no observable progress and timed out; no final review accepted",
+    "first_call": {
+      "timeout": true,
+      "seconds": 55.05173937500513
+    },
+    "resume": {
+      "timeout": true,
+      "seconds": 170.04941183299525
+    },
+    "tool_counts": {
+      "skill": 1,
+      "glob": 1,
+      "read": 13
+    },
+    "write_or_shell_tools_observed": false,
+    "files_changed_by_deepseek": []
+  },
+  "phase2": {
+    "second_opinion": "Need reassessed after new evidence; completed architecture feedback already used. No repeated request to the stalled OSS review in this phase. New changes reviewed and tested by Codex.",
+    "implementation_delegation": "Not used: user requires DeepSeek to remain read-only. No edit/bash/task permissions relaxed."
+  },
+  "phase3": {
+    "session": "ses_eb6a42076ffeFOEXcFfihuBdM3",
+    "question": "Read-only review of reusable source UI/core boundary and opaque identity",
+    "status": "No substantive response in 75 seconds; no review accepted; no replacement model",
+    "attempt": {
+      "timeout": true,
+      "seconds": 75.06339954098803
+    },
+    "files_changed_by_deepseek": [],
+    "implementation_delegation": "Not used: human requires DeepSeek to remain read-only."
+  },
+  "phase4": {
+    "second_opinion": "Benefit reassessed for native authentication/schema boundary. Provider had repeated non-retryable/free-tier errors and bounded no-response reviews. No new request issued in this phase; review and adversarial verification performed by Codex.",
+    "implementation_delegation": "Not used: user requires DeepSeek to remain read-only.",
+    "files_changed_by_deepseek": []
+  },
+  "phase5": {
+    "second_opinion": "Need reassessed for deployment-scoped configuration, MVC advice, Feign selection and temporal boundary. A bounded read-only attempt produced no substantive response or tool action; no independent review accepted.",
+    "session": "ses_eb6150683ffePQXPD88HKxmT3n",
+    "attempt": {
+      "timeout": true,
+      "seconds": 45.0467528750014
+    },
+    "implementation_delegation": "Not used: human requires DeepSeek to remain read-only. No model substituted.",
+    "files_changed_by_deepseek": []
+  },
+  "phase6": {
+    "second_opinion": "Read-only adversarial review of deferred Java callbacks and collection effects attempted after new evidence. Only step_start was returned before a 45-second timeout. No substantive review accepted.",
+    "session": "ses_eb5bae331ffe3j9bycdNCE0kTu",
+    "attempt": {
+      "timeout": true,
+      "seconds": 45.026552041003015
+    },
+    "implementation_delegation": "Not used: human requires DeepSeek read-only. No model substituted.",
+    "files_changed_by_deepseek": []
+  }
+}

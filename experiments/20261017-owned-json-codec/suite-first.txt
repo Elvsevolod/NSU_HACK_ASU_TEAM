@@ -1,0 +1,37 @@
+........................................................................ [  6%]
+........................................................................ [ 13%]
+........................................................................ [ 20%]
+........................................................................ [ 27%]
+........................................................................ [ 34%]
+........................................................................ [ 41%]
+........................................................................ [ 48%]
+........................................................................ [ 55%]
+........................................................................ [ 62%]
+........................................................................ [ 69%]
+........................................................................ [ 76%]
+..................F..................................................... [ 82%]
+........................................................................ [ 89%]
+........................................................................ [ 96%]
+.................................                                        [100%]
+=================================== FAILURES ===================================
+___ test_unknown_json_property_cannot_supply_a_differently_cased_java_field ____
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-637/test_unknown_json_property_can0')
+
+    def test_unknown_json_property_cannot_supply_a_differently_cased_java_field(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;
+          import com.fasterxml.jackson.databind.ObjectMapper;
+          class Item {public String id;}
+          class Api {String entry(){Map input=new HashMap();input.put("ID","wrong-known");
+            ObjectMapper mapper=new ObjectMapper();String text=mapper.writeValueAsString(input);
+            Item result=mapper.readValue(text,Item.class);return result.id;}}'''})
+        engine=Engine(project,ScenarioState(db))
+        assert engine.run(ids['Api.entry'],{}) is U
+>       assert engine.approximate and any('undeclared JSON properties' in warning for warning in engine.warnings)
+E       assert (False)
+E        +  where False = <analyzer.engine.Engine object at 0x1046ab190>.approximate
+
+code/tests/test_scalar_record_boundaries.py:40: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_scalar_record_boundaries.py::test_unknown_json_property_cannot_supply_a_differently_cased_java_field
+1 failed, 1040 passed in 2.33s

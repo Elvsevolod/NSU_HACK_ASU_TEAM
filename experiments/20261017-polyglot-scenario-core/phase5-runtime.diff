@@ -1,0 +1,1563 @@
+--- phase4/code/polygraph/analysis.py
++++ phase5/code/polygraph/analysis.py
+@@ -9,6 +9,8 @@
+ 
+ 
+ def analyze(project, initial, context, scenario, grounder=None, path_limit=16, loop_limit=32, depth_limit=32, step_limit=30000, policy="may", smt=True, smt_timeout_ms=50):
++    if context.get('configuration',project.source_configuration)!=project.source_configuration:
++        raise ValueError('Deployment configuration differs from the project index; rebuild Project with this configuration')
+     grounder = grounder if grounder is not None else Grounder(project)
+     pending, paths, frontier = deque([()]), [], []
+     attempts = 0
+--- phase4/code/polygraph/cli.py
++++ phase5/code/polygraph/cli.py
+@@ -41,8 +41,8 @@
+     if context_path and context_path.is_dir():
+         candidates=[path for path in context_path.iterdir() if path.suffix in {'.json','.sql','.gz'}]
+         context_path=candidates[0] if len(candidates)==1 else None
+-    source_globals=read_json(context_path).get('globals',{}) if context_path and context_path.suffix=='.json' else {}
+-    project = Project(args.source, args.skeleton, args.cache, args.profile,source_globals)
++    startup=read_json(context_path) if context_path and context_path.suffix=='.json' else {}
++    project = Project(args.source, args.skeleton, args.cache, args.profile,startup.get('globals',{}),startup.get('configuration',{}))
+     initial, context, warnings = load_context(args.context, project, args.sql_dialect)
+     context = {**context, "sql_dialect": args.sql_dialect}
+     grounder = Grounder(project)
+@@ -76,6 +76,7 @@
+                    "methods": len(project.methods), "endpoints": len(project.endpoints), "lowered_methods": project.lowered,
+                    "IR_cache_hits": project.cache_hits, "project_diagnostics": project.diagnostics,
+                    "source_framework_versions": project.framework_versions,
++                   "deployment_configuration":project.configuration.summary(),
+                    "frontend":grounder.ui.summary(), "native_javascript":js_after,
+                    "native_security":{k:native_security_calls[k]-security_before[k] for k in native_security_calls},
+                    "peak_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * (1 if sys.platform == "darwin" else 1024)})
+--- phase4/code/polygraph/ir.py
++++ phase5/code/polygraph/ir.py
+@@ -38,6 +38,7 @@
+     alias: str = ""
+     default: Expr | None = None
+     dependency: str = ""
++    annotations: dict = field(default_factory=dict)
+ 
+ 
+ @dataclass
+--- phase4/code/polygraph/java.py
++++ phase5/code/polygraph/java.py
+@@ -22,6 +22,11 @@
+     mods = next((c for c in node.named_children if c.type == "modifiers"), None)
+     return {text(a.child_by_field_name("name")).split(".")[-1]: text(a.child_by_field_name("arguments"))
+             for a in mods.named_children if a.type in {"annotation", "marker_annotation"}} if mods else {}
++
++
++def full_annotations(node):
++    mods=next((c for c in node.named_children if c.type=='modifiers'),None)
++    return {text(a.child_by_field_name('name')):text(a.child_by_field_name('arguments')) for a in mods.named_children if a.type in {'annotation','marker_annotation'}} if mods else {}
+ 
+ 
+ def annotation_value(raw, key=""):
+@@ -57,6 +62,7 @@
+         self.trees, self.raw_types = {}, {}
+         self.file, self.local_types = "", {}
+         self.owner = ""
++        self.package_names={};self.custom_constraints=set()
+ 
+     def span(self, node):
+         return Span(self.file, node.start_point.row + 1, node.start_point.column + 1)
+@@ -71,6 +77,7 @@
+             if tree.root_node.has_error:
+                 self.p.warn("java-parse", "Java parser reported an unsupported or invalid construct", Span(file))
+             package = next((text(n).removeprefix("package ").rstrip(";").strip() for n in tree.root_node.named_children if n.type == "package_declaration"), "")
++            self.package_names[file]=package
+             imported = self.p.imports.setdefault(file, {})
+             for node in tree.root_node.named_children:
+                 if node.type == "import_declaration":
+@@ -81,6 +88,8 @@
+                         self.p.import_wildcards[file].append(value[:-2])
+             module = self.p.module(file)
+             for node in walk(tree.root_node):
++                if node.type=='annotation_type_declaration' and 'Constraint' in annotations(node):
++                    self.custom_constraints.add((package+'.' if package else '')+text(node.child_by_field_name('name')))
+                 if node.type not in {"class_declaration", "interface_declaration", "enum_declaration", "record_declaration"}:
+                     continue
+                 short = text(node.child_by_field_name("name"))
+@@ -96,12 +105,14 @@
+                     if ext:
+                         parents.extend(re.findall(r"[\w.]+(?:\s*<[^>]+>)?", re.sub(r"^extends\s+", "", text(ext))))
+                 meta = annotations(node)
++                meta['validation_annotations']=full_annotations(node)
+                 meta["kind"] = node.type
+                 info = TypeInfo(key, short, module, "java", self.span(node), parents=parents, annotations=meta)
+                 self.p.add_type(info)
+                 self.raw_types[key] = node
+                 body = node.child_by_field_name("body")
+-                for child in body.named_children if body else []:
++                members=[member for child in body.named_children for member in (child.named_children if child.type=='enum_body_declarations' else [child])] if body else []
++                for child in members:
+                     if child.type == "field_declaration":
+                         typ = text(child.child_by_field_name("type"))
+                         ann = annotations(child)
+@@ -124,6 +135,7 @@
+                                     self.p.immutable_globals.add(key + "." + field)
+                                 continue
+                             info.fields[field] = (typ, self.expr(default_node) if default_node else None)
++                            if ann:info.annotations.setdefault('field_annotations',{})[field]=full_annotations(child)
+                             if "Column" in ann:
+                                 info.columns[field] = annotation_value(ann["Column"], "name") or field
+                             if "Id" in ann:
+@@ -164,9 +176,10 @@
+                     value = annotation_value(ann[attribute], "defaultValue")
+                     if value:
+                         default = Expr("const", value=value, span=self.span(par))
+-            params.append(Parameter(pname, typ, location, alias, default))
++            params.append(Parameter(pname, typ, location, alias, default,annotations=full_annotations(par)))
+         key = owner.key + "#" + name + "(" + ",".join(p.typ for p in params) + ")"
+         ann = annotations(node)
++        ann['validation_annotations']=full_annotations(node)
+         method = Method(key, name, owner.key, owner.module, "java", self.span(node), params,
+                         text(node.child_by_field_name("type")), abstract=node.child_by_field_name("body") is None,
+                         transaction="Transactional" in ann or "Transactional" in owner.annotations, annotations=ann)
+@@ -215,9 +228,14 @@
+                             path = "/" + "/".join(part.strip("/") for part in [prefix, suffix] if part.strip("/"))
+                             for verb in verbs:
+                                 conditions = {"profile_unknown": enabled is None}
++                                context_path=self.p.configuration.context_path(info.module)
++                                from .values import unknown
++                                if unknown(context_path):conditions['context_path_unknown']=True
++                                full_path=path if unknown(context_path) else context_path+path
+                                 if re.search(r"\b(?:params|headers|consumes|produces)\s*=", args):
+                                     conditions["mapping_constraints"] = args
+-                                self.p.endpoints.append(Endpoint(mid, verb, path, info.module, "spring", conditions=conditions))
++                                from .spring_http import response_status
++                                self.p.endpoints.append(Endpoint(mid, verb, full_path, info.module, "spring",status=response_status({**info.annotations,**ann}),conditions=conditions))
+ 
+     def expr(self, node):
+         if node is None:
+--- phase4/code/polygraph/java_contracts.py
++++ phase5/code/polygraph/java_contracts.py
+@@ -16,6 +16,7 @@
+     'org.springframework.util.StringUtils', 'org.slf4j.LoggerFactory', 'org.slf4j.Logger',
+     'java.util.ArrayList', 'java.util.HashMap', 'java.util.LinkedList', 'java.util.LinkedHashMap',
+     'java.util.Optional', 'java.util.UUID',
++    'java.util.Date','java.time.LocalDate','java.time.LocalDateTime','java.time.Instant','java.time.ZonedDateTime','java.time.ZoneId',
+ }
+ 
+ 
+--- phase4/code/polygraph/java_time.py
++++ phase5/code/polygraph/java_time.py
+@@ -0,0 +1,135 @@
++"""Bounded Java time bridge over CPython datetime and pinned IANA tzdata.
++
++No host clock or system timezone files are read. Regional rules require an
++explicit target tzdb version. Nanoseconds and years outside CPython's range
++remain unsupported rather than rounded into different Java values.
++"""
++from datetime import date,datetime,time,timedelta,timezone
++from functools import lru_cache
++from importlib.resources import files
++import re
++from zoneinfo import ZoneInfo
++
++import tzdata
++
++from .values import Object,TypeRef,Unknown,Raised,unknown
++from .models import NOT_HANDLED
++
++EPOCH=datetime(1970,1,1,tzinfo=timezone.utc)
++TYPES={'java.time.LocalDate','java.time.LocalDateTime','java.time.ZonedDateTime','java.time.Instant','java.util.Date'}
++
++
++@lru_cache(maxsize=128)
++def zone(name):
++    # Validate resource components before opening package data, never TZPATH.
++    if not re.fullmatch(r'[A-Za-z0-9_+-]+(?:/[A-Za-z0-9_+-]+)*',name):raise ValueError('Unsupported zone ID')
++    with files('tzdata.zoneinfo').joinpath(*name.split('/')).open('rb') as stream:
++        return ZoneInfo.from_file(stream,key=name)
++
++
++def timezone_value(engine,value,span):
++    if not isinstance(value,Object) or value.typ!='java.time.ZoneId':engine.unsupported('Unresolved Java timezone',span)
++    name=value.fields.get('name')
++    if not isinstance(name,str):engine.unsupported('Unknown Java timezone identifier',span)
++    if name not in {'UTC','GMT','UT','Etc/UTC','Etc/GMT'} and engine.context.get('timezone_database')!=tzdata.IANA_VERSION:
++        engine.unsupported('Regional Java time requires an explicit matching timezone_database ('+tzdata.IANA_VERSION+')',span)
++    try:return zone('UTC' if name=='UT' else name)
++    except (ValueError,OSError):engine.unsupported('Java ZoneId needs a fixed-offset, alias or unavailable IANA contract',span)
++
++
++def now(engine,span):
++    from .security_models import clock
++    raw=engine.context.get('clock')
++    if isinstance(raw,str) and re.search(r'\.\d{7,}',raw):engine.unsupported('Java nanosecond clock precision exceeds the datetime bridge',span)
++    result=clock(engine)
++    if unknown(result):engine.unsupported('Java current time requires an explicit analysis clock',span)
++    try:return result.astimezone(timezone.utc)
++    except OverflowError:engine.unsupported('Java clock exceeds the datetime bridge range',span)
++
++
++def wrapped(engine,typ,value):return engine.state.new(typ,{'value':value})
++
++
++def value(engine,obj,typ,span):
++    if obj is None:raise Raised('NullPointerException')
++    if not isinstance(obj,Object) or obj.typ!=typ or unknown(obj.fields.get('value')):
++        engine.unsupported('Unresolved '+typ+' value',span)
++    result=obj.fields.get('value')
++    if typ=='java.time.LocalDate' and type(result) is date:return result
++    if type(result) is datetime and ((result.tzinfo is None)==(typ=='java.time.LocalDateTime')):return result
++    engine.unsupported('Invalid native value for '+typ,span)
++
++
++def millis(instant):
++    delta=instant-EPOCH
++    return (delta.days*86400+delta.seconds)*1000+delta.microseconds//1000
++
++
++def date_construct(engine,typ,args,kwargs,span):
++    qualified=engine.p.resolve_import(typ,span.file) or typ
++    if qualified!='java.util.Date':return NOT_HANDLED
++    if kwargs:return NOT_HANDLED
++    if not args:instant=now(engine,span)
++    elif len(args)==1 and type(args[0]) is int:
++        try:instant=EPOCH+timedelta(milliseconds=args[0])
++        except OverflowError:engine.unsupported('Java Date exceeds the datetime bridge year range',span)
++    else:engine.unsupported('Unmodeled Java Date constructor overload',span)
++    return wrapped(engine,'java.util.Date',EPOCH+timedelta(milliseconds=millis(instant)))
++
++
++def call(engine,receiver,name,args,kwargs,span):
++    typ=receiver.name if isinstance(receiver,TypeRef) else receiver.typ if isinstance(receiver,Object) else ''
++    if typ not in TYPES|{'java.time.ZoneId'}:return NOT_HANDLED
++    if kwargs:return NOT_HANDLED
++    static=isinstance(receiver,TypeRef)
++    if static and typ=='java.time.ZoneId' and name in {'of','systemDefault'}:
++        if name=='systemDefault' and not args:identifier=engine.context.get('timezone')
++        elif name=='of' and len(args)==1:identifier=args[0]
++        else:return NOT_HANDLED
++        if identifier is None:engine.unsupported('Java system timezone is not supplied',span)
++        result=engine.state.new(typ,{'name':identifier});timezone_value(engine,result,span)
++        return result
++    if static and name=='now' and typ in {'java.time.LocalDate','java.time.Instant'}:
++        instant=now(engine,span)
++        if typ=='java.time.Instant' and not args:return wrapped(engine,typ,instant)
++        if typ=='java.time.LocalDate' and len(args)<=1:
++            selected=args[0] if args else engine.state.new('java.time.ZoneId',{'name':engine.context.get('timezone')})
++            return wrapped(engine,typ,instant.astimezone(timezone_value(engine,selected,span)).date())
++        return NOT_HANDLED
++    if static and name=='of' and typ in {'java.time.LocalDate','java.time.LocalDateTime'}:
++        counts={3} if typ.endswith('.LocalDate') else {5,6}
++        if len(args) not in counts or any(type(arg) is not int for arg in args):return NOT_HANDLED
++        if not 1<=args[0]<=9999:engine.unsupported('Java time year exceeds the datetime bridge range',span)
++        try:result=date(*args) if typ.endswith('.LocalDate') else datetime(*args)
++        except ValueError:raise Raised('DateTimeException') from None
++        return wrapped(engine,typ,result)
++    if static and typ=='java.time.Instant' and name=='ofEpochMilli' and len(args)==1 and type(args[0]) is int:
++        try:return wrapped(engine,typ,EPOCH+timedelta(milliseconds=args[0]))
++        except OverflowError:engine.unsupported('Java Instant exceeds the datetime bridge range',span)
++    if static and typ=='java.util.Date' and name=='from' and len(args)==1:
++        instant=value(engine,args[0],'java.time.Instant',span)
++        return wrapped(engine,typ,EPOCH+timedelta(milliseconds=millis(instant)))
++    if static:engine.unsupported('Java temporal static method '+typ+'.'+name,span)
++    if typ=='java.time.ZoneId':
++        if name in {'getId','toString'} and not args:return receiver.fields.get('name',Unknown('Unknown Java timezone ID'))
++        engine.unsupported('Java ZoneId method '+name,span)
++    current=value(engine,receiver,typ,span)
++    if typ=='java.time.LocalDate' and name=='atStartOfDay' and not args:
++        return wrapped(engine,'java.time.LocalDateTime',datetime.combine(current,time()))
++    if typ=='java.time.LocalDateTime' and name=='atZone' and len(args)==1:
++        selected=timezone_value(engine,args[0],span)
++        # fold=0 selects the earlier offset in overlaps; round-trip through UTC
++        # shifts nonexistent local times by the gap, as LocalDateTime.atZone.
++        try:result=current.replace(tzinfo=selected,fold=0).astimezone(timezone.utc).astimezone(selected)
++        except OverflowError:engine.unsupported('Zoned Java time exceeds the datetime bridge range',span)
++        return wrapped(engine,'java.time.ZonedDateTime',result)
++    if typ in {'java.time.ZonedDateTime','java.util.Date'} and name=='toInstant' and not args:
++        return wrapped(engine,'java.time.Instant',current.astimezone(timezone.utc))
++    if typ in {'java.time.Instant','java.util.Date'} and name==('getTime' if typ=='java.util.Date' else 'toEpochMilli') and not args:return millis(current)
++    if name in {'equals','isBefore','isAfter','before','after'} and len(args)==1 and typ!='java.time.ZonedDateTime':
++        if name=='equals' and (not isinstance(args[0],Object) or args[0].typ!=typ):return False
++        other=value(engine,args[0],typ,span)
++        return current==other if name=='equals' else current<other if name in {'isBefore','before'} else current>other
++    if name=='toEpochDay' and typ=='java.time.LocalDate' and not args:return (current-date(1970,1,1)).days
++    if name=='toString' and typ=='java.time.LocalDate' and not args:return current.isoformat()
++    engine.unsupported('Java temporal instance method '+typ+'.'+name,span)
+--- phase4/code/polygraph/java_validation.py
++++ phase5/code/polygraph/java_validation.py
+@@ -0,0 +1,136 @@
++"""Field Bean Validation subset over IR values, with native Pydantic bounds.
++
++Source getter/custom validators and custom groups remain explicit cutoffs.
++Length measures Java UTF-16 code units, not Python Unicode code points.
++"""
++from functools import lru_cache
++import re
++from typing import Annotated
++
++from pydantic import Field,TypeAdapter,ValidationError
++
++from .values import Object,Raised,Symbol,unknown
++
++PACKAGES={'javax.validation.constraints','jakarta.validation.constraints','org.hibernate.validator.constraints'}
++SUPPORTED={'NotNull','Null','Length','Size','Min','Max','AssertTrue','AssertFalse','NotEmpty'}
++
++
++def qualified(project,name,file):
++    explicit=project.resolve_import(name,file)
++    if explicit:return explicit
++    if '.' in name:return name
++    custom=project.adapters['java'].custom_constraints
++    local=project.adapters['java'].package_names.get(file,'')
++    local=(local+'.' if local else '')+name
++    if local in custom:return local
++    if name in {'Valid','Validated'}:
++        candidates={package+'.'+name for package in project.import_wildcards[file] if package in {'javax.validation','jakarta.validation','org.springframework.validation.annotation'}}
++        return candidates.pop() if len(candidates)==1 else ''
++    candidates={package+'.'+name for package in project.import_wildcards[file] if package in PACKAGES}
++    candidates|={package+'.'+name for package in project.import_wildcards[file] if package+'.'+name in custom}
++    return candidates.pop() if len(candidates)==1 else ''
++
++
++@lru_cache(maxsize=256)
++def bounds(minimum,maximum):return TypeAdapter(Annotated[int,Field(ge=minimum,le=maximum)])
++
++
++def literal(engine,raw,name,default,span):
++    if name!='value' and not re.search(r'\b'+name+r'\s*=',raw):return default
++    pattern=r'\b'+name+r'\s*=\s*([+-]?\d[\d_]*)[lL]?(?=\s*[,\)])' if name!='value' or 'value' in raw else r'^\(\s*([+-]?\d[\d_]*)[lL]?\s*\)$'
++    found=re.search(pattern,raw)
++    if not found:engine.unsupported('Nonliteral Bean Validation bound',span)
++    return int(found[1].replace('_',''))
++
++
++def reject(engine,field,constraint,span):
++    engine.note('bean-validation','Source field fails a checked constraint',span,field=field,constraint=constraint)
++    raise Raised('MethodArgumentNotValidException')
++
++
++def constraint(engine,name,raw,value,typ,field,span):
++    if 'groups' in raw:engine.unsupported('Custom Bean Validation groups',span)
++    if name not in SUPPORTED:engine.unsupported('Bean Validation constraint '+name+' needs an additional contract',span)
++    if name=='NotNull':
++        if value is None:reject(engine,field,name,span)
++        if unknown(value) and not isinstance(value,Symbol):engine.unsupported('Unknown nullability during Bean Validation',span)
++        if isinstance(value,Symbol) and not value.nonnull:engine.unsupported('Unknown symbol nullability during Bean Validation',span)
++        return
++    if name=='Null':
++        if unknown(value):engine.unsupported('Unknown value for a Null constraint',span)
++        if value is not None:reject(engine,field,name,span)
++        return
++    if value is None:
++        if name=='NotEmpty':reject(engine,field,name,span)
++        return
++    if unknown(value):engine.unsupported('Unknown value during Bean Validation',span)
++    if name in {'AssertTrue','AssertFalse'}:
++        if type(value) is not bool:engine.unsupported('Non-boolean assertion constraint',span)
++        if value!=(name=='AssertTrue'):reject(engine,field,name,span)
++        return
++    if name in {'Length','Size','NotEmpty'}:
++        raw_type=typ.split('<')[0].split('.')[-1]
++        if raw_type not in {'String','CharSequence','List','Set','Collection','Map','Iterable'} and not typ.endswith('[]'):engine.unsupported('Constraint on an unmodeled sized Java type',span)
++        if name=='Length' and not isinstance(value,str):engine.unsupported('Length constraint requires a CharSequence',span)
++        if not isinstance(value,(str,list,tuple,dict)):engine.unsupported('Unmodeled sized Java value',span)
++        measure=len(value.encode('utf-16-le',errors='surrogatepass'))//2 if isinstance(value,str) else len(value)
++        minimum=1 if name=='NotEmpty' else literal(engine,raw,'min',0,span)
++        maximum=2147483647 if name=='NotEmpty' else literal(engine,raw,'max',2147483647,span)
++    else:
++        if type(value) is not int:engine.unsupported('Non-integral Min/Max value',span)
++        measure=value;limit=literal(engine,raw,'value',None,span)
++        minimum,maximum=(limit,None) if name=='Min' else (None,limit)
++    if minimum is not None and maximum is not None and (minimum<0 and name in {'Length','Size'} or maximum<minimum):engine.unsupported('Invalid Bean Validation bounds',span)
++    try:bounds(minimum,maximum).validate_python(measure,strict=True)
++    except ValidationError:reject(engine,field,name,span)
++
++
++def validate(engine,key,value,span,active=frozenset()):
++    if value is None:return
++    if unknown(value):engine.unsupported('Unknown cascaded Bean Validation value',span)
++    if (key,id(value)) in active:return
++    active=active|{(key,id(value))}
++    info=engine.p.types[key]
++    if set(info.annotations)&{'GroupSequence','GroupSequenceProvider'}:engine.unsupported('Custom Bean Validation default sequence',info.span)
++    if any(qualified(engine.p,name,info.span.file).rpartition('.')[0] in PACKAGES or qualified(engine.p,name,info.span.file) in engine.p.adapters['java'].custom_constraints for name in info.annotations.get('validation_annotations',{})):engine.unsupported('Class-level Bean Validation callback',info.span)
++    for method_key in info.methods:
++        method=engine.p.methods[method_key]
++        if any(qualified(engine.p,name,info.span.file).rpartition('.')[0] in PACKAGES or qualified(engine.p,name,info.span.file) in engine.p.adapters['java'].custom_constraints or qualified(engine.p,name,info.span.file) in {'javax.validation.Valid','jakarta.validation.Valid'} for name in method.annotations.get('validation_annotations',{})):engine.unsupported('Getter-based Bean Validation requires a source callback contract',method.span)
++    fields=value.fields if isinstance(value,Object) else value
++    if not isinstance(fields,dict):engine.unsupported('Unmodeled bean value',span)
++    if any('@' in typ for typ,_ in info.fields.values()):engine.unsupported('Type-use Bean Validation requires a container-element contract',info.span)
++    for parent in info.parents:
++        resolved=engine.p.resolve_type(parent,info.module,info.span.file)
++        if resolved:
++            if set(engine.p.types[resolved].fields)&set(info.fields):engine.unsupported('Shadowed Java validation fields',span)
++            validate(engine,resolved,value,span,active)
++    for field,annotations in info.annotations.get('field_annotations',{}).items():
++        current=fields.get(field)
++        typ=info.fields[field][0]
++        for name,raw in annotations.items():
++            full=qualified(engine.p,name,info.span.file)
++            if full in engine.p.adapters['java'].custom_constraints:engine.unsupported('Custom field Bean Validation callback',info.span)
++            if full.rpartition('.')[0] in PACKAGES:constraint(engine,name.split('.')[-1],raw,current,typ,field,info.span)
++        if any(name.split('.')[-1]=='ConvertGroup' for name in annotations):engine.unsupported('Cascaded validation group conversion',span)
++        if not any(qualified(engine.p,name,info.span.file) in {'javax.validation.Valid','jakarta.validation.Valid'} for name in annotations) or current is None:continue
++        if unknown(current):engine.unsupported('Unknown cascaded field',span)
++        inner=re.fullmatch(r'(?:[\w.]+)(?:<(.+)>)?',typ)
++        if isinstance(current,(list,tuple)):
++            child_type=inner[1] if inner and inner[1] else typ.removesuffix('[]')
++            children=current
++        elif isinstance(current,dict) and typ.split('<')[0].split('.')[-1]=='Map':
++            child_type=inner[1].split(',')[-1].strip() if inner and inner[1] else '';children=current.values()
++        else:child_type=typ;children=[current]
++        resolved=engine.p.resolve_type(child_type,info.module,info.span.file)
++        if resolved:
++            for child in children:validate(engine,resolved,child,span,active)
++
++
++def validate_parameter(engine,param,value,method):
++    if any(qualified(engine.p,name,method.span.file).rpartition('.')[0] in PACKAGES or qualified(engine.p,name,method.span.file) in engine.p.adapters['java'].custom_constraints for name in param.annotations):engine.unsupported('Executable Bean Validation constraints require a method-validation contract',method.span)
++    marker=next((name for name in param.annotations if name.split('.')[-1] in {'Valid','Validated'}),None)
++    if marker is None:return
++    if qualified(engine.p,marker,method.span.file) not in {'javax.validation.Valid','jakarta.validation.Valid','org.springframework.validation.annotation.Validated'}:return
++    if marker.split('.')[-1]=='Validated' and param.annotations[marker].strip('() '):engine.unsupported('Custom validation group on Spring parameter',method.span)
++    key=engine.p.resolve_type(param.typ,method.module,method.span.file)
++    if key:validate(engine,key,value,method.span)
+--- phase4/code/polygraph/models.py
++++ phase5/code/polygraph/models.py
+@@ -47,6 +47,9 @@
+ 
+ 
+ def construct(engine, typ, args, kwargs, span):
++    from .java_time import date_construct
++    modeled=date_construct(engine,typ,args,kwargs,span)
++    if modeled is not NOT_HANDLED:return modeled
+     short = simple(typ)
+     if short in {"ResponseEntity", "HttpEntity"}:
+         status = args[-1] if args and type(args[-1]) is int and short == "ResponseEntity" else 200
+@@ -85,8 +88,6 @@
+     aliases = {"RestTemplate": "spring.RestTemplate", "JdbcTemplate": "spring.JdbcTemplate", "NamedParameterJdbcTemplate": "spring.NamedParameterJdbcTemplate", "BindingResult": "spring.BindingResult"}
+     if short in aliases:
+         return engine.state.new(aliases[short], kwargs)
+-    if short in {"Date"}:
+-        return engine.state.symbol("Date")
+     if short in {"BigDecimal"}:
+         if args and type(args[0]) in {int, float}:
+             return args[0]
+@@ -330,6 +331,9 @@
+ 
+ 
+ def call(engine, receiver, name, args, kwargs, span):
++    from .java_time import call as time_call
++    modeled=time_call(engine,receiver,name,args,kwargs,span)
++    if modeled is not NOT_HANDLED:return modeled
+     prefix=receiver.name if isinstance(receiver,TypeRef) else receiver.typ if isinstance(receiver,Object) else name
+     if prefix.startswith(('jwt','datetime','pwdlib')):
+         from .security_models import call as security_call
+@@ -400,8 +404,10 @@
+                                 body = wire(value)
+                         response = engine.request({"method": verbs[0], "url": "http://" + service + path, "body": body}, engine.method, span)
+                         if type(response.status) is int and response.status >= 400:
++                            if 'fallback' in info.annotations['FeignClient']:
++                                engine.unsupported('Feign failure fallback requires an additional lifecycle contract',span)
+                             raise Raised("FeignException", response)
+-                        if "fallback" in info.annotations["FeignClient"]:
++                        if "fallback" in info.annotations["FeignClient"] and unknown(response.status):
+                             engine.note("feign-fallback", "Feign fallback/circuit breaker behavior is outside the model", span)
+                         return response.body
+     result = repository(engine, receiver, name, args, span)
+--- phase4/code/polygraph/project.py
++++ phase5/code/polygraph/project.py
+@@ -1,5 +1,6 @@
+ """Project facts and skeleton identity mapping; bodies are lowered on demand."""
+ from collections import defaultdict
++from copy import deepcopy
+ import gzip
+ import hashlib
+ import importlib.metadata
+@@ -14,7 +15,7 @@
+                   'rank-bm25','numpy','PyYAML','html5lib','quickjs-ng','six','webencodings',
+                   'fastapi','starlette','pydantic','pydantic-core','python-multipart','email-validator',
+                   'PyJWT','pwdlib','argon2-cffi','argon2-cffi-bindings','bcrypt','anyio','cffi','pycparser',
+-                  'typing-extensions','typing-inspection','annotated-doc','annotated-types','opentelemetry-api','dnspython','idna')
++                  'typing-extensions','typing-inspection','annotated-doc','annotated-types','opentelemetry-api','dnspython','idna','javaproperties','tzdata')
+ 
+ 
+ def read_json(path):
+@@ -25,9 +26,10 @@
+ class Project:
+     MODEL_VERSION = "polygraph-13-models-1"
+ 
+-    def __init__(self, root, skeleton, cache=None, profiles=(), source_globals=None):
++    def __init__(self, root, skeleton, cache=None, profiles=(), source_globals=None,source_configuration=None):
+         self.root = Path(root).resolve()
+         self.source_globals=source_globals or {}
++        self.source_configuration=deepcopy(source_configuration or {})
+         self.skeleton = read_json(skeleton) if not isinstance(skeleton, dict) else skeleton
+         self.nodes = self.skeleton["nodes"]
+         if not isinstance(self.nodes, dict):
+@@ -47,10 +49,11 @@
+         self.modules = {k: v for k, v in self.nodes.items() if v.get("kind") == "module"}
+         self.tables = {k: v for k, v in self.nodes.items() if v.get("kind") == "data_resource"}
+         self.profiles = set(profiles)
+-        self.config = {}
++        self.profile_order=tuple(dict.fromkeys(profiles))
+         self.framework_versions = {}
+         build_sources, spring_candidates = {}, defaultdict(set)
+         self.sources = {}
++        self.configuration_sources={}
+         self.frontend_hashes = {}
+         self.lowered, self.cache_hits = 0, 0
+         self.cache_path = Path(cache) if cache else None
+@@ -77,29 +80,27 @@
+                     spring_candidates[self.module(relative.as_posix())].update(spring_versions(raw))
+                 except ET.ParseError:
+                     self.warn('build-config-parse', 'Maven metadata cannot establish library versions', Span(relative.as_posix()))
+-            elif path.name.startswith("application") and path.suffix in {".properties", ".yaml", ".yml"}:
+-                raw = path.read_text(errors="replace")
+-                for key, value in re.findall(r"(?m)^\s*([\w.-]+)\s*[=:]\s*([^\n#]+)", raw):
+-                    self.config[key.strip()] = value.strip().strip('"\'')
++            elif path.suffix in {'.properties','.yaml','.yml'}:
++                self.configuration_sources[relative.as_posix()]=path.read_bytes()
+         for module, versions in spring_candidates.items():
+             if module and len(versions) == 1:
+                 self.framework_versions[module] = {'spring': next(iter(versions))}
+             elif len(versions) > 1:
+                 self.warn('framework-version-conflict', 'Explicit Spring dependency versions disagree; mutability is unknown', detail=module)
+-        if not self.profiles:
+-            self.profiles.update(p.strip() for p in self.config.get("spring.profiles.active", "").split(",") if p.strip())
+         digest = hashlib.sha256(self.MODEL_VERSION.encode())
+         for package in RUNTIME_PACKAGES:
+             digest.update((package + "=" + importlib.metadata.version(package)).encode())
+         digest.update(json.dumps(self.skeleton, sort_keys=True).encode())
+-        digest.update(json.dumps(sorted(self.profiles)).encode())
+-        digest.update(json.dumps(self.config, sort_keys=True).encode())
++        digest.update(json.dumps(self.profile_order).encode())
++        digest.update(json.dumps(self.source_configuration,sort_keys=True).encode())
+         digest.update(json.dumps(self.source_globals,sort_keys=True).encode())
+         digest.update(json.dumps(self.frontend_hashes, sort_keys=True).encode())
+         for file, content in self.sources.items():
+             digest.update(file.encode() + b"\0" + content)
+         for file, content in build_sources.items():
+             digest.update(file.encode() + b"\0" + content)
++        for file,content in self.configuration_sources.items():
++            digest.update(file.encode()+b'\0'+content)
+         # A model/code change invalidates lowered IR even when source bytes stay equal.
+         for path in sorted(Path(__file__).parent.rglob("*.py")):
+             digest.update(path.relative_to(Path(__file__).parent).as_posix().encode() + b'\0' + path.read_bytes())
+@@ -111,6 +112,8 @@
+         self.adapters = {"java": JavaAdapter(self), "python": PythonAdapter(self)}
+         for adapter in self.adapters.values():
+             adapter.index()
++        from .spring_config import SpringConfiguration
++        self.configuration=SpringConfiguration(self,self.configuration_sources,build_sources,self.source_configuration,self.profile_order)
+         for adapter in self.adapters.values():
+             adapter.link()
+         for info in self.types.values():
+@@ -263,11 +266,16 @@
+         if not profile:
+             return True
+         values = re.findall(r'"([^"\\]+)"', profile)
+-        if not self.profiles:
++        profiles=self.configuration.profiles.get(info.module) or self.profiles
++        if not profiles:
+             return None
+-        return any((v[1:] not in self.profiles) if v.startswith("!") else v in self.profiles for v in values)
++        from .spring_config import matches
++        outcomes=[matches(v,profiles) for v in values]
++        return True if True in outcomes else None if None in outcomes else False
+ 
+     def implementation(self, key):
++        if 'FeignClient' in self.types[key].annotations:
++            return '' if re.search(r'\bprimary\s*=\s*false\b',self.types[key].annotations['FeignClient']) else key
+         candidates = []
+         for candidate, info in self.types.items():
+             if self.enabled(info) is False:
+--- phase4/code/polygraph/protocol.py
++++ phase5/code/polygraph/protocol.py
+@@ -69,7 +69,6 @@
+         elif default is None:
+             if engine.p.types[resolved].language == "python":
+                 raise Raised("RequestValidationError")
+-            kwargs[name] = Unknown("body field not provided", ftype, name)
+     obj = engine.create(resolved, kwargs=kwargs, span=span)
+     if isinstance(obj, Object):
+         obj.fields.update({k: v for k, v in kwargs.items()})
+@@ -148,6 +147,9 @@
+         if parameters is not None:
+             candidates.append((endpoint, parameters))
+     if not candidates:
++        from .spring_http import no_handler
++        response=no_handler(engine,module,path,verb,span)
++        if response is not None:return response
+         engine.note("unresolved-request", "No source-derived handler matches HTTP method/path/module", span, method=verb, url=url, module=module)
+         return Response(Unknown("unresolved server response"), Unknown("unresolved server status"))
+     # Spring prefers literal paths; Starlette/FastAPI uses registration order.
+@@ -171,6 +173,8 @@
+     path_values = {k: restore(v) for k, v in path_values.items()}
+     path_values.update(request.get("path_params", {}))
+     method = engine.p.methods[endpoint.method]
++    if endpoint.conditions.get('context_path_unknown'):
++        engine.unsupported('Servlet context path depends on unresolved deployment configuration',method.span)
+     risks = [r for r in engine.p.framework_risks if r["module"] == endpoint.module and r["framework"] == endpoint.framework]
+     if risks:
+         engine.note("framework-lifecycle", "Handler graph is conditional on an unmodeled framework phase", method.span, risks=risks)
+@@ -254,6 +258,9 @@
+             else:
+                 value = Unknown("request input not supplied", param.typ, alias)
+             values[param.name] = scalar(value, param.typ, method.language)
++        if method.language=='java':
++            from .java_validation import validate_parameter
++            for param in method.params:validate_parameter(engine,param,values.get(param.name),method)
+         receiver = engine.create(method.owner, span=method.span, bean=True) if method.owner in engine.p.types else None
+         result = engine.execute_method(method.key, kwargs=values, receiver=receiver, span=span)
+         response = result if isinstance(result, Response) else Response(result, endpoint.status)
+@@ -274,6 +281,10 @@
+                               "bound": values, "status": response.status, "body": response.body})
+         return response
+     except Raised as exc:
++        if endpoint.framework=='spring':
++            from .spring_http import handle_exception
++            handled=handle_exception(engine,exc,endpoint.module,method)
++            if handled is not None:return handled
+         if exc.typ in {"HTTPException", "fastapi.HTTPException", "starlette.exceptions.HTTPException"} and isinstance(exc.value, Object):
+             detail=exc.value.fields.get('detail')
+             return Response({'detail':detail} if endpoint.framework=='fastapi' else detail, exc.value.fields.get("status_code", 500),exc.value.fields.get('headers',{}))
+@@ -281,6 +292,7 @@
+             return Response({'detail':exc.value} if endpoint.framework=='fastapi' and isinstance(exc.value,list) else None, 422 if endpoint.framework == "fastapi" else 400)
+         if exc.typ == 'UnsupportedMediaType':
+             return Response(None, 415)
++        if exc.typ=='MethodArgumentNotValidException':return Response(Unknown('Spring validation error response payload'),400)
+         if exc.typ == 'ResponseValidationError':return Response(None,500)
+         engine.note("unhandled-exception", "Request stops at an exception; HTTP error mapping may be incomplete", method.span, exception=exc.typ)
+         return Response(Unknown("unhandled server exception"), 500)
+--- phase4/code/polygraph/spring_config.py
++++ phase5/code/polygraph/spring_config.py
+@@ -0,0 +1,243 @@
++"""Bounded, deployment-scoped Spring properties from supplied configuration.
++
++PyYAML and javaproperties own parsing. No process environment, Config Server,
++Maven execution, or application initializer is consulted.
++"""
++from dataclasses import dataclass
++from pathlib import PurePosixPath
++import re
++import xml.etree.ElementTree as ET
++
++import javaproperties
++import yaml
++
++from .ir import Span
++from .values import Unknown,unknown
++
++
++@dataclass(frozen=True)
++class Entry:
++    value: object
++    file: str
++    line: int
++    rank: tuple
++    conditional: bool=False
++
++
++def parse(file,raw):
++    """Flattened documents with original key locations; no target code runs."""
++    if file.endswith('.properties'):
++        values={};line=1
++        for item in javaproperties.parse(raw):
++            if isinstance(item,javaproperties.KeyValue):values[item.key]=(item.value,line)
++            line+=len(item.source.splitlines())
++        return [values]
++    documents=[];loader=yaml.SafeLoader(raw)
++    try:
++        while loader.check_data():
++            node=loader.get_node();documents.append((loader.construct_document(node),node))
++    finally:loader.dispose()
++    result=[]
++    for document,node in documents:
++        if document is None:continue
++        if not isinstance(document,dict):raise ValueError('Configuration YAML root is not a mapping')
++        values={}
++        def visit(value,current,prefix='',active=frozenset()):
++            if isinstance(value,(dict,list)):
++                if id(value) in active or len(active)>64:raise ValueError('Recursive/deep configuration YAML')
++                active=active|{id(value)}
++            if isinstance(value,dict):
++                locations={key.value:child for key,child in current.value}
++                for key,child in value.items():
++                    if not isinstance(key,str):raise ValueError('Nonstring YAML configuration key')
++                    visit(child,locations[key],prefix+'.'+key if prefix else key,active)
++            elif isinstance(value,list):
++                for index,child in enumerate(value):visit(child,current.value[index],prefix+'['+str(index)+']',active)
++                if not value:values[prefix]=('',current.start_mark.line+1)
++            else:values[prefix]=('' if value is None else value,current.start_mark.line+1)
++        visit(document,node);result.append(values)
++    return result
++
++
++def names(value):
++    if isinstance(value,list):return tuple((str(v).lower() if type(v) is bool else str(v)).strip() for v in value)
++    return tuple(v.strip() for v in str(value).split(',') if v.strip())
++
++
++def matches(expression,profiles):
++    if profiles is None or not isinstance(expression,str) or re.search(r'[&|()]',expression):return None
++    return any((value[1:] not in profiles) if value.startswith('!') else value in profiles for value in names(expression))
++
++
++class SpringConfiguration:
++    def __init__(self,project,sources,build_sources,provided,profiles):
++        self.p,self.sources,self.provided=project,sources,provided
++        if not isinstance(provided,dict):raise ValueError('Configuration must map deployment names to Spring environments')
++        self.entries={};self.profiles={};self.remote_unknown=set();self.unsupported=set();self.used={}
++        self.boot={};self.documents={}
++        self.explicit_profiles=tuple(dict.fromkeys(profiles))
++        for key,meta in project.modules.items():
++            module=meta.get('name',key.removeprefix('module:'));root=meta.get('path',meta.get('name','')).strip('/')
++            self.boot[module]=self.boot_version(root,build_sources)
++            self.load(module,root)
++
++    def docs(self,file):
++        if file not in self.documents:
++            try:self.documents[file]=parse(file,self.sources[file])
++            except (ValueError,RecursionError,yaml.YAMLError,javaproperties.InvalidUEscapeError) as exc:
++                self.documents[file]=None
++                self.p.warn('configuration-parse','Configuration cannot be resolved: '+str(exc),Span(file,1))
++        return self.documents[file]
++
++    @staticmethod
++    def boot_version(root,sources):
++        file=(root+'/' if root else '')+'pom.xml';seen=set()
++        while file in sources and file not in seen:
++            seen.add(file)
++            try:node=ET.fromstring(sources[file])
++            except ET.ParseError:return ''
++            parent=node.find('{*}parent')
++            if parent is None:return ''
++            group=parent.findtext('{*}groupId');artifact=parent.findtext('{*}artifactId');version=parent.findtext('{*}version','')
++            if group=='org.springframework.boot' and artifact=='spring-boot-starter-parent':
++                return version if '${' not in version else ''
++            relative=parent.findtext('{*}relativePath','../pom.xml')
++            if not relative:return ''
++            parts=[]
++            for part in (PurePosixPath(file).parent/PurePosixPath(relative)).parts:
++                if part=='..':
++                    if not parts:return ''
++                    parts.pop()
++                elif part!='.':parts.append(part)
++            file='/'.join(parts)
++        return ''
++
++    def add(self,module,key,value,file,line,rank,conditional=False):
++        self.entries.setdefault(module,{}).setdefault(key,[]).append(Entry(value,file,line,rank,conditional))
++
++    def local_files(self,root):
++        main=(root+'/' if root else '')+'src/main/resources'
++        resource_roots={main} if any(file.startswith(main+'/') for file in self.sources) else set()
++        # Small supplied source roots need not be Maven projects.
++        if not resource_roots:resource_roots={root or '.'}
++        result=[]
++        for file in self.sources:
++            path=PurePosixPath(file)
++            for resource in resource_roots:
++                parent=path.parent.as_posix();base=resource.rstrip('/')
++                if parent not in {base,base+'/config' if base!='.' else 'config'}:continue
++                stem=path.stem;match=re.fullmatch(r'(application|bootstrap)(?:-(.+))?',stem)
++                if match:result.append((file,match[1],match[2],int(parent.endswith('/config') or parent=='config')))
++        return result
++
++    def load(self,module,root):
++        self.entries[module]={};files=self.local_files(root)
++        snapshot=self.provided.get(module)
++        if snapshot is not None:
++            if not isinstance(snapshot,dict) or not isinstance(snapshot.get('propertySources'),list):raise ValueError('Spring environment needs ordered propertySources for '+module)
++            if 'profiles' in snapshot and (not isinstance(snapshot['profiles'],list) or any(not isinstance(v,str) for v in snapshot['profiles'])):raise ValueError('Invalid Spring environment profiles for '+module)
++            if self.explicit_profiles and 'profiles' in snapshot and self.explicit_profiles!=(tuple(snapshot['profiles']) or ('default',)):raise ValueError('Resolved Spring environment profiles conflict with CLI profiles for '+module)
++            for index,source in enumerate(snapshot['propertySources']):
++                if not isinstance(source,dict) or not isinstance(source.get('source'),dict) or any(not isinstance(k,str) for k in source['source']):raise ValueError('Invalid Spring property source for '+module)
++                for key,value in source['source'].items():
++                    if value is not None:self.add(module,key,value,'context:configuration.'+module+'.propertySources.'+str(index),0,(-index,))
++            active=self.value(module,'spring.profiles.active',None)
++            self.profiles[module]=tuple(snapshot['profiles']) or ('default',) if 'profiles' in snapshot else names(active) if active is not None and not unknown(active) else None
++            if self.raw(module,'spring.mvc.servlet.path','/')!='/' or self.raw(module,'server.servlet-path','/')!='/':self.unsupported.add(module)
++            return
++        # Read bootstrap/application base documents first to establish the
++        # supplied active profiles. A sibling deployment cannot affect them.
++        for file,kind,profile,location in files:
++            if profile:continue
++            docs=self.docs(file)
++            if docs is None:self.unsupported.add(module);continue
++            for index,doc in enumerate(docs):
++                if 'spring.profiles' in doc or 'spring.config.activate.on-profile' in doc:continue
++                for key,(value,line) in doc.items():self.add(module,key,value,file,line,(kind=='application',0,location,index))
++        active=self.value(module,'spring.profiles.active',None)
++        if active is None:active=self.value(module,'spring.profiles.default',None)
++        self.profiles[module]=self.explicit_profiles or (names(active) if active is not None and not unknown(active) else None)
++        self.entries[module]={}
++        for file,kind,profile,location in files:
++            if profile:
++                selected=matches(profile,self.profiles[module])
++                if selected is False:continue
++            else:selected=True
++            docs=self.docs(file)
++            if docs is None:self.unsupported.add(module);continue
++            for index,doc in enumerate(docs):
++                condition=selected
++                selector=doc.get('spring.profiles')
++                modern=doc.get('spring.config.activate.on-profile')
++                version=self.boot[module]
++                if modern and not version:self.unsupported.add(module)
++                if selector and version and not version.startswith(('1.','2.0.','2.1.','2.2.','2.3.')):self.unsupported.add(module)
++                if modern and not version.startswith(('1.','2.0.','2.1.','2.2.','2.3.')):selector=modern
++                if selector:
++                    current=matches(str(selector[0]),self.profiles[module])
++                    condition=False if current is False or condition is False else None if current is None or condition is None else True
++                if condition is False:continue
++                order=max((self.profiles[module].index(v)+1 for v in names(profile or (selector[0] if selector else '')) if self.profiles[module] and v in self.profiles[module]),default=0)
++                for key,(value,line) in doc.items():self.add(module,key,value,file,line,(kind=='application',int(bool(profile or selector)),order,location,index),condition is None)
++        enabled=self.value(module,'spring.cloud.config.enabled',True)
++        disabled=enabled is False or isinstance(enabled,str) and enabled.lower()=='false'
++        if not disabled and self.raw(module,'spring.cloud.config.uri',None) is not None:
++            self.remote_unknown.add(module)
++            if not self.explicit_profiles:self.profiles[module]=None
++        if any(self.raw(module,key,None) is not None for key in ['spring.config.location','spring.config.additional-location','spring.config.import']):self.unsupported.add(module)
++        if self.raw(module,'spring.config.name','application')!='application':self.unsupported.add(module)
++        if self.raw(module,'spring.mvc.servlet.path','/')!='/' or self.raw(module,'server.servlet-path','/')!='/':self.unsupported.add(module)
++        if any(key=='spring.profiles.include' or key.startswith(('spring.profiles.include[','spring.profiles.group.')) or key.startswith('spring.config.activate.') and key!='spring.config.activate.on-profile' for key in self.entries[module]):self.unsupported.add(module)
++        if module in self.unsupported:self.profiles[module]=None
++
++    def raw(self,module,key,default=None):
++        entries=self.entries.get(module,{}).get(key,[])
++        if not entries:return default
++        possible=[]
++        for rank in sorted({entry.rank for entry in entries},reverse=True):
++            group=[entry for entry in entries if entry.rank==rank]
++            possible.extend(entry.value for entry in group)
++            if any(not entry.conditional for entry in group):break
++        else:possible.append(default)
++        if any(value!=possible[0] for value in possible[1:]):return Unknown('Conditional/conflicting configuration '+key,origin=module)
++        return possible[0]
++
++    def value(self,module,key,default=None,seen=frozenset()):
++        if module in self.remote_unknown or module in self.unsupported:return Unknown('Unresolved external/unsupported configuration source',origin=module)
++        if key in seen:return Unknown('Cyclic configuration placeholder',origin=key)
++        if key not in self.entries.get(module,{}) and key+'[0]' in self.entries.get(module,{}):
++            value=[];index=0
++            while key+'['+str(index)+']' in self.entries[module]:
++                value.append(self.value(module,key+'['+str(index)+']',seen=seen|{key}));index+=1
++            return value
++        value=self.raw(module,key,default)
++        self.used.setdefault(module,set()).add(key)
++        if not isinstance(value,str):return value
++        for _ in range(32):
++            found=re.search(r'\$\{([^{}]+)\}',value)
++            if not found:return value
++            name,separator,fallback=found[1].partition(':')
++            replacement=self.value(module,name,fallback if separator else Unknown('Unresolved configuration placeholder',origin=name),seen|{key})
++            if unknown(replacement):return replacement
++            if isinstance(replacement,(dict,list)):return Unknown('Non-scalar configuration placeholder',origin=name)
++            text=str(replacement).lower() if type(replacement) is bool else str(replacement)
++            value=value[:found.start()]+text+value[found.end():]
++        return Unknown('Configuration placeholder expansion budget',origin=key)
++
++    def context_path(self,module):
++        if module in self.remote_unknown or module in self.unsupported:return Unknown('Unresolved external/unsupported configuration source',origin=module)
++        version=self.boot.get(module,'');modern=self.value(module,'server.servlet.context-path',None);legacy=self.value(module,'server.context-path',None)
++        if version.startswith('1.'):value=legacy
++        elif version:value=modern
++        elif modern is not None and legacy is not None and modern!=legacy:return Unknown('Servlet context-path version is ambiguous',origin=module)
++        else:value=modern if modern is not None else legacy
++        if value is None:return ''
++        if unknown(value):return value
++        if not isinstance(value,str) or value and (not value.startswith('/') or value.endswith('/') or '?' in value or '#' in value):return Unknown('Invalid/unmodeled servlet context path',origin=module)
++        return value
++
++    def summary(self):
++        from .values import serial
++        return {module:{'spring_boot':self.boot[module],'profiles':self.profiles[module],'context_path':serial(self.context_path(module)),
++                        'used':{key:[{'file':entry.file,'line':entry.line,'conditional':entry.conditional} for entry in self.entries.get(module,{}).get(key,[])] for key in sorted(self.used.get(module,set()))}}
++                for module in self.entries}
+--- phase4/code/polygraph/spring_http.py
++++ phase5/code/polygraph/spring_http.py
+@@ -0,0 +1,124 @@
++"""Default Spring MVC outcomes with no selected source handler."""
++import re
++
++from .values import Object,Raised,Response,Unknown,unknown,wire
++
++PARENTS={'IllegalArgumentException':'RuntimeException','NumberFormatException':'IllegalArgumentException',
++         'ArithmeticException':'RuntimeException','NullPointerException':'RuntimeException','IllegalStateException':'RuntimeException',
++         'IndexOutOfBoundsException':'RuntimeException','RuntimeException':'Exception','ServletException':'Exception',
++         'HttpRequestMethodNotSupportedException':'ServletException','MethodArgumentNotValidException':'Exception',
++         'Exception':'Throwable','Error':'Throwable'}
++NATIVE={name:'java.lang.'+name for name in set(PARENTS)|{'Throwable'} if name not in {'ServletException','HttpRequestMethodNotSupportedException','MethodArgumentNotValidException'}}
++NATIVE.update({'HttpRequestMethodNotSupportedException':'org.springframework.web.HttpRequestMethodNotSupportedException',
++               'MethodArgumentNotValidException':'org.springframework.web.bind.MethodArgumentNotValidException',
++               'ServletException':'javax.servlet.ServletException'})
++
++
++def response_status(annotations):
++    from .models import STATUSES
++    if 'ResponseStatus' not in annotations:return 200
++    raw=annotations['ResponseStatus'];found=re.search(r'\bHttpStatus\.([A-Z_]+)',raw)
++    if found:return STATUSES.get(found[1],Unknown('Unsupported Spring HTTP status'))
++    return 500 if not raw.strip('() ') else Unknown('Unresolved Spring response status')
++
++
++def canonical(project,name,method=None,actual=False):
++    if name in project.types:return name
++    if actual and '.' not in name:return NATIVE.get(name,name)
++    if method:
++        imported=project.resolve_import(name,method.span.file)
++        if imported:return project.resolve_type(imported,method.module,method.span.file) or imported
++        owner=project.types.get(getattr(method,'owner',method.key))
++        if owner:
++            package=owner.key.split(':',1)[-1].rpartition('.')[0]
++            local=method.module+':'+package+'.'+name if package else method.module+':'+name
++            if local in project.types:return local
++    return NATIVE.get(name,name)
++
++
++def distance(project,actual,expected,method):
++    target=canonical(project,expected,method);queue=[(canonical(project,actual,actual=True),0)];seen=set()
++    while queue:
++        current,depth=queue.pop(0)
++        if current in seen:continue
++        seen.add(current)
++        if current==target:return depth
++        if current in project.types:
++            info=project.types[current]
++            queue.extend((canonical(project,parent,info),depth+1) for parent in info.parents)
++        else:
++            parent=PARENTS.get(current.split('.')[-1]) if current in NATIVE.values() else None
++            if parent:queue.append((canonical(project,parent,actual=True),depth+1))
++    return None
++
++
++def exception_handler(engine,exception,module,controller=None):
++    choices=[]
++    if exception.typ=='UnknownException' and any(m.module==module and 'ExceptionHandler' in m.annotations for m in engine.p.methods.values()):
++        engine.unsupported('Unknown exception type may select source Spring advice',controller.span if controller else engine.p.methods[next(k for k,m in engine.p.methods.items() if m.module==module and 'ExceptionHandler' in m.annotations)].span)
++    for info in engine.p.types.values():
++        if info.module!=module or info.language!='java':continue
++        local=controller is not None and controller.owner==info.key
++        advice=set(info.annotations)&{'ControllerAdvice','RestControllerAdvice'}
++        if not local and not advice:continue
++        for key in info.methods:
++            method=engine.p.methods[key]
++            if 'ExceptionHandler' not in method.annotations:continue
++            catches=re.findall(r'([\w.]+)\.class',method.annotations['ExceptionHandler']) or [p.typ for p in method.params]
++            depths=[value for name in catches if (value:=distance(engine.p,exception.typ,name,method)) is not None]
++            if not depths:continue
++            enabled=engine.p.enabled(info)
++            if enabled is False:continue
++            if enabled is None or any(info.annotations[name].strip('() ') for name in advice):
++                engine.unsupported('Conditional/scoped Spring exception advice',method.span)
++            raw=info.annotations.get('Order','');found=re.fullmatch(r'\(?\s*([+-]?\d+)\s*\)?',raw)
++            if raw and not found:engine.unsupported('Unresolved Spring advice ordering',method.span)
++            choices.append(((0 if local else 1,int(found[1]) if found else 2147483647,min(depths)),method,info))
++    if not choices:return None
++    best=min(choice[0] for choice in choices);selected=[choice for choice in choices if choice[0]==best]
++    if len(selected)!=1:engine.unsupported('Ambiguous Spring exception handler ordering',selected[0][1].span)
++    return selected[0][1:]
++
++
++def handle_exception(engine,exception,module,controller=None):
++    selected=exception_handler(engine,exception,module,controller)
++    if selected is None:return None
++    method,info=selected
++    outer=engine.frames;engine.frames=[]
++    try:
++        receiver=engine.create(info.key,span=info.span,bean=True)
++        value=exception.value if isinstance(exception.value,Object) else engine.state.new(exception.typ,{'message':exception.value})
++        if len(method.params)>1:engine.unsupported('Additional Spring exception-handler parameters',method.span)
++        result=engine.execute_method(method.key,(value,) if method.params else (),receiver=receiver,span=method.span)
++        if isinstance(result,Response):return result
++        status=response_status({**info.annotations,**method.annotations})
++        if unknown(status):engine.unsupported('Unresolved Spring exception-handler status',method.span)
++        rest=set(info.annotations)&{'RestControllerAdvice','RestController','ResponseBody'} or 'ResponseBody' in method.annotations
++        if result is not None and not rest:engine.unsupported('View-based Spring exception-handler result',method.span)
++        return Response(wire(result),status)
++    finally:engine.frames=outer
++
++
++def no_handler(engine,module,path,verb,span):
++    from .protocol import route_match
++    endpoints=[e for e in engine.p.endpoints if e.module==module and e.framework=='spring']
++    if not module or not endpoints or any(e.module==module and e.framework!='spring' for e in engine.p.endpoints):return None
++    prefix=engine.p.configuration.context_path(module)
++    status,headers=None,{}
++    if not unknown(prefix) and prefix and path!=prefix and not path.startswith(prefix+'/'):
++        status=404
++    elif verb.upper() not in {'HEAD','OPTIONS'}:
++        paths=[e for e in endpoints if route_match(path,e.path) is not None]
++        if not paths or any(e.conditions.get('profile_unknown') or e.conditions.get('context_path_unknown') for e in paths):return None
++        risks=[risk for risk in engine.p.framework_risks if risk['module']==module]
++        if risks and not engine.context.get('assumptions',{}).get('framework_entry'):return None
++        selected=exception_handler(engine,Raised('HttpRequestMethodNotSupportedException'),module)
++        if selected is not None:return handle_exception(engine,Raised('HttpRequestMethodNotSupportedException'),module)
++        custom=any(info.module==module and any(re.search(r'(?:HandlerExceptionResolver|ErrorController)\b',parent) for parent in info.parents) for info in engine.p.types.values())
++        if custom:return None
++        allowed={e.verb for e in paths if e.verb!='*'}
++        if allowed and not any(e.verb=='*' for e in paths):status,headers=405,{'Allow':', '.join(sorted(allowed))}
++    if status is None:return None
++    engine.note('framework-error-body','Default routing status is known; the framework error payload is not reconstructed',span,status=status)
++    engine.events.append({'kind':'framework-http-response','module':module,'path':path,'method':verb,'status':status,'reason':'servlet context boundary' if status==404 else 'source mapping HTTP method mismatch'})
++    return Response(Unknown('framework error response body'),status,headers)
+--- phase4/code/polygraph/values.py
++++ phase5/code/polygraph/values.py
+@@ -235,6 +235,8 @@
+             return Unknown("wire cycle or depth requires an unmodeled serializer")
+         active = active | {id(value)}
+     if isinstance(value, Object):
++        if value.typ.startswith('java.time.') or value.typ=='java.util.Date':
++            return Unknown('Java temporal serialization requires an explicit codec contract')
+         if value.typ in {'spring.HttpHeaders', 'spring.ReadOnlyHttpHeaders'}:
+             return wire(value.fields.get('values'), active)
+         return {k: wire(v, active) for k, v in value.fields.items()}
+@@ -247,7 +249,7 @@
+ 
+ def wire_incomplete(value):
+     if isinstance(value, Unknown):
+-        return value.reason == "wire cycle or depth requires an unmodeled serializer"
++        return value.reason in {"wire cycle or depth requires an unmodeled serializer",'Java temporal serialization requires an explicit codec contract'}
+     return any(wire_incomplete(item) for item in (value.values() if isinstance(value, dict) else value)) if isinstance(value, (dict, list, tuple)) else False
+ 
+ 
+--- phase4/code/tests/support.py
++++ phase5/code/tests/support.py
+@@ -11,7 +11,7 @@
+ from polygraph.state import Store
+ 
+ 
+-def fixture(tmp_path, sources, tables=(), rows=None, modules=None, profiles=(), cache=None):
++def fixture(tmp_path, sources, tables=(), rows=None, modules=None, profiles=(), cache=None,configuration=None):
+     root = tmp_path / "src"
+     root.mkdir(parents=True)
+     nodes = {}
+@@ -41,7 +41,8 @@
+                 tid = "owner:" + file + ":" + owner
+                 nodes[tid] = {"kind": "type", "fqn": package + owner, "file": file, "module": module}
+                 body = decl.child_by_field_name("body")
+-                for node in body.named_children if body else []:
++                members=[member for child in body.named_children for member in (child.named_children if child.type=='enum_body_declarations' else [child])] if body else []
++                for node in members:
+                     if node.type not in {"method_declaration", "constructor_declaration"}:
+                         continue
+                     name = "<init>" if node.type == "constructor_declaration" else node.child_by_field_name("name").text.decode()
+@@ -64,7 +65,7 @@
+     skeleton = {"project": "independent-fixture", "nodes": nodes, "edges": [], "context": {}}
+     path = tmp_path / "skeleton.json"
+     path.write_text(json.dumps(skeleton))
+-    project = Project(root, path, cache, profiles)
++    project = Project(root, path, cache, profiles,source_configuration=configuration)
+     store = Store({"storage:" + k: tuple(v) for k, v in (rows or {}).items()})
+     return project, store, ids
+ 
+--- phase4/code/tests/test_java_framework_boundaries.py
++++ phase5/code/tests/test_java_framework_boundaries.py
+@@ -0,0 +1,57 @@
++from polygraph.analysis import analyze
++from support import fixture,scenario,edge_set
++
++
++def test_source_enum_method_is_indexed_and_executed_like_other_java_methods(tmp_path):
++    source='''import org.springframework.web.bind.annotation.*;
++enum Mode { VALUE; public static int capacity(){return 7;} }
++@RestController class Reader {@GetMapping("/value") int value(){return Mode.capacity();}}
++'''
++    p,store,ids=fixture(tmp_path,{'Reader.java':source})
++    block,detail=analyze(p,store,{},scenario({'path':'/value'}))
++    assert detail['paths'][0]['steps'][0]['response']['body']==7
++    assert edge_set(block)=={('scenario:arbitrary','executes',ids['Reader.value']),('scenario:arbitrary','executes',ids['Mode.capacity']),(ids['Reader.value'],'calls',ids['Mode.capacity'])}
++
++
++def test_feign_interface_uses_proxy_while_source_fallback_waits_for_failure(tmp_path):
++    gateway='''import org.springframework.web.bind.annotation.*;
++import org.springframework.cloud.openfeign.FeignClient;
++import org.springframework.beans.factory.annotation.Autowired;
++@FeignClient(name="catalog",fallback=Failover.class)
++interface Client {@GetMapping("/item") int read();}
++class Failover implements Client {public int read(){return -7;}}
++@RestController class Gateway {
++ @Autowired private Client client;
++ @GetMapping("/read") int read(){return client.read();}
++}
++'''
++    target='''import org.springframework.web.bind.annotation.*;
++@RestController class Catalog {@GetMapping("/item") int item(){return 9;}}
++'''
++    p,store,ids=fixture(tmp_path,{'front/Gateway.java':gateway,'back/Catalog.java':target},modules={'gateway':'front','catalog':'back'})
++    block,detail=analyze(p,store,{},scenario({'module':'gateway','path':'/read'}))
++    assert detail['paths'][0]['steps'][0]['response']['body']==9
++    assert ids['Failover.read'] not in {e[2] for e in edge_set(block,'executes')}
++    assert (ids['Gateway.read'],'remote',ids['Catalog.item']) in edge_set(block)
++
++
++def test_wrong_http_method_stops_scenario_before_later_source_effects(tmp_path):
++    source='''import org.springframework.web.bind.annotation.*;
++@RestController class Endpoint {@GetMapping("/value") int value(){return 7;}}
++'''
++    p,store,_=fixture(tmp_path,{'Endpoint.java':source})
++    block,detail=analyze(p,store,{},scenario({'module':'app','path':'/value','method':'POST'},{'module':'app','path':'/value'}))
++    assert not edge_set(block)
++    assert len(detail['paths'])==1 and len(detail['paths'][0]['steps'])==1
++    assert detail['paths'][0]['steps'][0]['response']['status']==405
++    assert detail['paths'][0]['steps'][0]['response']['headers']['Allow']=='GET'
++
++
++def test_request_outside_known_context_does_not_reach_controller(tmp_path):
++    source='''import org.springframework.web.bind.annotation.*;
++@RestController class Endpoint {@GetMapping("/value") int value(){return 7;}}
++'''
++    p,store,_=fixture(tmp_path,{'Endpoint.java':source,'application.yml':'server.servlet.context-path: /api\n'})
++    block,detail=analyze(p,store,{},scenario({'module':'app','path':'/value'},{'module':'app','path':'/api/value'}))
++    assert not edge_set(block) and len(detail['paths'][0]['steps'])==1
++    assert detail['paths'][0]['steps'][0]['response']['status']==404
+--- phase4/code/tests/test_java_time.py
++++ phase5/code/tests/test_java_time.py
+@@ -0,0 +1,98 @@
++"""Time results use declared analysis inputs, never the host clock/timezone."""
++import pytest
++
++from polygraph.analysis import analyze
++from support import fixture,scenario
++
++
++def run(tmp_path,expression,context=None,statements=''):
++    source='''import org.springframework.web.bind.annotation.*;
++import java.time.LocalDate;
++import java.time.LocalDateTime;
++import java.time.Instant;
++import java.time.ZoneId;
++import java.util.Date;
++@RestController class Endpoint {@GetMapping("/value") Object value(){'''+statements+'return '+expression+';}}'
++    p,store,ids=fixture(tmp_path,{'Endpoint.java':source})
++    block,detail=analyze(p,store,context or {},scenario({'path':'/value'}))
++    return block,detail
++
++
++def test_current_day_converts_through_java_types_and_preserves_epoch_millis(tmp_path):
++    _,detail=run(tmp_path,'Date.from(LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()).getTime()',
++                 {'clock':'2026-01-02T10:00:00Z','timezone':'UTC'})
++    assert len(detail['paths'])==1
++    assert detail['paths'][0]['steps'][0]['response']['body']==1767312000000
++
++
++@pytest.mark.parametrize('instant,expected',[
++    ('LocalDateTime.of(2021,3,14,2,30)',1615707000000),
++    ('LocalDateTime.of(2021,11,7,1,30)',1636263000000),
++])
++def test_gap_shifts_forward_and_overlap_chooses_earlier_offset(tmp_path,instant,expected):
++    _,detail=run(tmp_path,instant+'.atZone(ZoneId.of("America/New_York")).toInstant().toEpochMilli()',{'timezone_database':'2026e'})
++    assert detail['paths'][0]['steps'][0]['response']['body']==expected
++
++
++def test_date_constructor_floors_fractional_milliseconds_and_keeps_negative_epoch(tmp_path):
++    _,detail=run(tmp_path,'new Date().getTime()',{'clock':'1969-12-31T23:59:59.999999Z'})
++    assert detail['paths'][0]['steps'][0]['response']['body']==-1
++
++
++def test_date_millis_round_trip_does_not_depend_on_float_timestamp(tmp_path):
++    _,detail=run(tmp_path,'Date.from(new Date(-1L).toInstant()).getTime()')
++    assert detail['paths'][0]['steps'][0]['response']['body']==-1
++
++
++def test_current_date_uses_supplied_zone_at_midnight_boundary(tmp_path):
++    _,detail=run(tmp_path,'LocalDate.now().toString()',{'clock':'2026-01-02T00:30:00Z','timezone':'America/Los_Angeles','timezone_database':'2026e'})
++    assert detail['paths'][0]['steps'][0]['response']['body']=='2026-01-01'
++
++
++@pytest.mark.parametrize('expression,context,reason',[
++    ('Instant.now().toEpochMilli()',{},'analysis clock'),
++    ('LocalDate.now().toEpochDay()',{'clock':'2026-01-02T00:00:00Z'},'timezone'),
++    ('LocalDate.now().toEpochDay()',{'clock':'2026-01-02T00:00:00Z','timezone':'Europe/Paris'},'timezone_database'),
++    ('Instant.now().toEpochMilli()',{'clock':'2026-01-02T00:00:00.123456789Z'},'nanosecond'),
++    ('LocalDate.of(10000,1,1).toEpochDay()',{},'year'),
++])
++def test_unprovided_or_unrepresentable_time_stops_with_diagnostics(tmp_path,expression,context,reason):
++    _,detail=run(tmp_path,expression,context)
++    assert all(path['coverage']=='cutoff' for path in detail['paths'])
++    assert any(reason in note['message'] for path in detail['paths'] for note in path['diagnostics'])
++
++
++def test_java_temporal_http_codec_is_not_fabricated_as_object_fields(tmp_path):
++    _,detail=run(tmp_path,'LocalDate.of(2026,1,2)')
++    response=detail['paths'][0]['steps'][0]['response']
++    assert response['body']['kind']=='Unknown' and 'codec' in response['body']['reason']
++    assert response['status']['kind']=='Unknown'
++
++
++def test_zone_conversion_overflow_remains_a_model_limit(tmp_path):
++    _,detail=run(tmp_path,'LocalDate.of(1,1,1).atStartOfDay().atZone(ZoneId.of("Asia/Tokyo")).toInstant().toEpochMilli()',{'timezone_database':'2026e'})
++    assert all(path['coverage']=='cutoff' for path in detail['paths'])
++    assert any('range' in note['message'] for path in detail['paths'] for note in path['diagnostics'])
++
++
++def test_unmodeled_java_time_method_does_not_fall_through_to_generic_string_coercion(tmp_path):
++    _,detail=run(tmp_path,'new Date(0L).toString()')
++    assert all(path['coverage']=='cutoff' for path in detail['paths'])
++    assert any('instance method' in note['message'] for path in detail['paths'] for note in path['diagnostics'])
++
++
++@pytest.mark.parametrize('identifier',['UTC+01:00','Z','Unavailable/Region'])
++def test_zone_outside_iana_subset_does_not_fabricate_a_java_exception(tmp_path,identifier):
++    _,detail=run(tmp_path,'ZoneId.of("'+identifier+'").getId()',{'timezone_database':'2026e'})
++    assert all(path['coverage']=='cutoff' for path in detail['paths'])
++    assert any('ZoneId needs' in note['message'] for path in detail['paths'] for note in path['diagnostics'])
++
++
++def test_source_time_named_class_keeps_source_constructor_and_methods(tmp_path):
++    source='''import org.springframework.web.bind.annotation.*;
++class Date {long getTime(){return 17L;}}
++@RestController class Endpoint {@GetMapping("/value") long value(){return new Date().getTime();}}'''
++    p,store,ids=fixture(tmp_path,{'Endpoint.java':source})
++    block,detail=analyze(p,store,{},scenario({'path':'/value'}))
++    assert detail['paths'][0]['steps'][0]['response']['body']==17
++    assert any(edge['target']==ids['Date.getTime'] for edge in block['edges'])
+--- phase4/code/tests/test_java_validation_advice.py
++++ phase5/code/tests/test_java_validation_advice.py
+@@ -0,0 +1,160 @@
++import pytest
++
++from polygraph.analysis import analyze
++from support import fixture,scenario,edge_set
++
++
++def test_source_advice_controls_status_and_execution_without_a_fake_caller(tmp_path):
++    source='''import org.springframework.web.bind.annotation.*;
++import org.springframework.http.HttpStatus;
++import org.springframework.util.Assert;
++@RestController class Endpoint {@GetMapping("/value") void value(){Assert.notNull(null);}}
++@ControllerAdvice class Errors {
++ @ExceptionHandler(IllegalArgumentException.class) @ResponseStatus(HttpStatus.BAD_REQUEST)
++ void invalid(IllegalArgumentException exception){}
++}
++'''
++    p,store,ids=fixture(tmp_path,{'Endpoint.java':source})
++    block,detail=analyze(p,store,{},scenario({'path':'/value','module':'app'}))
++    assert detail['paths'][0]['steps'][0]['response']['status']==400
++    assert edge_set(block)=={('scenario:arbitrary','executes',ids['Endpoint.value']),('scenario:arbitrary','executes',ids['Errors.invalid'])}
++
++
++def test_narrow_advice_does_not_hide_a_known_405_or_get_called_for_it(tmp_path):
++    source='''import org.springframework.web.bind.annotation.*;
++import org.springframework.http.HttpStatus;
++@RestController class Endpoint {@GetMapping("/value") int value(){return 7;}}
++@ControllerAdvice class Errors {
++ @ExceptionHandler(IllegalArgumentException.class) @ResponseStatus(HttpStatus.BAD_REQUEST)
++ void invalid(IllegalArgumentException exception){}
++}
++'''
++    p,store,_=fixture(tmp_path,{'Endpoint.java':source})
++    block,detail=analyze(p,store,{},scenario({'path':'/value','module':'app','method':'POST'}))
++    assert not edge_set(block) and detail['paths'][0]['steps'][0]['response']['status']==405
++
++
++@pytest.mark.parametrize('body,status', [({'text':'ok'},200),({},400),({'text':None},400),({'text':'😀'},200),({'text':'😀a'},400)])
++def test_native_validation_bounds_use_java_utf16_length_and_not_null(tmp_path,body,status):
++    source='''import org.springframework.web.bind.annotation.*;
++import javax.validation.Valid;
++import javax.validation.constraints.NotNull;
++import org.hibernate.validator.constraints.Length;
++class Input {@NotNull @Length(max=2) private String text;}
++@RestController class Endpoint {@PostMapping("/value") int value(@Valid @RequestBody Input body){return 7;}}
++'''
++    p,store,_=fixture(tmp_path,{'Endpoint.java':source})
++    block,detail=analyze(p,store,{},scenario({'path':'/value','method':'POST','body':body}))
++    assert detail['paths'][0]['steps'][0]['response']['status']==status
++    assert bool(edge_set(block))==(status==200)
++
++
++def test_cascaded_list_validates_nested_source_fields_before_handler(tmp_path):
++    source='''import org.springframework.web.bind.annotation.*;
++import java.util.List;
++import javax.validation.Valid;
++import javax.validation.constraints.NotNull;
++class Child {@NotNull private String value;}
++class Input {@Valid private List<Child> children;}
++@RestController class Endpoint {@PostMapping("/value") int value(@Valid @RequestBody Input body){return 7;}}
++'''
++    p,store,_=fixture(tmp_path,{'Endpoint.java':source})
++    block,detail=analyze(p,store,{},scenario({'path':'/value','method':'POST','body':{'children':[{}]}}))
++    assert not edge_set(block) and detail['paths'][0]['steps'][0]['response']['status']==400
++
++
++def test_constraints_are_not_invoked_when_handler_does_not_request_valid(tmp_path):
++    source='''import org.springframework.web.bind.annotation.*;
++import javax.validation.constraints.NotNull;
++class Input {@NotNull private String text;}
++@RestController class Endpoint {@PostMapping("/value") int value(@RequestBody Input body){return 7;}}
++'''
++    p,store,_=fixture(tmp_path,{'Endpoint.java':source})
++    block,detail=analyze(p,store,{},scenario({'path':'/value','method':'POST','body':{}}))
++    assert edge_set(block) and detail['paths'][0]['steps'][0]['response']['status']==200
++
++
++def test_custom_validator_is_a_diagnostic_instead_of_silently_valid_input(tmp_path):
++    source='''import org.springframework.web.bind.annotation.*;
++import javax.validation.Valid;
++import javax.validation.Constraint;
++@Constraint(validatedBy={}) @interface Rule {}
++class Input {@Rule private String text;}
++@RestController class Endpoint {@PostMapping("/value") int value(@Valid @RequestBody Input body){return 7;}}
++'''
++    p,store,_=fixture(tmp_path,{'Endpoint.java':source})
++    block,detail=analyze(p,store,{},scenario({'path':'/value','method':'POST','body':{'text':'unknown'}}))
++    assert not edge_set(block) and detail['status']=='partial'
++    assert any('Custom field Bean' in d['message'] for d in detail['paths'][0]['diagnostics'])
++
++
++def test_fully_qualified_validation_annotations_do_not_need_imports(tmp_path):
++    source='''import org.springframework.web.bind.annotation.*;
++class Input {@javax.validation.constraints.NotNull private String text;}
++@RestController class Endpoint {@PostMapping("/value") int value(@javax.validation.Valid @RequestBody Input body){return 7;}}
++'''
++    p,store,_=fixture(tmp_path,{'Endpoint.java':source})
++    block,detail=analyze(p,store,{},scenario({'path':'/value','method':'POST','body':{}}))
++    assert not edge_set(block) and detail['paths'][0]['steps'][0]['response']['status']==400
++
++
++def test_local_handler_precedes_more_specific_global_advice(tmp_path):
++    source='''import org.springframework.web.bind.annotation.*;
++import org.springframework.http.HttpStatus;
++import org.springframework.util.Assert;
++@RestController class Endpoint {
++ @GetMapping("/value") void value(){Assert.notNull(null);}
++ @ExceptionHandler(RuntimeException.class) @ResponseStatus(HttpStatus.BAD_REQUEST)
++ String local(RuntimeException exception){return "local";}
++}
++@RestControllerAdvice class Errors {
++ @ExceptionHandler(IllegalArgumentException.class) @ResponseStatus(HttpStatus.FORBIDDEN)
++ String global(IllegalArgumentException exception){return "global";}
++}
++'''
++    p,store,ids=fixture(tmp_path,{'Endpoint.java':source})
++    block,detail=analyze(p,store,{},scenario({'path':'/value','module':'app'}))
++    response=detail['paths'][0]['steps'][0]['response']
++    assert response['body']=='local' and response['status']==400
++    assert ids['Errors.global'] not in {e[2] for e in edge_set(block,'executes')}
++
++
++def test_source_exception_shadow_does_not_catch_native_same_short_name(tmp_path):
++    source='''import org.springframework.web.bind.annotation.*;
++import org.springframework.util.Assert;
++class IllegalArgumentException extends Exception {}
++@RestController class Endpoint {@GetMapping("/value") void value(){Assert.notNull(null);}}
++@RestControllerAdvice class Errors {
++ @ExceptionHandler(IllegalArgumentException.class)
++ String incorrect(IllegalArgumentException exception){return "incorrect";}
++}
++'''
++    p,store,ids=fixture(tmp_path,{'Endpoint.java':source})
++    block,detail=analyze(p,store,{},scenario({'path':'/value','module':'app'}))
++    assert ids['Errors.incorrect'] not in {e[2] for e in edge_set(block,'executes')}
++    assert detail['paths'][0]['steps'][0]['response']['status']==500
++
++
++def test_normal_response_status_annotation_uses_checked_http_constant(tmp_path):
++    source='''import org.springframework.web.bind.annotation.*;
++import org.springframework.http.HttpStatus;
++@RestController class Endpoint {@PostMapping("/value") @ResponseStatus(HttpStatus.CREATED) int value(){return 7;}}
++'''
++    p,store,_=fixture(tmp_path,{'Endpoint.java':source})
++    _,detail=analyze(p,store,{},scenario({'path':'/value','module':'app','method':'POST'}))
++    assert detail['paths'][0]['steps'][0]['response']['status']==201
++
++
++@pytest.mark.parametrize('declaration,parameter,reason',[
++    ('class Input {java.util.List<@javax.validation.constraints.NotNull String> names;}','@javax.validation.Valid @RequestBody Input body','Type-use'),
++    ('@org.hibernate.validator.constraints.ScriptAssert(lang="javascript",script="false") class Input {String name;}','@javax.validation.Valid @RequestBody Input body','Class-level'),
++    ('class Input {String name;}','@javax.validation.constraints.NotNull @RequestBody Input body','Executable'),
++])
++def test_unmodeled_validation_hooks_do_not_confirm_handler_execution(tmp_path,declaration,parameter,reason):
++    source='''import org.springframework.web.bind.annotation.*;
++'''+declaration+'\n@RestController class Endpoint {@PostMapping("/value") int value('+parameter+'){return 7;}}'
++    p,store,ids=fixture(tmp_path,{'Endpoint.java':source})
++    block,detail=analyze(p,store,{},scenario({'path':'/value','method':'POST','body':{'names':[None]}}))
++    assert not edge_set(block)
++    assert all(path['coverage']=='cutoff' for path in detail['paths'])
++    assert any(reason in note['message'] for path in detail['paths'] for note in path['diagnostics'])
+--- phase4/code/tests/test_spring_configuration.py
++++ phase5/code/tests/test_spring_configuration.py
+@@ -0,0 +1,185 @@
++"""Configuration semantics cannot depend on sibling services or file order."""
++import pytest
++
++from polygraph.analysis import analyze
++from polygraph.project import Project
++from polygraph.spring_config import parse
++from polygraph.values import Unknown
++from support import fixture,scenario,edge_set
++
++
++CONTROLLER='''import org.springframework.web.bind.annotation.*;
++@RestController class Endpoint {
++ @RequestMapping(path="/value",method={RequestMethod.GET,RequestMethod.POST})
++ String value(){return "source-result";}
++}
++'''
++
++
++def test_java_properties_parser_preserves_escapes_continuations_duplicates_and_lines():
++    raw=b'# header\nserver.servlet.context-path=/old\nserver.servlet.context-path=\\u002fpor\\\n tal\nkey\\:name=value#literal\n'
++    data=parse('application.properties',raw)[0]
++    assert data['server.servlet.context-path']==('/portal',3)
++    assert data['key:name']==('value#literal',5)
++
++
++def test_yaml_native_merge_and_nested_lists_keep_source_locations():
++    raw=b'base: &base\n  context-path: /source\nserver:\n  servlet:\n    <<: *base\nspring:\n  profiles:\n    active: [a, b]\n'
++    data=parse('application.yml',raw)[0]
++    assert data['server.servlet.context-path']==('/source',2)
++    assert data['spring.profiles.active[1]']==('b',8)
++
++
++def test_nested_yaml_context_path_applies_once_to_every_http_verb(tmp_path):
++    p,store,ids=fixture(tmp_path,{'Endpoint.java':CONTROLLER,'application.yml':'server:\n  servlet:\n    context-path: /api\n'})
++    assert {endpoint.path for endpoint in p.endpoints}=={'/api/value'}
++    for verb in ['GET','POST']:
++        block,detail=analyze(p,store,{},scenario({'path':'/api/value','method':verb}))
++        assert detail['paths'][0]['steps'][0]['response']['body']=='source-result'
++        assert edge_set(block)=={('scenario:arbitrary','executes',ids['Endpoint.value'])}
++    source=p.configuration.summary()['app']['used']['server.servlet.context-path']
++    assert source[0]['file']=='application.yml' and source[0]['line']==3
++
++
++def test_maven_main_resources_do_not_load_test_or_unrelated_files(tmp_path):
++    p,store,_=fixture(tmp_path,{'src/main/java/Endpoint.java':CONTROLLER,
++        'src/main/resources/application.yml':'server.servlet.context-path: /main\n',
++        'src/test/resources/application.yml':'server.servlet.context-path: /wrong\n',
++        'src/main/resources/unused.yml':'bad: !custom value\n'})
++    assert p.configuration.context_path('app')=='/main'
++    assert not any(d['code']=='configuration-parse' for d in p.diagnostics)
++    _,detail=analyze(p,store,{},scenario({'path':'/main/value'}))
++    assert detail['paths'][0]['steps'][0]['response']['status']==200
++
++
++def test_config_and_profiles_are_isolated_per_deployment(tmp_path):
++    alpha=CONTROLLER.replace('@RestController','@org.springframework.context.annotation.Profile("prod") @RestController')
++    beta=CONTROLLER.replace('@RestController','@org.springframework.context.annotation.Profile("dev") @RestController')
++    p,_,_=fixture(tmp_path,{'alpha/Endpoint.java':alpha,'beta/Endpoint.java':beta,
++      'alpha/application.yml':'spring.profiles.active: prod\nserver.servlet.context-path: /one\n',
++      'beta/application.yml':'spring.profiles.active: dev\nserver.servlet.context-path: /two\n'},modules={'first':'alpha','second':'beta'})
++    assert {(e.module,e.path) for e in p.endpoints}=={('first','/one/value'),('second','/two/value')}
++    assert all(p.enabled(p.methods[e.method]) is True for e in p.endpoints)
++
++
++def test_profile_documents_filename_and_last_active_profile_order(tmp_path):
++    p,_,_=fixture(tmp_path,{'Endpoint.java':CONTROLLER,
++       'application.yml':'spring.profiles.active: [blue, green]\nserver.servlet.context-path: /base\n---\nspring.profiles: blue\nserver.servlet.context-path: /blue\n',
++       'application-green.yml':'server.servlet.context-path: /green\n',
++       'application-disabled.yml':'bad: !tag cannot-be-read\n'})
++    assert p.configuration.context_path('app')=='/green'
++    assert not any(d['file']=='application-disabled.yml' for d in p.diagnostics)
++
++
++def test_unresolved_profile_override_does_not_pretend_base_value_is_final(tmp_path):
++    p,store,_=fixture(tmp_path,{'Endpoint.java':CONTROLLER,
++      'application.yml':'server.servlet.context-path: /base\n---\nspring.profiles: prod\nserver.servlet.context-path: /conditional\n'})
++    assert isinstance(p.configuration.context_path('app'),Unknown)
++    block,detail=analyze(p,store,{},scenario({'path':'/value'}))
++    assert not edge_set(block) and detail['status']=='partial'
++    assert any('configuration' in d['message'] for d in detail['paths'][0]['diagnostics'])
++
++
++def test_ordered_native_environment_sources_override_in_declared_order(tmp_path):
++    configuration={'app':{'profiles':['prod'],'propertySources':[
++        {'name':'runtime','source':{'server.servlet.context-path':'${ROOT:/fallback}','flag':True,'text':'before-${flag}-after','ROOT':'/runtime'}},
++        {'name':'classpath','source':{'server.servlet.context-path':'/ignored'}}]}}
++    p,store,_=fixture(tmp_path,{'Endpoint.java':CONTROLLER,'bootstrap.yml':'spring.cloud.config.uri: http://config:8888\n'},configuration=configuration)
++    assert p.configuration.context_path('app')=='/runtime'
++    assert p.configuration.value('app','text')=='before-true-after'
++    _,detail=analyze(p,store,{'configuration':configuration},scenario({'path':'/runtime/value'}))
++    assert detail['paths'][0]['steps'][0]['response']['status']==200
++    configuration['app']['propertySources'][0]['source']['ROOT']='/changed'
++    assert p.configuration.context_path('app')=='/runtime'
++    with pytest.raises(ValueError,match='rebuild Project'):analyze(p,store,{'configuration':configuration},scenario({'path':'/changed/value'}))
++
++
++def test_external_config_without_snapshot_is_unknown_and_never_fetched(tmp_path):
++    p,store,_=fixture(tmp_path,{'Endpoint.java':CONTROLLER,'bootstrap.yml':'spring.cloud.config.uri: http://unreachable.invalid:8888\nspring.profiles.active: local\nclient.url: http://local.invalid\n'})
++    assert isinstance(p.configuration.context_path('app'),Unknown)
++    assert isinstance(p.configuration.value('app','client.url'),Unknown)
++    assert p.configuration.profiles['app'] is None
++    block,detail=analyze(p,store,{},scenario({'path':'/value'}))
++    assert not edge_set(block) and detail['paths'][0]['coverage']=='cutoff'
++
++
++def test_configuration_and_profile_order_invalidate_ir_cache(tmp_path):
++    cache=tmp_path/'cache.json'
++    p,_,_=fixture(tmp_path,{'Endpoint.java':CONTROLLER,'application.properties':'server.servlet.context-path=/first\n'},cache=cache,profiles=['blue','green'])
++    before=p.fingerprint;p.save_cache()
++    (p.root/'application.properties').write_text('server.servlet.context-path=/second\n')
++    changed=Project(p.root,p.skeleton,cache,profiles=['blue','green'])
++    reordered=Project(p.root,p.skeleton,cache,profiles=['green','blue'])
++    assert len({before,changed.fingerprint,reordered.fingerprint})==3
++    assert changed.configuration.context_path('app')=='/second'
++
++
++def test_disabled_config_client_does_not_invent_an_external_override(tmp_path):
++    p,_,_=fixture(tmp_path,{'Endpoint.java':CONTROLLER,
++        'bootstrap.properties':'spring.cloud.config.uri=http://unreachable.invalid\nspring.cloud.config.enabled=false\n',
++        'application.yml':'server.servlet.context-path: /local\n'})
++    assert p.configuration.context_path('app')=='/local'
++
++
++def test_property_placeholders_default_cycle_and_missing_value(tmp_path):
++    p,_,_=fixture(tmp_path,{'Endpoint.java':CONTROLLER,
++      'application.properties':'server.servlet.context-path=${root:/fallback}\nfirst=${second}\nsecond=${first}\nmissing=${NOT_GIVEN}\n'})
++    assert p.configuration.context_path('app')=='/fallback'
++    assert isinstance(p.configuration.value('app','first'),Unknown)
++    assert isinstance(p.configuration.value('app','missing'),Unknown)
++
++
++def test_config_snapshot_conflict_is_detected_before_indexing_routes(tmp_path):
++    with pytest.raises(ValueError,match='conflict'):
++        fixture(tmp_path,{'Endpoint.java':CONTROLLER},profiles=['dev'],configuration={'app':{'profiles':['prod'],'propertySources':[]}})
++
++
++@pytest.mark.parametrize('version,path', [('1.5.22.RELEASE','/legacy'),('2.0.3.RELEASE','/modern')])
++def test_boot_version_selects_the_supported_context_path_property(tmp_path,version,path):
++    pom='<project><parent><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-parent</artifactId><version>'+version+'</version></parent></project>'
++    p,_,_=fixture(tmp_path,{'Endpoint.java':CONTROLLER,'pom.xml':pom,
++        'application.properties':'server.context-path=/legacy\nserver.servlet.context-path=/modern\n'})
++    assert p.configuration.context_path('app')==path
++
++
++def test_config_yaml_profile_syntax_is_not_retroactively_applied_to_old_boot(tmp_path):
++    p,_,_=fixture(tmp_path,{'Endpoint.java':CONTROLLER,
++        'pom.xml':'<project><parent><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-parent</artifactId><version>2.0.3.RELEASE</version></parent></project>',
++        'application.yml':'server.servlet.context-path: /base\n---\nspring.config.activate.on-profile: prod\nserver.servlet.context-path: /unconditional-in-this-version\n'},profiles=['dev'])
++    assert p.configuration.context_path('app')=='/unconditional-in-this-version'
++
++
++def test_equal_values_across_unknown_profile_do_not_invent_an_unknown_prefix(tmp_path):
++    p,_,_=fixture(tmp_path,{'Endpoint.java':CONTROLLER,
++        'application.yml':'server.servlet.context-path: /same\n---\nspring.profiles: prod\nserver.servlet.context-path: /same\n'})
++    assert p.configuration.context_path('app')=='/same'
++
++
++def test_null_in_higher_property_source_does_not_hide_lower_value(tmp_path):
++    configuration={'app':{'propertySources':[{'name':'higher','source':{'server.servlet.context-path':None}},
++        {'name':'lower','source':{'server.servlet.context-path':'/source'}}]}}
++    p,_,_=fixture(tmp_path,{'Endpoint.java':CONTROLLER},configuration=configuration)
++    assert p.configuration.context_path('app')=='/source'
++
++
++def test_resolved_snapshot_does_not_hide_a_custom_dispatcher_servlet_path(tmp_path):
++    configuration={'app':{'propertySources':[{'name':'runtime','source':{'spring.mvc.servlet.path':'/custom'}}]}}
++    p,store,_=fixture(tmp_path,{'Endpoint.java':CONTROLLER},configuration=configuration)
++    assert isinstance(p.configuration.context_path('app'),Unknown)
++    _,detail=analyze(p,store,{'configuration':configuration},scenario({'path':'/value'}))
++    assert all(path['coverage']=='cutoff' for path in detail['paths'])
++
++
++def test_default_profile_snapshot_conflicts_with_explicit_active_profile(tmp_path):
++    with pytest.raises(ValueError,match='conflict'):
++        fixture(tmp_path,{'Endpoint.java':CONTROLLER},profiles=['prod'],configuration={'app':{'profiles':[],'propertySources':[]}})
++
++
++@pytest.mark.parametrize('extra',['spring.profiles.include: extra\n','spring.profiles.group.prod: extra\n','spring.config.activate.on-cloud-platform: kubernetes\n'])
++def test_unsupported_profile_activation_does_not_confirm_local_configuration(tmp_path,extra):
++    p,store,_=fixture(tmp_path,{'Endpoint.java':CONTROLLER,
++        'application.yml':'spring.profiles.active: prod\nserver.servlet.context-path: /base\n'+extra})
++    assert p.configuration.profiles['app'] is None
++    assert isinstance(p.configuration.context_path('app'),Unknown)
++    block,detail=analyze(p,store,{},scenario({'path':'/value'}))
++    assert not edge_set(block) and all(path['coverage']=='cutoff' for path in detail['paths'])

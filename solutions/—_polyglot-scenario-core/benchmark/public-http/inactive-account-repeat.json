@@ -1,0 +1,55 @@
+{
+  "project": "public-python",
+  "scenarios": {
+    "inactive-account": {
+      "method": "polyglot-ir-may",
+      "edges": [
+        {
+          "source": "method:backend:app/api/routes/login.py#login_access_token:24",
+          "relation": "calls",
+          "target": "method:backend:app/crud.py#authenticate:45"
+        },
+        {
+          "source": "method:backend:app/crud.py#authenticate:45",
+          "relation": "calls",
+          "target": "method:backend:app/core/security.py#verify_password:29"
+        },
+        {
+          "source": "method:backend:app/crud.py#authenticate:45",
+          "relation": "calls",
+          "target": "method:backend:app/crud.py#get_user_by_email:34"
+        },
+        {
+          "source": "method:backend:app/crud.py#get_user_by_email:34",
+          "relation": "data",
+          "target": "resource:user"
+        },
+        {
+          "source": "scenario:inactive-account",
+          "relation": "executes",
+          "target": "method:backend:app/api/deps.py#get_db:21"
+        },
+        {
+          "source": "scenario:inactive-account",
+          "relation": "executes",
+          "target": "method:backend:app/api/routes/login.py#login_access_token:24"
+        },
+        {
+          "source": "scenario:inactive-account",
+          "relation": "executes",
+          "target": "method:backend:app/core/security.py#verify_password:29"
+        },
+        {
+          "source": "scenario:inactive-account",
+          "relation": "executes",
+          "target": "method:backend:app/crud.py#authenticate:45"
+        },
+        {
+          "source": "scenario:inactive-account",
+          "relation": "executes",
+          "target": "method:backend:app/crud.py#get_user_by_email:34"
+        }
+      ]
+    }
+  }
+}

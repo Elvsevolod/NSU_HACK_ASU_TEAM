@@ -1,0 +1,36 @@
+{
+  "author": "Codex manual source oracle, fixed before the first HTTP prediction; not an independent author",
+  "project": "fastapi/full-stack-fastapi-template",
+  "commit": "b1125d8839482cb7bbae603ddc6d0081bf87532e",
+  "scope": "HTTP requests through real source dependencies, credentials, JWT, ORM state and response schemas. No target imports or application execution. Startup succeeded with explicitly supplied validated configuration and database snapshot; startup itself is outside this trace.",
+  "groups": {
+    "login_methods": ["app.api.deps.get_db", "app.api.routes.login.login_access_token", "app.crud.authenticate", "app.crud.get_user_by_email", "app.core.security.verify_password"],
+    "login_calls": [["app.api.routes.login.login_access_token", "app.crud.authenticate"], ["app.crud.authenticate", "app.crud.get_user_by_email"], ["app.crud.authenticate", "app.core.security.verify_password"]],
+    "login_data": [["app.crud.get_user_by_email", "user"]],
+    "token_methods": ["app.core.security.create_access_token"],
+    "token_calls": [["app.api.routes.login.login_access_token", "app.core.security.create_access_token"]],
+    "authenticated_methods": ["app.api.deps.get_current_user"],
+    "authenticated_data": [["app.api.deps.get_current_user", "user"]]
+  },
+  "cases": [
+    {
+      "id": "login-create-update-read-delete-missing",
+      "groups": ["login", "token", "authenticated"],
+      "methods": ["app.api.routes.login.test_token", "app.api.routes.items.create_item", "app.models.get_datetime_utc", "app.api.routes.items.update_item", "app.api.routes.items.read_item", "app.api.routes.items.delete_item"],
+      "calls": [["app.api.routes.items.create_item", "app.models.get_datetime_utc"]],
+      "data": [["app.api.routes.items.create_item", "item"], ["app.api.routes.items.update_item", "item"], ["app.api.routes.items.read_item", "item"], ["app.api.routes.items.delete_item", "item"]],
+      "statuses": [200, 200, 200, 200, 200, 200, 404],
+      "final_items": [],
+      "expected_title": "Changed",
+      "expected_description": "keep"
+    },
+    {"id": "wrong-password", "groups": ["login"], "password": "incorrect", "methods": [], "calls": [], "data": [], "statuses": [400], "detail": "Incorrect email or password"},
+    {"id": "inactive-account", "groups": ["login"], "active": false, "methods": [], "calls": [], "data": [], "statuses": [400], "detail": "Inactive user"},
+    {"id": "missing-bearer", "groups": [], "methods": ["app.api.deps.get_db"], "calls": [], "data": [], "statuses": [401]},
+    {"id": "invalid-signature-token", "groups": [], "methods": ["app.api.deps.get_db", "app.api.deps.get_current_user"], "calls": [], "data": [], "statuses": [403], "detail": "Could not validate credentials"},
+    {"id": "expired-token", "groups": [], "methods": ["app.api.deps.get_db", "app.api.deps.get_current_user"], "calls": [], "data": [], "statuses": [403], "detail": "Could not validate credentials"},
+    {"id": "foreign-owner", "groups": ["login", "token", "authenticated"], "methods": ["app.api.routes.items.read_item"], "calls": [], "data": [["app.api.routes.items.read_item", "item"]], "statuses": [200, 403], "detail": "Not enough permissions"},
+    {"id": "empty-title-validation", "groups": ["login", "token", "authenticated"], "methods": [], "calls": [], "data": [], "statuses": [200, 422]}
+  ],
+  "required_checks": ["All four edge sets including explicit empty remote set", "Every expected HTTP status and stop at failure", "JWT result transferred through history", "Source defaults, validation and response projection", "Final state, response field values, no Session/User injection", "Exact source hashes and code freeze", "Repeatability and separate preparation/analysis measurements"]
+}

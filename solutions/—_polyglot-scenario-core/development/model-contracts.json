@@ -1,0 +1,132 @@
+{
+  "HttpEntity": [
+    {
+      "tag": "v5.3.4",
+      "git_blob": "7b7fe9af6002cb71a41892d8da125a317d14c35b",
+      "url": "https://github.com/spring-projects/spring-framework/blob/v5.3.4/spring-web/src/main/java/org/springframework/http/HttpEntity.java",
+      "observed": "Constructor wraps headers with HttpHeaders.readOnlyHttpHeaders; getHeaders returns that wrapper"
+    },
+    {
+      "tag": "v6.2.0",
+      "git_blob": "b3203e4e05deaf11c976c70515da35418a46db80",
+      "url": "https://github.com/spring-projects/spring-framework/blob/v6.2.0/spring-web/src/main/java/org/springframework/http/HttpEntity.java",
+      "observed": "Constructor wraps headers with HttpHeaders.readOnlyHttpHeaders; getHeaders returns that wrapper"
+    },
+    {
+      "tag": "v7.0.0",
+      "git_blob": "a83039bf55d5260451406e90ca7b7640d8a9c005",
+      "url": "https://github.com/spring-projects/spring-framework/blob/v7.0.0/spring-web/src/main/java/org/springframework/http/HttpEntity.java",
+      "observed": "Constructor wraps headers with HttpHeaders.readOnlyHttpHeaders; getHeaders returns that wrapper"
+    }
+  ],
+  "later_development_branch": "https://github.com/spring-projects/spring-framework/blob/main/spring-web/src/main/java/org/springframework/http/HttpEntity.java",
+  "version_policy": "HttpEntity mutability is established only for checked 5.3, 6.2 and 7.0 families. Other/unspecified versions retain alternatives. Per-module explicit Spring dependencies or context framework_versions may establish this contract. Bounded Boot parent/configuration/profile support is recorded separately under spring_configuration; complete Maven/Gradle dependency resolution is absent.",
+  "implementation": "Our bounded semantic contracts, not an executing Spring library. Readonly list views stop with unsupported diagnostics.",
+  "browser_http": {
+    "sources": [
+      "https://api.jquery.com/jQuery.ajax/",
+      "https://fastapi.tiangolo.com/tutorial/request-forms/",
+      "https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-methods/requestparam.html",
+      "https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-methods/requestbody.html",
+      "https://github.com/angular/angular.js/blob/v1.8.2/src/ng/http.js"
+    ],
+    "checked_rules": [
+      "Default jQuery verb GET and contentType form-urlencoded",
+      "Object data processed independently of declared contentType",
+      "Source headers are case insensitive; explicit header overrides contentType default",
+      "FastAPI scalar Form/default and Annotated markers; Spring RequestParam form/query split",
+      "AngularJS $http object-data JSON transformation and JSON content type for POST/PUT/PATCH are distinct from jQuery processData defaults"
+    ],
+    "boundary": "Bounded jQuery/AngularJS/Spring contracts. Compound requests, hooks, full DOM and cookie/CORS lifecycle remain unsupported. Selected Python form/Bearer and body/response contracts now use pinned native libraries; see native_python."
+  },
+  "native_python": {
+    "details": "development/native-contracts.json",
+    "support": "FASTAPI.md",
+    "versions": {
+      "fastapi": "0.143.3",
+      "pydantic": "2.14.1",
+      "PyJWT": "2.15.1",
+      "pwdlib": "0.3.1"
+    },
+    "policy": "Execute only allowlisted pinned library primitives. Source functions use IR. Conflicting supplied versions stop unsupported; unspecified versions assume this pinned contract. No target import or startup execution."
+  },
+  "spring_configuration": {
+    "native_libraries": {
+      "javaproperties": "0.8.2",
+      "PyYAML": "6.0.3"
+    },
+    "upstream_sources": [
+      {
+        "file": "boot203-ConfigFileApplicationListener.java",
+        "url": "https://raw.githubusercontent.com/spring-projects/spring-boot/v2.0.3.RELEASE/spring-boot-project/spring-boot/src/main/java/org/springframework/boot/context/config/ConfigFileApplicationListener.java",
+        "sha256": "e161470be11807de155b22c709169efecc8fc38f96dcfcd1db9a34dcf374a1c2"
+      },
+      {
+        "file": "boot203-AbstractConfigurableWebServerFactory.java",
+        "url": "https://raw.githubusercontent.com/spring-projects/spring-boot/v2.0.3.RELEASE/spring-boot-project/spring-boot/src/main/java/org/springframework/boot/web/server/AbstractConfigurableWebServerFactory.java",
+        "sha256": "25b2a987b1e81e91ded4ca2865ec820124b253c2411252791286f638873a8270"
+      },
+      {
+        "file": "boot203-AbstractServletWebServerFactory.java",
+        "url": "https://raw.githubusercontent.com/spring-projects/spring-boot/v2.0.3.RELEASE/spring-boot-project/spring-boot/src/main/java/org/springframework/boot/web/servlet/server/AbstractServletWebServerFactory.java",
+        "sha256": "58b21f877ee096c130bb75e4aec346d9fdec93b2a0739589cadf0670c8ae1482"
+      },
+      {
+        "file": "cloud200-NativeEnvironmentRepository.java",
+        "url": "https://raw.githubusercontent.com/spring-cloud/spring-cloud-config/v2.0.0.RELEASE/spring-cloud-config-server/src/main/java/org/springframework/cloud/config/server/environment/NativeEnvironmentRepository.java",
+        "sha256": "338863b263c351d747ef34c4690ef6aa61552787e7d08d08d822883bdf526535"
+      }
+    ],
+    "documentation": [
+      "https://cloud.spring.io/spring-cloud-config/2.0.x/multi/multi__spring_cloud_config_server.html",
+      "https://docs.spring.io/spring-boot/docs/2.0.x/reference/html/boot-features-external-config.html"
+    ],
+    "scope": "Deployment-scoped conventional classpath sources, bounded literal profile selectors and ordered resolved Environment snapshots. External config fetch, custom imports, locations, ConfigData loader and full bootstrap lifecycle are unsupported."
+  },
+  "spring_MVC_validation": {
+    "sources": [
+      "https://docs.spring.io/spring-framework/docs/5.3.4/reference/html/web.html#mvc-ann-exceptionhandler",
+      "https://docs.jboss.org/hibernate/validator/6.0/reference/en-US/html_single/"
+    ],
+    "scope": "Bounded field Default-group constraints, selected source exception handlers and known routing status. Custom getter/class/field validation, groups, selectors, resolvers and full request/response lifecycle are not inferred."
+  },
+  "java_time": {
+    "native_libraries": {
+      "CPython": "3.11.9",
+      "tzdata": "2026.5",
+      "IANA": "2026e"
+    },
+    "sources": [
+      "https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html",
+      "https://docs.oracle.com/javase/8/docs/api/java/time/LocalDateTime.html",
+      "https://docs.oracle.com/javase/8/docs/api/java/util/Date.html",
+      "https://github.com/python/cpython/blob/v3.11.14/Doc/library/zoneinfo.rst",
+      "https://github.com/python/tzdata/releases/tag/2026.5"
+    ],
+    "scope": "Selected LocalDate/LocalDateTime/ZoneId/Instant/Date conversions over explicit scenario time and pinned timezone data. No wall clock or OS timezone files. Regional rules require matching timezone_database. Nanoseconds, extended years and unspecified codecs are explicit cutoffs."
+  },
+  "java_streams_and_wrappers": {
+    "native_libraries": {
+      "CPython": "3.11.9",
+      "primitives": [
+        "map",
+        "filter",
+        "itertools.islice",
+        "functools.reduce",
+        "functools.partial"
+      ]
+    },
+    "sources": [
+      "https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html",
+      "https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html",
+      "https://docs.oracle.com/javase/8/docs/api/java/util/HashSet.html",
+      "https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html",
+      "https://docs.oracle.com/javase/8/docs/api/java/lang/Long.html",
+      "https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.13",
+      "https://docs.oracle.com/javase/specs/jls/se8/html/jls-5.html#jls-5.1.7",
+      "https://docs.python.org/3.11/library/itertools.html#itertools.islice",
+      "https://docs.python.org/3.11/library/functools.html#functools.reduce"
+    ],
+    "scope": "Bounded sequential reference streams, source/static/bound/unbound/constructor method references, lazy native iterator traversal, selected terminal operations, native scalar boxing, source set hash/equals callbacks and small collision buckets. Parallelism, unordered multi-element traversal, count callback elision, large collision trees, unknown source interference and unsupported overloads are diagnostic boundaries. This is not a JVM or full JDK implementation. Float/Double/Character wrappers, arbitrary generic bridges and codecs remain unsupported."
+  }
+}

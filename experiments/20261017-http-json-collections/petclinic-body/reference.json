@@ -1,0 +1,218 @@
+{
+  "scope": "authorized controller/service method bodies with supplied successful BindingResult",
+  "preconditions": {
+    "profiles": [
+      "hsqldb",
+      "spring-data-jpa"
+    ],
+    "authority": "ROLE_VET_ADMIN",
+    "validation_errors": [],
+    "initial_types": [
+      {
+        "id": 7,
+        "name": "canine"
+      }
+    ]
+  },
+  "request_edges": [
+    [
+      [
+        "",
+        "executes",
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+      ],
+      [
+        "",
+        "executes",
+        "method:clinic:PetTypeRestController#getPetType(int)"
+      ],
+      [
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)",
+        "data",
+        "res:table:clinic.types"
+      ],
+      [
+        "method:clinic:PetTypeRestController#getPetType(int)",
+        "calls",
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+      ]
+    ],
+    [
+      [
+        "",
+        "executes",
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+      ],
+      [
+        "",
+        "executes",
+        "method:clinic:ClinicServiceImpl#savePetType(PetType)"
+      ],
+      [
+        "",
+        "executes",
+        "method:clinic:NamedEntity#getName()"
+      ],
+      [
+        "",
+        "executes",
+        "method:clinic:NamedEntity#setName(String)"
+      ],
+      [
+        "",
+        "executes",
+        "method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)"
+      ],
+      [
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)",
+        "data",
+        "res:table:clinic.types"
+      ],
+      [
+        "method:clinic:ClinicServiceImpl#savePetType(PetType)",
+        "data",
+        "res:table:clinic.types"
+      ],
+      [
+        "method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)",
+        "calls",
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+      ],
+      [
+        "method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)",
+        "calls",
+        "method:clinic:ClinicServiceImpl#savePetType(PetType)"
+      ],
+      [
+        "method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)",
+        "calls",
+        "method:clinic:NamedEntity#getName()"
+      ],
+      [
+        "method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)",
+        "calls",
+        "method:clinic:NamedEntity#setName(String)"
+      ]
+    ],
+    [
+      [
+        "",
+        "executes",
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+      ],
+      [
+        "",
+        "executes",
+        "method:clinic:PetTypeRestController#getPetType(int)"
+      ],
+      [
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)",
+        "data",
+        "res:table:clinic.types"
+      ],
+      [
+        "method:clinic:PetTypeRestController#getPetType(int)",
+        "calls",
+        "method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+      ]
+    ]
+  ],
+  "union": [
+    [
+      "",
+      "executes",
+      "method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+    ],
+    [
+      "",
+      "executes",
+      "method:clinic:ClinicServiceImpl#savePetType(PetType)"
+    ],
+    [
+      "",
+      "executes",
+      "method:clinic:NamedEntity#getName()"
+    ],
+    [
+      "",
+      "executes",
+      "method:clinic:NamedEntity#setName(String)"
+    ],
+    [
+      "",
+      "executes",
+      "method:clinic:PetTypeRestController#getPetType(int)"
+    ],
+    [
+      "",
+      "executes",
+      "method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)"
+    ],
+    [
+      "method:clinic:ClinicServiceImpl#findPetTypeById(int)",
+      "data",
+      "res:table:clinic.types"
+    ],
+    [
+      "method:clinic:ClinicServiceImpl#savePetType(PetType)",
+      "data",
+      "res:table:clinic.types"
+    ],
+    [
+      "method:clinic:PetTypeRestController#getPetType(int)",
+      "calls",
+      "method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+    ],
+    [
+      "method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)",
+      "calls",
+      "method:clinic:ClinicServiceImpl#findPetTypeById(int)"
+    ],
+    [
+      "method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)",
+      "calls",
+      "method:clinic:ClinicServiceImpl#savePetType(PetType)"
+    ],
+    [
+      "method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)",
+      "calls",
+      "method:clinic:NamedEntity#getName()"
+    ],
+    [
+      "method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)",
+      "calls",
+      "method:clinic:NamedEntity#setName(String)"
+    ]
+  ],
+  "source_evidence": {
+    "method:clinic:PetTypeRestController#getPetType(int)": {
+      "file": "src/main/java/org/springframework/samples/petclinic/rest/PetTypeRestController.java",
+      "line": 61
+    },
+    "method:clinic:PetTypeRestController#updatePetType(int,PetType,BindingResult)": {
+      "file": "src/main/java/org/springframework/samples/petclinic/rest/PetTypeRestController.java",
+      "line": 86
+    },
+    "method:clinic:ClinicServiceImpl#findPetTypeById(int)": {
+      "file": "src/main/java/org/springframework/samples/petclinic/service/ClinicServiceImpl.java",
+      "line": 154
+    },
+    "method:clinic:ClinicServiceImpl#savePetType(PetType)": {
+      "file": "src/main/java/org/springframework/samples/petclinic/service/ClinicServiceImpl.java",
+      "line": 173
+    },
+    "method:clinic:NamedEntity#getName()": {
+      "file": "src/main/java/org/springframework/samples/petclinic/model/NamedEntity.java",
+      "line": 38
+    },
+    "method:clinic:NamedEntity#setName(String)": {
+      "file": "src/main/java/org/springframework/samples/petclinic/model/NamedEntity.java",
+      "line": 42
+    }
+  },
+  "limits": [
+    "Component test; security, filters, Jackson and bean validation not exercised end to end",
+    "Skeleton supplied by source-only validation adapter, not organizer metadata",
+    "No interservice request in this journey; remote IoU is empty/empty, not tested"
+  ]
+}

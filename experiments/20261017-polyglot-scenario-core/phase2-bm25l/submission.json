@@ -1,0 +1,670 @@
+{
+  "project": "trainticket",
+  "scenarios": {
+    "S0": {
+      "method": "polyglot-ir-may",
+      "edges": [
+        {
+          "source": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "method:ts-contacts-service:contacts.controller.ContactsController#getContactsByContactsId(java.lang.String,?HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-contacts-service:contacts.service.ContactsServiceImpl#findContactsById(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S0",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S0",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S0",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S0",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S0",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "scenario:S0",
+          "relation": "executes",
+          "target": "method:ts-contacts-service:contacts.controller.ContactsController#getContactsByContactsId(java.lang.String,?HttpHeaders)"
+        },
+        {
+          "source": "scenario:S0",
+          "relation": "executes",
+          "target": "method:ts-contacts-service:contacts.service.ContactsServiceImpl#findContactsById(java.lang.String,org.springframework.http.HttpHeaders)"
+        }
+      ]
+    },
+    "S1": {
+      "method": "polyglot-ir-may",
+      "edges": [
+        {
+          "source": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "method:ts-price-service:price.controller.PriceController#query(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdAndTrainType(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-train-service:train.controller.TrainController#query(org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-train-service:train.service.TrainServiceImpl#query(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-train-service:train.service.TrainServiceImpl#query(org.springframework.http.HttpHeaders)",
+          "relation": "data",
+          "target": "res:table:ts-train-service.train_type"
+        },
+        {
+          "source": "scenario:S1",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S1",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S1",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S1",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S1",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "scenario:S1",
+          "relation": "executes",
+          "target": "method:ts-price-service:price.controller.PriceController#query(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S1",
+          "relation": "executes",
+          "target": "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdAndTrainType(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S1",
+          "relation": "executes",
+          "target": "method:ts-train-service:train.controller.TrainController#query(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S1",
+          "relation": "executes",
+          "target": "method:ts-train-service:train.service.TrainServiceImpl#query(org.springframework.http.HttpHeaders)"
+        }
+      ]
+    },
+    "S2": {
+      "method": "polyglot-ir-may",
+      "edges": [
+        {
+          "source": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "method:ts-order-other-service:other.controller.OrderOtherController#calculateSoldTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-order-other-service:other.service.OrderOtherServiceImpl#queryAlreadySoldOrders(java.util.Date,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-price-service:price.controller.PriceController#query(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdAndTrainType(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S2",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S2",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S2",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S2",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S2",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "scenario:S2",
+          "relation": "executes",
+          "target": "method:ts-order-other-service:other.controller.OrderOtherController#calculateSoldTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S2",
+          "relation": "executes",
+          "target": "method:ts-order-other-service:other.service.OrderOtherServiceImpl#queryAlreadySoldOrders(java.util.Date,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S2",
+          "relation": "executes",
+          "target": "method:ts-price-service:price.controller.PriceController#query(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S2",
+          "relation": "executes",
+          "target": "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdAndTrainType(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        }
+      ]
+    },
+    "S3": {
+      "method": "polyglot-ir-may",
+      "edges": [
+        {
+          "source": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "method:ts-price-service:price.controller.PriceController#query(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdAndTrainType(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-train-service:train.controller.TrainController#query(org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-train-service:train.service.TrainServiceImpl#query(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-train-service:train.service.TrainServiceImpl#query(org.springframework.http.HttpHeaders)",
+          "relation": "data",
+          "target": "res:table:ts-train-service.train_type"
+        },
+        {
+          "source": "scenario:S3",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S3",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S3",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S3",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S3",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "scenario:S3",
+          "relation": "executes",
+          "target": "method:ts-price-service:price.controller.PriceController#query(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S3",
+          "relation": "executes",
+          "target": "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdAndTrainType(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S3",
+          "relation": "executes",
+          "target": "method:ts-train-service:train.controller.TrainController#query(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S3",
+          "relation": "executes",
+          "target": "method:ts-train-service:train.service.TrainServiceImpl#query(org.springframework.http.HttpHeaders)"
+        }
+      ]
+    },
+    "S4": {
+      "method": "polyglot-ir-may",
+      "edges": [
+        {
+          "source": "method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#addContacts(edu.fudan.common.entity.Contacts,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-admin-basic-info-service:adminbasic.service.AdminBasicInfoServiceImpl#addContact(edu.fudan.common.entity.Contacts,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-admin-basic-info-service:adminbasic.service.AdminBasicInfoServiceImpl#addContact(edu.fudan.common.entity.Contacts,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-admin-basic-info-service:adminbasic.service.AdminBasicInfoServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "method:ts-user-service:user.controller.UserController#registerUser(user.dto.UserDto,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-user-service:user.service.impl.UserServiceImpl#saveUser(user.dto.UserDto,?HttpHeaders)"
+        },
+        {
+          "source": "scenario:S4",
+          "relation": "executes",
+          "target": "method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#addContacts(edu.fudan.common.entity.Contacts,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S4",
+          "relation": "executes",
+          "target": "method:ts-admin-basic-info-service:adminbasic.service.AdminBasicInfoServiceImpl#addContact(edu.fudan.common.entity.Contacts,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S4",
+          "relation": "executes",
+          "target": "method:ts-admin-basic-info-service:adminbasic.service.AdminBasicInfoServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "scenario:S4",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S4",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S4",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S4",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S4",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "scenario:S4",
+          "relation": "executes",
+          "target": "method:ts-user-service:user.controller.UserController#registerUser(user.dto.UserDto,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S4",
+          "relation": "executes",
+          "target": "method:ts-user-service:user.service.impl.UserServiceImpl#saveUser(user.dto.UserDto,?HttpHeaders)"
+        }
+      ]
+    },
+    "S5": {
+      "method": "polyglot-ir-may",
+      "edges": [
+        {
+          "source": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "method:ts-travel-service:travel.controller.TravelController#deleteTrip(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-travel-service:travel.service.TravelServiceImpl#delete(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-travel-service:travel.service.TravelServiceImpl#delete(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-common:edu.fudan.common.entity.TripId#<init>(java.lang.String)"
+        },
+        {
+          "source": "method:ts-travel2-service:travel2.controller.Travel2Controller#deleteTrip(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-travel2-service:travel2.service.TravelServiceImpl#delete(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-travel2-service:travel2.service.TravelServiceImpl#delete(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-common:edu.fudan.common.entity.TripId#<init>(java.lang.String)"
+        },
+        {
+          "source": "scenario:S5",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S5",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S5",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S5",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S5",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "scenario:S5",
+          "relation": "executes",
+          "target": "method:ts-common:edu.fudan.common.entity.TripId#<init>(java.lang.String)"
+        },
+        {
+          "source": "scenario:S5",
+          "relation": "executes",
+          "target": "method:ts-travel-service:travel.controller.TravelController#deleteTrip(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S5",
+          "relation": "executes",
+          "target": "method:ts-travel-service:travel.service.TravelServiceImpl#delete(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S5",
+          "relation": "executes",
+          "target": "method:ts-travel2-service:travel2.controller.Travel2Controller#deleteTrip(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S5",
+          "relation": "executes",
+          "target": "method:ts-travel2-service:travel2.service.TravelServiceImpl#delete(java.lang.String,org.springframework.http.HttpHeaders)"
+        }
+      ]
+    },
+    "S6": {
+      "method": "polyglot-ir-may",
+      "edges": [
+        {
+          "source": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "method:ts-route-service:route.controller.RouteController#createAndModifyRoute(route.entity.RouteInfo,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-route-service:route.service.RouteServiceImpl#createAndModify(route.entity.RouteInfo,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S6",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S6",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S6",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S6",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S6",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "scenario:S6",
+          "relation": "executes",
+          "target": "method:ts-route-service:route.controller.RouteController#createAndModifyRoute(route.entity.RouteInfo,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S6",
+          "relation": "executes",
+          "target": "method:ts-route-service:route.service.RouteServiceImpl#createAndModify(route.entity.RouteInfo,org.springframework.http.HttpHeaders)"
+        }
+      ]
+    },
+    "S7": {
+      "method": "polyglot-ir-may",
+      "edges": [
+        {
+          "source": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "method:ts-contacts-service:contacts.controller.ContactsController#getContactsByContactsId(java.lang.String,?HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-contacts-service:contacts.service.ContactsServiceImpl#findContactsById(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-price-service:price.controller.PriceController#query(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdAndTrainType(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-train-service:train.controller.TrainController#query(org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-train-service:train.service.TrainServiceImpl#query(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "method:ts-train-service:train.service.TrainServiceImpl#query(org.springframework.http.HttpHeaders)",
+          "relation": "data",
+          "target": "res:table:ts-train-service.train_type"
+        },
+        {
+          "source": "scenario:S7",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S7",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#cancelOrder(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S7",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S7",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S7",
+          "relation": "executes",
+          "target": "method:ts-cancel-service:cancel.service.CancelServiceImpl#getServiceUrl(java.lang.String)"
+        },
+        {
+          "source": "scenario:S7",
+          "relation": "executes",
+          "target": "method:ts-contacts-service:contacts.controller.ContactsController#getContactsByContactsId(java.lang.String,?HttpHeaders)"
+        },
+        {
+          "source": "scenario:S7",
+          "relation": "executes",
+          "target": "method:ts-contacts-service:contacts.service.ContactsServiceImpl#findContactsById(java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S7",
+          "relation": "executes",
+          "target": "method:ts-price-service:price.controller.PriceController#query(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S7",
+          "relation": "executes",
+          "target": "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdAndTrainType(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S7",
+          "relation": "executes",
+          "target": "method:ts-train-service:train.controller.TrainController#query(org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S7",
+          "relation": "executes",
+          "target": "method:ts-train-service:train.service.TrainServiceImpl#query(org.springframework.http.HttpHeaders)"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "project": "public-java",
+  "id": "stateful-account-statistics-chain",
+  "steps": [
+    {
+      "action": "Explicit conditional public-source HTTP request",
+      "request": {
+        "module": "account-service",
+        "path": "/accounts/current"
+      }
+    },
+    {
+      "action": "Explicit conditional public-source HTTP request",
+      "request": {
+        "module": "account-service",
+        "path": "/accounts/current",
+        "method": "PUT",
+        "body": {
+          "incomes": [
+            {
+              "title": "Salary",
+              "amount": "20",
+              "currency": "USD",
+              "period": "DAY",
+              "icon": "salary.png"
+            }
+          ],
+          "expenses": [
+            {
+              "title": "Rent",
+              "amount": "8",
+              "currency": "EUR",
+              "period": "DAY",
+              "icon": "rent.png"
+            }
+          ],
+          "saving": {
+            "amount": "100",
+            "currency": "USD",
+            "interest": "0",
+            "deposit": false,
+            "capitalization": false
+          },
+          "note": "Changed"
+        }
+      }
+    },
+    {
+      "action": "Explicit conditional public-source HTTP request",
+      "request": {
+        "module": "account-service",
+        "path": "/accounts/current"
+      }
+    },
+    {
+      "action": "Explicit conditional public-source HTTP request",
+      "request": {
+        "module": "statistics-service",
+        "path": "/statistics/current"
+      }
+    }
+  ]
+}

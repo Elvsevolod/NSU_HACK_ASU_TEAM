@@ -1,0 +1,30 @@
+{
+  "project": "public-java",
+  "scenarios": {
+    "configured-current-read": {
+      "method": "polyglot-ir-may",
+      "edges": [
+        {
+          "source": "method:account-service:com.piggymetrics.account.controller.AccountController#getCurrentAccount(Principal)",
+          "relation": "calls",
+          "target": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#findByName(String)"
+        },
+        {
+          "source": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#findByName(String)",
+          "relation": "data",
+          "target": "resource:accounts"
+        },
+        {
+          "source": "scenario:configured-current-read",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.controller.AccountController#getCurrentAccount(Principal)"
+        },
+        {
+          "source": "scenario:configured-current-read",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#findByName(String)"
+        }
+      ]
+    }
+  }
+}

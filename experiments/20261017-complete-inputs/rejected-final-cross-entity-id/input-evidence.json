@@ -1,0 +1,61 @@
+{
+  "user_confirms_all_files_provided": true,
+  "missing_concrete_values": [
+    {
+      "source": "tt-challenge/scenarios/S4.json",
+      "step": 1,
+      "quote": "Register a new passenger account (username, password, gender, ID document, e-mail)",
+      "missing": [
+        "gender value",
+        "ID document value",
+        "email value",
+        "username/password concrete values"
+      ]
+    },
+    {
+      "source": "tt-challenge/scenarios/S7.json",
+      "step": 12,
+      "quote": "Change the consignee's name and phone number in the consignment",
+      "missing": [
+        "new name",
+        "new phone number"
+      ]
+    }
+  ],
+  "context_source": "tt-challenge/context/README.md",
+  "context_supplies": [
+    "existing credentials",
+    "initial database",
+    "trip date and clock",
+    "first-result choices"
+  ],
+  "rule": "No arbitrary concrete values, source-derived defaults only on proven omission; symbolic inputs remain explicitly non-concrete.",
+  "choice_context_correction": "Authoritative choices context explicitly selects first unspecified store or dish. Food selections are recoverable analyzer work, not missing user facts; earlier missing_food categorization must not be used.",
+  "cannot_be_inferred": [
+    {
+      "scenario_file": "tt-challenge/scenarios/S3.json",
+      "step": 6,
+      "quote": "Add a new contact (a companion with an ID card) to the contact book",
+      "missing_values": [
+        "companion name",
+        "document number",
+        "phone number"
+      ],
+      "note": "Document category ID card is specified; binding that category remains an analyzer task, not missing evidence."
+    },
+    {
+      "scenario_file": "tt-challenge/scenarios/S7.json",
+      "step": 4,
+      "quote": "Book a first-class seat on the first trip found for this contact, with a luggage consignment of 3 kg to a consignee, without food or assurance",
+      "missing_values": [
+        "consignee name",
+        "consignee phone"
+      ],
+      "note": "No named new consignee or rule choosing an existing one is supplied. Initial consignments do not establish which recipient is intended."
+    }
+  ],
+  "counterexample": {
+    "description": "Two different valid new names and phone numbers satisfy exactly the same supplied instruction; source code and initial DB are identical in both. A deterministic source-only analyzer cannot recover which omitted pair the user intended.",
+    "claim": "Concrete values cannot all be recovered from these inputs. Unknown values and symbolic assumptions remain explicit."
+  }
+}

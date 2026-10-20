@@ -1,0 +1,11 @@
+# Value type flow, goal active
+
+Previous turn is progress: frozen15 changed source semantics and delivered reproducible archive; independent data probe confirmed .5->1 on one held component. Full unknown counter worsened18/40 to48/139, so goal incomplete. Preserve15 and all prior/parallel work. Latest steering: generic mechanisms only, no Train Ticket individual scenario/action/source trace or tuning.
+
+Rejected hypothesis: missing AST getter/setter bodies. Static all-project aggregate:1538methods1517AST21missing, all missing other-kind, no accessor field matches.
+
+Next hypothesis: Map key rejection conflates absent expression type inference with unknown runtime key. Frozen15 uses key_spec(str, unresolved)->unsupported for known string concatenations, and numeric_type comparisons returns operand numeric type rather than boolean. Reproduce with independent source before implementation, consult pinned free DeepSeek read-only if available, keep native char/String and int/long distinctions. Aggregate producer categories without logging business values/actions.
+
+Acceptance: source-derived expression typing; no guessed boxed type where runtime type really unresolved; independent coercion/namesake/branch tests; full inherited suite; family quality comparison including data and remote; all8 aggregate diagnostics, time/RSS, separate gold scoring; no goal completion at a checkpoint.
+
+Completed source probes rejected missing-AST hypothesis. Improvements cover expressions, lexical bindings, explicit/implicit callback types, namespace-qualified source returns, and primitive null conversion with evaluation order. All inherited checks retained. New pinned DeepSeek consult returned nonretryable403 before any substantive answer or edits; no alternate model. First two complete all-input iterations preserved identical submission and48/139 unknown counts. Aggregate live-checkpoint41/115 was invalidated and never used to claim improvement; all new aggregation asserts run_complete and103steps. Final run pending. Next general frontiers: backed Map views and order, method references, JSON lifecycle/JavaBeans, propagated browser state. No individual Train Ticket action/source case was used to select code rules.

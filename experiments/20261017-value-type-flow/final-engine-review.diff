@@ -1,0 +1,649 @@
+--- solutions/—_http-json-collections/code/analyzer/engine.py	2026-10-17 18:42:32
++++ solutions/—_value-type-flow/code/analyzer/engine.py	2026-10-17 19:42:32
+@@ -5,6 +5,7 @@
+ """
+ from collections import defaultdict,Counter
+ from copy import deepcopy
++from contextlib import contextmanager
+ import json
+ import operator
+ import math
+@@ -417,19 +418,58 @@
+         # Method execution never mutates completed request observations. Share
+         # their payloads, but own the journal list and all mutable execution data.
+         return deepcopy(state,{id(state.history):list(state.history)})
++
++    @contextmanager
++    def binding_scope(self,env,names):
++        saved={name:(name in env,env.get(name),self.variable_types.get(name)) for name in names}
++        try:yield
++        finally:
++            for name,(present,value,typ) in saved.items():
++                if present:env[name]=value
++                else:env.pop(name,None)
++                if typ is None:self.variable_types.pop(name,None)
++                else:self.variable_types[name]=typ
++
++    def unbox(self,value,node):
++        if value is None and any(self.standard_type(self.source_type(node),'java.lang.'+name)
++                                 for name in ('Integer','Long','Short','Byte','Float','Double','Character','Boolean')):
++            raise JavaThrow({'__type__':'NullPointerException'})
++        if value is None:
++            self.approximate=True
++            self.warnings.add('null scalar conversion requires an unresolved source type: '+self.method)
++        return value
++
++    def primitive_value(self,value,typ):
++        if value is None and typ in ('int','long','short','byte','float','double','char','boolean'):
++            raise JavaThrow({'__type__':'NullPointerException'})
++        return value
+ 
++    def binary_unboxes(self,node,side):
++        op=text(node.child_by_field_name('operator'))
++        if op in ('==','!='):
++            other=node.child_by_field_name('right' if side=='left' else 'left')
++            return self.source_type(other) in ('int','long','short','byte','float','double','char','boolean')
++        if op=='+':
++            return not any(self.standard_type(self.source_type(node.child_by_field_name(key)),'java.lang.String')
++                           for key in ('left','right'))
++        return op in ('-','*','/','%','<','>','<=','>=','&','|','^','<<','>>','>>>','&&','||')
++
+     def execute(self, node, env):
+         if node is None:
+             return U, None
+         typ = node.type
+         if typ in ('block', 'constructor_body'):
+-            for child in node.named_children:
+-                value, control = self.execute(child, env)
+-                if control:
+-                    return value, control
++            names=[text(var.child_by_field_name('name')) for child in node.named_children
++                   if child.type=='local_variable_declaration' for var in child.named_children if var.type=='variable_declarator']
++            with self.binding_scope(env,names):
++                for child in node.named_children:
++                    value, control = self.execute(child, env)
++                    if control:
++                        return value, control
+             return U, None
+         if typ in ('return_statement', 'throw_statement'):
+             value = self.value(node.named_children[0], env) if node.named_children else None
++            if typ=='return_statement':value=self.primitive_value(value,self.p.methods[self.method].get('return_raw',''))
+             if typ=='throw_statement' and value is None:value={'__type__':'NullPointerException'}
+             return value, 'return' if typ == 'return_statement' else 'throw'
+         if typ in ('switch_expression','switch_statement'):
+@@ -438,7 +478,8 @@
+         if typ=='yield_statement':
+             return self.value(node.named_children[0],env),'yield'
+         if typ == 'if_statement':
+-            cond = self.value(node.child_by_field_name('condition'), env)
++            condition=node.child_by_field_name('condition')
++            cond = self.unbox(self.value(condition, env),condition)
+             self.conditions.append({'method': self.method, 'line': node.start_point.row + 1,
+                                     'condition': text(node.child_by_field_name('condition')),
+                                     'value': cond if isinstance(cond, bool) else 'unknown'})
+@@ -477,42 +518,46 @@
+                 self.approximate = True
+                 self.warnings.add('loop collection widened after 64 elements')
+                 items = items[:64] + [U]
+-            for item in items:
+-                env[name] = item
+-                result, control = self.execute(node.child_by_field_name('body'), env)
+-                if control in ('return', 'throw') and isinstance(values, list):
+-                    return result, control
+-                if control == 'break': break
++            with self.binding_scope(env,[name]):
++                self.variable_types[name]=text(node.child_by_field_name('type'))
++                for item in items:
++                    env[name] = item
++                    result, control = self.execute(node.child_by_field_name('body'), env)
++                    if control in ('return', 'throw') and isinstance(values, list):
++                        return result, control
++                    if control == 'break': break
+             return U, None
+         if typ in ('for_statement', 'while_statement', 'do_statement'):
+             init = node.child_by_field_name('init')
+-            if init: self.execute(init, env)
+-            condnode = node.child_by_field_name('condition')
+-            for iteration in range(64):
+-                cond = self.value(condnode, env) if condnode else U
+-                if cond is False and not (typ == 'do_statement' and iteration == 0): break
+-                if cond is U:
+-                    decision = self.choose(self.method + ':loop:' + str(node.start_point.row + 1), [True, False])
+-                    if decision is False:
++            names=[text(var.child_by_field_name('name')) for var in init.named_children if var.type=='variable_declarator'] if init is not None and init.type=='local_variable_declaration' else []
++            with self.binding_scope(env,names):
++                if init: self.execute(init, env)
++                condnode = node.child_by_field_name('condition')
++                for iteration in range(64):
++                    cond = self.unbox(self.value(condnode, env),condnode) if condnode else U
++                    if cond is False and not (typ == 'do_statement' and iteration == 0): break
++                    if cond is U:
++                        decision = self.choose(self.method + ':loop:' + str(node.start_point.row + 1), [True, False])
++                        if decision is False:
++                            break
++                        if decision is True:
++                            cond = True
++                        else:
++                            self.uncertain += 1
++                    result, control = self.execute(node.child_by_field_name('body'), env)
++                    if cond is U: self.uncertain -= 1
++                    if control in ('return', 'throw') and cond is True: return result, control
++                    if control == 'break': break
++                    update = node.child_by_field_name('update')
++                    if update: self.value(update, env)
++                    if cond is not True:
++                        self.warnings.add('unknown loop bounded to one pass: ' + self.method)
+                         break
+-                    if decision is True:
+-                        cond = True
+-                    else:
+-                        self.uncertain += 1
+-                result, control = self.execute(node.child_by_field_name('body'), env)
+-                if cond is U: self.uncertain -= 1
+-                if control in ('return', 'throw') and cond is True: return result, control
+-                if control == 'break': break
+-                update = node.child_by_field_name('update')
+-                if update: self.value(update, env)
+-                if cond is not True:
+-                    self.warnings.add('unknown loop bounded to one pass: ' + self.method)
+-                    break
+-            else:
+-                self.approximate = True
+-                self.warnings.add('loop bounded after 64 passes: ' + self.method)
+-                self.fallback(self.method)
+-            return U, None
++                else:
++                    self.approximate = True
++                    self.warnings.add('loop bounded after 64 passes: ' + self.method)
++                    self.fallback(self.method)
++                return U, None
+         if typ == 'try_statement' or typ == 'try_with_resources_statement':
+             resources = node.child_by_field_name('resources')
+             if resources:
+@@ -537,11 +582,14 @@
+                                 self.fallback(self.method)
+                                 break
+                         if match:
+-                            env[text(parameter.child_by_field_name('name'))] = result
+-                            try:
+-                                result, control = self.execute(child.child_by_field_name('body'), env)
+-                            except JavaThrow as exc:
+-                                result,control = exc.value,'throw'
++                            name=text(parameter.child_by_field_name('name'))
++                            with self.binding_scope(env,[name]):
++                                self.variable_types[name]=text(types)
++                                env[name] = result
++                                try:
++                                    result, control = self.execute(child.child_by_field_name('body'), env)
++                                except JavaThrow as exc:
++                                    result,control = exc.value,'throw'
+                             break
+             for child in node.named_children:
+                 if child.type == 'finally_clause':
+@@ -557,7 +605,7 @@
+                 if child.type == 'variable_declarator':
+                     name = text(child.child_by_field_name('name'))
+                     self.variable_types[name] = text(node.child_by_field_name('type'))
+-                    env[name] = self.value(child.child_by_field_name('value'), env)
++                    env[name] = self.primitive_value(self.value(child.child_by_field_name('value'), env),self.variable_types[name])
+             return U, None
+         if typ in ('break_statement', 'continue_statement'):
+             return U, 'break' if typ == 'break_statement' else 'continue'
+@@ -625,7 +673,18 @@
+         if typ == 'null_literal':
+             return None
+         if typ == 'character_literal':
+-            return raw[1:-1]
++            content=raw[1:-1]
++            if len(content)==1:return content
++            if content=="\\'":return "'"
++            if content=='\\s':return ' '
++            if re.fullmatch(r'\\[0-7]{1,3}',content) and int(content[1:],8)<=255:return chr(int(content[1:],8))
++            try:
++                decoded=json.loads('"'+content+'"')
++                if len(decoded.encode('utf-16-le',errors='surrogatepass'))==2:return decoded
++            except ValueError:pass
++            self.approximate=True
++            self.warnings.add('unsupported Java character literal: '+self.method)
++            return U
+         if typ == 'string_literal':
+             try:
+                 return json.loads(raw)
+@@ -643,6 +702,7 @@
+         if typ == 'cast_expression':
+             value = self.value(node.named_children[-1], env)
+             target = text(node.child_by_field_name('type'))
++            value=self.primitive_value(value,target)
+             if isinstance(value,(str,JsonText)):
+                 base=target.split('<',1)[0]
+                 meta=self.p.methods[self.method]
+@@ -695,7 +755,8 @@
+                 self.warnings.add('unresolved static/instance field access through null: '+raw)
+             return len(obj) if isinstance(obj, list) and field == 'length' else member(obj, field)
+         if typ == 'unary_expression':
+-            arg = self.value(node.child_by_field_name('operand') or node.named_children[-1], env)
++            operand=node.child_by_field_name('operand') or node.named_children[-1]
++            arg = self.unbox(self.value(operand, env),operand)
+             if arg is U:
+                 return U
+             if raw.startswith('!') and isinstance(arg, bool):
+@@ -708,15 +769,32 @@
+         if typ == 'binary_expression':
+             op = text(node.child_by_field_name('operator'))
+             a = self.value(node.child_by_field_name('left'), env)
++            if a is None and self.binary_unboxes(node,'left'):self.unbox(a,node.child_by_field_name('left'))
+             if (op == '&&' and a is False) or (op == '||' and a is True):
+                 return a
+             b = self.value(node.child_by_field_name('right'), env)
++            if b is None and self.binary_unboxes(node,'right'):self.unbox(b,node.child_by_field_name('right'))
+             if op == '&&' and b is False:
+                 return False
+             if op == '||' and b is True:
+                 return True
+             if a is U or b is U:
+                 return U
++            # A Java char is represented by one UTF-16 code unit, but participates
++            # in numeric promotion unless this is a source-typed String concat.
++            operand_types=[self.numeric_type(node.child_by_field_name(side)) for side in ('left','right')]
++            if all(t in ('byte','short','char','int','long','float','double') for t in operand_types):
++                converted=[]
++                for value,source_type in zip((a,b),operand_types):
++                    if source_type=='char' and isinstance(value,str):
++                        units=value.encode('utf-16-le',errors='surrogatepass')
++                        if len(units)==2:value=int.from_bytes(units,'little')
++                        else:
++                            value=U;self.approximate=True
++                            self.warnings.add('unresolved Java char code unit: '+self.method)
++                    converted.append(value)
++                a,b=converted
++                if a is U or b is U:return U
+             if op in ('==','!=') and any(isinstance(value,(JavaRecord,JavaMap,JavaEnumValue,JavaTypeToken,JavaTypeFactory)) for value in (a,b)):
+                 equal=reference_equal(a,b)
+                 if equal is U:
+@@ -755,7 +833,8 @@
+                    '<=': operator.le, '>=': operator.ge, '+': operator.add, '-': operator.sub,
+                    '*': operator.mul, '/': operator.truediv, '&&': lambda x, y: x and y,
+                    '||': lambda x, y: x or y}
+-            if op == '+' and (isinstance(a, str) or isinstance(b, str)):
++            if op == '+' and (isinstance(a, str) or isinstance(b, str) or
++                              (a is None or b is None) and any(self.standard_type(self.source_type(node.child_by_field_name(side)),'java.lang.String') for side in ('left','right'))):
+                 def scalar(value):
+                     if value is None:return 'null'
+                     if type(value) is bool:return str(value).lower()
+@@ -793,19 +872,21 @@
+                 return U
+         if typ == 'update_expression':
+             child = node.named_children[0]
+-            old = self.value(child, env)
++            old = self.unbox(self.value(child, env),child)
+             new = old + (1 if '++' in raw else -1) if isinstance(old, (int, float)) else U
+             if type(new) is int:new=self.narrow_integer(new,self.numeric_type(child))
+             if child.type == 'identifier': env[text(child)] = new
+             return new if raw.startswith(('++', '--')) else old
+         if typ == 'assignment_expression':
+             lhs, rhs = node.child_by_field_name('left'), node.child_by_field_name('right')
+-            result = self.value(rhs, env)
+             op = text(node.child_by_field_name('operator'))
++            old = self.unbox(self.value(lhs, env),lhs) if op!='=' else U
++            result = self.primitive_value(self.value(rhs, env),self.source_type(lhs))
+             if op != '=':
+-                old = self.value(lhs, env)
+                 try: result = {'+=': operator.add, '-=': operator.sub}[op](old, result)
+-                except (KeyError, TypeError): result = U
++                except (KeyError, TypeError):
++                    result = U;self.approximate=True
++                    self.warnings.add('unsupported Java compound assignment: '+self.method)
+                 if type(result) is int:result=self.narrow_integer(result,self.numeric_type(lhs))
+             if lhs.type == 'identifier':
+                 env[text(lhs)] = result
+@@ -821,12 +902,13 @@
+                     obj[text(lhs.child_by_field_name('field'))] = result
+             return result
+         if typ == 'ternary_expression':
+-            c = self.value(node.child_by_field_name('condition'), env)
++            condition=node.child_by_field_name('condition')
++            c = self.unbox(self.value(condition, env),condition)
+             if isinstance(c, bool):
+-                return self.value(node.child_by_field_name('consequence' if c else 'alternative'), env)
++                return self.primitive_value(self.value(node.child_by_field_name('consequence' if c else 'alternative'), env),self.source_type(node))
+             decision = self.choose(self.method + ':ternary:' + str(node.start_point.row + 1), [True, False])
+             if decision is not None:
+-                return self.value(node.child_by_field_name('consequence' if decision else 'alternative'), env)
++                return self.primitive_value(self.value(node.child_by_field_name('consequence' if decision else 'alternative'), env),self.source_type(node))
+             self.uncertain += 1
+             self.approximate = True
+             result = merge(self.value(node.child_by_field_name('consequence'), deepcopy(env)),
+@@ -870,12 +952,16 @@
+         """Source types for Java integer promotion; values alone lose long vs int."""
+         if node is None:return ''
+         kind,raw=node.type,text(node)
+-        aliases={'Integer':'int','Long':'long','Short':'short','Byte':'byte','Double':'double','Float':'float'}
++        aliases={'Integer':'int','Long':'long','Short':'short','Byte':'byte','Double':'double','Float':'float','Character':'char','Boolean':'boolean'}
+         if kind=='decimal_integer_literal':return 'long' if raw.lower().endswith('l') else 'int'
+         if kind=='decimal_floating_point_literal':return 'float' if raw.lower().endswith('f') else 'double'
++        if kind=='character_literal':return 'char'
++        if kind in ('true','false'):return 'boolean'
+         if kind=='identifier':
+             info=self.p.type_fields.get(self.p.methods[self.method]['owner'],{}).get(raw,{})
+-            typ=self.variable_types.get(raw,info.get('type','')).split('.')[-1]
++            written=self.variable_types.get(raw,info.get('type',''))
++            if self.has_type_variables(written,self.p.methods[self.method]):return ''
++            typ=written.split('.')[-1]
+             return aliases.get(typ,typ)
+         if kind in ('parenthesized_expression','unary_expression','update_expression','expression_statement','yield_statement'):
+             typ=self.numeric_type(node.named_children[-1])
+@@ -885,16 +971,32 @@
+             if raw.startswith(('Integer.','Long.')):return 'int' if raw.startswith('Integer.') else 'long'
+             obj=node.child_by_field_name('object');field=text(node.child_by_field_name('field'))
+             owner=self.p.methods[self.method]['owner'] if text(obj)=='this' else self.p.resolve_type(self.variable_types.get(text(obj),text(obj)),self.p.methods[self.method]['module'])
+-            typ=self.p.type_fields.get(owner,{}).get(field,{}).get('type','').split('.')[-1]
++            info=self.p.type_fields.get(owner,{}).get(field,{})
++            if self.has_type_variables(info.get('type',''),{'owner':info.get('declaring_type',owner)}):return ''
++            typ=info.get('type','').split('.')[-1]
+             return aliases.get(typ,typ) or ('int' if field=='length' else '')
+         if kind=='binary_expression':
++            op=text(node.child_by_field_name('operator'))
++            if op in ('==','!=','<','>','<=','>=','&&','||'):return 'boolean'
+             types=[self.numeric_type(node.child_by_field_name(side)) for side in ('left','right')]
+-            if all(t in ('byte','short','char','int','long','float','double') for t in types):
++            if op in ('+','-','*','/','%','&','|','^') and all(t in ('byte','short','char','int','long','float','double') for t in types):
+                 return next((t for t in ('double','float','long') if t in types),'int')
++        if kind=='ternary_expression':
++            types=[self.numeric_type(node.child_by_field_name(side)) for side in ('consequence','alternative')]
++            if types[0] and types[0]==types[1]:return types[0]
++            if all(t in ('int','long','float','double') for t in types):
++                return next((t for t in ('double','float','long') if t in types),'int')
+         if kind=='method_invocation':
+             name=text(node.child_by_field_name('name'))
+             inferred=self.source_type(node).split('.')[-1]
+             if inferred:return aliases.get(inferred,inferred)
++            site=self.p.site(self.method,node)
++            declared=self.p.targets(self.method,site) if site else self.p.source_targets(self.method,node)
++            meta=self.p.methods[self.method]
++            owner=self.p.resolve_type(self.source_type(node.child_by_field_name('object')),meta['module'],meta['file'])
++            arguments=node.child_by_field_name('arguments')
++            arity=len(arguments.named_children) if arguments is not None else 0
++            if declared or owner and self.p.inherited_methods(owner,name,arity):return ''
+             if name in ('length','size','parseInt','intValue','indexOf'):return 'int'
+             if name in ('parseLong','longValue','getTime'):return 'long'
+             if name in ('parseDouble','doubleValue'):return 'double'
+@@ -913,11 +1015,28 @@
+         if node is None:return ''
+         kind,raw=node.type,text(node)
+         meta=self.p.methods[self.method]
++        if kind=='string_literal':return 'java.lang.String'
++        if kind=='character_literal':return 'char'
++        if kind in ('true','false'):return 'boolean'
++        if kind in ('decimal_integer_literal','decimal_floating_point_literal'):return self.numeric_type(node)
+         if kind=='this':return self.p.nodes[meta['owner']]['fqn']
+-        if kind=='identifier':return self.variable_types.get(raw,self.p.type_fields.get(meta['owner'],{}).get(raw,{}).get('type',''))
++        if kind=='identifier':
++            written=self.variable_types.get(raw,self.p.type_fields.get(meta['owner'],{}).get(raw,{}).get('type',''))
++            return '' if self.has_type_variables(written,meta) else written
+         if kind=='parenthesized_expression':return self.source_type(node.named_children[-1])
+         if kind in ('cast_expression','object_creation_expression'):return text(node.child_by_field_name('type'))
+         if kind=='array_access':return self.source_type(node.child_by_field_name('array')).removesuffix('[]')
++        if kind=='binary_expression':
++            if text(node.child_by_field_name('operator'))=='+':
++                types=[self.source_type(node.child_by_field_name(side)) for side in ('left','right')]
++                if any(self.standard_type(t,'java.lang.String') for t in types):return 'java.lang.String'
++            return self.numeric_type(node)
++        if kind=='unary_expression' and raw.startswith('!'):return 'boolean'
++        if kind=='ternary_expression':
++            types=[self.source_type(node.child_by_field_name(side)) for side in ('consequence','alternative')]
++            if types[0] and types[0]==types[1]:return types[0]
++            if all(self.standard_type(t,'java.lang.String') for t in types):return 'java.lang.String'
++            return self.numeric_type(node)
+         if kind not in ('method_invocation','field_access'):return ''
+         obj=node.child_by_field_name('object')
+         receiver=self.source_type(obj) if obj is not None else self.p.nodes[meta['owner']]['fqn']
+@@ -925,11 +1044,27 @@
+         if kind=='method_invocation':
+             site=self.p.site(self.method,node)
+             targets=self.p.targets(self.method,site) if site else self.p.source_targets(self.method,node)
+-            types={self.p.methods[target].get('return_raw','') for target in targets}
++            if not targets and owner is not None:
++                name=text(node.child_by_field_name('name'))
++                arguments=node.child_by_field_name('arguments')
++                count=len(arguments.named_children) if arguments is not None else 0
++                owners=set(self.p.type_parents.get(owner,set()))|{owner}
++                targets=[target for target in self.p.by_name.get(name,[]) if self.p.methods[target]['owner'] in owners
++                         and len(self.p.parameters(target))==count]
++            types={self.source_return_type(target) for target in targets}
+             if len(types)==1:return next(iter(types))
+             name=text(node.child_by_field_name('name'))
+             arguments=node.child_by_field_name('arguments')
+             count=len(arguments.named_children) if arguments is not None else 0
++            shadowed=text(obj) in self.variable_types or text(obj) in self.p.type_fields.get(meta['owner'],{})
++            if name=='asList' and count and not shadowed and self.standard_type(text(obj),'java.util.Arrays'):
++                types={self.scalar_or_source_type(self.source_type(arg)) for arg in arguments.named_children}
++                if len(types)==1 and '' not in types:return 'java.util.List<'+next(iter(types))+'>'
++            if self.standard_type(receiver,'java.lang.String'):
++                if (name=='substring' and count in (1,2)) or (name in ('toString','trim','toLowerCase','toUpperCase') and count==0):return 'java.lang.String'
++                if name=='charAt' and count==1:return 'char'
++                if name=='length' and count==0:return 'int'
++                if (name in ('equals','equalsIgnoreCase','contains','startsWith','endsWith') and count==1) or (name=='isEmpty' and count==0):return 'boolean'
+             if name=='get' and count==1 and owner is None:
+                 collection=re.fullmatch(r'(?:java\.util\.)?(?:List|ArrayList|LinkedList)\s*<\s*([\w.]+)\s*>',receiver)
+                 if collection:return collection[1]
+@@ -946,11 +1081,51 @@
+             if current is None or current in seen:continue
+             seen.add(current)
+             info=self.p.type_fields.get(current,{}).get(field)
+-            if info:return info['type']
++            if info:return '' if self.has_type_variables(info['type'],{'owner':info.get('declaring_type',current)}) else info['type']
+             pending.extend(self.p.resolve_type(parent,self.p.nodes[current]['module'],self.p.nodes[current]['file'])
+                            for parent in self.p.framework_types.get(current,set()))
+         return ''
+ 
++    def map_key_type(self,node):
++        """Use source types for boxing, never the shape of a Python scalar."""
++        typ=self.source_type(node) or self.numeric_type(node)
++        if typ in ('byte','short','char','int','long','float','double','boolean'):return typ
++        for name in ('String','Integer','Long','Byte','Short','Character','Boolean'):
++            if self.standard_type(typ,'java.lang.'+name):return name
++        return 'unresolved'
++
++    def source_return_type(self,target):
++        meta=self.p.methods[target]
++        written=meta.get('return_raw','')
++        if self.has_type_variables(written,meta):return ''
++        if not re.fullmatch(r'[\w.]+',written):return written
++        owner=self.p.resolve_type(written,meta['module'],meta['file'])
++        if owner:return self.p.nodes[owner]['fqn']
++        for name in ('String','Integer','Long','Byte','Short','Character','Boolean','Float','Double','Object'):
++            if self.standard_type(written,'java.lang.'+name,meta):return 'java.lang.'+name
++        return written
++
++    def scalar_or_source_type(self,written):
++        """Qualify a bounded generic argument in the current source namespace."""
++        if not re.fullmatch(r'[\w.]+',written):return ''
++        boxed={'byte':'Byte','short':'Short','int':'Integer','long':'Long','char':'Character',
++               'boolean':'Boolean','double':'Double','float':'Float'}
++        if written in boxed:return 'java.lang.'+boxed[written]
++        meta=self.p.methods[self.method]
++        if self.has_type_variables(written,meta):return ''
++        owner=self.p.resolve_type(written,meta['module'],meta['file'])
++        if owner:return self.p.nodes[owner]['fqn']
++        for name in ('String','Integer','Long','Short','Byte','Character','Boolean','Double','Float','Object'):
++            if self.standard_type(written,'java.lang.'+name):return 'java.lang.'+name
++        return ''
++
++    def stream_element_type(self,node):
++        written=self.source_type(node)
++        match=re.fullmatch(r'((?:java\.util\.)?(?:List|ArrayList|LinkedList))\s*<\s*([\w.]+)\s*>',written)
++        if match and self.standard_type(match[1],'java.util.'+match[1].rsplit('.',1)[-1]):
++            return self.scalar_or_source_type(match[2])
++        return ''
++
+     def narrow_integer(self,value,typ):
+         bits={'byte':8,'short':16,'int':32,'long':64}.get(typ)
+         if bits:return (value+(1<<(bits-1)))%(1<<bits)-(1<<(bits-1))
+@@ -961,6 +1136,37 @@
+     def standard_type(self,name,fqn,meta=None):
+         """A source-proven JDK type, rather than an unrelated namesake."""
+         meta=self.p.methods[self.method] if meta is None else meta
++        # Project source and namespaces are immutable during a run. Type proofs
++        # are reused across paths, unlike values or local variable bindings.
++        cache=self.p.__dict__.setdefault('_standard_type_cache',{})
++        variables=self.type_variable_scope(meta)
++        key=(name,fqn,meta['module'],meta['file'],tuple(sorted(variables)))
++        if key not in cache:cache[key]=name not in variables and self.prove_standard_type(name,fqn,meta)
++        return cache[key]
++
++    def type_variable_scope(self,meta):
++        owner=meta.get('owner')
++        if owner is None:return frozenset()
++        methods=self.p.__dict__.get('_method_meta_ids')
++        if methods is None:
++            methods={id(value):mid for mid,value in self.p.methods.items()}
++            self.p._method_meta_ids=methods
++        mid=methods.get(id(meta))
++        cache=self.p.__dict__.setdefault('_type_variable_scope_cache',{})
++        if mid in cache:return cache[mid]
++        names=set(self.p.type_variables.get(owner,{}))
++        node=self.p.ast.get(mid)
++        parameters=node.child_by_field_name('type_parameters') if node is not None else None
++        if parameters is not None:names.update(text(par.named_children[0]) for par in parameters.named_children if par.named_children)
++        result=frozenset(names)
++        if mid is not None:cache[mid]=result
++        return result
++
++    def has_type_variables(self,written,meta):
++        variables=self.type_variable_scope(meta)
++        return bool(variables and set(re.findall(r'(?<![\w.])[\w$]+',written)) & variables)
++
++    def prove_standard_type(self,name,fqn,meta):
+         if self.p.resolve_type(name,meta['module'],meta['file']):
+             return False
+         if name==fqn:return True
+@@ -1058,8 +1264,7 @@
+                 invocations.append(values)
+         for nodes in invocations:
+             values=[self.value(value,env) for value in nodes]
+-            key_type={'string_literal':'String','character_literal':'char','true':'boolean','false':'boolean'}.get(nodes[0].type)
+-            key_type=key_type or self.numeric_type(nodes[0]) or 'unresolved'
++            key_type=self.map_key_type(nodes[0])
+             _,result=library('put',mapping,values,'this',self.state.now,key_type=key_type)
+             if result is U or any(value is U for value in values):
+                 self.approximate=True
+@@ -1075,8 +1280,18 @@
+         objnode = node.child_by_field_name('object')
+         obj = self.value(objnode, env) if objnode else env.get('this', U)
+         argnode = node.child_by_field_name('arguments')
+-        args = [self.value(child, env) for child in argnode.named_children
+-                if child.type not in ('line_comment', 'block_comment')] if argnode else []
++        declared=None
++        args=[]
++        for child in argnode.named_children if argnode else []:
++            if child.type in ('line_comment','block_comment'):continue
++            value=self.value(child,env)
++            if value is None:
++                if declared is None:declared=self.p.targets(mid,site) if site else self.p.source_targets(mid,node)
++                parameters=[self.p.parameters(target) for target in declared]
++                expected={pars[len(args)][1] for pars in parameters if len(pars)>len(args)}
++                if len(expected)==1 and all(len(pars)>len(args) for pars in parameters):
++                    value=self.primitive_value(value,next(iter(expected)))
++            args.append(value)
+         reason = site or f"{self.p.methods[mid]['file']}:{node.start_point.row + 1}"
+         if name=='doFilter' and type(obj) is dict and '__filter_chain__' in obj:
+             self.continue_filter(*obj['__filter_chain__'])
+@@ -1372,7 +1587,8 @@
+                 self.warnings.add('Object.equals reference identity is unresolved: '+reason)
+             return equal
+         if not targets:
+-            handled, value = self.stream_call(name, obj, args, text(objnode), reason, env)
++            handled, value = self.stream_call(name, obj, args, text(objnode), reason, env,
++                                              self.stream_element_type(objnode) if name=='stream' else '')
+             if handled:
+                 return value
+         if not targets and isinstance(obj,JavaTypeFactory):
+@@ -1411,8 +1627,7 @@
+         key_type=None
+         if isinstance(obj,JavaMap) and args:
+             first=next(child for child in argnode.named_children if child.type not in ('line_comment','block_comment'))
+-            key_type={'string_literal':'String','character_literal':'char','true':'boolean','false':'boolean'}.get(first.type)
+-            if key_type is None:key_type=self.numeric_type(first) or 'unresolved'
++            key_type=self.map_key_type(first)
+         handled, value = library(name, obj, args, text(objnode), self.state.now,key_type=key_type,
+                                  json_issue=lambda message:self.json_issue(message,reason)) if not targets else (False, U)
+         if handled:
+@@ -1550,10 +1765,10 @@
+                 return True if name=='contains' else U if unknown else index
+         return U if unknown else False if name=='contains' else -1
+ 
+-    def stream_call(self, name, obj, args, receiver, reason, env):
++    def stream_call(self, name, obj, args, receiver, reason, env,element_type=''):
+         """Sequential lazy filter/map pipelines over a known ordered collection."""
+         if name == 'stream' and isinstance(obj, list) and not args:
+-            return True, {'__stream__': obj, 'operations': [], 'linked': False, 'lifecycle': {'consumed': False}}
++            return True, {'__stream__': obj, 'operations': [], 'linked': False, 'lifecycle': {'consumed': False},'element_type':element_type}
+         if name == 'toList' and not args and receiver in ('Collectors', 'java.util.stream.Collectors'):
+             meta = self.p.methods[self.method]
+             source = text(self.p.trees[meta['file']].root_node)
+@@ -1569,7 +1784,9 @@
+             return True, U
+         if name in ('filter', 'map') and len(args) == 1 and isinstance(args[0], tuple) and args[0][0] == 'lambda':
+             obj['linked'] = True
+-            return True, {**obj, 'linked': False, 'operations': [*obj['operations'], (name, args[0])]}
++            incoming=obj.get('element_type','')
++            outgoing=self.callback_return_type(args[0],incoming) if name=='map' else incoming
++            return True, {**obj, 'linked': False, 'operations': [*obj['operations'], (name, args[0],incoming)],'element_type':outgoing}
+         if name != 'collect' or args != [{'__collector__': 'java.util.stream.Collectors.toList'}]:
+             self.approximate = True
+             self.warnings.add('unsupported stream operation: ' + reason + ' ' + name)
+@@ -1582,8 +1799,8 @@
+         output = []
+         for item in obj['__stream__']:
+             keep = True
+-            for operation, callback in obj['operations']:
+-                value = self.callback_value(callback, [item])
++            for operation, callback, input_type in obj['operations']:
++                value = self.callback_value(callback, [item],input_type)
+                 if operation == 'map':
+                     item = value
+                     continue
+@@ -1600,7 +1817,34 @@
+                 output.append(item)
+         return True, output
+ 
+-    def callback_value(self, callback, arguments):
++    def callback_parameter_types(self,node,inferred):
++        parameters=node.child_by_field_name('parameters')
++        if parameters is None:return {}
++        if parameters.type=='identifier':return {text(parameters):inferred} if inferred else {}
++        result={text(par.child_by_field_name('name')):text(par.child_by_field_name('type'))
++                for par in parameters.named_children if par.type=='formal_parameter'}
++        if not result and inferred and len(parameters.named_children)==1:
++            result[text(parameters.named_children[0])]=inferred
++        return result
++
++    def callback_return_type(self,callback,inferred):
++        node,_,owner,types=callback[1:]
++        previous,previous_types=self.method,self.variable_types
++        self.method,self.variable_types=owner,{**types,**self.callback_parameter_types(node,inferred)}
++        try:
++            body=node.child_by_field_name('body')
++            if body.type!='block':return self.scalar_or_source_type(self.source_type(body))
++            def returns(current):
++                if current.type in ('lambda_expression','class_body','method_declaration'):return
++                if current.type=='return_statement' and current.named_children:
++                    yield self.scalar_or_source_type(self.source_type(current.named_children[0]))
++                else:
++                    for child in current.named_children:yield from returns(child)
++            types=set(returns(body))
++            return next(iter(types)) if len(types)==1 else ''
++        finally:self.method,self.variable_types=previous,previous_types
++
++    def callback_value(self, callback, arguments,inferred=''):
+         node, captured, owner, types = callback[1:]
+         parameters = node.child_by_field_name('parameters')
+         names = ([text(parameters)] if parameters is not None and parameters.type == 'identifier' else
+@@ -1613,6 +1857,7 @@
+         local = {**captured, **dict(zip(names,arguments))}
+         previous, previous_types = self.method, self.variable_types
+         self.method, self.variable_types = owner, dict(types)
++        self.variable_types.update(self.callback_parameter_types(node,inferred))
+         try:
+             body = node.child_by_field_name('body')
+             if body.type != 'block':

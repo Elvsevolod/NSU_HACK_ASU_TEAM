@@ -1,0 +1,168 @@
+{
+  "cases": 53,
+  "families": 48,
+  "references_and_sources_equal": true,
+  "exact_edge_sets_before": 43,
+  "exact_edge_sets_after": 51,
+  "changes": [
+    {
+      "case": "owned_null_default",
+      "family": "owned_json_null_policy",
+      "iou": {
+        "executes": [
+          0.6666666666666666,
+          1.0
+        ],
+        "calls": [
+          0.5,
+          1.0
+        ]
+      }
+    },
+    {
+      "case": "owned_literal_to_data",
+      "family": "owned_json_literal_binding",
+      "iou": {
+        "executes": [
+          0.6666666666666666,
+          1.0
+        ],
+        "calls": [
+          0.5,
+          1.0
+        ]
+      }
+    },
+    {
+      "case": "owned_convert_failure",
+      "family": "owned_json_failure_wrapper",
+      "iou": {
+        "executes": [
+          0.3333333333333333,
+          1.0
+        ],
+        "calls": [
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "case": "owned_mapper_copy",
+      "family": "owned_json_copy_identity",
+      "iou": {
+        "executes": [
+          0.6666666666666666,
+          1.0
+        ],
+        "calls": [
+          0.5,
+          1.0
+        ]
+      }
+    },
+    {
+      "case": "null_mapper_failure",
+      "family": "owned_json_null_receiver",
+      "iou": {
+        "executes": [
+          0.3333333333333333,
+          1.0
+        ],
+        "calls": [
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "case": "feature_value_qualifier",
+      "family": "native_enum_value_qualifier",
+      "iou": {
+        "executes": [
+          0.75,
+          1.0
+        ],
+        "calls": [
+          0.6666666666666666,
+          1.0
+        ]
+      }
+    },
+    {
+      "case": "checked_json_failure_to_remote",
+      "family": "owned_json_checked_failure_remote",
+      "iou": {
+        "executes": [
+          0.3333333333333333,
+          1.0
+        ],
+        "remote": [
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "case": "owned_json_failure_to_data",
+      "family": "owned_json_failure_data",
+      "iou": {
+        "executes": [
+          0.3333333333333333,
+          1.0
+        ],
+        "calls": [
+          0.0,
+          1.0
+        ],
+        "data": [
+          0.0,
+          1.0
+        ]
+      }
+    }
+  ],
+  "remaining_limits": [
+    {
+      "case": "generic_shadowing_conservative",
+      "missing": [],
+      "extra": [
+        [
+          "",
+          "executes",
+          "method:service:Api#wrong()"
+        ],
+        [
+          "method:service:Api#entry()",
+          "calls",
+          "method:service:Api#wrong()"
+        ]
+      ],
+      "warnings": [
+        "Java Map operation remains unresolved: get at call:method:service:Api#entry()@3:24",
+        "Java Map operation remains unresolved: put at call:method:service:Api#entry()@2:85"
+      ]
+    },
+    {
+      "case": "view_stream_limit",
+      "missing": [
+        [
+          "",
+          "executes",
+          "method:service:Api#accepted()"
+        ],
+        [
+          "method:service:Api#entry()",
+          "calls",
+          "method:service:Api#accepted()"
+        ]
+      ],
+      "extra": [],
+      "warnings": [
+        "Java Map operation remains unresolved: stream at call:method:service:Api#entry()@1:160",
+        "unsupported call: call:method:service:Api#entry()@1:169 map",
+        "unsupported call: call:method:service:Api#entry()@1:192 collect"
+      ]
+    }
+  ]
+}

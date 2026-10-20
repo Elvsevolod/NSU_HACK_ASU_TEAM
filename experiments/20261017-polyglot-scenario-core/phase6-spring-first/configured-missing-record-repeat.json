@@ -1,0 +1,30 @@
+{
+  "project": "public-java",
+  "scenarios": {
+    "configured-missing-record": {
+      "method": "polyglot-ir-may",
+      "edges": [
+        {
+          "source": "method:account-service:com.piggymetrics.account.controller.AccountController#getAccountByName(String)",
+          "relation": "calls",
+          "target": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#findByName(String)"
+        },
+        {
+          "source": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#findByName(String)",
+          "relation": "data",
+          "target": "resource:accounts"
+        },
+        {
+          "source": "scenario:configured-missing-record",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.controller.AccountController#getAccountByName(String)"
+        },
+        {
+          "source": "scenario:configured-missing-record",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#findByName(String)"
+        }
+      ]
+    }
+  }
+}

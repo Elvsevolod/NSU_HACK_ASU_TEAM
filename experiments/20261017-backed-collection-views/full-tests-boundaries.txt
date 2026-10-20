@@ -1,0 +1,31 @@
+........................................................................ [  7%]
+........................................................................ [ 14%]
+........................................................................ [ 22%]
+........................................................................ [ 29%]
+........................................................................ [ 37%]
+........................................................................ [ 44%]
+........................................................................ [ 51%]
+...........................................................F............ [ 59%]
+........................................................................ [ 66%]
+........................................................................ [ 74%]
+........................................................................ [ 81%]
+........................................................................ [ 89%]
+........................................................................ [ 96%]
+..................................                                       [100%]
+=================================== FAILURES ===================================
+___ test_view_clear_recovers_known_contents_after_an_unsupported_map_mutator ___
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-595/test_view_clear_recovers_known0')
+
+    def test_view_clear_recovers_known_contents_after_an_unsupported_map_mutator(tmp_path):
+        p,db,ids=project(tmp_path,'Map map=new HashMap();Set view=map.keySet();map.compute("key",(k,v)->"unknown");'
+          'view.clear();return map.isEmpty();')
+        engine=Engine(p,ScenarioState(db));assert engine.run(ids['Api.entry'],{}) is True
+>       assert engine.approximate and engine.operation_issues[('unsupported_map_mutator','compute')]
+E       assert (True and 0)
+E        +  where True = <analyzer.engine.Engine object at 0x1033799d0>.approximate
+
+solutions/—_backed-collection-views/code/tests/test_map_view_boundaries.py:38: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_backed-collection-views/code/tests/test_map_view_boundaries.py::test_view_clear_recovers_known_contents_after_an_unsupported_map_mutator
+1 failed, 969 passed in 2.47s

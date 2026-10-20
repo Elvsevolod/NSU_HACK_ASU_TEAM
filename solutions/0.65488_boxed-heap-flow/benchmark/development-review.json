@@ -1,0 +1,72 @@
+{
+  "parent": 24,
+  "runtime_diff_read": true,
+  "changed_files": [
+    "analyzer/boxed_values.py",
+    "analyzer/context_key.py",
+    "analyzer/engine.py",
+    "analyzer/heap_join.py",
+    "analyzer/http_binding.py",
+    "analyzer/http_json.py",
+    "analyzer/java_collections.py",
+    "analyzer/java_lists.py",
+    "analyzer/java_numbers.py",
+    "analyzer/models.py",
+    "analyzer/native_arrays.py",
+    "analyzer/native_storage.py",
+    "analyzer/project.py",
+    "analyzer/reference_scalars.py",
+    "analyzer/source_conversions.py",
+    "analyzer/source_generics.py",
+    "analyzer/source_literals.py",
+    "package_solution.py",
+    "tests/test_boxed_heap_flow.py",
+    "tests/test_collection_equality.py",
+    "tests/test_generic_member_flow.py",
+    "tests/test_guaranteed_access_failures.py",
+    "tests/test_map_view_boundaries.py",
+    "tests/test_native_number_boundaries.py",
+    "tests/test_native_storage.py",
+    "tests/test_written_composites.py"
+  ],
+  "new_scope": [
+    "Observed scalar classes separated from source types, frames/lists/fields/maps/args/returns/callbacks and protocol boundaries",
+    "Declaration-bound erasure and consumer-aware generic checks; ordinary source/unsupported foreign casts are checked or diagnosed",
+    "Kind-aware List mutation/equality and iterator identity/version semantics; actual iteration budgets prevent growth loops",
+    "Cycle-safe call contexts and agreement-only return-kind joins",
+    "Number.intValue narrowing, BigDecimal scale equality and exact double construction; unsupported Float precision and decimal arithmetic are diagnosed"
+  ],
+  "no_target_specific_rules": true,
+  "no_external_runtime_models": true,
+  "no_gold_read_by_predictor": true,
+  "rejected_measurements": [
+    "iterations/interrupted-before-iterator-identity has no final score",
+    "iterations/measured-before-foreach-bound and iterations/measured-before-number-boundaries are completed intermediates, not this final snapshot"
+  ],
+  "references": [
+    "https://raw.githubusercontent.com/openjdk/jdk/jdk-21%2B35/src/jdk.compiler/share/classes/com/sun/tools/javac/comp/TransTypes.java",
+    "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html",
+    "https://raw.githubusercontent.com/openjdk/jdk/jdk-21%2B35/src/java.base/share/classes/java/util/ArrayList.java",
+    "https://raw.githubusercontent.com/openjdk/jdk/jdk-21%2B35/src/java.base/share/classes/java/util/LinkedList.java",
+    "https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.12.2",
+    "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/math/BigDecimal.html",
+    "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Long.html#intValue()"
+  ],
+  "remaining_limits": [
+    "Missing authoritative values remain unknown",
+    "No complete JVM/overload/wildcard/bridge semantics",
+    "Full array allocation/store/covariance and array-backed Arrays.asList views are not implemented",
+    "Set/custom collections, native models and stream operations are bounded; unknown interference is diagnosed",
+    "No complete real-application graph oracle; public checks are bounded",
+    "No general semantic IR or conditional summary cache",
+    "No general binary32 arithmetic model; exact zero can be retained, other Float operations are diagnosed",
+    "Decimal arithmetic exceeding the supported precision is diagnosed, not silently rounded",
+    "Version effects of every empty bulk List operation are not yet proven; no complete native library semantics claimed"
+  ],
+  "independent_numeric_probes": {
+    "before": "Three confirmed wrong results without warnings in native-number-boundary-probes.json",
+    "after": "Long.intValue and BigDecimal.equals corrected; Float result becomes explicit unknown with precision diagnostic",
+    "new_regressions": 24,
+    "inherited_float_zero_assertion_preserved": true
+  }
+}

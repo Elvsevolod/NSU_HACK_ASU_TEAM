@@ -1,0 +1,20 @@
+.............F.                                                          [100%]
+=================================== FAILURES ===================================
+__________________ test_false_float_guard_keeps_the_nan_case ___________________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-16/test_false_float_guard_keeps_t0')
+
+    def test_false_float_guard_keeps_the_nan_case(tmp_path):
+        code = 'if (x > 5) { return 1; } if (x <= 5) { return 2; } return 3;'
+        paths = execute(tmp_path, code, 'double')
+>       assert {p['result'] for p in paths} == {1, 2, 3}
+E       assert {1, 2} == {1, 2, 3}
+E         
+E         Extra items in the right set:
+E         3
+E         Use -v to get more diff
+
+solutions/—_predicate-state-analysis/code/tests/test_constraints.py:102: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_predicate-state-analysis/code/tests/test_constraints.py::test_false_float_guard_keeps_the_nan_case
+1 failed, 14 passed in 0.05s

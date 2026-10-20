@@ -1,0 +1,71 @@
+--- initial
++++ current
+@@ -46,8 +46,7 @@
+     proposals, _ = grounder.step('Submit a widget', state)
+     assert proposals
+     proposal = proposals[0]
+-    assert 'caption' not in proposal['params']
+-    assert any('Unknown input: caption' in issue for issue in proposal['unresolved'])
++    assert proposal['params'].get('caption') == ''
+     assert not any('DOM preparation' in issue for issue in proposal['unresolved'])
+ 
+ 
+@@ -82,7 +81,7 @@
+     assert dom_value(frontend, site, state, method='val') == 'Caption'
+     proposals, _ = grounder.step('Submit a widget', state)
+     assert proposals
+-    assert 'caption' not in proposals[0]['params']
++    assert proposals[0]['params'].get('caption') == ''
+ 
+ 
+ def test_text_write_does_not_supply_the_value_property(tmp_path):
+@@ -94,15 +93,16 @@
+     assert proposals[0]['params']['caption'] == 'Before'
+ 
+ 
+-def test_callback_write_uses_the_captured_outer_binding(tmp_path):
++def test_captured_outer_local_is_not_pinned_inside_the_callback(tmp_path):
+     frontend, site, state, grounder = fixture(tmp_path, stub_in_callback(
+         before='var note="Captured";', inside='$("#summary").text(note);'))
++    assert dom_value(frontend, site, state) is U
+     proposals, _ = grounder.step('Submit a widget', state)
+     assert proposals
+     proposal = proposals[0]
+-    assert proposal['params']['caption'] == 'Captured'
++    assert 'caption' not in proposal['params']
+     assert any('DOM preparation' in issue and 'unobserved' in issue for issue in proposal['unresolved'])
+-    assert '#summary' not in state.browser.get('dom_text', {})
++    assert state.browser['dom_text'].get('#summary') == ''
+ 
+ 
+ def test_callback_local_declaration_shadows_the_outer_binding(tmp_path):
+@@ -113,8 +113,8 @@
+ 
+ def test_write_keeps_the_binding_value_at_its_program_point(tmp_path):
+     frontend, site, state, _ = fixture(tmp_path, stub_in_callback(
+-        before='var note="Outer";', inside='$("#summary").text(note);note="Inner";'))
+-    assert dom_value(frontend, site, state) == 'Outer'
++        inside='var note="Inner";$("#summary").text(note);note="Later";'))
++    assert dom_value(frontend, site, state) == 'Inner'
+ 
+ 
+ def test_async_callback_cannot_override_a_later_synchronous_write(tmp_path):
+@@ -124,14 +124,15 @@
+ 
+ 
+ def test_aliased_and_computed_writers_are_rejected_with_source_diagnostics(tmp_path):
+-    cases = ('$("#summary").text("A");var el=$("#summary");el.text("B");',
+-             '$("#summary").text("A");$("#"+"summary").text("B");',
++    cases = ('$("#summary").text("A");$("#"+"summary").text("B");',
++             '$("#summary").text("A");$("#summary").html("B");',
+              '$("#summary").text("A");$("#summary")[0].textContent="B";')
+     for index, before in enumerate(cases):
+         frontend, site, state, grounder = fixture(tmp_path/str(index), stub(before=before))
+         assert dom_value(frontend, site, state) is U
+-        assert any('ui.js' in warning for warning in frontend.warnings)
++        assert any('Unsupported DOM mutation' in warning and 'ui.js' in warning for warning in frontend.warnings)
+         proposals, _ = grounder.step('Submit a widget', state)
++        assert proposals
+         assert all('caption' not in proposal['params'] for proposal in proposals)
+ 
+ 

@@ -1,0 +1,13 @@
+{
+  "java_long_comparison": {
+    "source": "int value(int n){if(n<2147483648L)return 1;return impossible();}",
+    "expected": "always 1 for any int n",
+    "observed": "-1; impossible() exported; Z3 incorrectly proved the true branch UNSAT",
+    "cause": "comparison Formula lost binary numeric promotion to long"
+  },
+  "java_shift_distance": {
+    "source": "int value(int n){return n << 32L;}",
+    "expected": "same int n (low 5 bits of shift count)",
+    "cause_to_verify": "frontend used binary numeric promotion for shift width; ordinary concrete evaluator did not mask count"
+  }
+}

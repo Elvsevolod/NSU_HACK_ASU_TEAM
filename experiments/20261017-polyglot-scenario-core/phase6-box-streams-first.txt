@@ -1,0 +1,821 @@
+...FFFF.FF..F..F.FF.F...FF.                                              [100%]
+=================================== FAILURES ===================================
+________ test_filter_map_reduce_use_source_static_and_bound_references _________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-625/test_filter_map_reduce_use_sou0')
+
+    def test_filter_map_reduce_use_source_static_and_bound_references(tmp_path):
+>       block,detail,ids=probe(tmp_path,'return Arrays.asList(1,2,3).stream().filter(this::keep).map(Endpoint::twice).reduce(0,Endpoint::sum);',
+            'boolean keep(int n){return n>1;} static int twice(int n){return n*2;} static int sum(int left,int right){return left+right;}')
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:17: in probe
+    block,detail=analyze(project,store,{},scenario({'path':'/value'}),**limits)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/analysis.py:32: in analyze
+    response = engine.request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:915: in request
+    return dispatch(self, request, caller, span)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/protocol.py:265: in dispatch
+    result = engine.execute_method(method.key, kwargs=values, receiver=receiver, span=span)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:178: in execute_method
+    completion = self.block(self.p.lower(key), env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:772: in statement
+    return self.block(stmt.body, env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:786: in statement
+    return Completion(op,self.value(args[0],env),args[0].typ)
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:489: in value
+    result = self.evaluate(expr, env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:672: in evaluate
+    return self.call(receiver,expr.value,values,kwargs,span,env,receiver_expr is not None,expr.bindings,receiver_expr.typ if receiver_expr is not None else '',tuple(a.typ for a in positional))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:720: in call
+    result=call(self,receiver,name,args,kwargs,span,receiver_type,argument_types)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/models.py:361: in call
+    modeled=stream_call(engine,receiver,name,args,kwargs,span,receiver_type,argument_types)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:135: in call
+    return reduce(accumulate,values,initial)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+callback = MethodRef(receiver=TypeRef(name='app:Endpoint'), name='twice', owner='app:Endpoint#value()', span=Span(file='Endpoint.java', line=7, column=99), qualifier_type='app:Endpoint', return_type='int')
+item = Object(identity='o3', typ='java.lang.Integer', fields={'value': 2, 'fresh': False, 'cache_guaranteed': True}, provided=None)
+predicate = False, peek = False
+
+    def apply(callback,item,predicate=False,peek=False):
+        result=engine.invoke_callable(callback,(item,),span);check()
+>       return engine.condition(result,getattr(callback,'span',span)) if predicate else item if peek else argument(engine,result,getattr(callback,'return_type',''),span)
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'MethodRef' object is not callable
+
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:64: TypeError
+______________ test_escaped_stream_keeps_callback_callsite_owner _______________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-625/test_escaped_stream_keeps_call0')
+
+    def test_escaped_stream_keeps_callback_callsite_owner(tmp_path):
+>       block,detail,ids=probe(tmp_path,'return pending().collect(Collectors.toList());',
+            'Stream<Integer> pending(){return Arrays.asList(1,2).stream().map(this::tap);} int tap(int n){return n*3;}')
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:17: in probe
+    block,detail=analyze(project,store,{},scenario({'path':'/value'}),**limits)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/analysis.py:32: in analyze
+    response = engine.request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:915: in request
+    return dispatch(self, request, caller, span)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/protocol.py:265: in dispatch
+    result = engine.execute_method(method.key, kwargs=values, receiver=receiver, span=span)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:178: in execute_method
+    completion = self.block(self.p.lower(key), env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:772: in statement
+    return self.block(stmt.body, env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:786: in statement
+    return Completion(op,self.value(args[0],env),args[0].typ)
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:489: in value
+    result = self.evaluate(expr, env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:672: in evaluate
+    return self.call(receiver,expr.value,values,kwargs,span,env,receiver_expr is not None,expr.bindings,receiver_expr.typ if receiver_expr is not None else '',tuple(a.typ for a in positional))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:720: in call
+    result=call(self,receiver,name,args,kwargs,span,receiver_type,argument_types)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/models.py:361: in call
+    modeled=stream_call(engine,receiver,name,args,kwargs,span,receiver_type,argument_types)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:127: in call
+    if args[0].fields['kind']=='toList':return list(values)
+                                               ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+callback = MethodRef(receiver=Object(identity='o1', typ='app:Endpoint', fields={'seen': 0}, provided=None), name='tap', owner='ap...point#pending()', span=Span(file='Endpoint.java', line=8, column=66), qualifier_type='app:Endpoint', return_type='int')
+item = Object(identity='o2', typ='java.lang.Integer', fields={'value': 1, 'fresh': False, 'cache_guaranteed': True}, provided=None)
+predicate = False, peek = False
+
+    def apply(callback,item,predicate=False,peek=False):
+        result=engine.invoke_callable(callback,(item,),span);check()
+>       return engine.condition(result,getattr(callback,'span',span)) if predicate else item if peek else argument(engine,result,getattr(callback,'return_type',''),span)
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'MethodRef' object is not callable
+
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:64: TypeError
+_ test_short_circuiting_does_not_run_later_throwing_callbacks[findFirst().get()-10] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-625/test_short_circuiting_does_not0')
+terminal = 'findFirst().get()', expected = 10
+
+    @pytest.mark.parametrize('terminal,expected', [('findFirst().get()',10),('limit(1).collect(Collectors.toList())',[10]),('limit(0).collect(Collectors.toList())',[])])
+    def test_short_circuiting_does_not_run_later_throwing_callbacks(tmp_path,terminal,expected):
+>       block,detail,ids=probe(tmp_path,'return Arrays.asList(1,2).stream().map(this::tap).'+terminal+';',
+            'int tap(int n){if(n==2)return later();return n*10;} int later(){throw new IllegalStateException();}')
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:17: in probe
+    block,detail=analyze(project,store,{},scenario({'path':'/value'}),**limits)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/analysis.py:32: in analyze
+    response = engine.request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:915: in request
+    return dispatch(self, request, caller, span)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/protocol.py:265: in dispatch
+    result = engine.execute_method(method.key, kwargs=values, receiver=receiver, span=span)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:178: in execute_method
+    completion = self.block(self.p.lower(key), env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:772: in statement
+    return self.block(stmt.body, env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:786: in statement
+    return Completion(op,self.value(args[0],env),args[0].typ)
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:489: in value
+    result = self.evaluate(expr, env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:645: in evaluate
+    receiver = self.value(receiver_expr, env) if receiver_expr is not None else None
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:489: in value
+    result = self.evaluate(expr, env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:672: in evaluate
+    return self.call(receiver,expr.value,values,kwargs,span,env,receiver_expr is not None,expr.bindings,receiver_expr.typ if receiver_expr is not None else '',tuple(a.typ for a in positional))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:720: in call
+    result=call(self,receiver,name,args,kwargs,span,receiver_type,argument_types)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/models.py:361: in call
+    modeled=stream_call(engine,receiver,name,args,kwargs,span,receiver_type,argument_types)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:137: in call
+    sentinel=object();result=next(values,sentinel)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+callback = MethodRef(receiver=Object(identity='o1', typ='app:Endpoint', fields={'seen': 0}, provided=None), name='tap', owner='app:Endpoint#value()', span=Span(file='Endpoint.java', line=7, column=78), qualifier_type='app:Endpoint', return_type='int')
+item = Object(identity='o2', typ='java.lang.Integer', fields={'value': 1, 'fresh': False, 'cache_guaranteed': True}, provided=None)
+predicate = False, peek = False
+
+    def apply(callback,item,predicate=False,peek=False):
+        result=engine.invoke_callable(callback,(item,),span);check()
+>       return engine.condition(result,getattr(callback,'span',span)) if predicate else item if peek else argument(engine,result,getattr(callback,'return_type',''),span)
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'MethodRef' object is not callable
+
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:64: TypeError
+_ test_short_circuiting_does_not_run_later_throwing_callbacks[limit(1).collect(Collectors.toList())-expected1] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-625/test_short_circuiting_does_not1')
+terminal = 'limit(1).collect(Collectors.toList())', expected = [10]
+
+    @pytest.mark.parametrize('terminal,expected', [('findFirst().get()',10),('limit(1).collect(Collectors.toList())',[10]),('limit(0).collect(Collectors.toList())',[])])
+    def test_short_circuiting_does_not_run_later_throwing_callbacks(tmp_path,terminal,expected):
+>       block,detail,ids=probe(tmp_path,'return Arrays.asList(1,2).stream().map(this::tap).'+terminal+';',
+            'int tap(int n){if(n==2)return later();return n*10;} int later(){throw new IllegalStateException();}')
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:17: in probe
+    block,detail=analyze(project,store,{},scenario({'path':'/value'}),**limits)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/analysis.py:32: in analyze
+    response = engine.request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:915: in request
+    return dispatch(self, request, caller, span)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/protocol.py:265: in dispatch
+    result = engine.execute_method(method.key, kwargs=values, receiver=receiver, span=span)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:178: in execute_method
+    completion = self.block(self.p.lower(key), env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:772: in statement
+    return self.block(stmt.body, env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:786: in statement
+    return Completion(op,self.value(args[0],env),args[0].typ)
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:489: in value
+    result = self.evaluate(expr, env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:672: in evaluate
+    return self.call(receiver,expr.value,values,kwargs,span,env,receiver_expr is not None,expr.bindings,receiver_expr.typ if receiver_expr is not None else '',tuple(a.typ for a in positional))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:720: in call
+    result=call(self,receiver,name,args,kwargs,span,receiver_type,argument_types)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/models.py:361: in call
+    modeled=stream_call(engine,receiver,name,args,kwargs,span,receiver_type,argument_types)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:127: in call
+    if args[0].fields['kind']=='toList':return list(values)
+                                               ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+callback = MethodRef(receiver=Object(identity='o1', typ='app:Endpoint', fields={'seen': 0}, provided=None), name='tap', owner='app:Endpoint#value()', span=Span(file='Endpoint.java', line=7, column=78), qualifier_type='app:Endpoint', return_type='int')
+item = Object(identity='o2', typ='java.lang.Integer', fields={'value': 1, 'fresh': False, 'cache_guaranteed': True}, provided=None)
+predicate = False, peek = False
+
+    def apply(callback,item,predicate=False,peek=False):
+        result=engine.invoke_callable(callback,(item,),span);check()
+>       return engine.condition(result,getattr(callback,'span',span)) if predicate else item if peek else argument(engine,result,getattr(callback,'return_type',''),span)
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'int' object is not callable
+
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:64: TypeError
+________ test_constructor_and_unbound_instance_references_are_deferred _________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-625/test_constructor_and_unbound_i0')
+
+    def test_constructor_and_unbound_instance_references_are_deferred(tmp_path):
+>       block,detail,ids=probe(tmp_path,'return Arrays.asList("A","B").stream().map(Item::new).map(Item::title).collect(Collectors.toList());',
+            classes='class Item {private String text;Item(String value){text=value;} String title(){return text;}}')
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:17: in probe
+    block,detail=analyze(project,store,{},scenario({'path':'/value'}),**limits)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/analysis.py:32: in analyze
+    response = engine.request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:915: in request
+    return dispatch(self, request, caller, span)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/protocol.py:265: in dispatch
+    result = engine.execute_method(method.key, kwargs=values, receiver=receiver, span=span)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:178: in execute_method
+    completion = self.block(self.p.lower(key), env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:772: in statement
+    return self.block(stmt.body, env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:786: in statement
+    return Completion(op,self.value(args[0],env),args[0].typ)
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:489: in value
+    result = self.evaluate(expr, env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:672: in evaluate
+    return self.call(receiver,expr.value,values,kwargs,span,env,receiver_expr is not None,expr.bindings,receiver_expr.typ if receiver_expr is not None else '',tuple(a.typ for a in positional))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:720: in call
+    result=call(self,receiver,name,args,kwargs,span,receiver_type,argument_types)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/models.py:361: in call
+    modeled=stream_call(engine,receiver,name,args,kwargs,span,receiver_type,argument_types)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:127: in call
+    if args[0].fields['kind']=='toList':return list(values)
+                                               ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+callback = MethodRef(receiver=TypeRef(name='app:Item'), name='new', owner='app:Endpoint#value()', span=Span(file='Endpoint.java', line=7, column=82), qualifier_type='app:Item', return_type='app:Item')
+item = 'A', predicate = False, peek = False
+
+    def apply(callback,item,predicate=False,peek=False):
+        result=engine.invoke_callable(callback,(item,),span);check()
+>       return engine.condition(result,getattr(callback,'span',span)) if predicate else item if peek else argument(engine,result,getattr(callback,'return_type',''),span)
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'MethodRef' object is not callable
+
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:64: TypeError
+_____ test_native_unbound_string_reference_uses_native_value_at_invocation _____
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-625/test_native_unbound_string_ref0')
+
+    def test_native_unbound_string_reference_uses_native_value_at_invocation(tmp_path):
+>       _,detail,_=probe(tmp_path,'return Arrays.asList("a","abc").stream().map(String::length).collect(Collectors.toList());')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:17: in probe
+    block,detail=analyze(project,store,{},scenario({'path':'/value'}),**limits)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/analysis.py:32: in analyze
+    response = engine.request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:915: in request
+    return dispatch(self, request, caller, span)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/protocol.py:265: in dispatch
+    result = engine.execute_method(method.key, kwargs=values, receiver=receiver, span=span)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:178: in execute_method
+    completion = self.block(self.p.lower(key), env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:772: in statement
+    return self.block(stmt.body, env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:786: in statement
+    return Completion(op,self.value(args[0],env),args[0].typ)
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:489: in value
+    result = self.evaluate(expr, env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:672: in evaluate
+    return self.call(receiver,expr.value,values,kwargs,span,env,receiver_expr is not None,expr.bindings,receiver_expr.typ if receiver_expr is not None else '',tuple(a.typ for a in positional))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:720: in call
+    result=call(self,receiver,name,args,kwargs,span,receiver_type,argument_types)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/models.py:361: in call
+    modeled=stream_call(engine,receiver,name,args,kwargs,span,receiver_type,argument_types)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:127: in call
+    if args[0].fields['kind']=='toList':return list(values)
+                                               ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+callback = MethodRef(receiver=TypeRef(name='java.lang.String'), name='length', owner='app:Endpoint#value()', span=Span(file='Endpoint.java', line=7, column=84), qualifier_type='', return_type='int')
+item = 'a', predicate = False, peek = False
+
+    def apply(callback,item,predicate=False,peek=False):
+        result=engine.invoke_callable(callback,(item,),span);check()
+>       return engine.condition(result,getattr(callback,'span',span)) if predicate else item if peek else argument(engine,result,getattr(callback,'return_type',''),span)
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'MethodRef' object is not callable
+
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:64: TypeError
+__________ test_source_collection_is_bound_late_at_terminal_operation __________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-625/test_source_collection_is_boun0')
+
+    def test_source_collection_is_bound_late_at_terminal_operation(tmp_path):
+>       _,detail,_=probe(tmp_path,'List<Integer> rows=new ArrayList();rows.add(1);Stream<Integer> pending=rows.stream().map(this::tap);rows.add(2);return pending.collect(Collectors.toList());',
+            'int tap(int n){return n*2;}')
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:17: in probe
+    block,detail=analyze(project,store,{},scenario({'path':'/value'}),**limits)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/analysis.py:32: in analyze
+    response = engine.request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:915: in request
+    return dispatch(self, request, caller, span)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/protocol.py:265: in dispatch
+    result = engine.execute_method(method.key, kwargs=values, receiver=receiver, span=span)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:178: in execute_method
+    completion = self.block(self.p.lower(key), env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:772: in statement
+    return self.block(stmt.body, env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:786: in statement
+    return Completion(op,self.value(args[0],env),args[0].typ)
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:489: in value
+    result = self.evaluate(expr, env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:672: in evaluate
+    return self.call(receiver,expr.value,values,kwargs,span,env,receiver_expr is not None,expr.bindings,receiver_expr.typ if receiver_expr is not None else '',tuple(a.typ for a in positional))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:720: in call
+    result=call(self,receiver,name,args,kwargs,span,receiver_type,argument_types)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/models.py:361: in call
+    modeled=stream_call(engine,receiver,name,args,kwargs,span,receiver_type,argument_types)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:127: in call
+    if args[0].fields['kind']=='toList':return list(values)
+                                               ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+callback = MethodRef(receiver=Object(identity='o1', typ='app:Endpoint', fields={'seen': 0}, provided=None), name='tap', owner='ap...dpoint#value()', span=Span(file='Endpoint.java', line=7, column=128), qualifier_type='app:Endpoint', return_type='int')
+item = Object(identity='o2', typ='java.lang.Integer', fields={'value': 1, 'fresh': False, 'cache_guaranteed': True}, provided=None)
+predicate = False, peek = False
+
+    def apply(callback,item,predicate=False,peek=False):
+        result=engine.invoke_callable(callback,(item,),span);check()
+>       return engine.condition(result,getattr(callback,'span',span)) if predicate else item if peek else argument(engine,result,getattr(callback,'return_type',''),span)
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'MethodRef' object is not callable
+
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:64: TypeError
+____________ test_plain_count_needs_no_callback_or_encounter_order _____________
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-625/test_plain_count_needs_no_call0')
+
+    def test_plain_count_needs_no_callback_or_encounter_order(tmp_path):
+        _,detail,_=probe(tmp_path,'return Arrays.asList(1,2).stream().count();')
+>       assert response(detail)==2
+               ^^^^^^^^^^^^^^^^
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+detail = {'evidence': {'scenario:arbitrary | executes | opaque-method-1': [{'file': 'Endpoint.java', 'line': 7, 'reason': 'sour...False, 'may': [{'relation': 'executes', 'source': 'scenario:arbitrary', 'target': 'opaque-method-1'}], 'must': [], ...}
+
+>   def response(detail):return detail['paths'][0]['steps'][0]['response']['body']
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   IndexError: list index out of range
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:21: IndexError
+______ test_stream_budget_is_a_cutoff_without_a_claim_of_no_more_effects _______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-625/test_stream_budget_is_a_cutoff0')
+
+    def test_stream_budget_is_a_cutoff_without_a_claim_of_no_more_effects(tmp_path):
+>       _,detail,_=probe(tmp_path,'return Arrays.asList(1,2,3).stream().map(this::tap).collect(Collectors.toList());','int tap(int n){return n;}',loop_limit=2)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:124: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:17: in probe
+    block,detail=analyze(project,store,{},scenario({'path':'/value'}),**limits)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/analysis.py:32: in analyze
+    response = engine.request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:915: in request
+    return dispatch(self, request, caller, span)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/protocol.py:265: in dispatch
+    result = engine.execute_method(method.key, kwargs=values, receiver=receiver, span=span)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:178: in execute_method
+    completion = self.block(self.p.lower(key), env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:772: in statement
+    return self.block(stmt.body, env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:786: in statement
+    return Completion(op,self.value(args[0],env),args[0].typ)
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:489: in value
+    result = self.evaluate(expr, env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:672: in evaluate
+    return self.call(receiver,expr.value,values,kwargs,span,env,receiver_expr is not None,expr.bindings,receiver_expr.typ if receiver_expr is not None else '',tuple(a.typ for a in positional))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:720: in call
+    result=call(self,receiver,name,args,kwargs,span,receiver_type,argument_types)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/models.py:361: in call
+    modeled=stream_call(engine,receiver,name,args,kwargs,span,receiver_type,argument_types)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:127: in call
+    if args[0].fields['kind']=='toList':return list(values)
+                                               ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+callback = MethodRef(receiver=Object(identity='o1', typ='app:Endpoint', fields={'seen': 0}, provided=None), name='tap', owner='app:Endpoint#value()', span=Span(file='Endpoint.java', line=7, column=80), qualifier_type='app:Endpoint', return_type='int')
+item = Object(identity='o2', typ='java.lang.Integer', fields={'value': 1, 'fresh': False, 'cache_guaranteed': True}, provided=None)
+predicate = False, peek = False
+
+    def apply(callback,item,predicate=False,peek=False):
+        result=engine.invoke_callable(callback,(item,),span);check()
+>       return engine.condition(result,getattr(callback,'span',span)) if predicate else item if peek else argument(engine,result,getattr(callback,'return_type',''),span)
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'MethodRef' object is not callable
+
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:64: TypeError
+_____ test_source_hashcode_and_collision_equals_callbacks_are_not_skipped ______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-625/test_source_hashcode_and_colli0')
+
+    def test_source_hashcode_and_collision_equals_callbacks_are_not_skipped(tmp_path):
+>       block,detail,ids=probe(tmp_path,'java.util.Set<Item> items=Arrays.asList("FB","Ea","FB").stream().map(this::item).collect(Collectors.toSet());return Arrays.asList(items.size(),hashes,comparisons);',
+            'private int hashes=0;private int comparisons=0;Item item(String title){return new Item(title,this);}void hashed(){hashes++;}void compared(){comparisons++;}',
+            'class Item {private String title;private Endpoint owner;Item(String title,Endpoint owner){this.title=title;this.owner=owner;}public int hashCode(){owner.hashed();return title.hashCode();}public boolean equals(Object other){owner.compared();return title.equals(((Item)other).title);}}')
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:17: in probe
+    block,detail=analyze(project,store,{},scenario({'path':'/value'}),**limits)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/analysis.py:32: in analyze
+    response = engine.request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:915: in request
+    return dispatch(self, request, caller, span)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/protocol.py:265: in dispatch
+    result = engine.execute_method(method.key, kwargs=values, receiver=receiver, span=span)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:178: in execute_method
+    completion = self.block(self.p.lower(key), env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:772: in statement
+    return self.block(stmt.body, env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:761: in statement
+    value = self.value(args[1], env)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:489: in value
+    result = self.evaluate(expr, env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:672: in evaluate
+    return self.call(receiver,expr.value,values,kwargs,span,env,receiver_expr is not None,expr.bindings,receiver_expr.typ if receiver_expr is not None else '',tuple(a.typ for a in positional))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:720: in call
+    result=call(self,receiver,name,args,kwargs,span,receiver_type,argument_types)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/models.py:361: in call
+    modeled=stream_call(engine,receiver,name,args,kwargs,span,receiver_type,argument_types)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:129: in call
+    for item in values:java_sets.put(engine,result,item,span);check()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+callback = MethodRef(receiver=Object(identity='o1', typ='app:Endpoint', fields={'seen': 0, 'hashes': 0, 'comparisons': 0}, provid...point#value()', span=Span(file='Endpoint.java', line=7, column=108), qualifier_type='app:Endpoint', return_type='Item')
+item = 'FB', predicate = False, peek = False
+
+    def apply(callback,item,predicate=False,peek=False):
+        result=engine.invoke_callable(callback,(item,),span);check()
+>       return engine.condition(result,getattr(callback,'span',span)) if predicate else item if peek else argument(engine,result,getattr(callback,'return_type',''),span)
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'MethodRef' object is not callable
+
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:64: TypeError
+___ test_singleton_set_can_feed_unbound_reference_without_order_uncertainty ____
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-625/test_singleton_set_can_feed_un0')
+
+    def test_singleton_set_can_feed_unbound_reference_without_order_uncertainty(tmp_path):
+>       _,detail,_=probe(tmp_path,'return Arrays.asList("a","a").stream().collect(Collectors.toSet()).stream().map(String::length).collect(Collectors.toList());')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:17: in probe
+    block,detail=analyze(project,store,{},scenario({'path':'/value'}),**limits)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/analysis.py:32: in analyze
+    response = engine.request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:915: in request
+    return dispatch(self, request, caller, span)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/protocol.py:265: in dispatch
+    result = engine.execute_method(method.key, kwargs=values, receiver=receiver, span=span)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:178: in execute_method
+    completion = self.block(self.p.lower(key), env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:772: in statement
+    return self.block(stmt.body, env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:786: in statement
+    return Completion(op,self.value(args[0],env),args[0].typ)
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:489: in value
+    result = self.evaluate(expr, env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:672: in evaluate
+    return self.call(receiver,expr.value,values,kwargs,span,env,receiver_expr is not None,expr.bindings,receiver_expr.typ if receiver_expr is not None else '',tuple(a.typ for a in positional))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:720: in call
+    result=call(self,receiver,name,args,kwargs,span,receiver_type,argument_types)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/models.py:361: in call
+    modeled=stream_call(engine,receiver,name,args,kwargs,span,receiver_type,argument_types)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:127: in call
+    if args[0].fields['kind']=='toList':return list(values)
+                                               ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+callback = MethodRef(receiver=TypeRef(name='java.lang.String'), name='length', owner='app:Endpoint#value()', span=Span(file='Endpoint.java', line=7, column=119), qualifier_type='', return_type='int')
+item = 'a', predicate = False, peek = False
+
+    def apply(callback,item,predicate=False,peek=False):
+        result=engine.invoke_callable(callback,(item,),span);check()
+>       return engine.condition(result,getattr(callback,'span',span)) if predicate else item if peek else argument(engine,result,getattr(callback,'return_type',''),span)
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'MethodRef' object is not callable
+
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:64: TypeError
+______ test_fully_qualified_native_type_is_not_a_chain_of_unknown_fields _______
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-625/test_fully_qualified_native_ty0')
+
+    def test_fully_qualified_native_type_is_not_a_chain_of_unknown_fields(tmp_path):
+>       _,detail,_=probe(tmp_path,'return java.util.stream.Stream.of("ab").map(java.lang.String::length).collect(Collectors.toList());')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:17: in probe
+    block,detail=analyze(project,store,{},scenario({'path':'/value'}),**limits)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/analysis.py:32: in analyze
+    response = engine.request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:915: in request
+    return dispatch(self, request, caller, span)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/protocol.py:265: in dispatch
+    result = engine.execute_method(method.key, kwargs=values, receiver=receiver, span=span)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:178: in execute_method
+    completion = self.block(self.p.lower(key), env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:772: in statement
+    return self.block(stmt.body, env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:786: in statement
+    return Completion(op,self.value(args[0],env),args[0].typ)
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:489: in value
+    result = self.evaluate(expr, env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:672: in evaluate
+    return self.call(receiver,expr.value,values,kwargs,span,env,receiver_expr is not None,expr.bindings,receiver_expr.typ if receiver_expr is not None else '',tuple(a.typ for a in positional))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:720: in call
+    result=call(self,receiver,name,args,kwargs,span,receiver_type,argument_types)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/models.py:361: in call
+    modeled=stream_call(engine,receiver,name,args,kwargs,span,receiver_type,argument_types)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:127: in call
+    if args[0].fields['kind']=='toList':return list(values)
+                                               ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+callback = MethodRef(receiver=TypeRef(name='java.lang.String'), name='length', owner='app:Endpoint#value()', span=Span(file='Endpoint.java', line=7, column=83), qualifier_type='', return_type='int')
+item = 'ab', predicate = False, peek = False
+
+    def apply(callback,item,predicate=False,peek=False):
+        result=engine.invoke_callable(callback,(item,),span);check()
+>       return engine.condition(result,getattr(callback,'span',span)) if predicate else item if peek else argument(engine,result,getattr(callback,'return_type',''),span)
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'MethodRef' object is not callable
+
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:64: TypeError
+_ test_imported_source_type_is_resolved_before_static_or_method_reference_dispatch _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-625/test_imported_source_type_is_r0')
+
+    def test_imported_source_type_is_resolved_before_static_or_method_reference_dispatch(tmp_path):
+        sources={'other/Names.java':'package other; public class Names {public static int value(){return 11;} public static int twice(int n){return n*2;}}',
+            'Endpoint.java':'''import org.springframework.web.bind.annotation.*;import other.Names;import java.util.Arrays;import java.util.stream.Collectors;
+    @RestController class Endpoint {@GetMapping("/value") Object value(){return Arrays.asList(Names.value()).stream().map(Names::twice).collect(Collectors.toList());}}'''}
+>       p,store,ids=fixture(tmp_path,sources);block,detail=analyze(p,store,{},scenario({'path':'/value'}))
+                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_polyglot-scenario-core/code/polygraph/analysis.py:32: in analyze
+    response = engine.request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:915: in request
+    return dispatch(self, request, caller, span)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/protocol.py:265: in dispatch
+    result = engine.execute_method(method.key, kwargs=values, receiver=receiver, span=span)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:178: in execute_method
+    completion = self.block(self.p.lower(key), env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:772: in statement
+    return self.block(stmt.body, env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:750: in block
+    completion = self.statement(stmt, env)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:786: in statement
+    return Completion(op,self.value(args[0],env),args[0].typ)
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:489: in value
+    result = self.evaluate(expr, env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:672: in evaluate
+    return self.call(receiver,expr.value,values,kwargs,span,env,receiver_expr is not None,expr.bindings,receiver_expr.typ if receiver_expr is not None else '',tuple(a.typ for a in positional))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/kernel.py:720: in call
+    result=call(self,receiver,name,args,kwargs,span,receiver_type,argument_types)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/models.py:361: in call
+    modeled=stream_call(engine,receiver,name,args,kwargs,span,receiver_type,argument_types)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:127: in call
+    if args[0].fields['kind']=='toList':return list(values)
+                                               ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+callback = MethodRef(receiver=TypeRef(name='app:other.Names'), name='twice', owner='app:Endpoint#value()', span=Span(file='Endpoint.java', line=2, column=119), qualifier_type='app:other.Names', return_type='int')
+item = Object(identity='o2', typ='java.lang.Integer', fields={'value': 11, 'fresh': False, 'cache_guaranteed': True}, provided=None)
+predicate = False, peek = False
+
+    def apply(callback,item,predicate=False,peek=False):
+        result=engine.invoke_callable(callback,(item,),span);check()
+>       return engine.condition(result,getattr(callback,'span',span)) if predicate else item if peek else argument(engine,result,getattr(callback,'return_type',''),span)
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'MethodRef' object is not callable
+
+solutions/—_polyglot-scenario-core/code/polygraph/java_streams.py:64: TypeError
+=========================== short test summary info ============================
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py::test_filter_map_reduce_use_source_static_and_bound_references
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py::test_escaped_stream_keeps_callback_callsite_owner
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py::test_short_circuiting_does_not_run_later_throwing_callbacks[findFirst().get()-10]
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py::test_short_circuiting_does_not_run_later_throwing_callbacks[limit(1).collect(Collectors.toList())-expected1]
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py::test_constructor_and_unbound_instance_references_are_deferred
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py::test_native_unbound_string_reference_uses_native_value_at_invocation
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py::test_source_collection_is_bound_late_at_terminal_operation
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py::test_plain_count_needs_no_callback_or_encounter_order
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py::test_stream_budget_is_a_cutoff_without_a_claim_of_no_more_effects
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py::test_source_hashcode_and_collision_equals_callbacks_are_not_skipped
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py::test_singleton_set_can_feed_unbound_reference_without_order_uncertainty
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py::test_fully_qualified_native_type_is_not_a_chain_of_unknown_fields
+FAILED solutions/—_polyglot-scenario-core/code/tests/test_java_streams.py::test_imported_source_type_is_resolved_before_static_or_method_reference_dispatch
+13 failed, 14 passed in 1.40s

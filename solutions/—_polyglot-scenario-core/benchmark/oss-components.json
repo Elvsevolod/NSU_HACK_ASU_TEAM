@@ -1,0 +1,203 @@
+{
+  "application_executed": false,
+  "external_model_calls": 0,
+  "versions": {
+    "sqlglot": "30.23.0",
+    "libcst": "1.9.0",
+    "z3-solver": "5.3.1.0"
+  },
+  "smt_ablation": {
+    "java": {
+      "source": "import org.springframework.web.bind.annotation.*;\n@RestController class Handler {int impossible(){return -1;}int possible(){return 1;}\n@GetMapping(\"/value\")int value(@RequestParam int n){if(n>10){if(n<5)return impossible();}return possible();}}",
+      "request": {
+        "path": "/value"
+      },
+      "without_z3": {
+        "edges": [
+          {
+            "source": "opaque-method-3",
+            "relation": "calls",
+            "target": "opaque-method-1"
+          },
+          {
+            "source": "opaque-method-3",
+            "relation": "calls",
+            "target": "opaque-method-2"
+          },
+          {
+            "source": "scenario:arbitrary",
+            "relation": "executes",
+            "target": "opaque-method-1"
+          },
+          {
+            "source": "scenario:arbitrary",
+            "relation": "executes",
+            "target": "opaque-method-2"
+          },
+          {
+            "source": "scenario:arbitrary",
+            "relation": "executes",
+            "target": "opaque-method-3"
+          }
+        ],
+        "paths": 3,
+        "solver": {
+          "enabled": false,
+          "timeout_ms": 50,
+          "checks": 0,
+          "pruned_outcomes": 0,
+          "unknown": 0,
+          "seconds": 0.0,
+          "failures": []
+        },
+        "impossible_method_in_output": true
+      },
+      "with_z3": {
+        "edges": [
+          {
+            "source": "opaque-method-3",
+            "relation": "calls",
+            "target": "opaque-method-2"
+          },
+          {
+            "source": "scenario:arbitrary",
+            "relation": "executes",
+            "target": "opaque-method-2"
+          },
+          {
+            "source": "scenario:arbitrary",
+            "relation": "executes",
+            "target": "opaque-method-3"
+          }
+        ],
+        "paths": 2,
+        "solver": {
+          "enabled": true,
+          "timeout_ms": 50,
+          "checks": 8,
+          "pruned_outcomes": 1,
+          "unknown": 0,
+          "seconds": 0.0007879170007072389,
+          "failures": []
+        },
+        "impossible_method_in_output": false
+      }
+    },
+    "python": {
+      "source": "from fastapi import FastAPI\napp=FastAPI()\ndef impossible():return -1\ndef possible():return 1\n@app.get(\"/value\")\ndef value(n:int):\n    if n>10:\n        if n<5:return impossible()\n    return possible()\n",
+      "request": {
+        "path": "/value"
+      },
+      "without_z3": {
+        "edges": [
+          {
+            "source": "opaque-method-3",
+            "relation": "calls",
+            "target": "opaque-method-1"
+          },
+          {
+            "source": "opaque-method-3",
+            "relation": "calls",
+            "target": "opaque-method-2"
+          },
+          {
+            "source": "scenario:arbitrary",
+            "relation": "executes",
+            "target": "opaque-method-1"
+          },
+          {
+            "source": "scenario:arbitrary",
+            "relation": "executes",
+            "target": "opaque-method-2"
+          },
+          {
+            "source": "scenario:arbitrary",
+            "relation": "executes",
+            "target": "opaque-method-3"
+          }
+        ],
+        "paths": 3,
+        "solver": {
+          "enabled": false,
+          "timeout_ms": 50,
+          "checks": 0,
+          "pruned_outcomes": 0,
+          "unknown": 0,
+          "seconds": 0.0,
+          "failures": []
+        },
+        "impossible_method_in_output": true
+      },
+      "with_z3": {
+        "edges": [
+          {
+            "source": "opaque-method-3",
+            "relation": "calls",
+            "target": "opaque-method-2"
+          },
+          {
+            "source": "scenario:arbitrary",
+            "relation": "executes",
+            "target": "opaque-method-2"
+          },
+          {
+            "source": "scenario:arbitrary",
+            "relation": "executes",
+            "target": "opaque-method-3"
+          }
+        ],
+        "paths": 2,
+        "solver": {
+          "enabled": true,
+          "timeout_ms": 50,
+          "checks": 8,
+          "pruned_outcomes": 1,
+          "unknown": 0,
+          "seconds": 0.0003428759955568239,
+          "failures": []
+        },
+        "impossible_method_in_output": false
+      }
+    }
+  },
+  "libcst": {
+    "host_ast_error": "multiple exception types must be parenthesized (<unknown>, line 7)",
+    "source": "from fastapi import FastAPI as API\napp=API()\n@app.get(\"/value\")\ndef value():\n    try:\n        raise ValueError()\n    except ValueError, KeyError:\n        return 12\n",
+    "endpoints": 1,
+    "response": {
+      "kind": "Response",
+      "body": 12,
+      "status": 200,
+      "headers": {},
+      "headers_readonly": null
+    },
+    "diagnostics": [
+      {
+        "code": "python-syntax-normalized",
+        "message": "LibCST parenthesized exception tuples in memory for the host AST parser",
+        "file": "main.py",
+        "line": 0,
+        "detail": ""
+      }
+    ],
+    "source_unchanged": true
+  },
+  "sqlglot_snapshot": {
+    "source": "CREATE TABLE \"app\".\"stock\" (\"id\" INTEGER,\"description\" TEXT,\"price\" NUMERIC);\nINSERT INTO \"app\".\"stock\" (\"description\",\"price\",\"id\") VALUES ('O''Brien; -- text',0.10000000000000000001,3);",
+    "dialect": "postgres",
+    "tables": {
+      "storage:stock": [
+        {
+          "description": "O'Brien; -- text",
+          "price": {
+            "kind": "Decimal",
+            "value": "0.10000000000000000001"
+          },
+          "id": 3
+        }
+      ]
+    },
+    "warnings": []
+  },
+  "passed": true
+}

@@ -1,0 +1,180 @@
+{
+  "project": "public-java",
+  "scenarios": {
+    "stateful-account-statistics-chain": {
+      "method": "polyglot-ir-may",
+      "edges": [
+        {
+          "source": "method:account-service:com.piggymetrics.account.controller.AccountController#getCurrentAccount(Principal)",
+          "relation": "calls",
+          "target": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#findByName(String)"
+        },
+        {
+          "source": "method:account-service:com.piggymetrics.account.controller.AccountController#saveCurrentAccount(Principal,Account)",
+          "relation": "calls",
+          "target": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#saveChanges(String,Account)"
+        },
+        {
+          "source": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#findByName(String)",
+          "relation": "data",
+          "target": "resource:accounts"
+        },
+        {
+          "source": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#saveChanges(String,Account)",
+          "relation": "calls",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#getExpenses()"
+        },
+        {
+          "source": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#saveChanges(String,Account)",
+          "relation": "calls",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#getIncomes()"
+        },
+        {
+          "source": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#saveChanges(String,Account)",
+          "relation": "calls",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#getNote()"
+        },
+        {
+          "source": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#saveChanges(String,Account)",
+          "relation": "calls",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#getSaving()"
+        },
+        {
+          "source": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#saveChanges(String,Account)",
+          "relation": "calls",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#setExpenses(List<Item>)"
+        },
+        {
+          "source": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#saveChanges(String,Account)",
+          "relation": "calls",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#setIncomes(List<Item>)"
+        },
+        {
+          "source": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#saveChanges(String,Account)",
+          "relation": "calls",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#setLastSeen(Date)"
+        },
+        {
+          "source": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#saveChanges(String,Account)",
+          "relation": "calls",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#setNote(String)"
+        },
+        {
+          "source": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#saveChanges(String,Account)",
+          "relation": "calls",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#setSaving(Saving)"
+        },
+        {
+          "source": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#saveChanges(String,Account)",
+          "relation": "data",
+          "target": "resource:accounts"
+        },
+        {
+          "source": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#saveChanges(String,Account)",
+          "relation": "remote",
+          "target": "method:statistics-service:com.piggymetrics.statistics.controller.StatisticsController#saveAccountStatistics(String,Account)"
+        },
+        {
+          "source": "method:statistics-service:com.piggymetrics.statistics.controller.StatisticsController#saveAccountStatistics(String,Account)",
+          "relation": "calls",
+          "target": "method:statistics-service:com.piggymetrics.statistics.service.StatisticsServiceImpl#save(String,Account)"
+        },
+        {
+          "source": "method:statistics-service:com.piggymetrics.statistics.service.StatisticsServiceImpl#save(String,Account)",
+          "relation": "calls",
+          "target": "method:statistics-service:com.piggymetrics.statistics.domain.Account#getIncomes()"
+        },
+        {
+          "source": "method:statistics-service:com.piggymetrics.statistics.service.StatisticsServiceImpl#save(String,Account)",
+          "relation": "calls",
+          "target": "method:statistics-service:com.piggymetrics.statistics.domain.timeseries.DataPointId#<init>(String,Date)"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.controller.AccountController#getCurrentAccount(Principal)"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.controller.AccountController#saveCurrentAccount(Principal,Account)"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#getExpenses()"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#getIncomes()"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#getNote()"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#getSaving()"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#setExpenses(List<Item>)"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#setIncomes(List<Item>)"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#setLastSeen(Date)"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#setNote(String)"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.domain.Account#setSaving(Saving)"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#findByName(String)"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:account-service:com.piggymetrics.account.service.AccountServiceImpl#saveChanges(String,Account)"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:statistics-service:com.piggymetrics.statistics.controller.StatisticsController#saveAccountStatistics(String,Account)"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:statistics-service:com.piggymetrics.statistics.domain.Account#getIncomes()"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:statistics-service:com.piggymetrics.statistics.domain.timeseries.DataPointId#<init>(String,Date)"
+        },
+        {
+          "source": "scenario:stateful-account-statistics-chain",
+          "relation": "executes",
+          "target": "method:statistics-service:com.piggymetrics.statistics.service.StatisticsServiceImpl#save(String,Account)"
+        }
+      ]
+    }
+  }
+}

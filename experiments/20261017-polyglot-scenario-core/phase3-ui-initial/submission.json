@@ -1,0 +1,53 @@
+{
+  "project": "trainticket",
+  "scenarios": {
+    "S0": {
+      "method": "polyglot-ir-may",
+      "edges": []
+    },
+    "S1": {
+      "method": "polyglot-ir-may",
+      "edges": []
+    },
+    "S2": {
+      "method": "polyglot-ir-may",
+      "edges": []
+    },
+    "S3": {
+      "method": "polyglot-ir-may",
+      "edges": []
+    },
+    "S4": {
+      "method": "polyglot-ir-may",
+      "edges": [
+        {
+          "source": "method:ts-user-service:user.controller.UserController#registerUser(user.dto.UserDto,org.springframework.http.HttpHeaders)",
+          "relation": "calls",
+          "target": "method:ts-user-service:user.service.impl.UserServiceImpl#saveUser(user.dto.UserDto,?HttpHeaders)"
+        },
+        {
+          "source": "scenario:S4",
+          "relation": "executes",
+          "target": "method:ts-user-service:user.controller.UserController#registerUser(user.dto.UserDto,org.springframework.http.HttpHeaders)"
+        },
+        {
+          "source": "scenario:S4",
+          "relation": "executes",
+          "target": "method:ts-user-service:user.service.impl.UserServiceImpl#saveUser(user.dto.UserDto,?HttpHeaders)"
+        }
+      ]
+    },
+    "S5": {
+      "method": "polyglot-ir-may",
+      "edges": []
+    },
+    "S6": {
+      "method": "polyglot-ir-may",
+      "edges": []
+    },
+    "S7": {
+      "method": "polyglot-ir-may",
+      "edges": []
+    }
+  }
+}

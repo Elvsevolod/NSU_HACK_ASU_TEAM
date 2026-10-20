@@ -1,0 +1,129 @@
+FFFFF..                                                                  [100%]
+=================================== FAILURES ===================================
+_ test_local_bindings_stop_shadowing_a_field_after_leaving_their_scope[{int key=1;}] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-527/test_local_bindings_stop_shado0')
+statement = '{int key=1;}'
+
+    @pytest.mark.parametrize('statement',[
+     '{int key=1;}',
+     'if(true){int key=1;}',
+     'for(int key=0;key<2;key++){}',
+     'try{throw new IllegalStateException();}catch(IllegalStateException key){}',
+     'switch(1){case 1:{int key=1;break;}default:break;}',
+    ])
+    def test_local_bindings_stop_shadowing_a_field_after_leaving_their_scope(tmp_path,statement):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api {String key="outer";
+          Object inspect(){'''+statement+'''Map map=new HashMap();map.put(key,"found");return map.get("outer");}}
+          class Start{Object entry(){return new Api().inspect();}}'''})
+>       assert Engine(project,ScenarioState(db)).run(ids['Start.entry'],{})=='found'
+E       AssertionError: assert None == 'found'
+E        +  where None = run('method:service:Start#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105c3d650>.run
+E        +      where <analyzer.engine.Engine object at 0x105c3d650> = Engine(<analyzer.project.Project object at 0x1063e8b50>, <analyzer.state.ScenarioState object at 0x105c3f890>)
+E        +        where <analyzer.state.ScenarioState object at 0x105c3f890> = ScenarioState(<analyzer.state.Database object at 0x106450d90>)
+
+solutions/—_value-type-flow/code/tests/test_lexical_bindings.py:18: AssertionError
+_ test_local_bindings_stop_shadowing_a_field_after_leaving_their_scope[if(true){int key=1;}] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-527/test_local_bindings_stop_shado1')
+statement = 'if(true){int key=1;}'
+
+    @pytest.mark.parametrize('statement',[
+     '{int key=1;}',
+     'if(true){int key=1;}',
+     'for(int key=0;key<2;key++){}',
+     'try{throw new IllegalStateException();}catch(IllegalStateException key){}',
+     'switch(1){case 1:{int key=1;break;}default:break;}',
+    ])
+    def test_local_bindings_stop_shadowing_a_field_after_leaving_their_scope(tmp_path,statement):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api {String key="outer";
+          Object inspect(){'''+statement+'''Map map=new HashMap();map.put(key,"found");return map.get("outer");}}
+          class Start{Object entry(){return new Api().inspect();}}'''})
+>       assert Engine(project,ScenarioState(db)).run(ids['Start.entry'],{})=='found'
+E       AssertionError: assert None == 'found'
+E        +  where None = run('method:service:Start#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106679250>.run
+E        +      where <analyzer.engine.Engine object at 0x106679250> = Engine(<analyzer.project.Project object at 0x1064cc750>, <analyzer.state.ScenarioState object at 0x105c1f590>)
+E        +        where <analyzer.state.ScenarioState object at 0x105c1f590> = ScenarioState(<analyzer.state.Database object at 0x106541e10>)
+
+solutions/—_value-type-flow/code/tests/test_lexical_bindings.py:18: AssertionError
+_ test_local_bindings_stop_shadowing_a_field_after_leaving_their_scope[for(int key=0;key<2;key++){}] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-527/test_local_bindings_stop_shado2')
+statement = 'for(int key=0;key<2;key++){}'
+
+    @pytest.mark.parametrize('statement',[
+     '{int key=1;}',
+     'if(true){int key=1;}',
+     'for(int key=0;key<2;key++){}',
+     'try{throw new IllegalStateException();}catch(IllegalStateException key){}',
+     'switch(1){case 1:{int key=1;break;}default:break;}',
+    ])
+    def test_local_bindings_stop_shadowing_a_field_after_leaving_their_scope(tmp_path,statement):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api {String key="outer";
+          Object inspect(){'''+statement+'''Map map=new HashMap();map.put(key,"found");return map.get("outer");}}
+          class Start{Object entry(){return new Api().inspect();}}'''})
+>       assert Engine(project,ScenarioState(db)).run(ids['Start.entry'],{})=='found'
+E       AssertionError: assert None == 'found'
+E        +  where None = run('method:service:Start#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1063e9310>.run
+E        +      where <analyzer.engine.Engine object at 0x1063e9310> = Engine(<analyzer.project.Project object at 0x106537690>, <analyzer.state.ScenarioState object at 0x10665a690>)
+E        +        where <analyzer.state.ScenarioState object at 0x10665a690> = ScenarioState(<analyzer.state.Database object at 0x104c5f550>)
+
+solutions/—_value-type-flow/code/tests/test_lexical_bindings.py:18: AssertionError
+_ test_local_bindings_stop_shadowing_a_field_after_leaving_their_scope[try{throw new IllegalStateException();}catch(IllegalStateException key){}] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-527/test_local_bindings_stop_shado3')
+statement = 'try{throw new IllegalStateException();}catch(IllegalStateException key){}'
+
+    @pytest.mark.parametrize('statement',[
+     '{int key=1;}',
+     'if(true){int key=1;}',
+     'for(int key=0;key<2;key++){}',
+     'try{throw new IllegalStateException();}catch(IllegalStateException key){}',
+     'switch(1){case 1:{int key=1;break;}default:break;}',
+    ])
+    def test_local_bindings_stop_shadowing_a_field_after_leaving_their_scope(tmp_path,statement):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api {String key="outer";
+          Object inspect(){'''+statement+'''Map map=new HashMap();map.put(key,"found");return map.get("outer");}}
+          class Start{Object entry(){return new Api().inspect();}}'''})
+>       assert Engine(project,ScenarioState(db)).run(ids['Start.entry'],{})=='found'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'found'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Start#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1065416d0>.run
+E        +      where <analyzer.engine.Engine object at 0x1065416d0> = Engine(<analyzer.project.Project object at 0x1064cc950>, <analyzer.state.ScenarioState object at 0x106543cd0>)
+E        +        where <analyzer.state.ScenarioState object at 0x106543cd0> = ScenarioState(<analyzer.state.Database object at 0x10667a890>)
+
+solutions/—_value-type-flow/code/tests/test_lexical_bindings.py:18: AssertionError
+_ test_local_bindings_stop_shadowing_a_field_after_leaving_their_scope[switch(1){case 1:{int key=1;break;}default:break;}] _
+
+tmp_path = PosixPath('/private/var/folders/6v/q6fwh3qj04nf5_vxsf69v6940000gp/T/pytest-of-vsevolod/pytest-527/test_local_bindings_stop_shado4')
+statement = 'switch(1){case 1:{int key=1;break;}default:break;}'
+
+    @pytest.mark.parametrize('statement',[
+     '{int key=1;}',
+     'if(true){int key=1;}',
+     'for(int key=0;key<2;key++){}',
+     'try{throw new IllegalStateException();}catch(IllegalStateException key){}',
+     'switch(1){case 1:{int key=1;break;}default:break;}',
+    ])
+    def test_local_bindings_stop_shadowing_a_field_after_leaving_their_scope(tmp_path,statement):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api {String key="outer";
+          Object inspect(){'''+statement+'''Map map=new HashMap();map.put(key,"found");return map.get("outer");}}
+          class Start{Object entry(){return new Api().inspect();}}'''})
+>       assert Engine(project,ScenarioState(db)).run(ids['Start.entry'],{})=='found'
+E       AssertionError: assert None == 'found'
+E        +  where None = run('method:service:Start#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106659b90>.run
+E        +      where <analyzer.engine.Engine object at 0x106659b90> = Engine(<analyzer.project.Project object at 0x1065140d0>, <analyzer.state.ScenarioState object at 0x10639c1d0>)
+E        +        where <analyzer.state.ScenarioState object at 0x10639c1d0> = ScenarioState(<analyzer.state.Database object at 0x106515950>)
+
+solutions/—_value-type-flow/code/tests/test_lexical_bindings.py:18: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_value-type-flow/code/tests/test_lexical_bindings.py::test_local_bindings_stop_shadowing_a_field_after_leaving_their_scope[{int key=1;}]
+FAILED solutions/—_value-type-flow/code/tests/test_lexical_bindings.py::test_local_bindings_stop_shadowing_a_field_after_leaving_their_scope[if(true){int key=1;}]
+FAILED solutions/—_value-type-flow/code/tests/test_lexical_bindings.py::test_local_bindings_stop_shadowing_a_field_after_leaving_their_scope[for(int key=0;key<2;key++){}]
+FAILED solutions/—_value-type-flow/code/tests/test_lexical_bindings.py::test_local_bindings_stop_shadowing_a_field_after_leaving_their_scope[try{throw new IllegalStateException();}catch(IllegalStateException key){}]
+FAILED solutions/—_value-type-flow/code/tests/test_lexical_bindings.py::test_local_bindings_stop_shadowing_a_field_after_leaving_their_scope[switch(1){case 1:{int key=1;break;}default:break;}]
+5 failed, 2 passed in 0.07s

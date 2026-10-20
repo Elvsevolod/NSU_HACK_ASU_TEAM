@@ -1,0 +1,21 @@
+# Границы варианта № 19
+
+Извлечение исходных фактов, выбор запроса и исполнение остаются отдельными частями анализатора. Новая семантика относится к нативному Jackson2 в com.fasterxml.jackson, а не к бизнес-именам, маршрутам или ID сценария. Имя ObjectMapper у пользовательского класса и объявленный тип внедряемого поля не доказывают создание стандартного экземпляра.
+
+Поддержаны точный default constructor, две наблюдаемые DeserializationFeature, configure/enable/disable до использования, isEnabled и copy. После неизвестного расширения/модуля/операции, внешнего вызова с доступом к mapper или конфигурации после первого использования настройки становятся неизвестными. Копия не разделяет настройки, общая ссылка разделяет; консервативное объединение сохраняет согласованные записи и расширяет условные aliases.
+
+HTTP codec-контекст не получает настройки произвольного локального mapper. Внедряемые экземпляры, subclasses, ObjectReader/Writer, mixins, модули, factories, custom serializers/deserializers, произвольные аннотации и глобальная настройка Spring не реализованы полностью. Неизвестность сопровождается предупреждением; сама диагностика не гарантирует полный граф неподдержанного поведения.
+
+При доказанной схеме и payload нативная политика primitive-null даёт JVM-default либо семейство JsonMappingException. Boxed/reference null остаётся null. Для отсутствующего поля учитывается доказанный простой initializer/default; callbacks не выдумываются. Для лишнего свойства учитывается наблюдённая политика и ограниченный literal @JsonIgnoreProperties(ignoreUnknown=true). Неизвестные setters/getters, конструкторы, аннотации или неполная сериализация снимают доказательство конкретного отказа. JsonText хранит достоверность проекции отдельно от бизнес-полей.
+
+convertValue оборачивает доказанную ошибку преобразования в IllegalArgumentException; readValue сохраняет проверяемый JSON/IOException-контракт. Модель хранит верхнюю границу JsonMappingException, не точный подкласс: более узкий catch может остаться неопределённым. Простое совпадение имени с исходным или чужим импортированным исключением больше не доказывает совместимость.
+
+При readValue ограниченно разбирается полный корректный JSON-текст. Неподдержанная синтаксическая форма, NaN/Infinity и trailing tokens остаются неизвестными; это не объявляется точным Java JsonParseException. Общий JVM-парсер и все численные coercions не реализованы. Версия Jackson влияет на same-type convertValue и возможную общую ссылку; такой mutable-случай расширяется с предупреждением, копия не выдумывается. Общая модель произвольных aliases и длины plain-list остаётся ограниченной.
+
+Наследуемая модель JSON-generics использует исходное место объявления/использования, imports, raw upper bounds и единственный ациклический путь к полю. Полный Java type substitution/runtime checkcast/overload resolution, wildcard/owner-generics и все boxing-классы не реализованы. Старые ограничения Map-view stream, порядка HashMap, equals/hashCode исходных объектов, JavaScript, ORM и Spring lifecycle сохраняются.
+
+Из 53 независимых компонентов точных графов 51 против43 у родителя. Отдельно считаются executes/calls/remote/data; пустое отношение не доказывает качество. Это небольшая диагностическая панель. Petclinic подтверждает прежние 11 проб и ограниченные тела трёх запросов на неизменных 78 исходниках; полного независимого HTTP/security/Jackson-эталона нет. Универсальность не доказана.
+
+На основном входе ответ совпал с № 18, S0 не изменился; неизвестны46/103 шага и131 пара шаг–поле, все сценарии partial. Две отсутствующие исходные величины не объясняют технические ограничения. Агрегаты не являются точностью или числом независимых дефектов. Новые правила не выбирались по отдельным сценариям Train Ticket.
+
+Контракты сверены через Context7 и первичную документацию Jackson2: [ObjectMapper](https://fasterxml.github.io/jackson-databind/javadoc/2.9/com/fasterxml/jackson/databind/ObjectMapper.html), [DeserializationFeature](https://fasterxml.github.io/jackson-databind/javadoc/2.9/com/fasterxml/jackson/databind/DeserializationFeature.html), [JsonMappingException](https://fasterxml.github.io/jackson-databind/javadoc/2.9/com/fasterxml/jackson/databind/JsonMappingException.html). Настройки Jackson3 не переносились по совпадению названий. Внешние источники не читает готовый анализатор.

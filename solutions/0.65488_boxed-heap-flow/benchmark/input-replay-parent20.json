@@ -1,0 +1,290 @@
+{
+  "passed": false,
+  "exact_graphs": 0,
+  "cases": [
+    {
+      "case": "branch-write",
+      "passed": false,
+      "relations": {
+        "executes": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 2,
+          "iou": 0.6,
+          "nonempty": true
+        },
+        "calls": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 1,
+          "iou": 0.5,
+          "nonempty": true
+        },
+        "remote": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 1,
+          "iou": 0.5,
+          "nonempty": true
+        },
+        "data": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 1,
+          "iou": 0.5,
+          "nonempty": true
+        }
+      },
+      "results": [
+        "positive"
+      ],
+      "original_input_after": {
+        "active": true,
+        "count": 0
+      },
+      "paths": 2,
+      "reference_sha256": "d07f51ff084e1d576e68021a9871b71fc34eaf37a3093eaca7d13ca30f1f7cd9",
+      "source_sha256": {
+        "Client.java": "684442917d8fcdc38c3a1b998d91e6aae6a0548d77ac232293bfb60bcb0b7c8e",
+        "Warehouse.java": "0dff5d57690e7cfb3bcc72fbd07ef249c17f833831ec91a19a916793a4b60a7f"
+      },
+      "missing": [
+        [
+          "",
+          "executes",
+          "method:service:Client#negative()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Warehouse#negative()"
+        ],
+        [
+          "method:service:Client#entry(Request,boolean)",
+          "calls",
+          "method:service:Client#negative()"
+        ],
+        [
+          "method:service:Client#negative()",
+          "remote",
+          "method:service:Warehouse#negative()"
+        ],
+        [
+          "method:service:Warehouse#negative()",
+          "data",
+          "res:table:service.negative_parts"
+        ]
+      ],
+      "extra": []
+    },
+    {
+      "case": "prebranch-write",
+      "passed": false,
+      "relations": {
+        "executes": {
+          "tp": 1,
+          "fp": 2,
+          "fn": 2,
+          "iou": 0.2,
+          "nonempty": true
+        },
+        "calls": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 1,
+          "iou": 0.0,
+          "nonempty": true
+        },
+        "remote": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 1,
+          "iou": 0.0,
+          "nonempty": true
+        },
+        "data": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 1,
+          "iou": 0.0,
+          "nonempty": true
+        }
+      },
+      "results": [
+        "negative"
+      ],
+      "original_input_after": {
+        "active": false,
+        "count": 3
+      },
+      "paths": 2,
+      "reference_sha256": "3b2601432a6fe1cec16333bd36ece14a7f6d038b76d8c2f64fde54b208b4ba79",
+      "source_sha256": {
+        "Client.java": "0a96553ae932df4df0ae56ed1aaad1362b4da1532f5f13bf5dda5cdce67196d8",
+        "Warehouse.java": "0dff5d57690e7cfb3bcc72fbd07ef249c17f833831ec91a19a916793a4b60a7f"
+      },
+      "missing": [
+        [
+          "",
+          "executes",
+          "method:service:Client#positive()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Warehouse#positive()"
+        ],
+        [
+          "method:service:Client#entry(Request,boolean)",
+          "calls",
+          "method:service:Client#positive()"
+        ],
+        [
+          "method:service:Client#positive()",
+          "remote",
+          "method:service:Warehouse#positive()"
+        ],
+        [
+          "method:service:Warehouse#positive()",
+          "data",
+          "res:table:service.positive_parts"
+        ]
+      ],
+      "extra": [
+        [
+          "",
+          "executes",
+          "method:service:Client#negative()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Warehouse#negative()"
+        ],
+        [
+          "method:service:Client#entry(Request,boolean)",
+          "calls",
+          "method:service:Client#negative()"
+        ],
+        [
+          "method:service:Client#negative()",
+          "remote",
+          "method:service:Warehouse#negative()"
+        ],
+        [
+          "method:service:Warehouse#negative()",
+          "data",
+          "res:table:service.negative_parts"
+        ]
+      ]
+    },
+    {
+      "case": "conservative-restart",
+      "passed": false,
+      "relations": {
+        "executes": {
+          "tp": 1,
+          "fp": 2,
+          "fn": 2,
+          "iou": 0.2,
+          "nonempty": true
+        },
+        "calls": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 1,
+          "iou": 0.0,
+          "nonempty": true
+        },
+        "remote": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 1,
+          "iou": 0.0,
+          "nonempty": true
+        },
+        "data": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 1,
+          "iou": 0.0,
+          "nonempty": true
+        }
+      },
+      "results": [
+        "negative"
+      ],
+      "original_input_after": {
+        "active": false,
+        "count": 2
+      },
+      "paths": 1,
+      "reference_sha256": "3b2601432a6fe1cec16333bd36ece14a7f6d038b76d8c2f64fde54b208b4ba79",
+      "source_sha256": {
+        "Client.java": "0a96553ae932df4df0ae56ed1aaad1362b4da1532f5f13bf5dda5cdce67196d8",
+        "Warehouse.java": "0dff5d57690e7cfb3bcc72fbd07ef249c17f833831ec91a19a916793a4b60a7f"
+      },
+      "missing": [
+        [
+          "",
+          "executes",
+          "method:service:Client#positive()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Warehouse#positive()"
+        ],
+        [
+          "method:service:Client#entry(Request,boolean)",
+          "calls",
+          "method:service:Client#positive()"
+        ],
+        [
+          "method:service:Client#positive()",
+          "remote",
+          "method:service:Warehouse#positive()"
+        ],
+        [
+          "method:service:Warehouse#positive()",
+          "data",
+          "res:table:service.positive_parts"
+        ]
+      ],
+      "extra": [
+        [
+          "",
+          "executes",
+          "method:service:Client#negative()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Warehouse#negative()"
+        ],
+        [
+          "method:service:Client#entry(Request,boolean)",
+          "calls",
+          "method:service:Client#negative()"
+        ],
+        [
+          "method:service:Client#negative()",
+          "remote",
+          "method:service:Warehouse#negative()"
+        ],
+        [
+          "method:service:Warehouse#negative()",
+          "data",
+          "res:table:service.negative_parts"
+        ]
+      ]
+    }
+  ],
+  "reference_fixed_before_prediction": true,
+  "application_started": false,
+  "scope": "Internal Java entry parameter snapshots, remote HTTP and independent tables",
+  "limits": [
+    "Synthetic source-fixed component, not a real application or scenario understanding benchmark",
+    "The visible graph is the union of feasible flag values under the declared path budget"
+  ]
+}
