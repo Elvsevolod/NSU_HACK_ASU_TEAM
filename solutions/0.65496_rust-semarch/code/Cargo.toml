@@ -1,0 +1,32 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/semarch-core",
+    "crates/semarch-frontend-java",
+    "crates/semarch-frontend-python",
+    "crates/semarch-scenario",
+    "crates/semarch-tt",
+    "crates/semarch-cli",
+    "crates/grammar-spike",
+]
+
+[workspace.package]
+edition = "2021"
+version = "0.1.0"
+license = "MIT"
+
+[workspace.dependencies]
+tree-sitter = "0.27.1"
+tree-sitter-java = "0.23.5"
+tree-sitter-python = "0.25.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+ignore = "0.4"
+indexmap = "2"
+petgraph = "0.8"
+
+[profile.release]
+debug = false
