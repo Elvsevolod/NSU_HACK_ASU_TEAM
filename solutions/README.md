@@ -32,6 +32,7 @@
 | 24 | generic-member-flow | 0,64273 | 0,9509803922 | [README](0.64273_generic-member-flow/README.md) |
 | 25 | boxed-heap-flow | 0,65488 | 0,9509803922 | [README](0.65488_boxed-heap-flow/README.md) |
 | 26 | json-bean-lifecycle | 0,61822 | 0,9440476190 | [README](0.61822_json-bean-lifecycle/README.md) |
+| 27 | rust-semarch | **0,65496** | 0,9260149573 | [README](0.65496_rust-semarch/README.md) |
 | 27 | request-event-foundation | 0,19402 | 0,8627976190 | [README](0.19402_request-event-foundation/README.md) |
 | 28 | causal-execution-repair | 0,27421 | 0,8008928571 | [README](0.27421_causal-execution-repair/README.md) |
 | 29 | request-array-continuity | 0,36114 | 0,8008928571 | [README](0.36114_request-array-continuity/README.md) |
@@ -41,6 +42,8 @@
 | 33 | source-http-entry-contracts | — | 0,8008928571 | [README](—_source-http-entry-contracts/README.md) |
 | 34 | short-circuit-reference-guards (отклонён) | 0,22356 | 0,8008928571 | [README](0.22356_short-circuit-reference-guards/README.md) |
 | 35 | executor-allocation-boundary | 0,23964 | 0,8008928571 | [README](0.23964_executor-allocation-boundary/README.md) |
+
+В сводке два варианта № 27: `request-event-foundation` (Python) и `rust-semarch` (Rust). Исходные номера сохранены; варианты различаются по названию.
 
 В каждом варианте находятся код, `submission.json`, бенчмарк и архив `solution.zip` для загрузки. В архиве `submission.json` лежит в корне.
 
@@ -204,3 +207,5 @@ R01–R06 проверены в заявленных ограниченных к
 | 34 | 0,22086644 | 0,20594491 | 0,20782720 | 0,16931698 | 0,24546936 | 0,23872054 | 0,27677732 | 0,22356 |
 | 35 | 0,22086644 | 0,23372733 | 0,20782720 | 0,16931698 | 0,27237317 | 0,29662139 | 0,27677732 | 0,23964 |
 | Δ №35 − №32 | 0E-8 | 0,02778242 | 0E-8 | -0,00260516 | 0,02321130 | 0,01935533 | 0E-8 | +0,00967 |
+
+Решение № 27 — отдельный Rust-анализатор semarch, зарегистрированный по прямому запросу пользователя. Score **0,65496**, посылка **1666909** от **20.10.2026 14:13:18** (часовой пояс источника неизвестен). S1–S7 отдельно неизвестны. Δ к № 26: **+0,03674**; к лучшему № 5: **−0,254910**. Это сравнение результатов, а не родительская связь. Открытый S0 — **0,9260149573**. Оценённый архив сохранён без пересборки; исходники и ответ из него совпали с сохранённым снимком. [README № 27](0.65496_rust-semarch/README.md), [оценка и хеши](0.65496_rust-semarch/benchmark/site-score.json).

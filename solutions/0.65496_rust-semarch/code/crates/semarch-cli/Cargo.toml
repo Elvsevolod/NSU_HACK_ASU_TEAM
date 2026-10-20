@@ -1,0 +1,20 @@
+[package]
+name = "semarch-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "CLI entry point: discover + parse + dump IR (v0)"
+
+[[bin]]
+name = "semarch"
+path = "src/main.rs"
+
+[dependencies]
+semarch-core = { path = "../semarch-core" }
+semarch-frontend-java = { path = "../semarch-frontend-java" }
+semarch-frontend-python = { path = "../semarch-frontend-python" }
+semarch-scenario = { path = "../semarch-scenario" }
+semarch-tt = { path = "../semarch-tt" }
+serde_json = { workspace = true }
+clap = { workspace = true }
+anyhow = { workspace = true }
