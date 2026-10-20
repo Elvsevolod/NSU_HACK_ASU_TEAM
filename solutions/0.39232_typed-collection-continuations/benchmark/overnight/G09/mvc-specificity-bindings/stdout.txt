@@ -1,0 +1,19 @@
+.F.....                                                                  [100%]
+=================================== FAILURES ===================================
+_________ test_multiple_unordered_advice_is_not_resolved_by_file_order _________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-279/test_multiple_unordered_advice0')
+
+    def test_multiple_unordered_advice_is_not_resolved_by_file_order(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''class Api{@GetMapping("/fail")String fail(){throw new IllegalArgumentException();}}
+          @ControllerAdvice class First{@ExceptionHandler(Exception.class)String one(Exception ex){return "first";}}
+          @ControllerAdvice class Second{@ExceptionHandler(IllegalArgumentException.class)String two(IllegalArgumentException ex){return "second";}}'''})
+        e=Engine(p,ScenarioState(db));assert e.run(ids['Api.fail'],Request.http('service','GET','/fail',headers={})) is U
+>       assert any('advice registration/order' in a for a in e.assumptions)
+                                                             ^^^^^^^^^^^^^
+E       AttributeError: 'Engine' object has no attribute 'assumptions'
+
+code/tests/test_mvc_specific_handlers.py:31: AttributeError
+=========================== short test summary info ============================
+FAILED code/tests/test_mvc_specific_handlers.py::test_multiple_unordered_advice_is_not_resolved_by_file_order
+1 failed, 6 passed in 0.14s

@@ -1,0 +1,35 @@
+..............FF                                                         [100%]
+=================================== FAILURES ===================================
+_____________________ test_callback_remote_save_and_reread _____________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-9/test_callback_remote_save_and_0')
+
+    def test_callback_remote_save_and_reread(tmp_path):
+        p,db,ids=equipment(tmp_path,'rest.postForObject("http://warehouse/reserve/"+id,null,String.class);')
+        e=Engine(p,ScenarioState(db));assert e.run(ids['Approval.entry'],{})=='reserved'
+>       assert e.state.database.tables[('service','equipment')]==[{'id':'A','status':'reserved'},{'id':'B','status':'reserved'}]
+E       AssertionError: assert [{'id': 'A', ...e__': 'Item'}] == [{'id': 'A', ...: 'reserved'}]
+E         
+E         At index 0 diff: {'id': 'A', 'status': 'reserved', '__type__': 'Item'} != {'id': 'A', 'status': 'reserved'}
+E         Use -v to get more diff
+
+code/tests/test_foreach_remote_data32.py:37: AssertionError
+_______ test_callback_remote_failure_keeps_first_write_and_stops_reread ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-9/test_callback_remote_failure_k0')
+
+    def test_callback_remote_failure_keeps_first_write_and_stops_reread(tmp_path):
+        p,db,ids=equipment(tmp_path,'rest.postForObject("http://warehouse/reserve/"+id,null,String.class);',rows=[{'id':'A','status':'free'}])
+        e=Engine(p,ScenarioState(db));assert e.run(ids['Approval.entry'],{}) is U
+        assert e.outcome=='uncaught application exception'
+>       assert e.state.database.tables[('service','equipment')]==[{'id':'A','status':'reserved'}]
+E       AssertionError: assert [{'id': 'A', ...e__': 'Item'}] == [{'id': 'A', ...: 'reserved'}]
+E         
+E         At index 0 diff: {'id': 'A', 'status': 'reserved', '__type__': 'Item'} != {'id': 'A', 'status': 'reserved'}
+E         Use -v to get more diff
+
+code/tests/test_foreach_remote_data32.py:52: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_foreach_remote_data32.py::test_callback_remote_save_and_reread
+FAILED code/tests/test_foreach_remote_data32.py::test_callback_remote_failure_keeps_first_write_and_stops_reread
+2 failed, 14 passed in 0.17s

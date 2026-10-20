@@ -1,0 +1,603 @@
+{
+  "outcome": "unsupported_semantics boundary",
+  "warnings": [
+    "Java collection contents or membership are unknown at the JSON boundary: scenario request",
+    "iteration over unknown collection membership: method:service:Approval#inspect(String,List<String>,boolean):16"
+  ],
+  "unscoped_state_assumptions": [],
+  "boundary_had_transaction": false,
+  "frames": [
+    {
+      "mid": "method:service:Approval#inspect(String,List<String>,boolean)",
+      "node": "block",
+      "unknown_type": "Unknown",
+      "unknown_flavor": null,
+      "unknown_opaque": null
+    },
+    {
+      "mid": "method:service:Approval#inspect(String,List<String>,boolean)",
+      "node": "if_statement",
+      "unknown_type": "Unknown",
+      "unknown_flavor": null,
+      "unknown_opaque": null
+    },
+    {
+      "mid": "method:service:Approval#inspect(String,List<String>,boolean)",
+      "node": "block",
+      "unknown_type": "Unknown",
+      "unknown_flavor": null,
+      "unknown_opaque": null
+    },
+    {
+      "mid": "method:service:Approval#inspect(String,List<String>,boolean)",
+      "node": "enhanced_for_statement",
+      "unknown_type": "Unknown",
+      "unknown_flavor": null,
+      "unknown_opaque": null
+    }
+  ],
+  "effects": [
+    {
+      "model_version": "unknown-foreach-boundary/1",
+      "operation": "foreach",
+      "callsite": "method:service:Approval#inspect(String,List<String>,boolean):16",
+      "heap_roots": [
+        "id",
+        "inspectOnly",
+        "prefix",
+        "this",
+        "unknown"
+      ],
+      "affected_native_objects": 0,
+      "global_footprint": "reachable native heap",
+      "callbacks": "not executed; membership unknown",
+      "completions": "unresolved"
+    }
+  ],
+  "losses": [
+    {
+      "sequence": 1,
+      "phase": "input_or_value",
+      "cause": "unresolved identifier",
+      "location": {
+        "file": "approval/Approval.java",
+        "line": 15,
+        "end_line": 15,
+        "method": "method:service:Approval#inspect(String,List<String>,boolean)"
+      },
+      "source_sha256": "eb0d908486b2a8564f23692e2a987822ee1d7fb88128b887171e9a3e2d11e7ff",
+      "declared_type": "org.springframework.web.client.RestTemplate",
+      "runtime_kind": null,
+      "before": {
+        "knowledge": "unknown"
+      },
+      "after": {
+        "knowledge": "unknown"
+      },
+      "completion": "unresolved",
+      "guards": [],
+      "assumptions": [
+        "JSON model boundary: Java collection contents or membership are unknown at the JSON boundary: scenario request"
+      ],
+      "prefix_event_count": 1,
+      "prefix_edges": [
+        [
+          "",
+          "executes",
+          "method:service:Approval#inspect(String,List<String>,boolean)"
+        ]
+      ],
+      "actual_effect_count": 0,
+      "actual_effects": [],
+      "possible_write_footprint": [],
+      "widened_locations": [],
+      "request_id": 1,
+      "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+    },
+    {
+      "sequence": 2,
+      "phase": "input_or_value",
+      "cause": "unresolved identifier",
+      "location": {
+        "file": "warehouse/Warehouse.java",
+        "line": 8,
+        "end_line": 8,
+        "method": "method:service:Warehouse#read(String)"
+      },
+      "source_sha256": "d8c46033bce2ca818730531e4458ee0fc7a171a40b88dbce6c9ec5dd9ad0ea7b",
+      "declared_type": "Store",
+      "runtime_kind": null,
+      "before": {
+        "knowledge": "unknown"
+      },
+      "after": {
+        "knowledge": "unknown"
+      },
+      "completion": "unresolved",
+      "guards": [],
+      "assumptions": [
+        "JSON model boundary: Java collection contents or membership are unknown at the JSON boundary: scenario request"
+      ],
+      "prefix_event_count": 3,
+      "prefix_edges": [
+        [
+          "",
+          "executes",
+          "method:service:Approval#inspect(String,List<String>,boolean)"
+        ],
+        [
+          "method:service:Approval#inspect(String,List<String>,boolean)",
+          "remote",
+          "method:service:Warehouse#read(String)"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Warehouse#read(String)"
+        ]
+      ],
+      "actual_effect_count": 0,
+      "actual_effects": [],
+      "possible_write_footprint": [],
+      "widened_locations": [],
+      "request_id": 2,
+      "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+    },
+    {
+      "sequence": 3,
+      "phase": "input_or_value",
+      "cause": "unresolved identifier",
+      "location": {
+        "file": "approval/Approval.java",
+        "line": 16,
+        "end_line": 16,
+        "method": "method:service:Approval#inspect(String,List<String>,boolean)"
+      },
+      "source_sha256": "eb0d908486b2a8564f23692e2a987822ee1d7fb88128b887171e9a3e2d11e7ff",
+      "declared_type": "java.util.List<java.lang.String>",
+      "runtime_kind": null,
+      "before": {
+        "knowledge": "unknown"
+      },
+      "after": {
+        "knowledge": "unknown"
+      },
+      "completion": "unresolved",
+      "guards": [
+        {
+          "condition": "(inspectOnly)",
+          "value": "True",
+          "assumed": false
+        }
+      ],
+      "assumptions": [
+        "JSON model boundary: Java collection contents or membership are unknown at the JSON boundary: scenario request"
+      ],
+      "prefix_event_count": 4,
+      "prefix_edges": [
+        [
+          "",
+          "executes",
+          "method:service:Approval#inspect(String,List<String>,boolean)"
+        ],
+        [
+          "method:service:Approval#inspect(String,List<String>,boolean)",
+          "remote",
+          "method:service:Warehouse#read(String)"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Warehouse#read(String)"
+        ],
+        [
+          "method:service:Warehouse#read(String)",
+          "data",
+          "res:table:service.equipment"
+        ]
+      ],
+      "actual_effect_count": 1,
+      "actual_effects": [
+        {
+          "method": "method:service:Warehouse#read(String)",
+          "resource": "res:table:service.equipment",
+          "operation": "findById",
+          "arguments": [
+            "A"
+          ],
+          "source_site": "call:method:service:Warehouse#read(String)@8:28",
+          "argument_kinds": [
+            "String"
+          ],
+          "request_id": 2,
+          "uncertain_write": false,
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:service:Warehouse#read(String)@8:28"
+        }
+      ],
+      "possible_write_footprint": [],
+      "widened_locations": [],
+      "request_id": 2,
+      "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+    },
+    {
+      "sequence": 4,
+      "phase": "unsupported",
+      "cause": "iteration over unknown collection membership: method:service:Approval#inspect(String,List<String>,boolean):16",
+      "location": {
+        "file": "approval/Approval.java",
+        "line": 16,
+        "end_line": 16,
+        "method": "method:service:Approval#inspect(String,List<String>,boolean)"
+      },
+      "source_sha256": "eb0d908486b2a8564f23692e2a987822ee1d7fb88128b887171e9a3e2d11e7ff",
+      "declared_type": null,
+      "runtime_kind": null,
+      "before": {
+        "knowledge": "unknown"
+      },
+      "after": {
+        "knowledge": "unknown"
+      },
+      "completion": "boundary",
+      "guards": [
+        {
+          "condition": "(inspectOnly)",
+          "value": "True",
+          "assumed": false
+        }
+      ],
+      "assumptions": [
+        "JSON model boundary: Java collection contents or membership are unknown at the JSON boundary: scenario request"
+      ],
+      "prefix_event_count": 4,
+      "prefix_edges": [
+        [
+          "",
+          "executes",
+          "method:service:Approval#inspect(String,List<String>,boolean)"
+        ],
+        [
+          "method:service:Approval#inspect(String,List<String>,boolean)",
+          "remote",
+          "method:service:Warehouse#read(String)"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Warehouse#read(String)"
+        ],
+        [
+          "method:service:Warehouse#read(String)",
+          "data",
+          "res:table:service.equipment"
+        ]
+      ],
+      "actual_effect_count": 1,
+      "actual_effects": [
+        {
+          "method": "method:service:Warehouse#read(String)",
+          "resource": "res:table:service.equipment",
+          "operation": "findById",
+          "arguments": [
+            "A"
+          ],
+          "source_site": "call:method:service:Warehouse#read(String)@8:28",
+          "argument_kinds": [
+            "String"
+          ],
+          "request_id": 2,
+          "uncertain_write": false,
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:service:Warehouse#read(String)@8:28"
+        }
+      ],
+      "possible_write_footprint": [],
+      "widened_locations": [],
+      "request_id": 2,
+      "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+    },
+    {
+      "sequence": 5,
+      "phase": "unsupported",
+      "cause": "iteration over unknown collection membership: method:service:Approval#inspect(String,List<String>,boolean):16",
+      "location": {
+        "file": "approval/Approval.java",
+        "line": 16,
+        "end_line": 16,
+        "method": "method:service:Approval#inspect(String,List<String>,boolean)"
+      },
+      "source_sha256": "eb0d908486b2a8564f23692e2a987822ee1d7fb88128b887171e9a3e2d11e7ff",
+      "declared_type": null,
+      "runtime_kind": null,
+      "before": {
+        "knowledge": "unknown"
+      },
+      "after": {
+        "knowledge": "unknown"
+      },
+      "completion": "boundary",
+      "guards": [],
+      "assumptions": [
+        "JSON model boundary: Java collection contents or membership are unknown at the JSON boundary: scenario request"
+      ],
+      "prefix_event_count": 4,
+      "prefix_edges": [
+        [
+          "",
+          "executes",
+          "method:service:Approval#inspect(String,List<String>,boolean)"
+        ],
+        [
+          "method:service:Approval#inspect(String,List<String>,boolean)",
+          "remote",
+          "method:service:Warehouse#read(String)"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Warehouse#read(String)"
+        ],
+        [
+          "method:service:Warehouse#read(String)",
+          "data",
+          "res:table:service.equipment"
+        ]
+      ],
+      "actual_effect_count": 1,
+      "actual_effects": [
+        {
+          "method": "method:service:Warehouse#read(String)",
+          "resource": "res:table:service.equipment",
+          "operation": "findById",
+          "arguments": [
+            "A"
+          ],
+          "source_site": "call:method:service:Warehouse#read(String)@8:28",
+          "argument_kinds": [
+            "String"
+          ],
+          "request_id": 2,
+          "uncertain_write": false,
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:service:Warehouse#read(String)@8:28"
+        }
+      ],
+      "possible_write_footprint": [],
+      "widened_locations": [],
+      "request_id": 2,
+      "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+    },
+    {
+      "sequence": 6,
+      "phase": "unsupported",
+      "cause": "iteration over unknown collection membership: method:service:Approval#inspect(String,List<String>,boolean):16",
+      "location": {
+        "file": "approval/Approval.java",
+        "line": 14,
+        "end_line": 18,
+        "method": "method:service:Approval#inspect(String,List<String>,boolean)"
+      },
+      "source_sha256": "eb0d908486b2a8564f23692e2a987822ee1d7fb88128b887171e9a3e2d11e7ff",
+      "declared_type": null,
+      "runtime_kind": null,
+      "before": {
+        "knowledge": "unknown"
+      },
+      "after": {
+        "knowledge": "unknown"
+      },
+      "completion": "boundary",
+      "guards": [],
+      "assumptions": [
+        "JSON model boundary: Java collection contents or membership are unknown at the JSON boundary: scenario request"
+      ],
+      "prefix_event_count": 4,
+      "prefix_edges": [
+        [
+          "",
+          "executes",
+          "method:service:Approval#inspect(String,List<String>,boolean)"
+        ],
+        [
+          "method:service:Approval#inspect(String,List<String>,boolean)",
+          "remote",
+          "method:service:Warehouse#read(String)"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Warehouse#read(String)"
+        ],
+        [
+          "method:service:Warehouse#read(String)",
+          "data",
+          "res:table:service.equipment"
+        ]
+      ],
+      "actual_effect_count": 1,
+      "actual_effects": [
+        {
+          "method": "method:service:Warehouse#read(String)",
+          "resource": "res:table:service.equipment",
+          "operation": "findById",
+          "arguments": [
+            "A"
+          ],
+          "source_site": "call:method:service:Warehouse#read(String)@8:28",
+          "argument_kinds": [
+            "String"
+          ],
+          "request_id": 2,
+          "uncertain_write": false,
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:service:Warehouse#read(String)@8:28"
+        }
+      ],
+      "possible_write_footprint": [],
+      "widened_locations": [],
+      "request_id": 2,
+      "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+    },
+    {
+      "sequence": 7,
+      "phase": "unsupported",
+      "cause": "iteration over unknown collection membership: method:service:Approval#inspect(String,List<String>,boolean):16",
+      "location": {
+        "file": null,
+        "line": null,
+        "end_line": null,
+        "method": null
+      },
+      "source_sha256": null,
+      "declared_type": null,
+      "runtime_kind": null,
+      "before": {
+        "knowledge": "unknown"
+      },
+      "after": {
+        "knowledge": "unknown"
+      },
+      "completion": "boundary",
+      "guards": [],
+      "assumptions": [
+        "JSON model boundary: Java collection contents or membership are unknown at the JSON boundary: scenario request"
+      ],
+      "prefix_event_count": 4,
+      "prefix_edges": [
+        [
+          "",
+          "executes",
+          "method:service:Approval#inspect(String,List<String>,boolean)"
+        ],
+        [
+          "method:service:Approval#inspect(String,List<String>,boolean)",
+          "remote",
+          "method:service:Warehouse#read(String)"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Warehouse#read(String)"
+        ],
+        [
+          "method:service:Warehouse#read(String)",
+          "data",
+          "res:table:service.equipment"
+        ]
+      ],
+      "actual_effect_count": 1,
+      "actual_effects": [
+        {
+          "method": "method:service:Warehouse#read(String)",
+          "resource": "res:table:service.equipment",
+          "operation": "findById",
+          "arguments": [
+            "A"
+          ],
+          "source_site": "call:method:service:Warehouse#read(String)@8:28",
+          "argument_kinds": [
+            "String"
+          ],
+          "request_id": 2,
+          "uncertain_write": false,
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:service:Warehouse#read(String)@8:28"
+        }
+      ],
+      "possible_write_footprint": [],
+      "widened_locations": [],
+      "request_id": 2,
+      "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+    },
+    {
+      "sequence": 8,
+      "phase": "fallback",
+      "cause": "entry/method writable closure widened; not an executed SQL write",
+      "location": {
+        "file": null,
+        "line": null,
+        "end_line": null,
+        "method": null
+      },
+      "source_sha256": null,
+      "declared_type": null,
+      "runtime_kind": null,
+      "before": {
+        "knowledge": "unknown"
+      },
+      "after": {
+        "knowledge": "unknown"
+      },
+      "completion": "boundary_or_approximation",
+      "guards": [],
+      "assumptions": [
+        "JSON model boundary: Java collection contents or membership are unknown at the JSON boundary: scenario request",
+        "unsupported execution at method:service:Approval#inspect(String,List<String>,boolean)"
+      ],
+      "prefix_event_count": 4,
+      "prefix_edges": [
+        [
+          "",
+          "executes",
+          "method:service:Approval#inspect(String,List<String>,boolean)"
+        ],
+        [
+          "method:service:Approval#inspect(String,List<String>,boolean)",
+          "remote",
+          "method:service:Warehouse#read(String)"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Warehouse#read(String)"
+        ],
+        [
+          "method:service:Warehouse#read(String)",
+          "data",
+          "res:table:service.equipment"
+        ]
+      ],
+      "actual_effect_count": 1,
+      "actual_effects": [
+        {
+          "method": "method:service:Warehouse#read(String)",
+          "resource": "res:table:service.equipment",
+          "operation": "findById",
+          "arguments": [
+            "A"
+          ],
+          "source_site": "call:method:service:Warehouse#read(String)@8:28",
+          "argument_kinds": [
+            "String"
+          ],
+          "request_id": 2,
+          "uncertain_write": false,
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:service:Warehouse#read(String)@8:28"
+        }
+      ],
+      "possible_write_footprint": [
+        "res:table:service.equipment"
+      ],
+      "widened_locations": [
+        "res:table:service.equipment"
+      ],
+      "request_id": 2,
+      "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+    }
+  ],
+  "rows": null
+}

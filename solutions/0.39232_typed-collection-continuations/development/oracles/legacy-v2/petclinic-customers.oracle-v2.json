@@ -1,0 +1,332 @@
+{
+  "fixed_before_prediction": false,
+  "steps": [
+    {
+      "n": 1,
+      "endpoint": "method:customers:OwnerResource#findAll()",
+      "status": 200,
+      "result": [
+        {
+          "id": 1,
+          "firstName": "Joe",
+          "lastName": "Smith",
+          "address": "Main",
+          "city": "York",
+          "telephone": "12345",
+          "pets": []
+        }
+      ],
+      "result_subset": false,
+      "ignore_result": false,
+      "rows": {
+        "customers.owners": 1,
+        "customers.pets": 0
+      },
+      "arguments": {}
+    },
+    {
+      "n": 2,
+      "endpoint": "method:customers:OwnerResource#createOwner(OwnerRequest)",
+      "status": 201,
+      "result": {
+        "firstName": "Eva",
+        "lastName": "Jones",
+        "address": "Elm",
+        "city": "York",
+        "telephone": "67890",
+        "pets": []
+      },
+      "result_subset": true,
+      "ignore_result": false,
+      "rows": {
+        "customers.owners": 2,
+        "customers.pets": 0
+      },
+      "arguments": {}
+    },
+    {
+      "n": 3,
+      "endpoint": "method:customers:OwnerResource#findAll()",
+      "status": 200,
+      "result": null,
+      "result_subset": false,
+      "ignore_result": true,
+      "rows": {
+        "customers.owners": 2,
+        "customers.pets": 0
+      },
+      "arguments": {}
+    },
+    {
+      "n": 4,
+      "endpoint": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+      "status": 204,
+      "result": null,
+      "result_subset": false,
+      "ignore_result": true,
+      "rows": {
+        "customers.owners": 2,
+        "customers.pets": 0
+      },
+      "arguments": {
+        "ownerId": 1
+      }
+    },
+    {
+      "n": 5,
+      "endpoint": "method:customers:OwnerResource#findOwner(int)",
+      "status": 200,
+      "result": {
+        "id": 1,
+        "firstName": "Joe",
+        "lastName": "Smith",
+        "address": "Oak",
+        "city": "Leeds",
+        "telephone": "11223",
+        "pets": []
+      },
+      "result_subset": false,
+      "ignore_result": false,
+      "rows": {
+        "customers.owners": 2,
+        "customers.pets": 0
+      },
+      "arguments": {
+        "ownerId": 1
+      }
+    },
+    {
+      "n": 6,
+      "endpoint": "method:customers:OwnerResource#findOwner(int)",
+      "status": 400,
+      "result": null,
+      "result_subset": false,
+      "ignore_result": true,
+      "rows": {
+        "customers.owners": 2,
+        "customers.pets": 0
+      },
+      "arguments": {
+        "ownerId": "invalid"
+      }
+    },
+    {
+      "n": 7,
+      "endpoint": "method:customers:OwnerResource#findAll()",
+      "status": 200,
+      "result": null,
+      "result_subset": false,
+      "ignore_result": true,
+      "rows": {
+        "customers.owners": 2,
+        "customers.pets": 0
+      },
+      "arguments": {}
+    }
+  ],
+  "edges": [
+    {
+      "source": "scenario:clinic-journey",
+      "relation": "executes",
+      "target": "method:customers:OwnerResource#findAll()"
+    },
+    {
+      "source": "scenario:clinic-journey",
+      "relation": "executes",
+      "target": "method:customers:OwnerResource#createOwner(OwnerRequest)"
+    },
+    {
+      "source": "scenario:clinic-journey",
+      "relation": "executes",
+      "target": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)"
+    },
+    {
+      "source": "scenario:clinic-journey",
+      "relation": "executes",
+      "target": "method:customers:OwnerResource#findOwner(int)"
+    },
+    {
+      "source": "scenario:clinic-journey",
+      "relation": "executes",
+      "target": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)"
+    },
+    {
+      "source": "scenario:clinic-journey",
+      "relation": "executes",
+      "target": "method:customers:Owner#getPetsInternal()"
+    },
+    {
+      "source": "scenario:clinic-journey",
+      "relation": "executes",
+      "target": "method:customers:Owner#setAddress(String)"
+    },
+    {
+      "source": "scenario:clinic-journey",
+      "relation": "executes",
+      "target": "method:customers:Owner#setCity(String)"
+    },
+    {
+      "source": "scenario:clinic-journey",
+      "relation": "executes",
+      "target": "method:customers:Owner#setTelephone(String)"
+    },
+    {
+      "source": "scenario:clinic-journey",
+      "relation": "executes",
+      "target": "method:customers:Owner#setFirstName(String)"
+    },
+    {
+      "source": "scenario:clinic-journey",
+      "relation": "executes",
+      "target": "method:customers:Owner#setLastName(String)"
+    },
+    {
+      "source": "method:customers:OwnerResource#createOwner(OwnerRequest)",
+      "relation": "calls",
+      "target": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)"
+    },
+    {
+      "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+      "relation": "calls",
+      "target": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)"
+    },
+    {
+      "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+      "relation": "calls",
+      "target": "method:customers:Owner#setAddress(String)"
+    },
+    {
+      "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+      "relation": "calls",
+      "target": "method:customers:Owner#setCity(String)"
+    },
+    {
+      "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+      "relation": "calls",
+      "target": "method:customers:Owner#setTelephone(String)"
+    },
+    {
+      "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+      "relation": "calls",
+      "target": "method:customers:Owner#setFirstName(String)"
+    },
+    {
+      "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+      "relation": "calls",
+      "target": "method:customers:Owner#setLastName(String)"
+    },
+    {
+      "source": "method:customers:OwnerResource#findAll()",
+      "relation": "data",
+      "target": "res:table:customers.owners"
+    },
+    {
+      "source": "method:customers:OwnerResource#createOwner(OwnerRequest)",
+      "relation": "data",
+      "target": "res:table:customers.owners"
+    },
+    {
+      "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+      "relation": "data",
+      "target": "res:table:customers.owners"
+    },
+    {
+      "source": "method:customers:OwnerResource#findOwner(int)",
+      "relation": "data",
+      "target": "res:table:customers.owners"
+    },
+    {
+      "source": "method:customers:OwnerResource#findAll()",
+      "relation": "data",
+      "target": "res:table:customers.pets"
+    },
+    {
+      "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+      "relation": "data",
+      "target": "res:table:customers.pets"
+    },
+    {
+      "source": "method:customers:OwnerResource#findOwner(int)",
+      "relation": "data",
+      "target": "res:table:customers.pets"
+    },
+    {
+      "source": "scenario:clinic-journey",
+      "relation": "executes",
+      "target": "method:customers:Owner#toString()"
+    },
+    {
+      "source": "scenario:clinic-journey",
+      "relation": "executes",
+      "target": "method:customers:Owner#getId()"
+    },
+    {
+      "source": "scenario:clinic-journey",
+      "relation": "executes",
+      "target": "method:customers:Owner#getFirstName()"
+    },
+    {
+      "source": "scenario:clinic-journey",
+      "relation": "executes",
+      "target": "method:customers:Owner#getLastName()"
+    },
+    {
+      "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+      "relation": "calls",
+      "target": "method:customers:Owner#toString()"
+    },
+    {
+      "source": "method:customers:Owner#toString()",
+      "relation": "calls",
+      "target": "method:customers:Owner#getId()"
+    },
+    {
+      "source": "method:customers:Owner#toString()",
+      "relation": "calls",
+      "target": "method:customers:Owner#getFirstName()"
+    },
+    {
+      "source": "method:customers:Owner#toString()",
+      "relation": "calls",
+      "target": "method:customers:Owner#getLastName()"
+    }
+  ],
+  "limits": [
+    "Pinned Customers HTTP profile, prevalidated valid DTO fields; no gateway/reactive or full Bean Validation/security model",
+    "Generated numeric identifier is symbolic; never supplied as a guessed integer",
+    "No pets initially; EAGER association read is a datastore event even when empty",
+    "No remote edge in this real-source profile; synthetic corpus tests nonempty remote separately"
+  ],
+  "version": 2,
+  "previous_sha256": "c06a7f6dafbb769c1fa09d7c1cd5ed4adcc13b871145e480e081319cecab40cd",
+  "review_basis": "Source review after legacy failure; no analyzer behavior is changed to match the oracle",
+  "scope": "legacy HTTP regression; aggregate graph plus explicit wire/actual args/scalar table fields, not a new holdout",
+  "source_evidence": [
+    {
+      "file": "spring-petclinic-customers-service/src/main/java/org/springframework/samples/petclinic/customers/web/OwnerResource.java",
+      "line": 98,
+      "fact": "update logs ownerModel before save"
+    },
+    {
+      "file": "spring-petclinic-customers-service/src/main/java/org/springframework/samples/petclinic/customers/model/Owner.java",
+      "line": 88,
+      "fact": "source toString calls getId/getLastName/getFirstName and native ToStringCreator"
+    }
+  ],
+  "state_probe": {
+    "updated_id": 1,
+    "updated_fields": {
+      "firstName": "Joe",
+      "lastName": "Smith",
+      "address": "Oak",
+      "city": "Leeds",
+      "telephone": "11223"
+    },
+    "generated_identity": "same non-null Integer symbol, distinct from 1, from create response through later lists",
+    "row_counts_after_update": {
+      "customers.owners": 2,
+      "customers.pets": 0,
+      "customers.types": 0
+    }
+  }
+}

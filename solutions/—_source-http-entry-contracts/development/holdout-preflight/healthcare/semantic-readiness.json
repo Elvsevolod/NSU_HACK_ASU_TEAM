@@ -1,0 +1,53 @@
+{
+  "project": "healthcare",
+  "status": "in_progress: independent full semantic oracle not frozen",
+  "no_query_predictions_seen": true,
+  "runtime_applications_started": false,
+  "source_graph_ready": true,
+  "retrieval_labels_frozen": "development/real-retrieval-frozen-v1",
+  "required_before_inference": [
+    "complete E/C/R/D expectations",
+    "initial SQL and generated-ID contract",
+    "explicit and NL stateful request chains",
+    "values/native kinds/producer origin checks",
+    "repeat refusal without writes",
+    "remote failure and branch/completion checks",
+    "exact source JSON and wire expectations",
+    "source/graph/oracle hash manifest"
+  ],
+  "generated_id_rule": "Independent symbolic fresh Long variable or proven input generator state; never infer a concrete ID from the analyzer answer. History consumers must preserve producer identity across all relevant complete alternatives.",
+  "oracle_method": "Engineering reading of pinned production code/configuration, no target JVM and no analyzer prediction as oracle.",
+  "source_findings": [
+    {
+      "file": "source/patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "method": "createPatient/updatePatient/getPatientById",
+      "fact": "Create/save, lookup/orElseThrow, and explicit save after setters provide source-backed state obligations."
+    },
+    {
+      "file": "source/patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "method": "handlePatientNotFound",
+      "fact": "Specific not-found handler returns HTTP404 with timestamp, message and status; generic handler is a different branch."
+    },
+    {
+      "file": "source/doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "method": "getDoctorWithPatient/patientServiceFallback",
+      "fact": "Successful Feign response and circuit-breaker fallback have different call/remote/data sets. The fallback performs another doctor lookup."
+    },
+    {
+      "file": "source/doctor-service/src/main/resources/application.properties",
+      "method": "circuit-breaker configuration",
+      "fact": "Minimum calls=5, window=10. Initial circuit state and prior call history must be explicit before claiming an exact fallback oracle."
+    }
+  ],
+  "planned_chains": [
+    "create patient -> select by returned identity -> update -> read -> combined physician/patient remote read",
+    "delete created patient -> repeat update gives404 with no write -> combined remote read follows the source fallback",
+    "fresh scenario starts from its own initial state; ambiguous/no-handler NL refuses instead of choosing an entity"
+  ],
+  "source_evidence_sha256": {
+    "source/patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java": "ffedd89ffd3f38e6521cd64919426c0a49370eb5ba17b1d95678fdd4be98711a",
+    "source/patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java": "1a0df26d2ccb5c20a05f9b4ae7359454330f0b3df2afbdc1c8351948cd82e8c4",
+    "source/doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java": "bf8a6a53f44401ef59f45442fc873ff90d3da6aff00f473d231cd01e9b134f75",
+    "source/doctor-service/src/main/resources/application.properties": "32d42aeb0fbb145d2a4c122b5a1b8a398a66b580fcd9a141b3f65b8ac30a7d55"
+  }
+}

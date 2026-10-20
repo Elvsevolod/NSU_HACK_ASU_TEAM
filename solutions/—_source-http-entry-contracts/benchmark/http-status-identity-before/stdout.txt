@@ -1,0 +1,16 @@
+.............F...........................                                [100%]
+=================================== FAILURES ===================================
+_______ test_status_identity_does_not_equal_its_ordinary_string_spelling _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-136/test_status_identity_does_not_0')
+
+    def test_status_identity_does_not_equal_its_ordinary_string_spelling(tmp_path):
+        value,e,_=run(tmp_path,'''import org.springframework.http.HttpStatus;
+          class Api{boolean entry(){return HttpStatus.NOT_FOUND.equals("NOT_FOUND");}}''')
+>       assert value is False and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> is False)
+
+code/tests/test_http_error_values33.py:47: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_http_error_values33.py::test_status_identity_does_not_equal_its_ordinary_string_spelling
+1 failed, 40 passed in 0.18s

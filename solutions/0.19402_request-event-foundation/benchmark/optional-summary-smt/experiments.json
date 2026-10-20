@@ -1,0 +1,175 @@
+{
+  "summary_ablation": [
+    {
+      "enabled": false,
+      "fixture": "petclinic-customers",
+      "repetition": 0,
+      "prepare_seconds": 0.013213333033490926,
+      "analysis_seconds": 0.023065832967404276,
+      "graph_exact": false,
+      "results_exact": false,
+      "summary_entries": 0
+    },
+    {
+      "enabled": false,
+      "fixture": "petclinic-customers",
+      "repetition": 1,
+      "prepare_seconds": 0.013213333033490926,
+      "analysis_seconds": 0.013073500012978911,
+      "graph_exact": false,
+      "results_exact": false,
+      "summary_entries": 0
+    },
+    {
+      "enabled": false,
+      "fixture": "petclinic-customers",
+      "repetition": 2,
+      "prepare_seconds": 0.013213333033490926,
+      "analysis_seconds": 0.013000000035390258,
+      "graph_exact": false,
+      "results_exact": false,
+      "summary_entries": 0
+    },
+    {
+      "enabled": false,
+      "fixture": "piggymetrics-account",
+      "repetition": 0,
+      "prepare_seconds": 0.009208165982272476,
+      "analysis_seconds": 0.006831208011135459,
+      "graph_exact": true,
+      "results_exact": true,
+      "summary_entries": 0
+    },
+    {
+      "enabled": false,
+      "fixture": "piggymetrics-account",
+      "repetition": 1,
+      "prepare_seconds": 0.009208165982272476,
+      "analysis_seconds": 0.00434849999146536,
+      "graph_exact": true,
+      "results_exact": true,
+      "summary_entries": 0
+    },
+    {
+      "enabled": false,
+      "fixture": "piggymetrics-account",
+      "repetition": 2,
+      "prepare_seconds": 0.009208165982272476,
+      "analysis_seconds": 0.004616958962287754,
+      "graph_exact": true,
+      "results_exact": true,
+      "summary_entries": 0
+    },
+    {
+      "enabled": true,
+      "fixture": "petclinic-customers",
+      "repetition": 0,
+      "prepare_seconds": 0.008208832994569093,
+      "analysis_seconds": 0.0261710420018062,
+      "graph_exact": true,
+      "results_exact": true,
+      "summary_entries": 7
+    },
+    {
+      "enabled": true,
+      "fixture": "petclinic-customers",
+      "repetition": 1,
+      "prepare_seconds": 0.008208832994569093,
+      "analysis_seconds": 0.022432916972320527,
+      "graph_exact": true,
+      "results_exact": true,
+      "summary_entries": 7
+    },
+    {
+      "enabled": true,
+      "fixture": "petclinic-customers",
+      "repetition": 2,
+      "prepare_seconds": 0.008208832994569093,
+      "analysis_seconds": 0.021923167048953474,
+      "graph_exact": true,
+      "results_exact": true,
+      "summary_entries": 7
+    },
+    {
+      "enabled": true,
+      "fixture": "piggymetrics-account",
+      "repetition": 0,
+      "prepare_seconds": 0.00746858399361372,
+      "analysis_seconds": 0.006484291981905699,
+      "graph_exact": true,
+      "results_exact": true,
+      "summary_entries": 0
+    },
+    {
+      "enabled": true,
+      "fixture": "piggymetrics-account",
+      "repetition": 1,
+      "prepare_seconds": 0.00746858399361372,
+      "analysis_seconds": 0.007426958007272333,
+      "graph_exact": true,
+      "results_exact": true,
+      "summary_entries": 0
+    },
+    {
+      "enabled": true,
+      "fixture": "piggymetrics-account",
+      "repetition": 2,
+      "prepare_seconds": 0.00746858399361372,
+      "analysis_seconds": 0.004381833015941083,
+      "graph_exact": true,
+      "results_exact": true,
+      "summary_entries": 0
+    }
+  ],
+  "summary_decision": "Accepted only source effect summaries with source/model/config/receiver versions and alias proof; never cache a return value by method/arguments.",
+  "smt_version": "4.16.0",
+  "smt_checks": 6,
+  "smt_cases": [
+    {
+      "java_condition": "(x-y)==1 && x==y",
+      "expected_satisfiable": false,
+      "smt_satisfiable": false,
+      "interval_rejected": false,
+      "smt_seconds": 0.0019841670291498303
+    },
+    {
+      "java_condition": "x<0 && x>0",
+      "expected_satisfiable": false,
+      "smt_satisfiable": false,
+      "interval_rejected": true,
+      "smt_seconds": 0.000555959006305784
+    },
+    {
+      "java_condition": "x==y && x!=y",
+      "expected_satisfiable": false,
+      "smt_satisfiable": false,
+      "interval_rejected": false,
+      "smt_seconds": 0.0002086249878630042
+    },
+    {
+      "java_condition": "x==0 && (x*x)<0",
+      "expected_satisfiable": false,
+      "smt_satisfiable": false,
+      "interval_rejected": false,
+      "smt_seconds": 0.0003172089927829802
+    },
+    {
+      "java_condition": "x==2147483647 && (x+1)<0",
+      "expected_satisfiable": true,
+      "smt_satisfiable": true,
+      "interval_rejected": false,
+      "smt_seconds": 0.00037925003562122583
+    },
+    {
+      "java_condition": "x<y && y<0",
+      "expected_satisfiable": true,
+      "smt_satisfiable": true,
+      "interval_rejected": false,
+      "smt_seconds": 0.001657332992181182
+    }
+  ],
+  "smt_scope": "Experimental pure int32 locals/bitvector arithmetic. No heap, calls, long/floating-point, Java exceptions or write-state reuse.",
+  "smt_decision": "Not a production dependency: this pilot improves relational feasibility examples, but a real-corpus final error reduction is not established.",
+  "targets_started": false,
+  "external_llm_api_calls": 0
+}

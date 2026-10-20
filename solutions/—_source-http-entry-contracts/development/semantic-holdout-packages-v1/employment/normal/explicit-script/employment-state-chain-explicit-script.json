@@ -1,0 +1,187 @@
+{
+  "id": "employment-state-chain-explicit-script",
+  "project": "holdout-employment-v1",
+  "steps": [
+    {
+      "n": 1,
+      "action": "@http-script:employment-state-chain-explicit-script:1"
+    },
+    {
+      "n": 2,
+      "action": "@http-script:employment-state-chain-explicit-script:2"
+    },
+    {
+      "n": 3,
+      "action": "@http-script:employment-state-chain-explicit-script:3"
+    },
+    {
+      "n": 4,
+      "action": "@http-script:employment-state-chain-explicit-script:4"
+    },
+    {
+      "n": 5,
+      "action": "@http-script:employment-state-chain-explicit-script:5"
+    },
+    {
+      "n": 6,
+      "action": "@http-script:employment-state-chain-explicit-script:6"
+    },
+    {
+      "n": 7,
+      "action": "@http-script:employment-state-chain-explicit-script:7"
+    },
+    {
+      "n": 8,
+      "action": "@http-script:employment-state-chain-explicit-script:8"
+    },
+    {
+      "n": 9,
+      "action": "@http-script:employment-state-chain-explicit-script:9"
+    }
+  ],
+  "request_scripts": {
+    "employment-state-chain-explicit-script:1": {
+      "deployment": "companyms",
+      "method": "POST",
+      "route_template": "/companies",
+      "parameters": {},
+      "headers": {
+        "content-type": [
+          "application/json"
+        ]
+      },
+      "body": {
+        "name": "Delta Lab",
+        "description": "Robotics"
+      }
+    },
+    "employment-state-chain-explicit-script:2": {
+      "deployment": "companyms",
+      "method": "GET",
+      "route_template": "/companies/{id}",
+      "parameters": {
+        "id": {
+          "$response": 1,
+          "path": [
+            "id"
+          ],
+          "native_kind": "Long"
+        }
+      },
+      "headers": {}
+    },
+    "employment-state-chain-explicit-script:3": {
+      "deployment": "companyms",
+      "method": "PUT",
+      "route_template": "/companies/{id}",
+      "parameters": {
+        "id": {
+          "$response": 1,
+          "path": [
+            "id"
+          ],
+          "native_kind": "Long"
+        }
+      },
+      "headers": {
+        "content-type": [
+          "application/json"
+        ]
+      },
+      "body": {
+        "name": "Changed Name",
+        "description": "Changed description"
+      }
+    },
+    "employment-state-chain-explicit-script:4": {
+      "deployment": "companyms",
+      "method": "GET",
+      "route_template": "/companies/{id}",
+      "parameters": {
+        "id": {
+          "$response": 1,
+          "path": [
+            "id"
+          ],
+          "native_kind": "Long"
+        }
+      },
+      "headers": {}
+    },
+    "employment-state-chain-explicit-script:5": {
+      "deployment": "jobms",
+      "method": "GET",
+      "route_template": "/jobs/{id}",
+      "parameters": {
+        "id": 101
+      },
+      "headers": {}
+    },
+    "employment-state-chain-explicit-script:6": {
+      "deployment": "reviewms",
+      "method": "PUT",
+      "route_template": "/reviews/{reviewId}",
+      "parameters": {
+        "reviewId": 201
+      },
+      "headers": {
+        "content-type": [
+          "application/json"
+        ]
+      },
+      "body": {
+        "title": "Updated",
+        "description": "After",
+        "rating": 4.0,
+        "companyId": 2
+      }
+    },
+    "employment-state-chain-explicit-script:7": {
+      "deployment": "reviewms",
+      "method": "GET",
+      "route_template": "/reviews/{reviewId}",
+      "parameters": {
+        "reviewId": 201
+      },
+      "headers": {}
+    },
+    "employment-state-chain-explicit-script:8": {
+      "deployment": "reviewms",
+      "method": "PUT",
+      "route_template": "/reviews/{reviewId}",
+      "parameters": {
+        "reviewId": 999
+      },
+      "headers": {
+        "content-type": [
+          "application/json"
+        ]
+      },
+      "body": {
+        "title": "Updated",
+        "description": "After",
+        "rating": 4.0,
+        "companyId": 2
+      }
+    },
+    "employment-state-chain-explicit-script:9": {
+      "deployment": "reviewms",
+      "method": "PUT",
+      "route_template": "/reviews/{reviewId}",
+      "parameters": {
+        "reviewId": 999
+      },
+      "headers": {
+        "content-type": [
+          "application/json"
+        ]
+      },
+      "body": {
+        "title": "Updated",
+        "description": "After",
+        "rating": 4.0,
+        "companyId": 2
+      }
+    }
+  }
+}

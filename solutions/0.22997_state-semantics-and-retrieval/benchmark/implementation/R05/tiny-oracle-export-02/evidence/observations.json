@@ -1,0 +1,3350 @@
+[
+  {
+    "summary": false,
+    "case": "unknown-readonly",
+    "result": {
+      "unknown": true
+    },
+    "outcome": "unsupported_semantics boundary",
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:service:Approval#entry(String,List<String>,boolean)"
+      ],
+      [
+        "",
+        "executes",
+        "method:service:Warehouse#read(String)"
+      ],
+      [
+        "method:service:Approval#entry(String,List<String>,boolean)",
+        "remote",
+        "method:service:Warehouse#read(String)"
+      ],
+      [
+        "method:service:Warehouse#read(String)",
+        "data",
+        "res:table:service.equipment"
+      ]
+    ],
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:service:Approval#entry(String,List<String>,boolean)",
+        "reason": "scenario request",
+        "request": null,
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "A"
+          },
+          {
+            "name": "unknown",
+            "declared_type": "java.util.List<java.lang.String>",
+            "value": []
+          },
+          {
+            "name": "inspectOnly",
+            "declared_type": "boolean",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "entry": "method:service:Warehouse#read(String)",
+        "reason": "call:method:service:Approval#entry(String,List<String>,boolean)@3:28",
+        "request": {
+          "deployment": "warehouse",
+          "method": "GET",
+          "url": "http://warehouse/equipment/A",
+          "path": [
+            "equipment",
+            "A"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": null,
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:service:Approval#entry(String,List<String>,boolean)@3:28"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "A"
+          }
+        ]
+      }
+    ],
+    "responses": [
+      {
+        "request": 2,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": "free"
+      }
+    ],
+    "guards": [
+      {
+        "method": "method:service:Approval#entry(String,List<String>,boolean)",
+        "line": 4,
+        "condition": "(inspectOnly)",
+        "value": true
+      }
+    ],
+    "knowledge_losses": [
+      {
+        "sequence": 1,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Approval.java",
+          "line": 3,
+          "end_line": 3,
+          "method": "method:service:Approval#entry(String,List<String>,boolean)"
+        },
+        "source_sha256": "ce981254efec36c69cfd970926ec017d65b56ef76f40da9904118dbc169b2ab9",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 1,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 2,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Warehouse.java",
+          "line": 3,
+          "end_line": 3,
+          "method": "method:service:Warehouse#read(String)"
+        },
+        "source_sha256": "aff8357ed8c8b754988ac589bfc1db559dbf48aedc858deb6be25d39caec6c24",
+        "declared_type": "Store",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 3,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 3,
+        "phase": "unsupported",
+        "cause": "iteration over unknown collection membership: method:service:Approval#entry(String,List<String>,boolean):4",
+        "location": {
+          "file": "Approval.java",
+          "line": 4,
+          "end_line": 4,
+          "method": "method:service:Approval#entry(String,List<String>,boolean)"
+        },
+        "source_sha256": "ce981254efec36c69cfd970926ec017d65b56ef76f40da9904118dbc169b2ab9",
+        "declared_type": null,
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "boundary",
+        "guards": [
+          {
+            "condition": "(inspectOnly)",
+            "value": "True",
+            "assumed": false
+          }
+        ],
+        "assumptions": [],
+        "prefix_event_count": 4,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          }
+        ],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 4,
+        "phase": "unsupported",
+        "cause": "iteration over unknown collection membership: method:service:Approval#entry(String,List<String>,boolean):4",
+        "location": {
+          "file": "Approval.java",
+          "line": 4,
+          "end_line": 4,
+          "method": "method:service:Approval#entry(String,List<String>,boolean)"
+        },
+        "source_sha256": "ce981254efec36c69cfd970926ec017d65b56ef76f40da9904118dbc169b2ab9",
+        "declared_type": null,
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "boundary",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 4,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          }
+        ],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 5,
+        "phase": "unsupported",
+        "cause": "iteration over unknown collection membership: method:service:Approval#entry(String,List<String>,boolean):4",
+        "location": {
+          "file": "Approval.java",
+          "line": 2,
+          "end_line": 5,
+          "method": "method:service:Approval#entry(String,List<String>,boolean)"
+        },
+        "source_sha256": "ce981254efec36c69cfd970926ec017d65b56ef76f40da9904118dbc169b2ab9",
+        "declared_type": null,
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "boundary",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 4,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          }
+        ],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 6,
+        "phase": "unsupported",
+        "cause": "iteration over unknown collection membership: method:service:Approval#entry(String,List<String>,boolean):4",
+        "location": {
+          "file": null,
+          "line": null,
+          "end_line": null,
+          "method": null
+        },
+        "source_sha256": null,
+        "declared_type": null,
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "boundary",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 4,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          }
+        ],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 7,
+        "phase": "fallback",
+        "cause": "entry/method writable closure widened; not an executed SQL write",
+        "location": {
+          "file": null,
+          "line": null,
+          "end_line": null,
+          "method": null
+        },
+        "source_sha256": null,
+        "declared_type": null,
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "boundary_or_approximation",
+        "guards": [],
+        "assumptions": [
+          "unsupported execution at method:service:Approval#entry(String,List<String>,boolean)"
+        ],
+        "prefix_event_count": 4,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          }
+        ],
+        "possible_write_footprint": [
+          "res:table:service.equipment"
+        ],
+        "widened_locations": [
+          "res:table:service.equipment"
+        ],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      }
+    ],
+    "actual_data_operations": [
+      {
+        "method": "method:service:Warehouse#read(String)",
+        "resource": "res:table:service.equipment",
+        "operation": "findById",
+        "arguments": [
+          "A"
+        ],
+        "source_site": "call:method:service:Warehouse#read(String)@3:89",
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+      }
+    ],
+    "effect_contracts": [
+      {
+        "model_version": "unknown-foreach-boundary/1",
+        "operation": "foreach",
+        "callsite": "method:service:Approval#entry(String,List<String>,boolean):4",
+        "heap_roots": [
+          "id",
+          "inspectOnly",
+          "prefix",
+          "this",
+          "unknown"
+        ],
+        "affected_native_objects": 1,
+        "global_footprint": "reachable native heap",
+        "callbacks": "not executed; membership unknown",
+        "completions": "unresolved"
+      }
+    ],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "service.equipment": 2
+      },
+      "unknown_tables": [
+        "service.equipment"
+      ],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "class_initialization": {},
+      "join_losses": [],
+      "static_fields": {},
+      "tables": {
+        "service.equipment": {
+          "unknown": true
+        }
+      }
+    },
+    "heap": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        },
+        "class_initialization": {
+          "$id": "h11",
+          "kind": "dict",
+          "fields": {}
+        },
+        "static_fields": {
+          "$id": "h12",
+          "kind": "dict",
+          "fields": {}
+        }
+      }
+    }
+  },
+  {
+    "summary": false,
+    "case": "known-remote-save",
+    "result": "reserved",
+    "outcome": "returned",
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:service:Approval#entry(String,List<String>,boolean)"
+      ],
+      [
+        "",
+        "executes",
+        "method:service:Warehouse#read(String)"
+      ],
+      [
+        "",
+        "executes",
+        "method:service:Warehouse#reserve(String)"
+      ],
+      [
+        "method:service:Approval#entry(String,List<String>,boolean)",
+        "remote",
+        "method:service:Warehouse#read(String)"
+      ],
+      [
+        "method:service:Approval#entry(String,List<String>,boolean)",
+        "remote",
+        "method:service:Warehouse#reserve(String)"
+      ],
+      [
+        "method:service:Warehouse#read(String)",
+        "data",
+        "res:table:service.equipment"
+      ],
+      [
+        "method:service:Warehouse#reserve(String)",
+        "data",
+        "res:table:service.equipment"
+      ]
+    ],
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:service:Approval#entry(String,List<String>,boolean)",
+        "reason": "scenario request",
+        "request": null,
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "A"
+          },
+          {
+            "name": "unknown",
+            "declared_type": "java.util.List<java.lang.String>",
+            "value": [
+              "one"
+            ]
+          },
+          {
+            "name": "inspectOnly",
+            "declared_type": "boolean",
+            "value": false
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "entry": "method:service:Warehouse#read(String)",
+        "reason": "call:method:service:Approval#entry(String,List<String>,boolean)@3:28",
+        "request": {
+          "deployment": "warehouse",
+          "method": "GET",
+          "url": "http://warehouse/equipment/A",
+          "path": [
+            "equipment",
+            "A"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": null,
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:service:Approval#entry(String,List<String>,boolean)@3:28"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "A"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "entry": "method:service:Warehouse#reserve(String)",
+        "reason": "call:method:service:Approval#entry(String,List<String>,boolean)@5:21",
+        "request": {
+          "deployment": "warehouse",
+          "method": "POST",
+          "url": "http://warehouse/reserve/A",
+          "path": [
+            "reserve",
+            "A"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": null,
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:service:Approval#entry(String,List<String>,boolean)@5:21"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "A"
+          }
+        ]
+      }
+    ],
+    "responses": [
+      {
+        "request": 2,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": "free"
+      },
+      {
+        "request": 3,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": "reserved"
+      },
+      {
+        "request": 1,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": "reserved"
+      }
+    ],
+    "guards": [
+      {
+        "method": "method:service:Approval#entry(String,List<String>,boolean)",
+        "line": 4,
+        "condition": "(inspectOnly)",
+        "value": false
+      }
+    ],
+    "knowledge_losses": [
+      {
+        "sequence": 1,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Approval.java",
+          "line": 3,
+          "end_line": 3,
+          "method": "method:service:Approval#entry(String,List<String>,boolean)"
+        },
+        "source_sha256": "ce981254efec36c69cfd970926ec017d65b56ef76f40da9904118dbc169b2ab9",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 1,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 2,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Warehouse.java",
+          "line": 3,
+          "end_line": 3,
+          "method": "method:service:Warehouse#read(String)"
+        },
+        "source_sha256": "aff8357ed8c8b754988ac589bfc1db559dbf48aedc858deb6be25d39caec6c24",
+        "declared_type": "Store",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 3,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 3,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Approval.java",
+          "line": 5,
+          "end_line": 5,
+          "method": "method:service:Approval#entry(String,List<String>,boolean)"
+        },
+        "source_sha256": "ce981254efec36c69cfd970926ec017d65b56ef76f40da9904118dbc169b2ab9",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 4,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          }
+        ],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 4,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Warehouse.java",
+          "line": 4,
+          "end_line": 4,
+          "method": "method:service:Warehouse#reserve(String)"
+        },
+        "source_sha256": "aff8357ed8c8b754988ac589bfc1db559dbf48aedc858deb6be25d39caec6c24",
+        "declared_type": "Store",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 6,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#reserve(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#reserve(String)"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          }
+        ],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 3,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 5,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Warehouse.java",
+          "line": 5,
+          "end_line": 5,
+          "method": "method:service:Warehouse#reserve(String)"
+        },
+        "source_sha256": "aff8357ed8c8b754988ac589bfc1db559dbf48aedc858deb6be25d39caec6c24",
+        "declared_type": "Store",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 7,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#reserve(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#reserve(String)"
+          ],
+          [
+            "method:service:Warehouse#reserve(String)",
+            "data",
+            "res:table:service.equipment"
+          ]
+        ],
+        "actual_effect_count": 2,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          },
+          {
+            "method": "method:service:Warehouse#reserve(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#reserve(String)@4:94",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#reserve(String)@4:94"
+          }
+        ],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 3,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      }
+    ],
+    "actual_data_operations": [
+      {
+        "method": "method:service:Warehouse#read(String)",
+        "resource": "res:table:service.equipment",
+        "operation": "findById",
+        "arguments": [
+          "A"
+        ],
+        "source_site": "call:method:service:Warehouse#read(String)@3:89",
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+      },
+      {
+        "method": "method:service:Warehouse#reserve(String)",
+        "resource": "res:table:service.equipment",
+        "operation": "findById",
+        "arguments": [
+          "A"
+        ],
+        "source_site": "call:method:service:Warehouse#reserve(String)@4:94",
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:service:Warehouse#reserve(String)@4:94"
+      },
+      {
+        "method": "method:service:Warehouse#reserve(String)",
+        "resource": "res:table:service.equipment",
+        "operation": "save",
+        "arguments": [
+          {
+            "__type__": "Item",
+            "id": "A",
+            "status": "reserved"
+          }
+        ],
+        "source_site": "call:method:service:Warehouse#reserve(String)@5:40",
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:service:Warehouse#reserve(String)@5:40"
+      }
+    ],
+    "effect_contracts": [],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "service.equipment": 2
+      },
+      "unknown_tables": [],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "class_initialization": {},
+      "join_losses": [],
+      "static_fields": {},
+      "tables": {
+        "service.equipment": [
+          {
+            "id": "A",
+            "status": "reserved",
+            "__type__": "Item"
+          },
+          {
+            "id": "B",
+            "status": "free"
+          }
+        ]
+      }
+    },
+    "heap": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        },
+        "class_initialization": {
+          "$id": "h11",
+          "kind": "dict",
+          "fields": {}
+        },
+        "static_fields": {
+          "$id": "h12",
+          "kind": "dict",
+          "fields": {}
+        }
+      }
+    }
+  },
+  {
+    "summary": false,
+    "case": "remote-failure",
+    "result": {
+      "unknown": true
+    },
+    "outcome": "uncaught application exception",
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:service:Approval#entry(String,List<String>,boolean)"
+      ],
+      [
+        "",
+        "executes",
+        "method:service:Warehouse#read(String)"
+      ],
+      [
+        "method:service:Approval#entry(String,List<String>,boolean)",
+        "remote",
+        "method:service:Warehouse#read(String)"
+      ],
+      [
+        "method:service:Warehouse#read(String)",
+        "data",
+        "res:table:service.equipment"
+      ]
+    ],
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:service:Approval#entry(String,List<String>,boolean)",
+        "reason": "scenario request",
+        "request": null,
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "missing"
+          },
+          {
+            "name": "unknown",
+            "declared_type": "java.util.List<java.lang.String>",
+            "value": []
+          },
+          {
+            "name": "inspectOnly",
+            "declared_type": "boolean",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "entry": "method:service:Warehouse#read(String)",
+        "reason": "call:method:service:Approval#entry(String,List<String>,boolean)@3:28",
+        "request": {
+          "deployment": "warehouse",
+          "method": "GET",
+          "url": "http://warehouse/equipment/missing",
+          "path": [
+            "equipment",
+            "missing"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": null,
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:service:Approval#entry(String,List<String>,boolean)@3:28"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "missing"
+          }
+        ]
+      }
+    ],
+    "responses": [
+      {
+        "request": 2,
+        "status": 500,
+        "entered": true
+      },
+      {
+        "request": 1,
+        "status": 500,
+        "entered": true
+      }
+    ],
+    "guards": [],
+    "knowledge_losses": [
+      {
+        "sequence": 1,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Approval.java",
+          "line": 3,
+          "end_line": 3,
+          "method": "method:service:Approval#entry(String,List<String>,boolean)"
+        },
+        "source_sha256": "ce981254efec36c69cfd970926ec017d65b56ef76f40da9904118dbc169b2ab9",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 1,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 2,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Warehouse.java",
+          "line": 3,
+          "end_line": 3,
+          "method": "method:service:Warehouse#read(String)"
+        },
+        "source_sha256": "aff8357ed8c8b754988ac589bfc1db559dbf48aedc858deb6be25d39caec6c24",
+        "declared_type": "Store",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 3,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 3,
+        "phase": "application_exception",
+        "cause": "org.springframework.web.client.HttpServerErrorException",
+        "location": {
+          "file": null,
+          "line": null,
+          "end_line": null,
+          "method": null
+        },
+        "source_sha256": null,
+        "declared_type": null,
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "throw",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 4,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "missing"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          }
+        ],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      }
+    ],
+    "actual_data_operations": [
+      {
+        "method": "method:service:Warehouse#read(String)",
+        "resource": "res:table:service.equipment",
+        "operation": "findById",
+        "arguments": [
+          "missing"
+        ],
+        "source_site": "call:method:service:Warehouse#read(String)@3:89",
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+      }
+    ],
+    "effect_contracts": [],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "service.equipment": 2
+      },
+      "unknown_tables": [],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "class_initialization": {},
+      "join_losses": [],
+      "static_fields": {},
+      "tables": {
+        "service.equipment": [
+          {
+            "id": "A",
+            "status": "free"
+          },
+          {
+            "id": "B",
+            "status": "free"
+          }
+        ]
+      }
+    },
+    "heap": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        },
+        "class_initialization": {
+          "$id": "h11",
+          "kind": "dict",
+          "fields": {}
+        },
+        "static_fields": {
+          "$id": "h12",
+          "kind": "dict",
+          "fields": {}
+        }
+      }
+    }
+  },
+  {
+    "summary": true,
+    "case": "unknown-readonly",
+    "result": {
+      "unknown": true
+    },
+    "outcome": "unsupported_semantics boundary",
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:service:Approval#entry(String,List<String>,boolean)"
+      ],
+      [
+        "",
+        "executes",
+        "method:service:Warehouse#read(String)"
+      ],
+      [
+        "method:service:Approval#entry(String,List<String>,boolean)",
+        "remote",
+        "method:service:Warehouse#read(String)"
+      ],
+      [
+        "method:service:Warehouse#read(String)",
+        "data",
+        "res:table:service.equipment"
+      ]
+    ],
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:service:Approval#entry(String,List<String>,boolean)",
+        "reason": "scenario request",
+        "request": null,
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "A"
+          },
+          {
+            "name": "unknown",
+            "declared_type": "java.util.List<java.lang.String>",
+            "value": []
+          },
+          {
+            "name": "inspectOnly",
+            "declared_type": "boolean",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "entry": "method:service:Warehouse#read(String)",
+        "reason": "call:method:service:Approval#entry(String,List<String>,boolean)@3:28",
+        "request": {
+          "deployment": "warehouse",
+          "method": "GET",
+          "url": "http://warehouse/equipment/A",
+          "path": [
+            "equipment",
+            "A"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": null,
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:service:Approval#entry(String,List<String>,boolean)@3:28"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "A"
+          }
+        ]
+      }
+    ],
+    "responses": [
+      {
+        "request": 2,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": "free"
+      }
+    ],
+    "guards": [
+      {
+        "method": "method:service:Approval#entry(String,List<String>,boolean)",
+        "line": 4,
+        "condition": "(inspectOnly)",
+        "value": true
+      }
+    ],
+    "knowledge_losses": [
+      {
+        "sequence": 1,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Approval.java",
+          "line": 3,
+          "end_line": 3,
+          "method": "method:service:Approval#entry(String,List<String>,boolean)"
+        },
+        "source_sha256": "ce981254efec36c69cfd970926ec017d65b56ef76f40da9904118dbc169b2ab9",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 1,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 2,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Warehouse.java",
+          "line": 3,
+          "end_line": 3,
+          "method": "method:service:Warehouse#read(String)"
+        },
+        "source_sha256": "aff8357ed8c8b754988ac589bfc1db559dbf48aedc858deb6be25d39caec6c24",
+        "declared_type": "Store",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 3,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 3,
+        "phase": "unsupported",
+        "cause": "iteration over unknown collection membership: method:service:Approval#entry(String,List<String>,boolean):4",
+        "location": {
+          "file": "Approval.java",
+          "line": 4,
+          "end_line": 4,
+          "method": "method:service:Approval#entry(String,List<String>,boolean)"
+        },
+        "source_sha256": "ce981254efec36c69cfd970926ec017d65b56ef76f40da9904118dbc169b2ab9",
+        "declared_type": null,
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "boundary",
+        "guards": [
+          {
+            "condition": "(inspectOnly)",
+            "value": "True",
+            "assumed": false
+          }
+        ],
+        "assumptions": [],
+        "prefix_event_count": 4,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          }
+        ],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 4,
+        "phase": "unsupported",
+        "cause": "iteration over unknown collection membership: method:service:Approval#entry(String,List<String>,boolean):4",
+        "location": {
+          "file": "Approval.java",
+          "line": 4,
+          "end_line": 4,
+          "method": "method:service:Approval#entry(String,List<String>,boolean)"
+        },
+        "source_sha256": "ce981254efec36c69cfd970926ec017d65b56ef76f40da9904118dbc169b2ab9",
+        "declared_type": null,
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "boundary",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 4,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          }
+        ],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 5,
+        "phase": "unsupported",
+        "cause": "iteration over unknown collection membership: method:service:Approval#entry(String,List<String>,boolean):4",
+        "location": {
+          "file": "Approval.java",
+          "line": 2,
+          "end_line": 5,
+          "method": "method:service:Approval#entry(String,List<String>,boolean)"
+        },
+        "source_sha256": "ce981254efec36c69cfd970926ec017d65b56ef76f40da9904118dbc169b2ab9",
+        "declared_type": null,
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "boundary",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 4,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          }
+        ],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 6,
+        "phase": "unsupported",
+        "cause": "iteration over unknown collection membership: method:service:Approval#entry(String,List<String>,boolean):4",
+        "location": {
+          "file": null,
+          "line": null,
+          "end_line": null,
+          "method": null
+        },
+        "source_sha256": null,
+        "declared_type": null,
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "boundary",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 4,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          }
+        ],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      }
+    ],
+    "actual_data_operations": [
+      {
+        "method": "method:service:Warehouse#read(String)",
+        "resource": "res:table:service.equipment",
+        "operation": "findById",
+        "arguments": [
+          "A"
+        ],
+        "source_site": "call:method:service:Warehouse#read(String)@3:89",
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+      }
+    ],
+    "effect_contracts": [
+      {
+        "model_version": "unknown-foreach-boundary/1",
+        "operation": "foreach",
+        "callsite": "method:service:Approval#entry(String,List<String>,boolean):4",
+        "heap_roots": [
+          "id",
+          "inspectOnly",
+          "prefix",
+          "this",
+          "unknown"
+        ],
+        "affected_native_objects": 1,
+        "global_footprint": "reachable native heap",
+        "callbacks": "not executed; membership unknown",
+        "completions": "unresolved"
+      },
+      {
+        "model_version": "readonly-native-foreach-stop/1",
+        "operation": "stopped scalar projection",
+        "source_sha256": "ce981254efec36c69cfd970926ec017d65b56ef76f40da9904118dbc169b2ab9",
+        "method": "method:service:Approval#entry(String,List<String>,boolean)",
+        "source_spans": [
+          {
+            "file": "Approval.java",
+            "start_line": 4,
+            "end_line": 4
+          },
+          {
+            "file": "Approval.java",
+            "start_line": 4,
+            "end_line": 4
+          }
+        ],
+        "preconditions": {
+          "single_active_source_frame": true,
+          "native_collection": "ArrayList",
+          "membership": "unknown",
+          "no_transaction": true,
+          "no_unscoped_effect": true,
+          "residual_source_readonly": true
+        },
+        "return": "not supplied",
+        "throw": "not supplied",
+        "completion": "analysis boundary retained",
+        "read_footprint": "source scalar locals only",
+        "write_footprint": [],
+        "alias_assumptions": "all reachable aliases retained; no residual heap stores",
+        "guards": [
+          {
+            "condition": "(inspectOnly)",
+            "value": "True",
+            "assumed": false
+          }
+        ],
+        "prefix_effect_count": 1,
+        "effects_order": "executed prefix unchanged; suffix remains unexecuted",
+        "reuse": "none; source and preconditions checked on every occurrence"
+      }
+    ],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "service.equipment": 2
+      },
+      "unknown_tables": [],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "class_initialization": {},
+      "join_losses": [],
+      "static_fields": {},
+      "tables": {
+        "service.equipment": [
+          {
+            "id": "A",
+            "status": "free"
+          },
+          {
+            "id": "B",
+            "status": "free"
+          }
+        ]
+      }
+    },
+    "heap": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        },
+        "class_initialization": {
+          "$id": "h11",
+          "kind": "dict",
+          "fields": {}
+        },
+        "static_fields": {
+          "$id": "h12",
+          "kind": "dict",
+          "fields": {}
+        }
+      }
+    }
+  },
+  {
+    "summary": true,
+    "case": "known-remote-save",
+    "result": "reserved",
+    "outcome": "returned",
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:service:Approval#entry(String,List<String>,boolean)"
+      ],
+      [
+        "",
+        "executes",
+        "method:service:Warehouse#read(String)"
+      ],
+      [
+        "",
+        "executes",
+        "method:service:Warehouse#reserve(String)"
+      ],
+      [
+        "method:service:Approval#entry(String,List<String>,boolean)",
+        "remote",
+        "method:service:Warehouse#read(String)"
+      ],
+      [
+        "method:service:Approval#entry(String,List<String>,boolean)",
+        "remote",
+        "method:service:Warehouse#reserve(String)"
+      ],
+      [
+        "method:service:Warehouse#read(String)",
+        "data",
+        "res:table:service.equipment"
+      ],
+      [
+        "method:service:Warehouse#reserve(String)",
+        "data",
+        "res:table:service.equipment"
+      ]
+    ],
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:service:Approval#entry(String,List<String>,boolean)",
+        "reason": "scenario request",
+        "request": null,
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "A"
+          },
+          {
+            "name": "unknown",
+            "declared_type": "java.util.List<java.lang.String>",
+            "value": [
+              "one"
+            ]
+          },
+          {
+            "name": "inspectOnly",
+            "declared_type": "boolean",
+            "value": false
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "entry": "method:service:Warehouse#read(String)",
+        "reason": "call:method:service:Approval#entry(String,List<String>,boolean)@3:28",
+        "request": {
+          "deployment": "warehouse",
+          "method": "GET",
+          "url": "http://warehouse/equipment/A",
+          "path": [
+            "equipment",
+            "A"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": null,
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:service:Approval#entry(String,List<String>,boolean)@3:28"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "A"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "entry": "method:service:Warehouse#reserve(String)",
+        "reason": "call:method:service:Approval#entry(String,List<String>,boolean)@5:21",
+        "request": {
+          "deployment": "warehouse",
+          "method": "POST",
+          "url": "http://warehouse/reserve/A",
+          "path": [
+            "reserve",
+            "A"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": null,
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:service:Approval#entry(String,List<String>,boolean)@5:21"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "A"
+          }
+        ]
+      }
+    ],
+    "responses": [
+      {
+        "request": 2,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": "free"
+      },
+      {
+        "request": 3,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": "reserved"
+      },
+      {
+        "request": 1,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": "reserved"
+      }
+    ],
+    "guards": [
+      {
+        "method": "method:service:Approval#entry(String,List<String>,boolean)",
+        "line": 4,
+        "condition": "(inspectOnly)",
+        "value": false
+      }
+    ],
+    "knowledge_losses": [
+      {
+        "sequence": 1,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Approval.java",
+          "line": 3,
+          "end_line": 3,
+          "method": "method:service:Approval#entry(String,List<String>,boolean)"
+        },
+        "source_sha256": "ce981254efec36c69cfd970926ec017d65b56ef76f40da9904118dbc169b2ab9",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 1,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 2,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Warehouse.java",
+          "line": 3,
+          "end_line": 3,
+          "method": "method:service:Warehouse#read(String)"
+        },
+        "source_sha256": "aff8357ed8c8b754988ac589bfc1db559dbf48aedc858deb6be25d39caec6c24",
+        "declared_type": "Store",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 3,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 3,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Approval.java",
+          "line": 5,
+          "end_line": 5,
+          "method": "method:service:Approval#entry(String,List<String>,boolean)"
+        },
+        "source_sha256": "ce981254efec36c69cfd970926ec017d65b56ef76f40da9904118dbc169b2ab9",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 4,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          }
+        ],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 4,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Warehouse.java",
+          "line": 4,
+          "end_line": 4,
+          "method": "method:service:Warehouse#reserve(String)"
+        },
+        "source_sha256": "aff8357ed8c8b754988ac589bfc1db559dbf48aedc858deb6be25d39caec6c24",
+        "declared_type": "Store",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 6,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#reserve(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#reserve(String)"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          }
+        ],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 3,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 5,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Warehouse.java",
+          "line": 5,
+          "end_line": 5,
+          "method": "method:service:Warehouse#reserve(String)"
+        },
+        "source_sha256": "aff8357ed8c8b754988ac589bfc1db559dbf48aedc858deb6be25d39caec6c24",
+        "declared_type": "Store",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 7,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#reserve(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#reserve(String)"
+          ],
+          [
+            "method:service:Warehouse#reserve(String)",
+            "data",
+            "res:table:service.equipment"
+          ]
+        ],
+        "actual_effect_count": 2,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          },
+          {
+            "method": "method:service:Warehouse#reserve(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "A"
+            ],
+            "source_site": "call:method:service:Warehouse#reserve(String)@4:94",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#reserve(String)@4:94"
+          }
+        ],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 3,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      }
+    ],
+    "actual_data_operations": [
+      {
+        "method": "method:service:Warehouse#read(String)",
+        "resource": "res:table:service.equipment",
+        "operation": "findById",
+        "arguments": [
+          "A"
+        ],
+        "source_site": "call:method:service:Warehouse#read(String)@3:89",
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+      },
+      {
+        "method": "method:service:Warehouse#reserve(String)",
+        "resource": "res:table:service.equipment",
+        "operation": "findById",
+        "arguments": [
+          "A"
+        ],
+        "source_site": "call:method:service:Warehouse#reserve(String)@4:94",
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:service:Warehouse#reserve(String)@4:94"
+      },
+      {
+        "method": "method:service:Warehouse#reserve(String)",
+        "resource": "res:table:service.equipment",
+        "operation": "save",
+        "arguments": [
+          {
+            "__type__": "Item",
+            "id": "A",
+            "status": "reserved"
+          }
+        ],
+        "source_site": "call:method:service:Warehouse#reserve(String)@5:40",
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:service:Warehouse#reserve(String)@5:40"
+      }
+    ],
+    "effect_contracts": [],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "service.equipment": 2
+      },
+      "unknown_tables": [],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "class_initialization": {},
+      "join_losses": [],
+      "static_fields": {},
+      "tables": {
+        "service.equipment": [
+          {
+            "id": "A",
+            "status": "reserved",
+            "__type__": "Item"
+          },
+          {
+            "id": "B",
+            "status": "free"
+          }
+        ]
+      }
+    },
+    "heap": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        },
+        "class_initialization": {
+          "$id": "h11",
+          "kind": "dict",
+          "fields": {}
+        },
+        "static_fields": {
+          "$id": "h12",
+          "kind": "dict",
+          "fields": {}
+        }
+      }
+    }
+  },
+  {
+    "summary": true,
+    "case": "remote-failure",
+    "result": {
+      "unknown": true
+    },
+    "outcome": "uncaught application exception",
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:service:Approval#entry(String,List<String>,boolean)"
+      ],
+      [
+        "",
+        "executes",
+        "method:service:Warehouse#read(String)"
+      ],
+      [
+        "method:service:Approval#entry(String,List<String>,boolean)",
+        "remote",
+        "method:service:Warehouse#read(String)"
+      ],
+      [
+        "method:service:Warehouse#read(String)",
+        "data",
+        "res:table:service.equipment"
+      ]
+    ],
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:service:Approval#entry(String,List<String>,boolean)",
+        "reason": "scenario request",
+        "request": null,
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "missing"
+          },
+          {
+            "name": "unknown",
+            "declared_type": "java.util.List<java.lang.String>",
+            "value": []
+          },
+          {
+            "name": "inspectOnly",
+            "declared_type": "boolean",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "entry": "method:service:Warehouse#read(String)",
+        "reason": "call:method:service:Approval#entry(String,List<String>,boolean)@3:28",
+        "request": {
+          "deployment": "warehouse",
+          "method": "GET",
+          "url": "http://warehouse/equipment/missing",
+          "path": [
+            "equipment",
+            "missing"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": null,
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:service:Approval#entry(String,List<String>,boolean)@3:28"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "missing"
+          }
+        ]
+      }
+    ],
+    "responses": [
+      {
+        "request": 2,
+        "status": 500,
+        "entered": true
+      },
+      {
+        "request": 1,
+        "status": 500,
+        "entered": true
+      }
+    ],
+    "guards": [],
+    "knowledge_losses": [
+      {
+        "sequence": 1,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Approval.java",
+          "line": 3,
+          "end_line": 3,
+          "method": "method:service:Approval#entry(String,List<String>,boolean)"
+        },
+        "source_sha256": "ce981254efec36c69cfd970926ec017d65b56ef76f40da9904118dbc169b2ab9",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 1,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 2,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "Warehouse.java",
+          "line": 3,
+          "end_line": 3,
+          "method": "method:service:Warehouse#read(String)"
+        },
+        "source_sha256": "aff8357ed8c8b754988ac589bfc1db559dbf48aedc858deb6be25d39caec6c24",
+        "declared_type": "Store",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 3,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      },
+      {
+        "sequence": 3,
+        "phase": "application_exception",
+        "cause": "org.springframework.web.client.HttpServerErrorException",
+        "location": {
+          "file": null,
+          "line": null,
+          "end_line": null,
+          "method": null
+        },
+        "source_sha256": null,
+        "declared_type": null,
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "throw",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 4,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Approval#entry(String,List<String>,boolean)"
+          ],
+          [
+            "method:service:Approval#entry(String,List<String>,boolean)",
+            "remote",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Warehouse#read(String)"
+          ],
+          [
+            "method:service:Warehouse#read(String)",
+            "data",
+            "res:table:service.equipment"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:service:Warehouse#read(String)",
+            "resource": "res:table:service.equipment",
+            "operation": "findById",
+            "arguments": [
+              "missing"
+            ],
+            "source_site": "call:method:service:Warehouse#read(String)@3:89",
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+          }
+        ],
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": "request bound_arguments / request provenance and state history; see full step trace"
+      }
+    ],
+    "actual_data_operations": [
+      {
+        "method": "method:service:Warehouse#read(String)",
+        "resource": "res:table:service.equipment",
+        "operation": "findById",
+        "arguments": [
+          "missing"
+        ],
+        "source_site": "call:method:service:Warehouse#read(String)@3:89",
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:service:Warehouse#read(String)@3:89"
+      }
+    ],
+    "effect_contracts": [],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "service.equipment": 2
+      },
+      "unknown_tables": [],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "class_initialization": {},
+      "join_losses": [],
+      "static_fields": {},
+      "tables": {
+        "service.equipment": [
+          {
+            "id": "A",
+            "status": "free"
+          },
+          {
+            "id": "B",
+            "status": "free"
+          }
+        ]
+      }
+    },
+    "heap": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        },
+        "class_initialization": {
+          "$id": "h11",
+          "kind": "dict",
+          "fields": {}
+        },
+        "static_fields": {
+          "$id": "h12",
+          "kind": "dict",
+          "fields": {}
+        }
+      }
+    }
+  }
+]

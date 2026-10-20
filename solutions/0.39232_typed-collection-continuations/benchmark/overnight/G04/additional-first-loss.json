@@ -1,0 +1,116 @@
+{
+  "polluted": {
+    "result": "Unknown.VALUE",
+    "outcome": "unsupported_semantics boundary",
+    "warnings": [
+      "Java Map operation remains unresolved: get at call:method:service:Api#entry()@1:223",
+      "List bulk membership is unresolved: call:method:service:Api#entry()@1:206",
+      "implicit reference cast context or runtime kind is unresolved: call:method:service:Api#entry()@1:223 -> java.util.Collection",
+      "unsupported Java expression array_creation_expression: method:service:Api#entry():1",
+      "unsupported Java expression dimensions: method:service:Api#entry():1"
+    ],
+    "events": [
+      {
+        "edge": [
+          "",
+          "executes",
+          "method:service:Api#entry()"
+        ],
+        "request": 1,
+        "callsite": "scenario request",
+        "method": "method:service:Api#entry()",
+        "line": null,
+        "context": "C1",
+        "values": {
+          "version": "value-witness/1",
+          "arguments": []
+        },
+        "cause": "source_execution"
+      }
+    ],
+    "issues": {
+      "('unresolved_collection_cast', 'read')": 1,
+      "('unknown_map_value', 'get')": 1,
+      "('unsupported_semantics', 'stop')": 1
+    }
+  },
+  "custom": {
+    "result": "Unknown.VALUE",
+    "outcome": "returned",
+    "warnings": [
+      "Java Map operation remains unresolved: get at call:method:service:Api#entry()@1:261",
+      "String receiver value is unknown: call:method:service:Custom#removeAll(List<String>)@1:94",
+      "implicit reference cast context or runtime kind is unresolved: call:method:service:Api#entry()@1:261 -> <unresolved consumer>",
+      "opaque throw alternative requires path replay: call:method:service:Custom#removeAll(List<String>)@1:87",
+      "unsupported call: call:method:service:Custom#removeAll(List<String>)@1:87 get"
+    ],
+    "events": [
+      {
+        "edge": [
+          "",
+          "executes",
+          "method:service:Api#entry()"
+        ],
+        "request": 1,
+        "callsite": "scenario request",
+        "method": "method:service:Api#entry()",
+        "line": null,
+        "context": "C1",
+        "values": {
+          "version": "value-witness/1",
+          "arguments": []
+        },
+        "cause": "source_execution"
+      },
+      {
+        "edge": [
+          "",
+          "executes",
+          "method:service:Custom#removeAll(List<String>)"
+        ],
+        "request": 1,
+        "callsite": "call:method:service:Api#entry()@1:244",
+        "method": "method:service:Custom#removeAll(List<String>)",
+        "line": 1,
+        "context": "C1",
+        "values": {
+          "version": "value-witness/1",
+          "arguments": [
+            {
+              "kind": "unknown"
+            }
+          ]
+        },
+        "cause": "source_execution"
+      },
+      {
+        "edge": [
+          "method:service:Api#entry()",
+          "calls",
+          "method:service:Custom#removeAll(List<String>)"
+        ],
+        "request": 1,
+        "callsite": "call:method:service:Api#entry()@1:244",
+        "method": "method:service:Api#entry()",
+        "line": 1,
+        "context": "C2",
+        "values": {
+          "version": "value-witness/1",
+          "arguments": [
+            {
+              "kind": "unknown"
+            }
+          ]
+        },
+        "cause": "direct_call"
+      }
+    ],
+    "issues": {
+      "('unresolved_collection_cast', 'read')": 1,
+      "('unknown_map_value', 'get')": 1,
+      "('unknown_receiver', 'get')": 1,
+      "('unsupported_semantics', 'get')": 1,
+      "('known_native_operation_unknown_value', 'equals')": 1
+    }
+  }
+}

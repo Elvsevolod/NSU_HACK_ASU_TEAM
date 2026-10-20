@@ -1,0 +1,163 @@
+FFFF..FFFFF                                                              [100%]
+=================================== FAILURES ===================================
+___ test_literal_client_prefix_is_applied_before_method_route[/api/edition] ____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-74/test_literal_client_prefix_is_0')
+path = '/api/edition'
+
+    @pytest.mark.parametrize('path',['/api/edition','api/edition/',' /api/edition/ '])
+    def test_literal_client_prefix_is_applied_before_method_route(tmp_path,path):
+        e,ids=fixture(tmp_path,'@FeignClient(name="service",path="'+path+'")')
+>       assert e.run(ids['Api.entry'],{})=='item-7' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'item-7')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105e9ee50>.run
+
+code/tests/test_feign_path33.py:24: AssertionError
+___ test_literal_client_prefix_is_applied_before_method_route[api/edition/] ____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-74/test_literal_client_prefix_is_1')
+path = 'api/edition/'
+
+    @pytest.mark.parametrize('path',['/api/edition','api/edition/',' /api/edition/ '])
+    def test_literal_client_prefix_is_applied_before_method_route(tmp_path,path):
+        e,ids=fixture(tmp_path,'@FeignClient(name="service",path="'+path+'")')
+>       assert e.run(ids['Api.entry'],{})=='item-7' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'item-7')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106915890>.run
+
+code/tests/test_feign_path33.py:24: AssertionError
+__ test_literal_client_prefix_is_applied_before_method_route[ /api/edition/ ] __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-74/test_literal_client_prefix_is_2')
+path = ' /api/edition/ '
+
+    @pytest.mark.parametrize('path',['/api/edition','api/edition/',' /api/edition/ '])
+    def test_literal_client_prefix_is_applied_before_method_route(tmp_path,path):
+        e,ids=fixture(tmp_path,'@FeignClient(name="service",path="'+path+'")')
+>       assert e.run(ids['Api.entry'],{})=='item-7' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'item-7')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1066f1710>.run
+
+code/tests/test_feign_path33.py:24: AssertionError
+_________ test_client_prefix_and_interface_mapping_are_both_preserved __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-74/test_client_prefix_and_interfa0')
+
+    def test_client_prefix_and_interface_mapping_are_both_preserved(tmp_path):
+        e,ids=fixture(tmp_path,'@FeignClient(path="/api/edition",value="service")',
+            '/api/edition/base','@RequestMapping("/base")')
+>       assert e.run(ids['Api.entry'],{})=='item-7' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'item-7')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106c09550>.run
+
+code/tests/test_feign_path33.py:36: AssertionError
+_ test_unproved_destination_policy_is_not_silently_ignored[@FeignClient(name="service",path=PREFIX)] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-74/test_unproved_destination_poli0')
+annotation = '@FeignClient(name="service",path=PREFIX)'
+
+    @pytest.mark.parametrize('annotation',[
+        '@FeignClient(name="service",path=PREFIX)',
+        '@FeignClient(name="service",path="${client.prefix}")',
+        '@FeignClient(name="service",value="different")',
+        '@FeignClient(name="service",url="https://unmapped.example")',
+    ])
+    def test_unproved_destination_policy_is_not_silently_ignored(tmp_path,annotation):
+        e,ids=fixture(tmp_path,annotation,'')
+>       assert e.run(ids['Api.entry'],{}) is U
+E       AssertionError: assert 'item-7' is <Unknown.VALUE: 'unknown'>
+E        +  where 'item-7' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10690b850>.run
+
+code/tests/test_feign_path33.py:55: AssertionError
+_ test_unproved_destination_policy_is_not_silently_ignored[@FeignClient(name="service",path="${client.prefix}")] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-74/test_unproved_destination_poli1')
+annotation = '@FeignClient(name="service",path="${client.prefix}")'
+
+    @pytest.mark.parametrize('annotation',[
+        '@FeignClient(name="service",path=PREFIX)',
+        '@FeignClient(name="service",path="${client.prefix}")',
+        '@FeignClient(name="service",value="different")',
+        '@FeignClient(name="service",url="https://unmapped.example")',
+    ])
+    def test_unproved_destination_policy_is_not_silently_ignored(tmp_path,annotation):
+        e,ids=fixture(tmp_path,annotation,'')
+>       assert e.run(ids['Api.entry'],{}) is U
+E       AssertionError: assert 'item-7' is <Unknown.VALUE: 'unknown'>
+E        +  where 'item-7' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106c08190>.run
+
+code/tests/test_feign_path33.py:55: AssertionError
+_ test_unproved_destination_policy_is_not_silently_ignored[@FeignClient(name="service",value="different")] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-74/test_unproved_destination_poli2')
+annotation = '@FeignClient(name="service",value="different")'
+
+    @pytest.mark.parametrize('annotation',[
+        '@FeignClient(name="service",path=PREFIX)',
+        '@FeignClient(name="service",path="${client.prefix}")',
+        '@FeignClient(name="service",value="different")',
+        '@FeignClient(name="service",url="https://unmapped.example")',
+    ])
+    def test_unproved_destination_policy_is_not_silently_ignored(tmp_path,annotation):
+        e,ids=fixture(tmp_path,annotation,'')
+>       assert e.run(ids['Api.entry'],{}) is U
+E       AssertionError: assert 'item-7' is <Unknown.VALUE: 'unknown'>
+E        +  where 'item-7' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106c56110>.run
+
+code/tests/test_feign_path33.py:55: AssertionError
+_ test_unproved_destination_policy_is_not_silently_ignored[@FeignClient(name="service",url="https://unmapped.example")] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-74/test_unproved_destination_poli3')
+annotation = '@FeignClient(name="service",url="https://unmapped.example")'
+
+    @pytest.mark.parametrize('annotation',[
+        '@FeignClient(name="service",path=PREFIX)',
+        '@FeignClient(name="service",path="${client.prefix}")',
+        '@FeignClient(name="service",value="different")',
+        '@FeignClient(name="service",url="https://unmapped.example")',
+    ])
+    def test_unproved_destination_policy_is_not_silently_ignored(tmp_path,annotation):
+        e,ids=fixture(tmp_path,annotation,'')
+>       assert e.run(ids['Api.entry'],{}) is U
+E       AssertionError: assert 'item-7' is <Unknown.VALUE: 'unknown'>
+E        +  where 'item-7' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106c46190>.run
+
+code/tests/test_feign_path33.py:55: AssertionError
+______ test_source_feign_annotation_namesake_keeps_ordinary_java_dispatch ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-74/test_source_feign_annotation_n0')
+
+    def test_source_feign_annotation_namesake_keeps_ordinary_java_dispatch(tmp_path):
+        source='''import org.springframework.web.bind.annotation.*;
+          @interface FeignClient{String name();String path()default "";}
+          @FeignClient(name="service") interface Client{@GetMapping("/items")String read();}
+          class Local implements Client{public String read(){return "local";}}
+          class Api{String entry(){Client client=new Local();return client.read();}}
+          @RestController class Target{@GetMapping("/items")String read(){return "wrong-http";}}'''
+        p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Api.entry'],{})=='local' and not e.approximate
+E       AssertionError: assert ('wrong-http' == 'local'
+E         
+E         - local
+E         + wrong-http)
+
+code/tests/test_feign_path33.py:69: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_feign_path33.py::test_literal_client_prefix_is_applied_before_method_route[/api/edition]
+FAILED code/tests/test_feign_path33.py::test_literal_client_prefix_is_applied_before_method_route[api/edition/]
+FAILED code/tests/test_feign_path33.py::test_literal_client_prefix_is_applied_before_method_route[ /api/edition/ ]
+FAILED code/tests/test_feign_path33.py::test_client_prefix_and_interface_mapping_are_both_preserved
+FAILED code/tests/test_feign_path33.py::test_unproved_destination_policy_is_not_silently_ignored[@FeignClient(name="service",path=PREFIX)]
+FAILED code/tests/test_feign_path33.py::test_unproved_destination_policy_is_not_silently_ignored[@FeignClient(name="service",path="${client.prefix}")]
+FAILED code/tests/test_feign_path33.py::test_unproved_destination_policy_is_not_silently_ignored[@FeignClient(name="service",value="different")]
+FAILED code/tests/test_feign_path33.py::test_unproved_destination_policy_is_not_silently_ignored[@FeignClient(name="service",url="https://unmapped.example")]
+FAILED code/tests/test_feign_path33.py::test_source_feign_annotation_namesake_keeps_ordinary_java_dispatch
+9 failed, 2 passed in 0.15s

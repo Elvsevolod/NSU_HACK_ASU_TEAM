@@ -1,0 +1,93 @@
+{
+  "passed": false,
+  "evaluation_completed": true,
+  "frozen_inputs_unchanged": true,
+  "new_holdout_success": false,
+  "first_loss": {
+    "kind": "unsupported Java Stream.toList terminal operation",
+    "source_diagnostic": "unsupported stream operation: call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@65:18 toList",
+    "producer": "PaymentPersistenceAdapter.findByOrderId",
+    "consequence": "controller receives unknown list; selected payment/order IDs cannot feed subsequent Requests"
+  },
+  "steps": [
+    {
+      "n": 1,
+      "status": false,
+      "producer_available": null,
+      "response_rows": false
+    },
+    {
+      "n": 2,
+      "status": null,
+      "producer_available": false,
+      "response_fields": false
+    },
+    {
+      "n": 3,
+      "status": null,
+      "producer_available": false,
+      "response_fields": false
+    },
+    {
+      "n": 4,
+      "status": null,
+      "producer_available": false,
+      "response_fields": false
+    },
+    {
+      "n": 5,
+      "status": null,
+      "producer_available": false
+    },
+    {
+      "n": 6,
+      "status": false,
+      "producer_available": null
+    },
+    {
+      "n": 7,
+      "status": null,
+      "producer_available": null,
+      "no_arbitrary_unique_choice": true
+    },
+    {
+      "n": 8,
+      "status": false,
+      "producer_available": null,
+      "response_rows": false
+    }
+  ],
+  "required_edge_recall_only": {
+    "executes": {
+      "required": 0,
+      "observed": 0,
+      "precision": null,
+      "iou": null
+    },
+    "calls": {
+      "required": 13,
+      "observed": 3,
+      "precision": null,
+      "iou": null
+    },
+    "remote": {
+      "required": 1,
+      "observed": 0,
+      "precision": null,
+      "iou": null
+    },
+    "data": {
+      "required": 4,
+      "observed": 2,
+      "precision": null,
+      "iou": null
+    }
+  },
+  "limits": [
+    "Frozen v1 oracle is a required-edge subset; full graph precision and IoU are unmeasured",
+    "Stream.toList, PATCH transport, java.time/Jackson and complete security/bootstrap are not claimed supported by this failed profile",
+    "No guessed response identifiers, tokens, success statuses or source-specific fixes were inserted"
+  ],
+  "targets_started": false,
+  "source_commit": "64273c71575d61db8de6ba1a582b02f6a11103b3"
+}

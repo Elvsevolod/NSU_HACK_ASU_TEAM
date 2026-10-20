@@ -1,0 +1,158 @@
+Traceback (most recent call last):
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 767, in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 1290, in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 1367, in execute
+    result, control = self.execute(node.child_by_field_name('body'), env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 1290, in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 1479, in execute
+    return self.value(node, env), None
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 1533, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 1946, in expression_value
+    return self.value(node.named_children[0], env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 1533, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 1932, in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 2464, in call
+    value=self.value(child,env)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 1533, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 1932, in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 3164, in call
+    return apply_unknown(self,name,obj,args,env,declared,reason)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/call_effects.py", line 74, in apply_unknown
+    resources = source_resources(engine.p, owner)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/call_effects.py", line 33, in source_resources
+    resources.update(possible_writes(project,closure[0],closure[3]))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/resource_effects.py", line 58, in possible_writes
+    if not proven_read(project,site):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/resource_effects.py", line 10, in proven_read
+    owner=project.resolve_type(node.get('receiver_type',''),meta['module'],meta['file'])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/project.py", line 493, in resolve_type
+    if key not in cache:cache[key]=self._resolve_type(name,module,file)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/project.py", line 500, in _resolve_type
+    written = name.split('<')[0].replace('[]', '').strip()
+              ^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'split'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 767, in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 1290, in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 1295, in execute
+    value = self.value(node.named_children[0], env) if node.named_children else None
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 1533, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 1932, in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 2464, in call
+    value=self.value(child,env)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 1533, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 1932, in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 2692, in call
+    value,_=invoke_alternative(target,env,[args,obj])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 2682, in invoke_alternative
+    try:value=self.invoke(target,actual_args,actual_obj,reason,contexts[target],argument_kinds)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 683, in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 771, in _invoke
+    self.fallback(mid)
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 803, in fallback
+    writable=possible_writes(self.p,methods,data,bool(self.state.transactions))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/resource_effects.py", line 58, in possible_writes
+    if not proven_read(project,site):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/resource_effects.py", line 10, in proven_read
+    owner=project.resolve_type(node.get('receiver_type',''),meta['module'],meta['file'])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/project.py", line 493, in resolve_type
+    if key not in cache:cache[key]=self._resolve_type(name,module,file)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/project.py", line 500, in _resolve_type
+    written = name.split('<')[0].replace('[]', '').strip()
+              ^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'split'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/offline_run.py", line 41, in <module>
+    main()
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/portable.py", line 90, in main
+    block, detail = analyze(project, frontend, retrieval, None, database, context, scenario,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/__main__.py", line 105, in analyze
+    outcomes = path_runner(project, proposal['state'], proposal['entry'], inputs, path_limit)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/paths.py", line 53, in run_paths
+    result = engine.run(entry, owned_params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 368, in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 445, in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 533, in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 683, in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 771, in _invoke
+    self.fallback(mid)
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/engine.py", line 803, in fallback
+    writable=possible_writes(self.p,methods,data,bool(self.state.transactions))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/resource_effects.py", line 58, in possible_writes
+    if not proven_read(project,site):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/resource_effects.py", line 10, in proven_read
+    owner=project.resolve_type(node.get('receiver_type',''),meta['module'],meta['file'])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/project.py", line 493, in resolve_type
+    if key not in cache:cache[key]=self._resolve_type(name,module,file)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/development/stages/E-effects-and-order-boundaries/code/analyzer/project.py", line 500, in _resolve_type
+    written = name.split('<')[0].replace('[]', '').strip()
+              ^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'split'

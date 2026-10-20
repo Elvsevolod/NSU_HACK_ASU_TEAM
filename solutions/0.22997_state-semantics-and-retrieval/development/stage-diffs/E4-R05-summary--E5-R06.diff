@@ -1,0 +1,1092 @@
+--- E4-R05-summary/analyzer/__main__.py
++++ E5-R06/analyzer/__main__.py
+@@ -93,7 +93,9 @@
+                 unresolved.append('No supported request for step ' + str(step['n']))
+                 if not state.analysis_assumptions:
+                     state.analysis_assumptions.append('step '+str(step['n'])+': no supported source request')
+-                state.unscoped_state_assumptions.append('step '+str(step['n'])+': unknown preceding request effects')
++                # No source request was selected, so no application operation
++                # was invoked. Keep the scenario incomplete without inventing
++                # an opaque Java/global effect for the analyzer's abstention.
+                 next_states.append((state, previous_edges, previous_must))
+             for proposal in proposals:
+                 request = proposal.get('request') or grounded_request(project, proposal['entry'], proposal['params'],
+@@ -132,6 +134,7 @@
+                                               'ui_scope':(proposal.get('site') or {}).get('reference_scope'),
+                                               'entry': proposal['entry'], 'parameters': proposal['params'],
+                                               'created_objects': creations,
++                                              'outcome':engine.outcome,'exploration':deepcopy(outcome.get('exploration',{})),
+                                               'result': deepcopy(result)})
+                     from .history_refs import references
+                     following.history[-1]['response_refs'] = references(project, following.history[-1], len(following.history)-1)
+@@ -164,6 +167,7 @@
+                                     'created_objects': creations,
+                                     'path_conditions': engine.conditions, 'decisions': outcome['decisions'],
+                                     'pruned_paths': outcome.get('pruned_paths', []),
++                                    'exploration':outcome.get('exploration',{}),
+                                     'outcome': engine.outcome, 'unresolved': problems,
+                                     'operation_issues':[{'kind':kind,'operation':name,'occurrences':count}
+                                                         for (kind,name),count in sorted(engine.operation_issues.items())],
+--- E4-R05-summary/analyzer/contracts.py
++++ E5-R06/analyzer/contracts.py
+@@ -518,6 +518,13 @@
+                 params[key] = coerced
+                 bindings[key] = {'source': source, 'reference': reference, 'quote': quote,
+                                  'resolved': not contains_unknown(params[key])}
++                if source=='history':
++                    match=re.match(r'history\[(\d+)\]',reference or '')
++                    if match and int(match[1])<len(state.history):
++                        from .history_agreement import observation
++                        item=state.history[int(match[1])]
++                        bindings[key]['producer_observation']={'step':item.get('step'),'entry':item.get('entry'),
++                            'digest':observation(item),'exploration':deepcopy(item.get('exploration',{}))}
+ 
+         if site:
+             self.frontend.enter(site, path_state)
+--- E4-R05-summary/analyzer/engine.py
++++ E5-R06/analyzer/engine.py
+@@ -188,6 +188,9 @@
+             result.fixed_size=a.fixed_size if a.fixed_size==b.fixed_size else None
+             result.flavor=a.flavor if a.flavor==b.flavor else None
+             result.order_known=a.order_known and b.order_known
++            if hasattr(a,'repository_order') or hasattr(b,'repository_order'):
++                left,right=getattr(a,'repository_order',None),getattr(b,'repository_order',None)
++                result.repository_order=deepcopy(left) if left==right else {'supported':False,'reason':'joined order witnesses disagree','variants':[]}
+             if result.flavor=='HashSet':
+                 left,right=getattr(a,'set_hashes',None),getattr(b,'set_hashes',None)
+                 if left is not None and left==right:result.set_hashes=list(left)
+@@ -1271,6 +1274,9 @@
+         if not self.lvalue_valid(slot):return U
+         _,kind,obj,key=slot
+         if kind=='static':return self.state.static_fields[obj].get(key,U)
++        if kind=='array' and isinstance(obj,JavaArray) and not obj.order_known and hasattr(obj,'repository_order'):
++            from .repository_order import realize
++            realize(self,obj,text(slot[0]))
+         if kind=='array' and len(obj)>1 and not getattr(obj,'order_known',True):
+             self.approximate=True;self.warnings.add('array encounter order is unspecified: '+text(slot[0]));return U
+         return obj[key] if kind=='array' else obj.get(key,U)
+@@ -1288,6 +1294,9 @@
+                 for index,old in enumerate(obj):obj[index]=merge(old,value)
+             elif kind=='unresolved' and isinstance(obj,dict) and key is not None:obj[key]=U
+             return
++        if kind=='array' and isinstance(obj,JavaArray) and not obj.order_known and hasattr(obj,'repository_order'):
++            from .repository_order import realize
++            realize(self,obj,text(node))
+         if kind=='array' and self.source_type(node) not in ('byte','short','char','int','long','float','double','boolean') and value is not None:
+             if isinstance(obj,JavaArray):
+                 try:value=self.reference_check(value,reference_kind,obj.component,text(node))
+@@ -2089,6 +2098,9 @@
+             if arr is None:raise JavaThrow({'__type__':'NullPointerException'})
+             if isinstance(arr,list) and type(idx) is int and not 0<=idx<len(arr):
+                 raise JavaThrow({'__type__':'ArrayIndexOutOfBoundsException'})
++            if isinstance(arr,JavaArray) and type(idx) is int and not arr.order_known and hasattr(arr,'repository_order'):
++                from .repository_order import realize
++                realize(self,arr,text(node))
+             if isinstance(arr,list) and len(arr)>1 and not getattr(arr,'order_known',True):
+                 self.approximate=True;self.warnings.add('array encounter order is unspecified: '+text(node));return U
+             if isinstance(arr,JavaArray) and type(idx) is int and 0<=idx<len(arr):self.remember_reference_kind(arr.kinds[idx])
+@@ -2469,6 +2481,26 @@
+     def prove_standard_type(self,name,fqn,meta):
+         if self.p.resolve_type(name,meta['module'],meta['file']):
+             return False
++        # Annotation declarations need not have skeleton nodes. A source
++        # namesake still shadows an on-demand library import.
++        declarations=self.p.__dict__.get('_annotation_declarations')
++        if declarations is None:
++            declarations=[]
++            modules={}
++            for item in self.p.nodes.values():
++                if item.get('file') and item.get('module'):modules.setdefault(item['file'],set()).add(item['module'])
++            for file,tree in self.p.trees.items():
++                package=next((text(n).removeprefix('package').strip(' ;\n') for n in tree.root_node.named_children if n.type=='package_declaration'),'')
++                for node in walk(tree.root_node):
++                    if node.type=='annotation_type_declaration':
++                        short=text(node.child_by_field_name('name'))
++                        declarations.append((file,package,short,modules.get(file,set())))
++            self.p._annotation_declarations=declarations
++        package=next((text(n).removeprefix('package').strip(' ;\n') for n in self.p.trees[meta['file']].root_node.named_children if n.type=='package_declaration'),'')
++        if any((name==(prefix+'.' if prefix else '')+short or
++                name==short and (file==meta['file'] or prefix==package))
++               and (file==meta['file'] or meta['module'] in modules)
++               for file,prefix,short,modules in declarations):return False
+         if name==fqn:return True
+         if name!=fqn.rsplit('.',1)[-1]:return False
+         imports=[match[1] for node in self.p.trees[meta['file']].root_node.named_children if node.type=='import_declaration'
+@@ -2823,6 +2855,8 @@
+                              None if collection_name=='HashSet' else kinds)
+                 obj.flavor=collection_name
+                 obj.order_known=collection_name!='HashSet' and (not args or getattr(args[0],'order_known',True))
++                if collection_name!='HashSet' and args and hasattr(args[0],'repository_order'):
++                    obj.repository_order=deepcopy(args[0].repository_order)
+                 obj.opaque=bool(args and (self.opaque(args[0]) or isinstance(args[0],JavaList) and args[0].opaque))
+                 if collection_name=='HashSet' and args and not obj.opaque:
+                     from .java_sets import call as set_call
+@@ -3623,11 +3657,12 @@
+         source=obj['__stream__'];length=len(source)
+         version=source.structural_version if isinstance(source,JavaList) else None
+         remaining=list(range(length))
++        order_iterator={'remaining':remaining,'backing':source}
+         for position in range(length):
+             index=position
+             if length>1 and not getattr(source,'order_known',True):
+                 from .java_sets import next_index
+-                index=next_index(self,{'remaining':remaining},reason+':stream-order:'+str(position))
++                index=next_index(self,order_iterator,reason+':stream-order:'+str(position))
+                 if index is None:raise AnalysisBoundary('stream encounter order budget: '+reason,category='unsupported_semantics')
+             item=source[index]
+             kind=source.kinds[index] if isinstance(source,JavaList) else None
+@@ -3930,6 +3965,19 @@
+     def repository(self, mid, cs, args, resources, reason):
+         from . import persistence
+         result = U
++        receiver_owner=self.p.resolve_type(cs.get('receiver_type',''),self.p.methods[mid]['module'],self.p.methods[mid]['file'])
++        declarations=[target for target in self.p.by_name.get(cs.get('callee'),()) if self.p.methods[target]['owner']==receiver_owner]
++        for target in declarations:
++            for _,written in self.p.parameters(target):
++                base,_=type_parts(written)
++                if any(self.standard_type(base,'org.springframework.data.domain.'+kind,self.p.methods[target]) for kind in ('Sort','Pageable','Limit')):
++                    raise AnalysisBoundary('dynamic repository Sort/Pageable/Limit is outside the bounded source ordering contract: '+reason,category='unsupported_semantics')
++            query_key=(cs.get('receiver_type'),cs.get('callee'))
++            if query_key in self.p.repository_queries:
++                if not any(self.standard_type(a['name'],'org.springframework.data.jpa.repository.Query',self.p.methods[target]) for a in self.p.methods[target].get('annotations',[])):
++                    raise AnalysisBoundary('repository query annotation identity is not proven: '+reason,category='unsupported_semantics')
++                if self.p.repository_queries[query_key] is None or self.p.repository_order.get(query_key) is None:
++                    raise AnalysisBoundary('repository predicate is not fully modeled; query effects/completion stay unresolved: '+reason,category='unsupported_semantics')
+         primary=persistence.primary_resources(self,cs.get('receiver_type'))
+         for rid in resources:
+             if primary and rid not in primary:
+@@ -4027,7 +4075,9 @@
+                 if name == 'saveAndFlush':persistence.flush(self,reason)
+                 continue
+             selected = [self.p.materialize(self.state.database, rid, r) for r in rows]
+-            find = re.search(r'(?:find|query|get|delete|exists).*?By(.+)', name)
++            from .repository_order import derived,apply as apply_repository_order,realize as realize_repository_order
++            query_name,derived_order,result_limit=derived(name)
++            find = re.search(r'(?:find|query|get|delete|exists).*?By(.+)', query_name)
+             unknown_query = False
+             query_key = (cs.get('receiver_type'), name)
+             declared_query = query_key in self.p.repository_queries
+@@ -4055,7 +4105,7 @@
+                     unknown_query = True
+                 if name in ('findById', 'getById', 'getReferenceById', 'existsById', 'deleteById') and len(primary_keys) == 1 and args:
+                     pairs = [(primary_keys[0], args[0])]
+-            elif name not in ('findAll', 'count'):
++            elif query_name not in ('findAll','findAllBy','findBy','count'):
+                 unknown_query = True
+             for field, value in pairs:
+                 in_query = field.endswith('In')
+@@ -4137,6 +4187,12 @@
+                     record=persistence.materialize_record(self,entity,record,reason)
+                     record=persistence.attach_collections(self,rid,record,reason)
+                 materialized.append(persistence.manage(self,rid,record))
++            order_spec=self.p.repository_order.get(query_key,derived_order)
++            apply_repository_order(materialized,order_spec,'@Query ORDER BY' if query_key in self.p.repository_order else 'derived OrderBy' if derived_order else 'no source order')
++            if result_limit is not None and not unknown_query:
++                if result_limit<1:raise AnalysisBoundary('repository result limit is outside scope: '+reason,category='unsupported_semantics')
++                realize_repository_order(self,materialized,reason)
++                del materialized[result_limit:]
+             if unknown_query:
+                 from .repository_values import unknown_result
+                 result = unknown_result(self,cs)
+@@ -4146,6 +4202,8 @@
+             declared = [m.get('return_raw', '') for m in self.p.methods.values()
+                         if m['name'] == name and m['owner']==declared_owner]
+             return_type = declared[0] if declared else ('Optional' if name == 'findById' else '')
++            if len(materialized)>1 and not any(t in return_type for t in ('List','Set','Collection')):
++                raise AnalysisBoundary('repository single-result cardinality exceeds one: '+reason,category='unsupported_semantics')
+             first = materialized[0] if materialized else None
+             result = {'__optional__': True, 'optional': first} if 'Optional' in return_type else materialized if any(t in return_type for t in ('List', 'Set', 'Collection')) or name == 'findAll' else first
+         return result
+--- E4-R05-summary/analyzer/history_agreement.py
++++ E5-R06/analyzer/history_agreement.py
+@@ -0,0 +1,49 @@
++"""Strict agreement of complete observations, never of the first alternative."""
++from copy import deepcopy
++from decimal import Decimal
++import hashlib,json,math
++from .state import U
++from .java_collections import JsonObject
++
++
++def key(value,active=None,include_origins=False):
++    active=set() if active is None else active
++    if value is U:return None
++    if value is None:return ('null',)
++    if type(value) in (bool,int,str):return (type(value).__name__,value)
++    if isinstance(value,Decimal) or type(value) is float:
++        if type(value) is float and not math.isfinite(value):return None
++        if isinstance(value,Decimal) and not value.is_finite():return None
++        return ('number',str(Decimal(str(value)).normalize()))
++    if type(value) is dict or isinstance(value,(list,tuple,JsonObject)):
++        if id(value) in active:return None
++        active=active|{id(value)}
++        if value=={'unknown':True} or value=={'missing':True}:return None
++        if isinstance(value,dict):
++            if any(type(k) is not str for k in value):return None
++            items=[(k,key(v,active,include_origins)) for k,v in sorted(value.items())]
++            if any(v is None for _,v in items):return None
++            return ('object',getattr(value,'origin_type',None) if include_origins else None,tuple(items))
++        items=[key(v,active,include_origins) for v in value]
++        if any(v is None for v in items):return None
++        return ('array',getattr(value,'order_known',True) if include_origins else None,tuple(items))
++    return None
++
++
++def digest(value):
++    typed=key(value)
++    return hashlib.sha256(json.dumps(typed,ensure_ascii=True,separators=(',',':')).encode()).hexdigest() if typed is not None else None
++
++
++def agree_completed(rows,select):
++    if not rows or any(row.get('outcome')!='returned' or row.get('exploration',{}).get('complete') is not True for row in rows):return None
++    values=[select(row) for row in rows]
++    if any(value is None or value is U for value in values):return None
++    keys=[key(value,include_origins=True) for value in values]
++    if any(value is None for value in keys) or any(value!=keys[0] for value in keys[1:]):return None
++    return {'value':deepcopy(values[0]),'alternatives':len(rows),'coverage':'all reachable enumerated outcomes',
++        'conditions':[deepcopy(row.get('path_conditions',row.get('conditions',[]))) for row in rows]}
++
++
++def observation(item):
++    return digest({name:item.get(name) for name in ('result','selected_objects')})
+--- E4-R05-summary/analyzer/history_join.py
++++ E5-R06/analyzer/history_join.py
+@@ -0,0 +1,53 @@
++"""Join equal JSON response multisets without merging fields of different rows.
++
++This is only a history/wire value join. It never compares Java objects for Set
++membership, sorts a database answer, or proves an encounter order/ordinal.
++"""
++from collections import defaultdict
++from copy import deepcopy
++from .native_storage import JavaList
++from .history_agreement import key
++from .heap_join import mutable_ids
++
++
++def common_wire_bag(values):
++    if not values or any(not isinstance(value,list) or getattr(value,'opaque',False) for value in values):return None
++    groups=[]
++    for value in values:
++        seen=set()
++        def unique_tree(item):
++            if not isinstance(item,(dict,list)):return True
++            if id(item) in seen:return False
++            seen.add(id(item))
++            return all(unique_tree(v) for v in (item.values() if isinstance(item,dict) else item))
++        if not unique_tree(value):return None
++        grouped=defaultdict(list)
++        for item in value:
++            token=key(item,include_origins=True)
++            if token is None:return None
++            grouped[token].append(item)
++        groups.append(grouped)
++    shape={token:len(items) for token,items in groups[0].items()}
++    if any({token:len(items) for token,items in group.items()}!=shape for group in groups[1:]):return None
++    # A canonical diagnostic storage order is explicitly unknown to consumers.
++    # Duplicate JSON values keep their multiplicities; no Java identity is used.
++    result=JavaList([deepcopy(item) for token in sorted(shape,key=repr) for item in groups[0][token]])
++    result.order_known=len(result)<=1
++    result.history_order_proof='equal complete response multisets; canonical storage is not encounter order'
++    return result
++
++
++def merge_item(left,right,merge,live_left=(),live_right=()):
++    result=merge(left,right)
++    if not isinstance(left,dict) or not isinstance(right,dict) or not isinstance(result,dict):return result
++    if any(item.get('outcome')!='returned' or item.get('exploration',{}).get('complete') is not True for item in (left,right)):return result
++    a,b=left.get('result'),right.get('result')
++    if mutable_ids(a)&mutable_ids(live_left) or mutable_ids(b)&mutable_ids(live_right):return result
++    bag=common_wire_bag([a,b])
++    if bag is not None:
++        result['result']=bag
++        # Positions refer to old concrete observations; rebuild them lazily
++        # from the joined typed JSON value before any future selection.
++        result.pop('response_refs',None)
++        result['history_order_join']={'kind':'complete-wire-multiset','ordinal_known':len(bag)<=1}
++    return result
+--- E4-R05-summary/analyzer/http_json.py
++++ E5-R06/analyzer/http_json.py
+@@ -58,6 +58,7 @@
+             decoded=[decode(child,element,context,bindings,certain) for child in value]
+             result=JavaArray(decoded,component,[decoded_kind(child,element,context,bindings) for child in decoded])
+             result.order_known=getattr(value,'order_known',True)
++            if hasattr(value,'repository_order'):result.repository_order=deepcopy(value.repository_order)
+             return result
+         if isinstance(value,JsonText):
+             if standard_type(base,'java.lang.String',context) or standard_type(base,'java.lang.Object',context):return deepcopy(value)
+@@ -101,6 +102,7 @@
+             decoded=[decode(child,element,context,bindings,certain) for child in value]
+             result=JavaList(decoded,[decoded_kind(child,element,context,bindings) for child in decoded])
+             result.order_known=getattr(value,'order_known',True)
++            if hasattr(value,'repository_order'):result.repository_order=deepcopy(value.repository_order)
+             return result
+         owner=project.resolve_type(base,context['module'],context['file'])
+         if owner in project.enum_members:
+--- E4-R05-summary/analyzer/java_lists.py
++++ E5-R06/analyzer/java_lists.py
+@@ -79,6 +79,9 @@
+         if 'remaining' in obj:obj['remaining']=[index-1 if index>obj['index'] else index for index in obj['remaining']]
+         return True,None
+     if not isinstance(obj,JavaList) or isinstance(obj,JavaArray):return False,U
++    if not obj.order_known and hasattr(obj,'repository_order') and (name in ('get','set','remove','indexOf','lastIndexOf') or name=='add' and len(args)==2):
++        from .repository_order import realize
++        realize(engine,obj,reason)
+     if name=='clear' and not args:
+         if obj and not resizable(obj):return unresolved('List mutability is unresolved',obj)
+         obj.clear();return True,None
+--- E4-R05-summary/analyzer/java_sets.py
++++ E5-R06/analyzer/java_sets.py
+@@ -2,7 +2,7 @@
+ from .native_storage import JavaList
+ from .boxed_values import boxed_equal
+ from .state import U
+-from .set_keys import hash_value,equal as key_equal,stop
++from .set_keys import hash_value,equal as key_equal,stop,SCALARS
+ 
+ 
+ def shapes(value,path='body',seen=None):
+@@ -19,11 +19,28 @@
+ def next_index(engine,iterator,reason):
+     remaining=iterator['remaining']
+     if not remaining:return None
+-    selected=engine.choose(reason+':unordered-collection-next',list(range(len(remaining)))) if len(remaining)>1 else 0
++    choices=list(range(len(remaining)))
++    info=getattr(iterator.get('backing'),'repository_order',None)
++    if info:
++        from .engine import CompletionRequired,AnalysisBoundary
++        if not info['supported']:raise AnalysisBoundary('repository iteration order is outside scope: '+info.get('reason',''),category='unsupported_semantics')
++        variants=info['variants']
++        if 'order_variant' not in iterator:
++            label=reason+':repository-null-order'
++            selected=engine.choose(label,list(range(len(variants)))) if len(variants)>1 else 0
++            if selected is None:
++                if not engine.allow_completion_splits:raise AnalysisBoundary('repository null-order completion budget: '+reason)
++                raise CompletionRequired(str(engine.branch_index)+':'+label,list(range(len(variants))))
++            iterator['order_variant']=selected
++        groups=variants[iterator['order_variant']]
++        group=next((g for g in groups if any(i in remaining for i in g)),[])
++        choices=[position for position,index in enumerate(remaining) if index in group]
++        if not choices:raise AnalysisBoundary('repository encounter witness no longer covers remaining values: '+reason,category='unsupported_semantics')
++    selected=engine.choose(reason+':unordered-collection-next',choices) if len(choices)>1 else choices[0]
+     if selected is None:
+         from .engine import CompletionRequired,AnalysisBoundary
+         if not engine.allow_completion_splits:raise AnalysisBoundary('collection encounter order needs a continuation: '+reason)
+-        raise CompletionRequired(str(engine.branch_index)+':'+reason+':unordered-collection-next',list(range(len(remaining))))
++        raise CompletionRequired(str(engine.branch_index)+':'+reason+':unordered-collection-next',choices)
+     return remaining.pop(selected)
+ 
+ 
+@@ -36,7 +53,9 @@
+         if write:values.opaque=True
+         return True,U
+     def index(value,kind):
++        version=values.structural_version
+         hashed=hash_value(engine,value,kind,reason)
++        if values.structural_version!=version:stop('reentrant Set mutation during hashCode: '+reason)
+         if hashed is U:return U,U
+         hashed=(hashed & 0xffffffff)^((hashed & 0xffffffff)>>16)
+         stored=getattr(values,'set_hashes',None)
+@@ -47,6 +66,7 @@
+         for i,item in enumerate(values):
+             if stored[i]!=hashed:continue
+             equal=key_equal(engine,value,item,kind,values.kinds[i],reason)
++            if values.structural_version!=version:stop('reentrant Set mutation during equals: '+reason)
+             if equal is True:return i,hashed
+             if equal is U:return U,hashed
+         return -1,hashed
+@@ -79,7 +99,10 @@
+             raise AnalysisBoundary('Java Set bulk equality/hash callbacks are outside the scalar contract: '+reason,category='unsupported_semantics')
+         if name=='addAll':
+             changed=False
+-            for value,kind in zip(list(other),list(other.kinds)):
++            from .java_lists import iteration
++            scalar=all(value is None or kind in SCALARS for value,kind in zip(other,other.kinds))
++            entries=zip(list(other),list(other.kinds)) if scalar else iteration(engine,other,reason+':addAll source')
++            for value,kind in entries:
+                 _,result=call(engine,'add',values,[value],[kind],reason)
+                 if result is U:return True,U
+                 changed|=result
+--- E4-R05-summary/analyzer/models.py
++++ E5-R06/analyzer/models.py
+@@ -231,6 +231,7 @@
+             if not getattr(item,'order_known',True):
+                 from .native_storage import JavaList
+                 result=JavaList(result);result.order_known=False
++                if hasattr(item,'repository_order'):result.repository_order=deepcopy(item.repository_order)
+             return result
+         finally:
+             active.remove(id(item))
+--- E4-R05-summary/analyzer/native_storage.py
++++ E5-R06/analyzer/native_storage.py
+@@ -107,11 +107,13 @@
+         self.order_known=True
+ 
+     def append(self, value, kind=None):
++        self.changed_repository_order()
+         super().append(value)
+         self.kinds.append(kind)
+         self.structural_version=None if self.structural_version is None else self.structural_version+1
+ 
+     def extend(self, values, kinds=None):
++        self.changed_repository_order()
+         items = list(values)
+         if kinds is None:
+             evidence = list(values.kinds) if isinstance(values, JavaList) else [None] * len(items)
+@@ -124,6 +126,7 @@
+         if items:self.structural_version=None if self.structural_version is None else self.structural_version+1
+ 
+     def insert(self, index, value, kind=None):
++        self.changed_repository_order()
+         super().insert(index, value)
+         self.kinds.insert(index, kind)
+         self.structural_version=None if self.structural_version is None else self.structural_version+1
+@@ -136,6 +139,7 @@
+         self.kinds[index] = kind
+ 
+     def pop(self, index=-1):
++        self.changed_repository_order()
+         value = super().pop(index)
+         self.kinds.pop(index)
+         self.structural_version=None if self.structural_version is None else self.structural_version+1
+@@ -145,6 +149,8 @@
+         super().clear()
+         self.kinds.clear()
+         self.opaque=False
++        if self.flavor!='HashSet':self.order_known=True
++        if hasattr(self,'repository_order'):self.repository_order={'source':'cleared list','supported':True,'variants':[]}
+         self.structural_version=None if self.structural_version is None else self.structural_version+1
+ 
+     def remove(self, value):
+@@ -162,6 +168,7 @@
+             self.kinds[:] = [None] * len(self)
+ 
+     def __setitem__(self, index, value):
++        self.changed_repository_order()
+         if isinstance(index, slice):
+             previous=len(self)
+             items = list(value)
+@@ -173,6 +180,7 @@
+             self.kinds[index] = None
+ 
+     def __delitem__(self, index):
++        self.changed_repository_order()
+         previous=len(self)
+         super().__delitem__(index)
+         del self.kinds[index]
+@@ -183,6 +191,7 @@
+         return self
+ 
+     def __imul__(self, count):
++        self.changed_repository_order()
+         previous=len(self)
+         super().__imul__(count)
+         self.kinds *= count
+@@ -194,7 +203,12 @@
+         result=JavaList(self,self.kinds)
+         result.opaque,result.fixed_size,result.flavor=self.opaque,self.fixed_size,self.flavor
+         result.order_known=self.order_known
++        if hasattr(self,'repository_order'):result.repository_order=deepcopy(self.repository_order)
+         return result
++
++    def changed_repository_order(self):
++        if not self.order_known and hasattr(self,'repository_order'):
++            self.repository_order={'supported':False,'reason':'mutation before encounter order was realized','variants':[]}
+ 
+     def __copy__(self):
+         return self.copy()
+@@ -233,7 +247,7 @@
+         self.flavor='List'
+ 
+     def __getattr__(self,name):
+-        if name in ('kinds','structural_version','opaque','order_known'):
++        if name in ('kinds','structural_version','opaque','order_known','repository_order'):
+             backing=self.__dict__.get('backing')
+             if backing is not None:return getattr(backing,name)
+         raise AttributeError(name)
+--- E4-R05-summary/analyzer/paths.py
++++ E5-R06/analyzer/paths.py
+@@ -8,10 +8,12 @@
+ def join_states(states):
+     """Widen conflicting table contents; never choose one incompatible write."""
+     joined = deepcopy(states[0])
++    table_conflicts=set()
+     for other in states[1:]:
+         for key in set(joined.database.tables) | set(other.database.tables):
+             if joined.database.tables.raw_get(key) != other.database.tables.raw_get(key):
+                 joined.database.unknown_tables.add(key)
++                table_conflicts.add(key)
+                 event={'phase':'join','cause':'incompatible row alternatives','widened_location':'.'.join(key),
+                     'actual_sql_write':False,'before':'alternative tables differ','after':'table knowledge unknown'}
+                 if event not in joined.join_losses:joined.join_losses.append(event)
+@@ -24,7 +26,11 @@
+         joined.static_fields = merge(joined.static_fields,other.static_fields)
+         joined.class_initialization = merge(joined.class_initialization,other.class_initialization)
+         joined.input_journal=[merge(a,b) for a,b in zip(joined.input_journal,other.input_journal)]
+-        joined.history = [merge(a, b) for a, b in zip(joined.history, other.history)]
++        from .history_join import merge_item
++        joined.history = [merge_item(a,b,merge,
++            (joined.browser,joined.actor_browsers,joined.bean_instances,joined.static_fields,joined.transactions),
++            (other.browser,other.actor_browsers,other.bean_instances,other.static_fields,other.transactions))
++            for a,b in zip(joined.history,other.history)]
+         joined.symbol_sequence = max(joined.symbol_sequence, other.symbol_sequence)
+         joined.input_sequence = max(joined.input_sequence, other.input_sequence)
+         joined.analysis_assumptions = sorted(set(joined.analysis_assumptions+other.analysis_assumptions))
+@@ -43,7 +49,7 @@
+                 if operation not in target['pending']:target['pending'].append(deepcopy(operation))
+             target['managed'] = merge(target['managed'],frame['managed'])
+         joined.limitations = list(dict.fromkeys(joined.limitations+other.limitations))
+-    joined.limitations.append('state budget widening: conflicting database tables are unknown')
++    if table_conflicts:joined.limitations.append('state budget widening: conflicting database tables are unknown')
+     return joined
+ 
+ 
+@@ -53,6 +59,7 @@
+     pending, completed, pruned = [{}], [], []
+     completion_splits=0
+     completion_budget=max(8,limit)
++    exhaustive=True
+     while pending:
+         decisions = pending.pop(0)
+         (owned_state,owned_params),_ = clone_execution(state,params)
+@@ -90,6 +97,12 @@
+                 result=engine.run(entry,owned_params)
+         completed.append({'engine': engine, 'result': result, 'decisions': decisions,
+                           'state': engine.state, 'approximate': engine.approximate})
++        if engine.conservative or 'boundary' in engine.outcome or 'budget' in engine.outcome or engine.state.unscoped_state_assumptions:
++            exhaustive=False
+     for outcome in completed:
+         outcome['pruned_paths'] = pruned
++        outcome['exploration']={'complete':exhaustive,'path_limit':limit,'completion_budget':completion_budget,
++            'completion_splits':completion_splits,'completed':len(completed),'proven_infeasible':len(pruned),
++            'infeasible_exclusion':'source constraint conflict' if pruned else None,
++            'limits':[] if exhaustive else ['budget, unresolved completion or unscoped effects prevent exhaustive producer agreement']}
+     return completed
+--- E4-R05-summary/analyzer/project.py
++++ E5-R06/analyzer/project.py
+@@ -184,15 +184,19 @@
+         for edge in self.skeleton['edges']:
+             self.edges[edge['source']][edge['type']].add(edge['target'])
+         self.repository_queries = {}
++        self.repository_order = {}
+         for mid, node in self.ast.items():
+-            query = re.search(r'@Query\(\s*(?:value\s*=\s*)?"((?:\\.|[^"\\])*)"', text(node), re.S)
++            query = re.search(r'@(?:[\w$]+\.)*Query\(\s*(?:value\s*=\s*)?"((?:\\.|[^"\\])*)"', text(node), re.S)
+             if query:
+                 owner = self.nodes[self.methods[mid]['owner']]['fqn']
+-                where = re.search(r'\bwhere\b(.+)', query[1], re.I | re.S)
++                from .repository_order import query_order
++                self.repository_order[(owner,self.methods[mid]['name'])]=query_order(query[1])
++                unordered=re.sub(r'\border\s+by\b.+$','',query[1],flags=re.I|re.S)
++                where = re.search(r'\bwhere\b(.+)', unordered, re.I | re.S)
+                 predicates = []
+                 if not re.match(r'\s*(?:select\s+(?:\*|\w+\.?\*)?\s*from|select\s+\w+\s+from|from)\b', query[1], re.I):
+                     predicates = None
+-                elif re.search(r'\b(join|order|group|having|limit|union)\b', query[1], re.I):
++                elif re.search(r'\b(join|group|having|limit|union)\b', unordered, re.I):
+                     predicates = None
+                 elif where:
+                     for part in re.split(r'\band\b', where[1], flags=re.I):
+--- E4-R05-summary/analyzer/repository_order.py
++++ E5-R06/analyzer/repository_order.py
+@@ -0,0 +1,97 @@
++"""Bounded numeric repository ordering, ties and explicit encounter choices."""
++from itertools import permutations,product
++from functools import cmp_to_key
++from decimal import Decimal
++import math,re
++from .state import U
++
++
++def query_order(source):
++    match=re.search(r'\border\s+by\s+(.+?)\s*$',source,re.I|re.S)
++    if not match:return []
++    specs=[]
++    for clause in match[1].split(','):
++        field=re.fullmatch(r'\s*(?:\w+\.)?(\w+)(?:\s+(asc|desc))?(?:\s+nulls\s+(first|last))?\s*',clause,re.I)
++        if not field:return None
++        specs.append((field[1],(field[2] or 'asc').lower(),(field[3] or 'native').lower()))
++    return specs
++
++
++def derived(name):
++    predicate,separator,suffix=name.partition('OrderBy');specs=[]
++    if separator:
++        while suffix:
++            match=re.match(r'([A-Z][A-Za-z0-9_]*?)(Asc|Desc)(?=[A-Z]|$)',suffix)
++            if not match:return predicate,None,None
++            specs.append((match[1][:1].lower()+match[1][1:],match[2].lower(),'native'))
++            suffix=suffix[match.end():]
++    limit_match=re.match(r'(?:find|read|query|get)(?:First|Top)(\d*)By',predicate)
++    limit=int(limit_match[1] or 1) if limit_match else None
++    if limit_match:predicate='findBy'+predicate[limit_match.end():]
++    return predicate,specs,limit
++
++
++def apply(values,specs,source):
++    values.order_known=len(values)<=1
++    values.repository_order={'source':source,'specs':specs,'supported':True,'variants':[]}
++    if values.order_known:return
++    if specs is None:
++        values.repository_order.update(supported=False,reason='unsupported ordering expression');return
++    if not specs:
++        values.repository_order['variants']=[[list(range(len(values)))]];return
++    for row in values:
++        for field,_,_ in specs:
++            value=row.get(field,U)
++            if value is not None and not (type(value) in (int,float,Decimal) and
++                    (type(value) is not float or math.isfinite(value))):
++                values.repository_order.update(supported=False,reason='unproved numeric comparator/collation: '+field);return
++    native=[index for index,(_,_,nulls) in enumerate(specs) if nulls=='native' and any(row.get(specs[index][0]) is None for row in values)]
++    if len(native)>3:
++        values.repository_order.update(supported=False,reason='null-order variant scope exceeded');return
++    variants=[]
++    for choices in product(('first','last'),repeat=len(native)):
++        policy=dict(zip(native,choices))
++        def compare(left,right):
++            for index,(field,direction,nulls) in enumerate(specs):
++                a,b=values[left].get(field,U),values[right].get(field,U)
++                if a is None or b is None:
++                    if a is b:continue
++                    first=(policy.get(index,nulls)=='first')
++                    return -1 if (a is None)==first else 1
++                if a!=b:return (-1 if a<b else 1)*(-1 if direction=='desc' else 1)
++            return 0
++        ordered=sorted(range(len(values)),key=cmp_to_key(compare));groups=[]
++        for index in ordered:
++            if not groups or compare(groups[-1][0],index):groups.append([index])
++            else:groups[-1].append(index)
++        if groups not in variants:variants.append(groups)
++    values.repository_order['variants']=variants
++    if len(variants)==1 and all(len(group)==1 for group in variants[0]):
++        reorder(values,[group[0] for group in variants[0]])
++
++
++def reorder(values,indices):
++    items=[values[i] for i in indices];kinds=[values.kinds[i] for i in indices]
++    list.__setitem__(values,slice(None),items);values.kinds[:]=kinds;values.order_known=True
++
++
++def realize(engine,values,reason):
++    if values.order_known:return
++    from .engine import AnalysisBoundary,CompletionRequired
++    info=getattr(values,'repository_order',None)
++    if not info:return
++    if not info['supported']:raise AnalysisBoundary('repository order comparator is outside scope: '+info.get('reason',''),category='unsupported_semantics')
++    if len(values)>6:raise AnalysisBoundary('repository ordinal order needs more than the six-row permutation scope: '+reason,category='unsupported_semantics')
++    if not engine.path_replay:raise AnalysisBoundary('repository encounter order requires path replay: '+reason,category='unsupported_semantics')
++    options=[]
++    for groups in info['variants']:
++        for parts in product(*(list(permutations(group)) for group in groups)):
++            order=tuple(i for group in parts for i in group)
++            if order not in options:options.append(order)
++    label=reason+':repository-order'
++    selected=engine.choose(label,options) if len(options)>1 else options[0]
++    if selected is None:
++        if not engine.allow_completion_splits:raise AnalysisBoundary('repository order completion budget: '+reason)
++        raise CompletionRequired(str(engine.branch_index)+':'+label,options)
++    reorder(values,selected)
++    values.repository_order={**info,'realized_order':list(selected),'proof':'isolated path alternative'}
+--- E4-R05-summary/analyzer/request.py
++++ E5-R06/analyzer/request.py
+@@ -39,6 +39,7 @@
+ class FrozenList:
+     items: tuple
+     order_known: bool = True
++    order_evidence: object = None
+ 
+ 
+ def freeze(value):
+@@ -47,7 +48,8 @@
+     if isinstance(value, dict):
+         return FrozenMap(tuple((key, freeze(child)) for key, child in value.items()))
+     if isinstance(value, list):
+-        return FrozenList(tuple(freeze(child) for child in value),getattr(value,'order_known',True))
++        return FrozenList(tuple(freeze(child) for child in value),getattr(value,'order_known',True),
++            freeze(value.repository_order) if hasattr(value,'repository_order') else None)
+     if isinstance(value, tuple):
+         return FrozenList(tuple(freeze(child) for child in value))
+     return value
+@@ -61,6 +63,7 @@
+         if not value.order_known:
+             from .native_storage import JavaList
+             items=JavaList(items);items.order_known=False
++            if value.order_evidence is not None:items.repository_order=thaw(value.order_evidence)
+         return items
+     if isinstance(value, tuple) and len(value) == 3 and value[0] == 'json_text':
+         return JsonText(thaw(value[1]), value[2])
+--- E4-R05-summary/analyzer/scoped_effects.py
++++ E5-R06/analyzer/scoped_effects.py
+@@ -60,7 +60,7 @@
+         if kind=='field_access':return False  # lazy/active class reads need another contract
+         if kind=='identifier':
+             owner=engine.p.methods[owner_mid]
+-            if text(node) not in names and (text(node) in engine.p.type_fields.get(owner['owner'],{}) or
++            if (text(node) in engine.p.type_fields.get(owner['owner'],{}) or
+                     engine.p.static_field_declaration(owner['owner'],text(node)) or
+                     engine.p.imported_static_field(owner['file'],owner['module'],text(node))):return False
+         if kind=='method_invocation':
+--- E4-R05-summary/analyzer/set_keys.py
++++ E5-R06/analyzer/set_keys.py
+@@ -78,7 +78,8 @@
+ def hash_value(engine,value,kind,reason):
+     if value is None or kind in SCALARS:return scalar_hash(value,kind)
+     tid=owner(engine,value)
+-    if not tid or engine.p.type_parents.get(tid):stop('element equality/hash owner or inheritance is outside the leaf contract: '+reason)
++    if not tid or engine.p.type_parents.get(tid) or engine.p.framework_types.get(tid,set())-{'Object','java.lang.Object'}:
++        stop('element equality/hash owner or inheritance is outside the leaf contract: '+reason)
+     target=source_method(engine,tid,'hashCode')
+     if target:
+         value=engine.invoke(target,[],value,'HashSet hashCode callback at '+reason)
+--- E4-R05-summary/tests/builders.py
++++ E5-R06/tests/builders.py
+@@ -159,5 +159,5 @@
+       @PostMapping("/books") Book add(@RequestBody Book input) { repository.save(input); return input; }
+     }''',
+     'Book.java': 'import jakarta.persistence.*; @Entity @Table(name="books") class Book { @Id public String key; public String title; }',
+-    'BookStore.java': 'import org.springframework.data.jpa.repository.JpaRepository; interface BookStore extends JpaRepository<Book, String> { Book findByKey(String key); Book save(Book input); }',
++    'BookStore.java': 'import org.springframework.data.jpa.repository.JpaRepository; import org.springframework.data.jpa.repository.Query; interface BookStore extends JpaRepository<Book, String> { Book findByKey(String key); Book save(Book input); }',
+ }
+--- E4-R05-summary/tests/test_history_agreement32.py
++++ E5-R06/tests/test_history_agreement32.py
+@@ -0,0 +1,57 @@
++from copy import deepcopy
++import pytest
++from analyzer.history_agreement import agree_completed
++from analyzer.history_join import common_wire_bag
++from analyzer.java_collections import JsonObject
++from analyzer.paths import join_states,run_paths
++from analyzer.state import ScenarioState,U
++from builders import build
++
++
++def row(value,complete=True,outcome='returned'):
++    return {'result':value,'selected_objects':[],'outcome':outcome,'exploration':{'complete':complete}}
++
++
++def test_same_typed_id_in_every_complete_alternative_is_agreement():
++    result=agree_completed([row({'id':7,'kind':'Long'}),row({'id':7,'kind':'Long'})],lambda a:a['result'])
++    assert result['value']=={'id':7,'kind':'Long'} and result['alternatives']==2
++
++
++@pytest.mark.parametrize('other',[
++    row({'id':8,'kind':'Long'}),row({'id':True,'kind':'Boolean'}),row({'id':7,'kind':'Integer'}),
++    row({'id':7,'kind':'Long'},False),row({'id':7,'kind':'Long'},outcome='HTTP error response'),
++    row({'id':U,'kind':'Long'}),row(None)])
++def test_different_unknown_failed_or_incomplete_producer_is_not_agreement(other):
++    assert agree_completed([row({'id':7,'kind':'Long'}),other],lambda a:a['result']) is None
++
++
++def test_wire_multiset_keeps_rows_and_refuses_ordinal_order():
++    a=JsonObject({'id':7,'status':'READY'},'Equipment');b=JsonObject({'id':9,'status':'WAITING'},'Equipment')
++    bag=common_wire_bag([[a,b],[deepcopy(b),deepcopy(a)]])
++    assert {item['id'] for item in bag}=={7,9} and bag.order_known is False
++    assert all(item['status']==('READY' if item['id']==7 else 'WAITING') for item in bag)
++
++
++def test_unknown_values_type_collision_or_internal_alias_prevent_bag_join():
++    assert common_wire_bag([[{'id':1}],[{'id':True}]]) is None
++    assert common_wire_bag([[{'id':U}],[{'id':U}]]) is None
++    a=JsonObject({'id':1},'A');b=JsonObject({'id':1},'B')
++    assert common_wire_bag([[a],[b]]) is None
++    assert common_wire_bag([[a,a],[deepcopy(a),deepcopy(a)]]) is None
++
++
++def test_joined_complete_history_rebuilds_refs_without_mixing_row_fields(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'class Api{int entry(){return 1;}}'})
++    a=ScenarioState(db);b=ScenarioState(db)
++    x=JsonObject({'id':7,'status':'READY'},'Equipment');y=JsonObject({'id':9,'status':'WAITING'},'Equipment')
++    a.history=[{**row([x,y]),'response_refs':{'collections':[]}}]
++    b.history=[{**row([deepcopy(y),deepcopy(x)]),'response_refs':{'collections':[]}}]
++    joined=join_states([a,b]);item=joined.history[0]
++    assert {obj['id'] for obj in item['result']}=={7,9} and item['result'].order_known is False
++    assert 'response_refs' not in item
++
++
++def test_coverage_flag_does_not_claim_a_budget_boundary_is_complete(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''class Api{Object entry(boolean x,boolean y,boolean z){if(x)return 1;if(y)return 2;if(z)return 3;return 4;}}'''})
++    paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{'x':U,'y':U,'z':U},limit=1)
++    assert paths and all(path['exploration']['complete'] is False for path in paths)
+--- E4-R05-summary/tests/test_inventory_collection_journey.py
++++ E5-R06/tests/test_inventory_collection_journey.py
+@@ -75,21 +75,34 @@
+ def test_batch_unique_membership_noop_and_following_http_request(tmp_path,limit):
+     p,db,ids=fixture(tmp_path);state=ScenarioState(db)
+     paths=run_paths(p,state,ids['gateway.InventoryGateway.listProducts'],Request.http('gateway','GET','/inventory'),limit=limit)
+-    assert len(paths)==1
+-    engine=paths[0]['engine'];products=paths[0]['result']
+-    assert [r['id'] for r in products]==['SKU7','SKU8','SKU9']
+-    assert not engine.approximate and not engine.state.database.unknown_tables
+-    batch=next(row for row in engine.request_events if row['entry']==ids['catalog.CategoryController.lookup'])
+-    codes=batch['bound_arguments'][0]['value']
+-    assert len(codes)==2 and set(codes)=={'hardware','office'}
+-    assert any(row.get('model_version')=='native-map-noop/1' for row in engine.effect_events)
+-    chosen=products[1]
+-    request=Request.http('gateway','POST','/inventory/reserve',body={'id':chosen['id'],'revision':chosen['revision']})
+-    written=run_paths(p,engine.state,ids['gateway.InventoryGateway.reserveProduct'],request,limit=limit)
+-    assert len(written)==1 and written[0]['result']=={'id':'SKU8','category':'office','revision':6,'quantity':8}
+-    state=written[0]['state']
+-    assert len(state.database.tables[('warehouse','products')])==3 and not state.database.unknown_tables
+-    assert state.database.tables[('warehouse','products')][0]['quantity']==8
++    # The category query has two legal orders. The product list is explicitly
++    # built in SKU7/8/9 order by the warehouse source and must keep that order.
++    assert len(paths)==2
++    def category_response(path):
++        engine=path['engine']
++        request=next(r for r in engine.request_events if r['entry']==ids['catalog.CategoryController.lookup'])
++        response=next(r for r in engine.http_responses if r['request']==request['id'])
++        return response['body']
++    assert all(getattr(category_response(path),'order_known',True) is False for path in paths)
++    assert all({row['code'] for row in category_response(path)}=={'hardware','office'} for path in paths)
++    choices={value for path in paths for key,value in path['decisions'].items()
++             if 'InventoryGateway#listProducts' in key and key.endswith(':unordered-collection-next')}
++    assert choices=={0,1}
++    for path in paths:
++        engine=path['engine'];products=path['result']
++        assert [r['id'] for r in products]==['SKU7','SKU8','SKU9']
++        assert not engine.approximate and not engine.state.database.unknown_tables
++        batch=next(row for row in engine.request_events if row['entry']==ids['catalog.CategoryController.lookup'])
++        codes=batch['bound_arguments'][0]['value']
++        assert len(codes)==2 and set(codes)=={'hardware','office'}
++        assert any(row.get('model_version')=='native-map-noop/1' for row in engine.effect_events)
++        chosen=products[1]
++        request=Request.http('gateway','POST','/inventory/reserve',body={'id':chosen['id'],'revision':chosen['revision']})
++        written=run_paths(p,engine.state,ids['gateway.InventoryGateway.reserveProduct'],request,limit=limit)
++        assert len(written)==1 and written[0]['result']=={'id':'SKU8','category':'office','revision':6,'quantity':8}
++        state=written[0]['state']
++        assert len(state.database.tables[('warehouse','products')])==3 and not state.database.unknown_tables
++        assert state.database.tables[('warehouse','products')][0]['quantity']==8
+ 
+ 
+ def test_nl_selects_observed_product_and_rereads_changed_state(tmp_path):
+@@ -98,10 +111,10 @@
+         {'id':'inventory','steps':[{'n':1,'action':'List products'},{'n':2,'action':'Reserve second product'},
+                                   {'n':3,'action':'List products'}]},path_limit=4,grounder_type=ContractGrounder)
+     second=trace['steps'][1]['alternatives']
+-    assert len(second)==1 and second[0]['entry']==ids['gateway.InventoryGateway.reserveProduct']
+-    assert second[0]['request']['body']=={'id':'SKU8','revision':5}
+-    assert second[0]['result']=={'id':'SKU8','category':'office','revision':6,'quantity':8}
+-    assert trace['steps'][2]['alternatives'][0]['result'][1]==second[0]['result']
++    assert len(second)==2 and all(a['entry']==ids['gateway.InventoryGateway.reserveProduct'] for a in second)
++    assert all(a['request']['body']=={'id':'SKU8','revision':5} for a in second)
++    assert all(a['result']=={'id':'SKU8','category':'office','revision':6,'quantity':8} for a in second)
++    assert all(a['result'][1]==second[0]['result'] for a in trace['steps'][2]['alternatives'])
+ 
+ 
+ def test_missing_category_executes_live_removal_and_next_request(tmp_path):
+--- E4-R05-summary/tests/test_query_numeric_predicates.py
++++ E5-R06/tests/test_query_numeric_predicates.py
+@@ -9,7 +9,7 @@
+     ('!=',{'zero','two'}),('<>',{'zero','two'}),('=',{'one'}),
+ ])
+ def test_source_query_numeric_comparisons_choose_only_matching_rows(tmp_path,op,expected):
+-    project,db,ids=build(tmp_path,{'Api.java':'''class Api {@Autowired Store store;
++    project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import org.springframework.data.jpa.repository.*;class Api {@Autowired Store store;
+       List<Row> entry(){return store.visible(1);}}
+       @Entity @Table(name="rows") class Row {@Id String id;Integer amount;}
+       interface Store extends JpaRepository<Row,String>{
+@@ -22,20 +22,21 @@
+ 
+ 
+ def test_text_ordering_is_not_guessed_without_database_collation(tmp_path):
+-    project,db,ids=build(tmp_path,{'Api.java':'''class Api {@Autowired Store store;
++    project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import org.springframework.data.jpa.repository.*;class Api {@Autowired Store store;
+       List<Row> entry(){return store.visible("B");}}
+       @Entity @Table(name="rows") class Row {@Id String id;String amount;}
+       interface Store extends JpaRepository<Row,String>{
+         @Query(value="SELECT * FROM rows WHERE amount > ?1",nativeQuery=true)
+         List<Row> visible(String cutoff);}'''},rows={'rows':[{'id':'text','amount':'a'}]})
+     engine=Engine(project,ScenarioState(db))
+-    assert engine.run(ids['Api.entry'],{}) is U
++    result=engine.run(ids['Api.entry'],{})
++    assert result.opaque is True
+     assert any('predicate' in warning for warning in engine.warnings)
+ 
+ 
+ @pytest.mark.parametrize('predicate',['amount = ?1','amount in (?1)'])
+ def test_explicit_query_null_comparison_does_not_behave_like_is_null(tmp_path,predicate):
+-    project,db,ids=build(tmp_path,{'Api.java':'''class Api {@Autowired Store store;
++    project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import org.springframework.data.jpa.repository.*;class Api {@Autowired Store store;
+       List<Row> entry(){return store.visible(null);}}
+       @Entity @Table(name="rows") class Row {@Id String id;Integer amount;}
+       interface Store extends JpaRepository<Row,String>{
+@@ -45,7 +46,7 @@
+ 
+ 
+ def test_multiple_numeric_predicates_keep_their_parameter_indexes(tmp_path):
+-    project,db,ids=build(tmp_path,{'Api.java':'''class Api {@Autowired Store store;
++    project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import org.springframework.data.jpa.repository.*;class Api {@Autowired Store store;
+       List<Row> entry(){return store.visible(0,2);}}
+       @Entity @Table(name="rows") class Row {@Id String id;Integer amount;}
+       interface Store extends JpaRepository<Row,String>{
+--- E4-R05-summary/tests/test_query_parentheses.py
++++ E5-R06/tests/test_query_parentheses.py
+@@ -3,7 +3,7 @@
+ from analyzer.state import ScenarioState,U
+ from builders import build
+ 
+-SOURCE='''class Api {@Autowired Store store;
++SOURCE='''import java.util.*;import org.springframework.data.jpa.repository.*;class Api {@Autowired Store store;
+       List<Row> entry(){return store.visible(1);}}
+       @Entity @Table(name="rows") class Row {@Id String id;Integer amount;}
+       interface Store extends JpaRepository<Row,String>{
+--- E4-R05-summary/tests/test_repository_order32.py
++++ E5-R06/tests/test_repository_order32.py
+@@ -0,0 +1,132 @@
++"""Independent legal-order cases; frozen before the ORM order repair."""
++from copy import deepcopy
++import pytest
++from analyzer.engine import Engine
++from analyzer.paths import run_paths
++from analyzer.state import ScenarioState,U
++from builders import build
++
++ROWS=[{'id':1,'priority':20,'state':'OPEN'},{'id':2,'priority':10,'state':'OPEN'}]
++
++
++def model(tmp_path,body='return repo.findByState("OPEN");',method='List<Reservation> findByState(String state);',rows=None):
++    return build(tmp_path,{'Api.java':'''import java.util.*;import org.springframework.data.jpa.repository.*;
++      class Api{Store repo;Object entry(){'''+body+'''}}
++      @Entity @Table(name="reservations")class Reservation{@Id public Long id;public Integer priority;public String state;}
++      interface Store extends JpaRepository<Reservation,Long>{Reservation save(Reservation value);'''+method+'}'},
++      rows={'reservations':deepcopy(ROWS if rows is None else rows)})
++
++
++def outcomes(p,db,ids):return run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=4)
++
++
++def test_unsorted_repository_list_does_not_claim_dump_order(tmp_path):
++    p,db,ids=model(tmp_path);e=Engine(p,ScenarioState(db));result=e.run(ids['Api.entry'],{})
++    assert len(result)==2 and result.order_known is False
++
++
++@pytest.mark.parametrize('reverse',[False,True])
++def test_first_row_update_preserves_each_legal_id_and_state(tmp_path,reverse):
++    p,db,ids=model(tmp_path,'''List<Reservation> rows=repo.findByState("OPEN");Reservation selected=rows.get(0);
++      selected.state="HELD";repo.save(selected);return selected.id;''',rows=list(reversed(ROWS)) if reverse else ROWS)
++    paths=outcomes(p,db,ids)
++    assert {path['result'] for path in paths}=={1,2}
++    for path in paths:
++        rows=path['state'].database.tables[('service','reservations')]
++        assert all(row['state']==('HELD' if row['id']==path['result'] else 'OPEN') for row in rows)
++    assert ScenarioState(db).database.tables[('service','reservations')]==(list(reversed(ROWS)) if reverse else ROWS)
++
++
++@pytest.mark.parametrize('method,query',[
++    ('List<Reservation> findByStateOrderByPriorityAscIdAsc(String state);','findByStateOrderByPriorityAscIdAsc'),
++    ('@Query("select r from Reservation r where r.state=?1 order by r.priority asc, r.id asc") List<Reservation> ordered(String state);','ordered')])
++def test_source_numeric_total_order_determines_first_id(tmp_path,method,query):
++    p,db,ids=model(tmp_path,'return repo.'+query+'("OPEN").get(0).id;',method)
++    paths=outcomes(p,db,ids);assert {path['result'] for path in paths}=={2}
++    assert all(path['engine'].outcome=='returned' for path in paths)
++
++
++def test_equal_sort_keys_preserve_tie_alternatives(tmp_path):
++    rows=[{**row,'priority':10} for row in ROWS]
++    p,db,ids=model(tmp_path,'return repo.ordered("OPEN").get(0).id;',
++        '@Query("select r from Reservation r where r.state=?1 order by r.priority asc") List<Reservation> ordered(String state);',rows)
++    assert {path['result'] for path in outcomes(p,db,ids)}=={1,2}
++
++
++def test_explicit_null_precedence_and_limit_follow_source_order(tmp_path):
++    rows=[{**ROWS[0],'priority':None},ROWS[1]]
++    p,db,ids=model(tmp_path,'return repo.ordered("OPEN").get(0).id;',
++        '@Query("select r from Reservation r where r.state=?1 order by r.priority asc nulls last") List<Reservation> ordered(String state);',rows)
++    assert {path['result'] for path in outcomes(p,db,ids)}=={2}
++
++
++def test_top_limit_uses_order_before_selecting_entity(tmp_path):
++    p,db,ids=model(tmp_path,'return repo.findFirstByStateOrderByPriorityAscIdAsc("OPEN").id;',
++        'Reservation findFirstByStateOrderByPriorityAscIdAsc(String state);')
++    assert {path['result'] for path in outcomes(p,db,ids)}=={2}
++
++
++def test_large_unordered_ordinal_is_a_boundary_in_the_bounded_model(tmp_path):
++    rows=[{'id':i,'priority':i,'state':'OPEN'} for i in range(8)]
++    p,db,ids=model(tmp_path,'return repo.findByState("OPEN").get(0).id;',rows=rows)
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
++    assert e.outcome=='unsupported_semantics boundary'
++
++
++def test_loop_and_stream_keep_source_order_between_tie_groups(tmp_path):
++    rows=[{'id':1,'priority':10,'state':'OPEN'},{'id':2,'priority':10,'state':'OPEN'},{'id':3,'priority':20,'state':'OPEN'}]
++    method='@Query("select r from Reservation r where r.state=?1 order by r.priority asc") List<Reservation> ordered(String state);'
++    p,db,ids=model(tmp_path/'loop','for(Reservation value:repo.ordered("OPEN")){return value.id;}return -1;',method,rows)
++    assert {path['result'] for path in outcomes(p,db,ids)}=={1,2}
++    p,db,ids=model(tmp_path/'stream','return repo.ordered("OPEN").stream().map(x->x.id).toList();',method,rows)
++    assert {tuple(path['result']) for path in outcomes(p,db,ids)}=={(1,2,3),(2,1,3)}
++
++
++def test_unspecified_null_order_retains_both_provider_policies(tmp_path):
++    p,db,ids=model(tmp_path,'return repo.findByStateOrderByPriorityAsc("OPEN").get(0).id;',
++        'List<Reservation> findByStateOrderByPriorityAsc(String state);',
++        [{**ROWS[0],'priority':None},ROWS[1]])
++    assert {path['result'] for path in outcomes(p,db,ids)}=={1,2}
++
++
++@pytest.mark.parametrize('parameter',['Sort','Pageable','Limit'])
++def test_dynamic_order_and_pagination_stop_before_normal_suffix(tmp_path,parameter):
++    p,db,ids=model(tmp_path,'repo.findByState("OPEN",null);return 77;',
++        'List<Reservation> findByState(String state,org.springframework.data.domain.'+parameter+' order);')
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
++    assert e.outcome=='unsupported_semantics boundary'
++    assert not e.data_operations
++
++
++def test_source_query_namesake_is_not_a_spring_query(tmp_path):
++    p,db,ids=model(tmp_path,'repo.ordered("OPEN");return 77;',
++        '@Query("select r from Reservation r where r.state=?1") List<Reservation> ordered(String state);}\n@interface Query{}\ninterface Other{')
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
++    assert 'annotation identity' in ' '.join(e.warnings)
++
++
++def test_fully_qualified_query_is_supported(tmp_path):
++    p,db,ids=model(tmp_path,'return repo.ordered("OPEN").get(0).id;',
++        '@org.springframework.data.jpa.repository.Query("select r from Reservation r where r.state=?1 order by r.id asc") List<Reservation> ordered(String state);')
++    assert {path['result'] for path in outcomes(p,db,ids)}=={1}
++
++
++def test_unproved_collation_stops_an_ordinal_consumer(tmp_path):
++    p,db,ids=model(tmp_path,'repo.ordered("OPEN").get(0);return 77;',
++        '@Query("select r from Reservation r where r.state=?1 order by r.state asc") List<Reservation> ordered(String state);')
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
++    assert e.outcome=='unsupported_semantics boundary'
++
++
++def test_order_groups_survive_json_and_immutable_request(tmp_path):
++    from analyzer.models import wire
++    from analyzer.request import Request
++    from analyzer.http_json import decode_response
++    rows=[{'id':1,'priority':10,'state':'OPEN'},{'id':2,'priority':10,'state':'OPEN'},{'id':3,'priority':20,'state':'OPEN'}]
++    p,db,ids=model(tmp_path,method='@Query("select r from Reservation r where r.state=?1 order by r.priority asc") List<Reservation> findByState(String state);',rows=rows)
++    e=Engine(p,ScenarioState(db));result=e.run(ids['Api.entry'],{})
++    payload=Request.http('service','POST','/rows',body=wire(result)).body
++    decoded=decode_response(p,payload,'Reservation[]',p.methods[ids['Api.entry']],e.standard_type,
++        lambda message:pytest.fail(message))
++    assert decoded.order_known is False
++    assert decoded.repository_order['variants']==[[[0,1],[2]]]
+--- E4-R05-summary/tests/test_set_source_keys32.py
++++ E5-R06/tests/test_set_source_keys32.py
+@@ -78,6 +78,8 @@
+ 
+ @pytest.mark.parametrize('key',[
+  'class Data{} @Data class Key{int aisle;}',
++ 'import lombok.*;@interface Data{} @Data class Key{int aisle;}',
++ 'import lombok.*;class Key extends external.Base{public int hashCode(){return 1;}public boolean equals(Object o){return true;}}',
+  'import lombok.Data;class Base{int hidden;}@Data class Key extends Base{int aisle;}',
+  'import lombok.EqualsAndHashCode;@EqualsAndHashCode(exclude="aisle")class Key{int aisle;}',
+  'import lombok.Data;@Data class Key{int[] aisles;}',
+@@ -87,3 +89,13 @@
+     e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
+     assert e.outcome=='unsupported_semantics boundary'
+     assert ('','executes',ids['Api.after']) not in e.edges
++
++
++def test_source_hash_reentrant_set_write_keeps_boundary_and_prefix(tmp_path):
++    key='''class Key{Set<Key> parent;Key(Set<Key> p){parent=p;}
++      public int hashCode(){parent.clear();return 1;}public boolean equals(Object o){return false;}}'''
++    p,db,ids=model(tmp_path,'Set<Key> keys=new HashSet<>();keys.add(null);keys.add(new Key(keys));return after();',key)
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
++    assert ('','executes',ids['Key.hashCode']) in e.edges
++    assert ('','executes',ids['Api.after']) not in e.edges
++    assert e.outcome=='unsupported_semantics boundary'

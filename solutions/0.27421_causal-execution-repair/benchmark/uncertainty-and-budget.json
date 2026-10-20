@@ -1,0 +1,1133 @@
+{
+  "alternatives": 1007,
+  "all_unknown_steps": 53,
+  "outcomes": {
+    "uncaught application exception": 304,
+    "returned": 109,
+    "analysis completion budget exhausted": 587,
+    "unsupported_semantics boundary": 4,
+    "request stopped by filter": 3
+  },
+  "effect_categories": {
+    "unknown_receiver": 212,
+    "unsupported_semantics": 803,
+    "known_operation_unknown_value": 468
+  },
+  "operation_examples": [
+    {
+      "category": "unknown_receiver",
+      "operation": "claims",
+      "declared_receiver": "",
+      "scenario": "S0",
+      "step": 1,
+      "alternative": 0,
+      "callsite": "call:method:ts-auth-service:auth.security.jwt.JWTProvider#createToken(auth.entity.User)@31:30",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unknown_receiver",
+      "operation": "setSubject",
+      "declared_receiver": "",
+      "scenario": "S0",
+      "step": 1,
+      "alternative": 0,
+      "callsite": "call:method:ts-auth-service:auth.security.jwt.JWTProvider#createToken(auth.entity.User)@31:39",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "put",
+      "declared_receiver": "io.jsonwebtoken.Claims",
+      "scenario": "S0",
+      "step": 1,
+      "alternative": 2,
+      "callsite": "call:method:ts-auth-service:auth.security.jwt.JWTProvider#createToken(auth.entity.User)@32:16",
+      "heap_roots": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getMessage",
+      "declared_receiver": "auth.exception.UserOperationException",
+      "scenario": "S0",
+      "step": 1,
+      "alternative": 3,
+      "callsite": "call:method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)@48:108",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unknown_receiver",
+      "operation": "builder",
+      "declared_receiver": "",
+      "scenario": "S0",
+      "step": 1,
+      "alternative": 6,
+      "callsite": "call:method:ts-auth-service:auth.security.jwt.JWTProvider#createToken(auth.entity.User)@38:21",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unknown_receiver",
+      "operation": "setClaims",
+      "declared_receiver": "",
+      "scenario": "S0",
+      "step": 1,
+      "alternative": 6,
+      "callsite": "call:method:ts-auth-service:auth.security.jwt.JWTProvider#createToken(auth.entity.User)@39:18",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "known_operation_unknown_value",
+      "operation": "size",
+      "declared_receiver": "java.util.ArrayList",
+      "scenario": "S0",
+      "step": 2,
+      "alternative": 0,
+      "callsite": "call:method:ts-contacts-service:contacts.service.ContactsServiceImpl#findContactsByAccountId(java.lang.String,org.springframework.http.HttpHeaders)@44:107",
+      "heap_roots": [],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "java.lang.NullPointerException"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getFrom",
+      "declared_receiver": "order.entity.Order",
+      "scenario": "S0",
+      "step": 3,
+      "alternative": 1,
+      "callsite": "call:method:ts-order-service:order.service.OrderServiceImpl#queryOrdersForRefresh(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)@196:34",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getTo",
+      "declared_receiver": "order.entity.Order",
+      "scenario": "S0",
+      "step": 3,
+      "alternative": 2,
+      "callsite": "call:method:ts-order-service:order.service.OrderServiceImpl#queryOrdersForRefresh(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)@197:34",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getFrom",
+      "declared_receiver": "other.entity.Order",
+      "scenario": "S0",
+      "step": 4,
+      "alternative": 1,
+      "callsite": "call:method:ts-order-other-service:other.service.OrderOtherServiceImpl#queryOrdersForRefresh(other.entity.QueryInfo,java.lang.String,org.springframework.http.HttpHeaders)@213:34",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getTo",
+      "declared_receiver": "other.entity.Order",
+      "scenario": "S0",
+      "step": 4,
+      "alternative": 2,
+      "callsite": "call:method:ts-order-other-service:other.service.OrderOtherServiceImpl#queryOrdersForRefresh(other.entity.QueryInfo,java.lang.String,org.springframework.http.HttpHeaders)@214:34",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unknown_receiver",
+      "operation": "fromString",
+      "declared_receiver": "",
+      "scenario": "S0",
+      "step": 6,
+      "alternative": 0,
+      "callsite": "call:method:ts-consign-service:consign.controller.ConsignController#findByAccountId(java.lang.String,org.springframework.http.HttpHeaders)@49:27",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "known_operation_unknown_value",
+      "operation": "isEmpty",
+      "declared_receiver": "java.util.List",
+      "scenario": "S0",
+      "step": 6,
+      "alternative": 1,
+      "callsite": "call:method:ts-consign-service:consign.service.ConsignServiceImpl#queryByAccountId(java.util.UUID,org.springframework.http.HttpHeaders)@121:55",
+      "heap_roots": [],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "java.lang.NullPointerException"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getName",
+      "declared_receiver": "edu.fudan.common.entity.TrainType",
+      "scenario": "S1",
+      "step": 2,
+      "alternative": 0,
+      "callsite": "call:method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders)@217:32",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getBody",
+      "declared_receiver": "org.springframework.http.ResponseEntity<edu.fudan.common.util.Response>",
+      "scenario": "S1",
+      "step": 2,
+      "alternative": 2,
+      "callsite": "call:method:ts-travel-service:travel.service.TravelServiceImpl#getTicketsByBatch(java.util.List,java.lang.String,java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)@353:25",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getStatus",
+      "declared_receiver": "edu.fudan.common.util.Response",
+      "scenario": "S1",
+      "step": 2,
+      "alternative": 2,
+      "callsite": "call:method:ts-travel-service:travel.service.TravelServiceImpl#getTicketsByBatch(java.util.List,java.lang.String,java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)@354:14",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getFoodList",
+      "declared_receiver": "trainFood.entity.TrainFood",
+      "scenario": "S1",
+      "step": 4,
+      "alternative": 1,
+      "callsite": "call:method:ts-train-food-service:trainFood.service.TrainFoodServiceImpl#listTrainFoodByTripId(java.lang.String,org.springframework.http.HttpHeaders)@58:50",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "known_operation_unknown_value",
+      "operation": "isPresent",
+      "declared_receiver": "java.util.Optional",
+      "scenario": "S1",
+      "step": 9,
+      "alternative": 0,
+      "callsite": "call:method:ts-order-service:order.service.OrderServiceImpl#getOrderPrice(java.lang.String,org.springframework.http.HttpHeaders)@332:17",
+      "heap_roots": [],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "java.lang.NullPointerException"
+      ]
+    },
+    {
+      "category": "known_operation_unknown_value",
+      "operation": "get",
+      "declared_receiver": "java.util.Optional",
+      "scenario": "S1",
+      "step": 9,
+      "alternative": 2,
+      "callsite": "call:method:ts-order-service:order.service.OrderServiceImpl#getOrderPrice(java.lang.String,org.springframework.http.HttpHeaders)@336:30",
+      "heap_roots": [],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "java.lang.NullPointerException",
+        "java.util.NoSuchElementException"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getBody",
+      "declared_receiver": "org.springframework.http.ResponseEntity<edu.fudan.common.util.Response<java.util.List<edu.fudan.common.entity.Food>>>",
+      "scenario": "S2",
+      "step": 4,
+      "alternative": 2,
+      "callsite": "call:method:ts-food-service:foodsearch.service.FoodServiceImpl#getAllFood(java.lang.String,java.lang.String,java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)@238:67",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getData",
+      "declared_receiver": "edu.fudan.common.util.Response<java.util.List<edu.fudan.common.entity.Food>>",
+      "scenario": "S2",
+      "step": 4,
+      "alternative": 4,
+      "callsite": "call:method:ts-food-service:foodsearch.service.FoodServiceImpl#getAllFood(java.lang.String,java.lang.String,java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)@238:77",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getRouteId",
+      "declared_receiver": "travel.entity.Trip",
+      "scenario": "S2",
+      "step": 4,
+      "alternative": 6,
+      "callsite": "call:method:ts-travel-service:travel.service.TravelServiceImpl#getRouteByTripId(java.lang.String,org.springframework.http.HttpHeaders)@80:48",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "containsKey",
+      "declared_receiver": "org.springframework.http.HttpHeaders",
+      "scenario": "S2",
+      "step": 9,
+      "alternative": 0,
+      "callsite": "call:method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)@256:24",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getFirst",
+      "declared_receiver": "org.springframework.http.HttpHeaders",
+      "scenario": "S2",
+      "step": 9,
+      "alternative": 2,
+      "callsite": "call:method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)@257:66",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "add",
+      "declared_receiver": "org.springframework.http.HttpHeaders",
+      "scenario": "S2",
+      "step": 9,
+      "alternative": 3,
+      "callsite": "call:method:ts-cancel-service:cancel.service.CancelServiceImpl#getAuthorizationHeadersFrom(org.springframework.http.HttpHeaders)@257:24",
+      "heap_roots": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getMessage",
+      "declared_receiver": "Exception",
+      "scenario": "S2",
+      "step": 10,
+      "alternative": 3,
+      "callsite": "call:method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)@49:45",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "error",
+      "declared_receiver": "org.slf4j.Logger",
+      "scenario": "S2",
+      "step": 10,
+      "alternative": 6,
+      "callsite": "call:method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)@49:37",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unknown_receiver",
+      "operation": "parseDouble",
+      "declared_receiver": "",
+      "scenario": "S3",
+      "step": 14,
+      "alternative": 0,
+      "callsite": "call:method:ts-consign-price-service:consignprice.controller.ConsignPriceController#getPriceByWeightAndRegion(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)@35:60",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getInitialPrice",
+      "declared_receiver": "consignprice.entity.ConsignPrice",
+      "scenario": "S3",
+      "step": 14,
+      "alternative": 1,
+      "callsite": "call:method:ts-consign-price-service:consignprice.service.ConsignPriceServiceImpl#getPriceByWeightAndRegion(double,boolean,org.springframework.http.HttpHeaders)@29:43",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getInitialWeight",
+      "declared_receiver": "consignprice.entity.ConsignPrice",
+      "scenario": "S3",
+      "step": 14,
+      "alternative": 2,
+      "callsite": "call:method:ts-consign-price-service:consignprice.service.ConsignPriceServiceImpl#getPriceByWeightAndRegion(double,boolean,org.springframework.http.HttpHeaders)@30:35",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getWithinPrice",
+      "declared_receiver": "consignprice.entity.ConsignPrice",
+      "scenario": "S3",
+      "step": 14,
+      "alternative": 3,
+      "callsite": "call:method:ts-consign-price-service:consignprice.service.ConsignPriceServiceImpl#getPriceByWeightAndRegion(double,boolean,org.springframework.http.HttpHeaders)@35:66",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getInstances",
+      "declared_receiver": "org.springframework.cloud.client.discovery.DiscoveryClient",
+      "scenario": "S4",
+      "step": 1,
+      "alternative": 0,
+      "callsite": "call:method:ts-user-service:user.service.impl.UserServiceImpl#createDefaultAuthUser(user.dto.AuthDto)@86:59",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "known_operation_unknown_value",
+      "operation": "size",
+      "declared_receiver": "java.util.List",
+      "scenario": "S4",
+      "step": 1,
+      "alternative": 0,
+      "callsite": "call:method:ts-user-service:user.service.impl.UserServiceImpl#createDefaultAuthUser(user.dto.AuthDto)@87:22",
+      "heap_roots": [],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "java.lang.NullPointerException"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "orElseThrow",
+      "declared_receiver": "java.util.Optional<auth.entity.User>",
+      "scenario": "S4",
+      "step": 2,
+      "alternative": 0,
+      "callsite": "call:method:ts-auth-service:auth.security.UserDetailsServiceImpl#loadUserByUsername(java.lang.String)@30:18",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getNum",
+      "declared_receiver": "edu.fudan.common.entity.RoutePlanInfo",
+      "scenario": "S5",
+      "step": 2,
+      "alternative": 0,
+      "callsite": "call:method:ts-route-plan-service:plan.controller.RoutePlanController#getCheapestRoutes(edu.fudan.common.entity.RoutePlanInfo,org.springframework.http.HttpHeaders)@32:178",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getTravelDate",
+      "declared_receiver": "edu.fudan.common.entity.RoutePlanInfo",
+      "scenario": "S5",
+      "step": 2,
+      "alternative": 3,
+      "callsite": "call:method:ts-route-plan-service:plan.controller.RoutePlanController#getCheapestRoutes(edu.fudan.common.entity.RoutePlanInfo,org.springframework.http.HttpHeaders)@32:193",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getBody",
+      "declared_receiver": "org.springframework.http.ResponseEntity<edu.fudan.common.util.Response<java.util.ArrayList<edu.fudan.common.entity.RoutePlanResultUnit>>>",
+      "scenario": "S5",
+      "step": 2,
+      "alternative": 4,
+      "callsite": "call:method:ts-travel-plan-service:travelplan.service.TravelPlanServiceImpl#getRoutePlanResultCheapest(edu.fudan.common.entity.RoutePlanInfo,org.springframework.http.HttpHeaders)@263:19",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "parse",
+      "declared_receiver": "java.text.SimpleDateFormat",
+      "scenario": "S5",
+      "step": 8,
+      "alternative": 0,
+      "callsite": "call:method:ts-common:edu.fudan.common.util.StringUtils#String2Date(java.lang.String)@24:32",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getHeader",
+      "declared_receiver": "javax.servlet.http.HttpServletRequest",
+      "scenario": "S6",
+      "step": 2,
+      "alternative": 0,
+      "callsite": "call:method:ts-common:edu.fudan.common.security.jwt.JWTUtil#getTokenFromHeader(javax.servlet.http.HttpServletRequest)@90:38",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unknown_receiver",
+      "operation": "parser",
+      "declared_receiver": "",
+      "scenario": "S6",
+      "step": 2,
+      "alternative": 2,
+      "callsite": "call:method:ts-common:edu.fudan.common.security.jwt.JWTUtil#getClaims(java.lang.String)@120:21",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unknown_receiver",
+      "operation": "getContext",
+      "declared_receiver": "",
+      "scenario": "S6",
+      "step": 2,
+      "alternative": 3,
+      "callsite": "call:method:ts-common:edu.fudan.common.security.jwt.JWTFilter#doFilterInternal(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse,javax.servlet.FilterChain)@26:35",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unknown_receiver",
+      "operation": "setSigningKey",
+      "declared_receiver": "",
+      "scenario": "S6",
+      "step": 2,
+      "alternative": 4,
+      "callsite": "call:method:ts-common:edu.fudan.common.security.jwt.JWTUtil#getClaims(java.lang.String)@120:30",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unknown_receiver",
+      "operation": "parseClaimsJws",
+      "declared_receiver": "",
+      "scenario": "S6",
+      "step": 2,
+      "alternative": 4,
+      "callsite": "call:method:ts-common:edu.fudan.common.security.jwt.JWTUtil#getClaims(java.lang.String)@120:55",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unknown_receiver",
+      "operation": "setAuthentication",
+      "declared_receiver": "",
+      "scenario": "S6",
+      "step": 2,
+      "alternative": 6,
+      "callsite": "call:method:ts-common:edu.fudan.common.security.jwt.JWTFilter#doFilterInternal(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse,javax.servlet.FilterChain)@26:48",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getId",
+      "declared_receiver": "edu.fudan.common.entity.Station",
+      "scenario": "S6",
+      "step": 2,
+      "alternative": 6,
+      "callsite": "call:method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#addStation(edu.fudan.common.entity.Station,org.springframework.http.HttpHeaders)@86:102",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getName",
+      "declared_receiver": "fdse.microservice.entity.Station",
+      "scenario": "S6",
+      "step": 4,
+      "alternative": 0,
+      "callsite": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@108:30",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getId",
+      "declared_receiver": "fdse.microservice.entity.Station",
+      "scenario": "S6",
+      "step": 4,
+      "alternative": 1,
+      "callsite": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@108:43",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getStatus",
+      "declared_receiver": "edu.fudan.common.util.Response<java.util.Map<java.lang.String,java.lang.String>>",
+      "scenario": "S6",
+      "step": 4,
+      "alternative": 2,
+      "callsite": "call:method:ts-admin-route-service:adminroute.service.AdminRouteServiceImpl#checkStationsExists(java.util.List,?HttpHeaders)@109:14",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getStartStation",
+      "declared_receiver": "route.entity.RouteInfo",
+      "scenario": "S6",
+      "step": 4,
+      "alternative": 6,
+      "callsite": "call:method:ts-route-service:route.controller.RouteController#createAndModifyRoute(route.entity.RouteInfo,org.springframework.http.HttpHeaders)@35:117",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getEndStation",
+      "declared_receiver": "route.entity.RouteInfo",
+      "scenario": "S6",
+      "step": 4,
+      "alternative": 6,
+      "callsite": "call:method:ts-route-service:route.controller.RouteController#createAndModifyRoute(route.entity.RouteInfo,org.springframework.http.HttpHeaders)@35:160",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getStatusCode",
+      "declared_receiver": "org.springframework.http.ResponseEntity<edu.fudan.common.util.Response<edu.fudan.common.entity.Route>>",
+      "scenario": "S6",
+      "step": 4,
+      "alternative": 7,
+      "callsite": "call:method:ts-admin-route-service:adminroute.service.AdminRouteServiceImpl#createAndModifyRoute(edu.fudan.common.entity.RouteInfo,?HttpHeaders)@76:16",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getTripId",
+      "declared_receiver": "travel.entity.Trip",
+      "scenario": "S6",
+      "step": 8,
+      "alternative": 0,
+      "callsite": "call:method:ts-travel-service:travel.service.TravelServiceImpl#getTicketsByBatch(java.util.List,java.lang.String,java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)@340:30",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getTrainTypeName",
+      "declared_receiver": "edu.fudan.common.entity.Trip",
+      "scenario": "S6",
+      "step": 8,
+      "alternative": 1,
+      "callsite": "call:method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders)@141:47",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getRouteId",
+      "declared_receiver": "edu.fudan.common.entity.Trip",
+      "scenario": "S6",
+      "step": 8,
+      "alternative": 2,
+      "callsite": "call:method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders)@142:41",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getTripId",
+      "declared_receiver": "edu.fudan.common.entity.Trip",
+      "scenario": "S6",
+      "step": 8,
+      "alternative": 2,
+      "callsite": "call:method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders)@144:48",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unknown_receiver",
+      "operation": "parseBoolean",
+      "declared_receiver": "",
+      "scenario": "S7",
+      "step": 12,
+      "alternative": 2,
+      "callsite": "call:method:ts-consign-price-service:consignprice.controller.ConsignPriceController#getPriceByWeightAndRegion(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)@36:25",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getBody",
+      "declared_receiver": "org.springframework.http.ResponseEntity<edu.fudan.common.util.Response<java.lang.Double>>",
+      "scenario": "S7",
+      "step": 12,
+      "alternative": 3,
+      "callsite": "call:method:ts-consign-service:consign.service.ConsignServiceImpl#insertConsignRecord(consign.entity.Consign,org.springframework.http.HttpHeaders)@73:35",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": null,
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "category": "unsupported_semantics",
+      "operation": "getData",
+      "declared_receiver": "edu.fudan.common.util.Response<java.lang.Double>",
+      "scenario": "S7",
+      "step": 12,
+      "alternative": 6,
+      "callsite": "call:method:ts-consign-service:consign.service.ConsignServiceImpl#insertConsignRecord(consign.entity.Consign,org.springframework.http.HttpHeaders)@73:45",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    }
+  ],
+  "controlled_request_budget_runs": [
+    {
+      "path_limit": 1,
+      "passed_full_source_oracle": true,
+      "steps": 8,
+      "alternatives": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "preparation_seconds": 0.04056191700510681,
+      "analysis_seconds": 0.08087708300445229,
+      "peak_rss_bytes": 55115776
+    },
+    {
+      "path_limit": 4,
+      "passed_full_source_oracle": true,
+      "steps": 8,
+      "alternatives": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "preparation_seconds": 0.023538167006336153,
+      "analysis_seconds": 0.06701858399901539,
+      "peak_rss_bytes": 53690368
+    },
+    {
+      "path_limit": 8,
+      "passed_full_source_oracle": true,
+      "steps": 8,
+      "alternatives": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "preparation_seconds": 0.023051791999023408,
+      "analysis_seconds": 0.06587945896899328,
+      "peak_rss_bytes": 54525952
+    }
+  ],
+  "policy": "Preserve typed readonly native summaries and join compatible continuations; retain separate throwing completions and visible stops for unsupported calls",
+  "decision": "No global budget increase: the real full chain passes at 1/4/8; unsupported TT library/receiver cases remain partial and are not replaced by static closure",
+  "accuracy_limits": [
+    "True opaque effects cannot promise exact heap or future edges",
+    "Application exception is not automatically a legitimate business refusal",
+    "TT requests come from NL hypotheses; only the separate source-profile HTTP chain is an independently controlled Request experiment"
+  ],
+  "model_calls": 0,
+  "external_llm_api_calls": 0,
+  "deepseek_calls": 0
+}

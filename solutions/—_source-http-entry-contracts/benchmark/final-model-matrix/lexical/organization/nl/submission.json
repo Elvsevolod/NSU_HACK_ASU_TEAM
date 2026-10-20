@@ -1,0 +1,57 @@
+{
+  "project": "organization",
+  "scenarios": {
+    "organization-fresh-isolation": {
+      "edges": []
+    },
+    "organization-state-chain": {
+      "edges": [
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#add(Organization)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Organization#setAddress(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Organization#setDepartments(List<Department>)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Organization#setEmployees(List<Employee>)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Organization#setId(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Organization#setName(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Organization#toString()"
+        },
+        {
+          "source": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#add(Organization)",
+          "relation": "calls",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Organization#toString()"
+        },
+        {
+          "source": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#add(Organization)",
+          "relation": "data",
+          "target": "res:table:organization-service.organization"
+        }
+      ]
+    }
+  }
+}

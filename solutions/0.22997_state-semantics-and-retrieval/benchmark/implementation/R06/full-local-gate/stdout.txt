@@ -1,0 +1,103 @@
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 10%]
+........................................................................ [ 14%]
+........................................................................ [ 17%]
+........................................................................ [ 21%]
+........................................................................ [ 24%]
+........................................................................ [ 28%]
+........................................................................ [ 31%]
+........................................................................ [ 35%]
+........................................................................ [ 38%]
+......................................FFFF.............................. [ 42%]
+........................................................................ [ 45%]
+........................................................................ [ 49%]
+........................................................................ [ 52%]
+........................................................................ [ 56%]
+........................................................................ [ 59%]
+........................................................................ [ 63%]
+........................................................................ [ 66%]
+........................................................................ [ 70%]
+........................................................................ [ 73%]
+........................................................................ [ 77%]
+........................................................................ [ 80%]
+........................................................................ [ 84%]
+........................................................................ [ 87%]
+........................................................................ [ 91%]
+........................................................................ [ 94%]
+........................................................................ [ 98%]
+.......................................                                  [100%]
+=================================== FAILURES ===================================
+_______ test_batch_unique_membership_noop_and_following_http_request[1] ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-26/test_batch_unique_membership_n0')
+limit = 1
+
+    @pytest.mark.parametrize('limit',[1,4,8])
+    def test_batch_unique_membership_noop_and_following_http_request(tmp_path,limit):
+        p,db,ids=fixture(tmp_path);state=ScenarioState(db)
+        paths=run_paths(p,state,ids['gateway.InventoryGateway.listProducts'],Request.http('gateway','GET','/inventory'),limit=limit)
+>       assert len(paths)==1
+E       AssertionError: assert 2 == 1
+E        +  where 2 = len([{'approximate': False, 'decisions': {'1:method:gateway:InventoryGateway#listProducts():13:unordered-collection-next':...7fa8c50>, 'exploration': {'complete': True, 'completed': 2, 'completion_budget': 8, 'completion_splits': 2, ...}, ...}])
+
+code/tests/test_inventory_collection_journey.py:78: AssertionError
+_______ test_batch_unique_membership_noop_and_following_http_request[4] ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-26/test_batch_unique_membership_n1')
+limit = 4
+
+    @pytest.mark.parametrize('limit',[1,4,8])
+    def test_batch_unique_membership_noop_and_following_http_request(tmp_path,limit):
+        p,db,ids=fixture(tmp_path);state=ScenarioState(db)
+        paths=run_paths(p,state,ids['gateway.InventoryGateway.listProducts'],Request.http('gateway','GET','/inventory'),limit=limit)
+>       assert len(paths)==1
+E       AssertionError: assert 2 == 1
+E        +  where 2 = len([{'approximate': False, 'decisions': {'1:method:gateway:InventoryGateway#listProducts():13:unordered-collection-next':...9137190>, 'exploration': {'complete': True, 'completed': 2, 'completion_budget': 8, 'completion_splits': 0, ...}, ...}])
+
+code/tests/test_inventory_collection_journey.py:78: AssertionError
+_______ test_batch_unique_membership_noop_and_following_http_request[8] ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-26/test_batch_unique_membership_n2')
+limit = 8
+
+    @pytest.mark.parametrize('limit',[1,4,8])
+    def test_batch_unique_membership_noop_and_following_http_request(tmp_path,limit):
+        p,db,ids=fixture(tmp_path);state=ScenarioState(db)
+        paths=run_paths(p,state,ids['gateway.InventoryGateway.listProducts'],Request.http('gateway','GET','/inventory'),limit=limit)
+>       assert len(paths)==1
+E       AssertionError: assert 2 == 1
+E        +  where 2 = len([{'approximate': False, 'decisions': {'1:method:gateway:InventoryGateway#listProducts():13:unordered-collection-next':...7f401d0>, 'exploration': {'complete': True, 'completed': 2, 'completion_budget': 8, 'completion_splits': 0, ...}, ...}])
+
+code/tests/test_inventory_collection_journey.py:78: AssertionError
+__________ test_nl_selects_observed_product_and_rereads_changed_state __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-26/test_nl_selects_observed_produ0')
+
+    def test_nl_selects_observed_product_and_rereads_changed_state(tmp_path):
+        p,db,ids=fixture(tmp_path);frontend=Frontend(p)
+        _,trace=analyze(p,frontend,ContractIndex(p,frontend),None,db,{'facts':{},'unresolved':[],'choice_rules':[]},
+            {'id':'inventory','steps':[{'n':1,'action':'List products'},{'n':2,'action':'Reserve second product'},
+                                      {'n':3,'action':'List products'}]},path_limit=4,grounder_type=ContractGrounder)
+        second=trace['steps'][1]['alternatives']
+>       assert len(second)==1 and second[0]['entry']==ids['gateway.InventoryGateway.reserveProduct']
+E       AssertionError: assert (2 == 1)
+E        +  where 2 = len([{'assumptions': {}, 'bindings': {'id': {'quote': '', 'reference': 'gateway/ui.js:3:url0:item.id;row=gateway/page.html...e.html:2;history[0].result[1].id', 'resolved': True, 'source': 'ui'}}, 'call_effects': [], 'created_objects': [], ...}])
+
+code/tests/test_inventory_collection_journey.py:101: AssertionError
+----------------------------- Captured stdout call -----------------------------
+inventory step 1 paths 2
+inventory step 2 paths 2
+inventory step 3 paths 4
+=============================== warnings summary ===============================
+checks/tests/test_archive_support.py::test_duplicate_symlink_or_corruption[options0]
+  /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/zipfile.py:1566: UserWarning: Duplicate name: 'submission.json'
+    return self._open_to_write(zinfo, force_zip64=force_zip64)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED code/tests/test_inventory_collection_journey.py::test_batch_unique_membership_noop_and_following_http_request[1]
+FAILED code/tests/test_inventory_collection_journey.py::test_batch_unique_membership_noop_and_following_http_request[4]
+FAILED code/tests/test_inventory_collection_journey.py::test_batch_unique_membership_noop_and_following_http_request[8]
+FAILED code/tests/test_inventory_collection_journey.py::test_nl_selects_observed_product_and_rereads_changed_state
+4 failed, 2051 passed, 1 warning in 8.72s

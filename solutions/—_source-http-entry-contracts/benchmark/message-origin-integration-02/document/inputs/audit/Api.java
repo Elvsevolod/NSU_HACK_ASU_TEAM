@@ -1,0 +1,2 @@
+import org.springframework.http.*;class AuditController{
+ @PostMapping("/events") ResponseEntity<String> accept(@RequestBody String id){return new ResponseEntity<String>(null,HttpStatus.SERVICE_UNAVAILABLE);}}

@@ -1,0 +1,108 @@
+.............FFF.F                                                       [100%]
+=================================== FAILURES ===================================
+_ test_unobserved_custom_codec_registration_stops_after_the_server_prefix[client] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-125/test_unobserved_custom_codec_r0')
+customization = 'client'
+
+    @pytest.mark.parametrize('customization', ['client','scan','property','mapper','boot'])
+    def test_unobserved_custom_codec_registration_stops_after_the_server_prefix(tmp_path,customization):
+        extra='';boot=BOOT;context=None
+        if customization=='client':extra='class ClientConfig{}'
+        if customization=='scan':boot=BOOT.replace('@EnableFeignClients','@EnableFeignClients(defaultConfiguration=ClientConfig.class)');extra='class ClientConfig{}'
+        if customization=='property':
+            context={'configuration':{'service':{'propertySources':[{'name':'provided','source':{
+                'spring.cloud.openfeign.client.config.service.decoder':'foreign.CustomDecoder'}}]}}}
+        if customization=='mapper':extra='@Configuration class Wiring{@Bean com.fasterxml.jackson.databind.ObjectMapper custom(){return new com.fasterxml.jackson.databind.ObjectMapper();}}'
+        if customization=='boot':boot=BOOT.replace('@SpringBootApplication','@SpringBootApplication(exclude=org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration.class)')
+        e,ids=fixture(tmp_path,extra=extra,boot=boot,context=context,entry='client.read();return after();')
+        if customization=='client':
+            source=(tmp_path/'Api.java').read_text().replace('url="http://service:8080"','url="http://service:8080",configuration=ClientConfig.class')
+            p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Api.entry'],{}) is U and e.approximate
+E       AssertionError: assert ('after' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'after' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106107890>.run
+
+code/tests/test_feign_decoder33.py:159: AssertionError
+_ test_unobserved_custom_codec_registration_stops_after_the_server_prefix[scan] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-125/test_unobserved_custom_codec_r1')
+customization = 'scan'
+
+    @pytest.mark.parametrize('customization', ['client','scan','property','mapper','boot'])
+    def test_unobserved_custom_codec_registration_stops_after_the_server_prefix(tmp_path,customization):
+        extra='';boot=BOOT;context=None
+        if customization=='client':extra='class ClientConfig{}'
+        if customization=='scan':boot=BOOT.replace('@EnableFeignClients','@EnableFeignClients(defaultConfiguration=ClientConfig.class)');extra='class ClientConfig{}'
+        if customization=='property':
+            context={'configuration':{'service':{'propertySources':[{'name':'provided','source':{
+                'spring.cloud.openfeign.client.config.service.decoder':'foreign.CustomDecoder'}}]}}}
+        if customization=='mapper':extra='@Configuration class Wiring{@Bean com.fasterxml.jackson.databind.ObjectMapper custom(){return new com.fasterxml.jackson.databind.ObjectMapper();}}'
+        if customization=='boot':boot=BOOT.replace('@SpringBootApplication','@SpringBootApplication(exclude=org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration.class)')
+        e,ids=fixture(tmp_path,extra=extra,boot=boot,context=context,entry='client.read();return after();')
+        if customization=='client':
+            source=(tmp_path/'Api.java').read_text().replace('url="http://service:8080"','url="http://service:8080",configuration=ClientConfig.class')
+            p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Api.entry'],{}) is U and e.approximate
+E       AssertionError: assert ('after' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'after' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1050d7c10>.run
+
+code/tests/test_feign_decoder33.py:159: AssertionError
+_ test_unobserved_custom_codec_registration_stops_after_the_server_prefix[property] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-125/test_unobserved_custom_codec_r2')
+customization = 'property'
+
+    @pytest.mark.parametrize('customization', ['client','scan','property','mapper','boot'])
+    def test_unobserved_custom_codec_registration_stops_after_the_server_prefix(tmp_path,customization):
+        extra='';boot=BOOT;context=None
+        if customization=='client':extra='class ClientConfig{}'
+        if customization=='scan':boot=BOOT.replace('@EnableFeignClients','@EnableFeignClients(defaultConfiguration=ClientConfig.class)');extra='class ClientConfig{}'
+        if customization=='property':
+            context={'configuration':{'service':{'propertySources':[{'name':'provided','source':{
+                'spring.cloud.openfeign.client.config.service.decoder':'foreign.CustomDecoder'}}]}}}
+        if customization=='mapper':extra='@Configuration class Wiring{@Bean com.fasterxml.jackson.databind.ObjectMapper custom(){return new com.fasterxml.jackson.databind.ObjectMapper();}}'
+        if customization=='boot':boot=BOOT.replace('@SpringBootApplication','@SpringBootApplication(exclude=org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration.class)')
+        e,ids=fixture(tmp_path,extra=extra,boot=boot,context=context,entry='client.read();return after();')
+        if customization=='client':
+            source=(tmp_path/'Api.java').read_text().replace('url="http://service:8080"','url="http://service:8080",configuration=ClientConfig.class')
+            p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Api.entry'],{}) is U and e.approximate
+E       AssertionError: assert ('after' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'after' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1061c2690>.run
+
+code/tests/test_feign_decoder33.py:159: AssertionError
+_ test_unobserved_custom_codec_registration_stops_after_the_server_prefix[boot] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-125/test_unobserved_custom_codec_r4')
+customization = 'boot'
+
+    @pytest.mark.parametrize('customization', ['client','scan','property','mapper','boot'])
+    def test_unobserved_custom_codec_registration_stops_after_the_server_prefix(tmp_path,customization):
+        extra='';boot=BOOT;context=None
+        if customization=='client':extra='class ClientConfig{}'
+        if customization=='scan':boot=BOOT.replace('@EnableFeignClients','@EnableFeignClients(defaultConfiguration=ClientConfig.class)');extra='class ClientConfig{}'
+        if customization=='property':
+            context={'configuration':{'service':{'propertySources':[{'name':'provided','source':{
+                'spring.cloud.openfeign.client.config.service.decoder':'foreign.CustomDecoder'}}]}}}
+        if customization=='mapper':extra='@Configuration class Wiring{@Bean com.fasterxml.jackson.databind.ObjectMapper custom(){return new com.fasterxml.jackson.databind.ObjectMapper();}}'
+        if customization=='boot':boot=BOOT.replace('@SpringBootApplication','@SpringBootApplication(exclude=org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration.class)')
+        e,ids=fixture(tmp_path,extra=extra,boot=boot,context=context,entry='client.read();return after();')
+        if customization=='client':
+            source=(tmp_path/'Api.java').read_text().replace('url="http://service:8080"','url="http://service:8080",configuration=ClientConfig.class')
+            p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Api.entry'],{}) is U and e.approximate
+E       AssertionError: assert ('after' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'after' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1061fcd10>.run
+
+code/tests/test_feign_decoder33.py:159: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_feign_decoder33.py::test_unobserved_custom_codec_registration_stops_after_the_server_prefix[client]
+FAILED code/tests/test_feign_decoder33.py::test_unobserved_custom_codec_registration_stops_after_the_server_prefix[scan]
+FAILED code/tests/test_feign_decoder33.py::test_unobserved_custom_codec_registration_stops_after_the_server_prefix[property]
+FAILED code/tests/test_feign_decoder33.py::test_unobserved_custom_codec_registration_stops_after_the_server_prefix[boot]
+4 failed, 14 passed in 0.22s

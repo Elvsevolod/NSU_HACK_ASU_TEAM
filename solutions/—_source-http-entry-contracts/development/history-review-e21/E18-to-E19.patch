@@ -1,0 +1,65 @@
+--- E18-history-origin-chain/analyzer/contracts.py
++++ E19-selected-response-origin/analyzer/contracts.py
+@@ -495,7 +495,14 @@
+             if fqn not in types:continue
+             proposal=self._bind(action,state,contract,row['score'])
+             name=pars[0]['name'];proof=proposal['bindings'].get(name,{})
+-            match=re.fullmatch(r'history\[(\d+)\]\.(?:result|created_objects\[\d+\])\.([\w$]+)',proof.get('reference',''))
++            reference=proof.get('reference','');selection=None
++            selected_ref=re.fullmatch(r'history\[(\d+)\]\.selected_objects\[(\d+)\]\.value',reference)
++            if selected_ref:
++                i,j=map(int,selected_ref.groups());objects=state.history[i].get('selected_objects',[])
++                if not isinstance(objects,list) or j>=len(objects):continue
++                selection=objects[j];reference=selection.get('reference','')
++                if not isinstance(reference,str) or not re.fullmatch(r'history\['+str(i)+r'\]\.result\.[\w$]+',reference):continue
++            match=re.fullmatch(r'history\[(\d+)\]\.(?:result|created_objects\[\d+\])\.([\w$]+)',reference)
+             if (proposal['unresolved'] or proof.get('source')!='history' or not match or int(match[1])<number or
+                 not proof.get('producer_observation',{}).get('digest')):continue
+             selected=state.history[int(match[1])];record=selected.get('result')
+@@ -503,6 +510,8 @@
+                 selected.get('entry') not in self.project.methods or
+                 not isinstance(record,dict) or object_scope(self.project,selected,record)[1]!=fqn or
+                 result_shape(self.project,selected.get('entry'))!=(types,False)):continue
++            if selection and (selection.get('qualified_type')!=fqn or selection.get('producer_entry')!=selected['entry'] or
++                key(selection.get('value',U),include_origins=True)!=key(proposal['params'].get(name,U),include_origins=True)):continue
+             field=match[2];layout=self.project.type_fields.get(tid,{}).get(field,{})
+             engine=Engine(self.project,proposal['state'])
+             kind=engine.declared_kind(pars[0]['type'],self.project.methods[mid])
+@@ -519,7 +528,8 @@
+             if valid and creation_digest and key(record.get(field,U),include_origins=True)==key(value,include_origins=True) and proposal['params'].get(name)==value:
+                 evidence={'rule':'singular source GET and complete agreeing created identity','type':fqn,'field':field,
+                     'creation':{'step':item.get('step'),'entry':item.get('entry'),'digest':creation_digest},
+-                    'value_producer':deepcopy(proof['producer_observation']),'reference':proof['reference']}
++                    'value_producer':deepcopy(proof['producer_observation']),'reference':proof['reference'],
++                    'response_reference':reference}
+                 choices.append((row['score'],row['contract_id'],{**contract,'history_constraint':evidence}))
+         return choices if len(choices)==1 and raw[0]['score']-choices[0][0]<=0.08*max(raw[0]['score'],1e-12) else []
+ 
+--- E18-history-origin-chain/tests/test_history_request_choice33.py
++++ E19-selected-response-origin/tests/test_history_request_choice33.py
+@@ -126,3 +126,25 @@
+     state.history.append(later)
+     proposals,detail=g.step('Read the parcel just created again',state)
+     assert not proposals and detail['unresolved']
++
++
++@pytest.mark.parametrize('mutation',[None,'other-path','other-value','other-type','other-producer','unknown-path'])
++def test_selected_identity_needs_its_exact_completed_response_field(tmp_path,mutation):
++    p,ids,g,state=fixture(tmp_path);later=deepcopy(state.history[0])
++    later.update(step=2,entry=ids['ParcelController.getById'],action='Read the parcel')
++    selected={'entity':['parcel'],'value':7,'reference':'history[1].result.id',
++        'object':deepcopy(later['result']),'qualified_type':'Parcel','deployment':'service',
++        'producer_entry':ids['ParcelController.getById']}
++    if mutation=='other-path':selected['reference']='history[0].result.id'
++    elif mutation=='unknown-path':selected['reference']=U
++    elif mutation=='other-value':selected['value']=8
++    elif mutation=='other-type':selected['qualified_type']='Unrelated'
++    elif mutation=='other-producer':selected['producer_entry']=ids['ParcelController.create']
++    later['selected_objects']=[selected];state.history.append(later)
++    proposals,detail=g.step('Read the parcel just created again',state)
++    assert bool(proposals)==(mutation in (None,'other-type'))
++    if mutation is None:
++        assert proposals[0]['bindings']['id']['reference']=='history[1].selected_objects[0].value'
++        assert detail['source_history_constraint']['response_reference']=='history[1].result.id'
++    if mutation=='other-type':
++        assert proposals[0]['bindings']['id']['reference']=='history[1].result.id'

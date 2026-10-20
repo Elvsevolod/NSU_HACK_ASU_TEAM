@@ -1,0 +1,53 @@
+{
+  "project": "employment",
+  "status": "in_progress: independent full semantic oracle not frozen",
+  "no_query_predictions_seen": true,
+  "runtime_applications_started": false,
+  "source_graph_ready": true,
+  "retrieval_labels_frozen": "development/real-retrieval-frozen-v1",
+  "required_before_inference": [
+    "complete E/C/R/D expectations",
+    "initial SQL and generated-ID contract",
+    "explicit and NL stateful request chains",
+    "values/native kinds/producer origin checks",
+    "repeat refusal without writes",
+    "remote failure and branch/completion checks",
+    "exact source JSON and wire expectations",
+    "source/graph/oracle hash manifest"
+  ],
+  "generated_id_rule": "Independent symbolic fresh Long variable or proven input generator state; never infer a concrete ID from the analyzer answer. History consumers must preserve producer identity across all relevant complete alternatives.",
+  "oracle_method": "Engineering reading of pinned production code/configuration, no target JVM and no analyzer prediction as oracle.",
+  "source_findings": [
+    {
+      "file": "source/companyms/src/main/java/com/mohit/companyms/Company/impl/companyServiceImplement.java",
+      "method": "updateCompany",
+      "fact": "Mutates the entity but has no save and no source service transaction. Do not label the requested update as persisted without an ORM transaction proof."
+    },
+    {
+      "file": "source/jobms/src/main/java/com/mohit/jobms/job/impl/JobServiceImplement.java",
+      "method": "updateJob",
+      "fact": "The save call is commented out. HTTP success is not evidence of a database update."
+    },
+    {
+      "file": "source/jobms/src/main/java/com/mohit/jobms/job/JobController.java",
+      "method": "deleteJob",
+      "fact": "Returns HTTP404 even when deletion reports success; do not replace source behavior with intended REST conventions."
+    },
+    {
+      "file": "source/jobms/src/main/java/com/mohit/jobms/job/impl/JobServiceImplement.java",
+      "method": "getJobById/convertToDto",
+      "fact": "Finds a job then calls CompanyClient and ReviewClient. Keep the request sequence and actual remote argument provenance."
+    }
+  ],
+  "planned_chains": [
+    "create employer -> read returned identity -> update -> read actual persisted state",
+    "read seeded vacancy with company/reviews -> refusal on missing update -> repeat refusal",
+    "same source under independently supplied bad review endpoint prefix: company succeeds, review request returns no-handler HTTP404 before any review controller"
+  ],
+  "remote_failure_input": "development/holdout-preflight/employment/prepared/remote-error-configuration.json",
+  "source_evidence_sha256": {
+    "source/companyms/src/main/java/com/mohit/companyms/Company/impl/companyServiceImplement.java": "ceb2c3e0f57b6cc5d3a04d4bef3e881c1cd55d5fe4aa92155b3e47995b261ecf",
+    "source/jobms/src/main/java/com/mohit/jobms/job/impl/JobServiceImplement.java": "8ba8759c20d859d3d06bc605018cafac0324221c4ce68c1c249ac54d095c541c",
+    "source/jobms/src/main/java/com/mohit/jobms/job/JobController.java": "4673c453073f91c1ff4097f97560c401252cfb7cb508a25e2b877fce01828219"
+  }
+}

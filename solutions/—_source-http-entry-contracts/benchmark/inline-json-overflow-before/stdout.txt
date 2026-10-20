@@ -1,0 +1,24 @@
+......F.........                                                         [100%]
+=================================== FAILURES ===================================
+_ test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request[{"age":1e309}] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-158/test_invalid_or_ambiguous_expl3')
+literal = '{"age":1e309}'
+
+    @pytest.mark.parametrize('literal',[
+        '{"name":"first","name":"second"}', '{"age":NaN}', '{"age":Infinity}', '{"age":1e309}',
+        '{"name":"unterminated}', '{"age":1,}', '{"name":"first"} and body: {"name":"second"}',
+    ])
+    def test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request(tmp_path,literal):
+        p,db,ids,g=fixture(tmp_path)
+        proposals,detail=step(g,'Create item: '+literal,ScenarioState(db))
+>       assert proposals==[] and detail['unresolved']
+E       assert ([{'actor': <U...(Item)', ...}] == []
+E         
+E         Left contains one more item: {'actor': <Unknown.VALUE: 'unknown'>, 'bindings': {'input': {'quote': '{"age":1e309}', 'reference': 'action:inline-jso...y', 'resolved': True, 'source': 'literal'}}, 'body_omissions': {}, 'entry': 'method:service:Api#createItem(Item)', ...}
+E         Use -v to get more diff)
+
+code/tests/test_inline_json_body33.py:68: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_inline_json_body33.py::test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request[{"age":1e309}]
+1 failed, 15 passed in 0.23s

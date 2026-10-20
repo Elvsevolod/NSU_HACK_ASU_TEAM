@@ -1,0 +1,6658 @@
+[
+  {
+    "n": 1,
+    "wire": {
+      "deployment": "gateway",
+      "method": "GET",
+      "url": "/inventory",
+      "path": [
+        "inventory"
+      ],
+      "query": {},
+      "query_complete": true,
+      "headers": {},
+      "body": {
+        "missing": true
+      },
+      "actor": {
+        "unknown": true
+      },
+      "session": {
+        "unknown": true
+      },
+      "body_properties": {},
+      "provenance": []
+    },
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:gateway:InventoryGateway#listProducts()",
+        "reason": "scenario request",
+        "request": {
+          "deployment": "gateway",
+          "method": "GET",
+          "url": "/inventory",
+          "path": [
+            "inventory"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": {
+            "missing": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": []
+        },
+        "authorization_checked": false,
+        "bound_arguments": []
+      },
+      {
+        "id": 2,
+        "entry": "method:warehouse:StockController#listProducts()",
+        "reason": "call:method:gateway:InventoryGateway#listProducts()@7:32",
+        "request": {
+          "deployment": "warehouse",
+          "method": "GET",
+          "url": "http://warehouse/products",
+          "path": [
+            "products"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": null,
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": []
+      },
+      {
+        "id": 3,
+        "entry": "method:catalog:CategoryController#lookup(List<String>)",
+        "reason": "call:method:gateway:InventoryGateway#listProducts()@12:31",
+        "request": {
+          "collection_shapes": [
+            {
+              "path": "body",
+              "size": 2,
+              "order": "unspecified"
+            }
+          ],
+          "deployment": "catalog",
+          "method": "POST",
+          "url": "http://catalog/categories",
+          "path": [
+            "categories"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "body": [
+            "hardware",
+            "office"
+          ],
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "codes",
+            "declared_type": "java.util.List<java.lang.String>",
+            "native_kind": null,
+            "value": [
+              "hardware",
+              "office"
+            ],
+            "collection_shapes": [
+              {
+                "path": "value",
+                "size": 2,
+                "order": "unspecified"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "result": [
+      {
+        "category": "hardware",
+        "id": "SKU7",
+        "quantity": 8,
+        "revision": 4
+      },
+      {
+        "category": "office",
+        "id": "SKU8",
+        "quantity": 9,
+        "revision": 5
+      },
+      {
+        "category": "hardware",
+        "id": "SKU9",
+        "quantity": 10,
+        "revision": 6
+      }
+    ],
+    "responses": [
+      {
+        "request": 2,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "category": "hardware",
+            "id": "SKU7",
+            "quantity": 8,
+            "revision": 4
+          },
+          {
+            "category": "office",
+            "id": "SKU8",
+            "quantity": 9,
+            "revision": 5
+          },
+          {
+            "category": "hardware",
+            "id": "SKU9",
+            "quantity": 10,
+            "revision": 6
+          }
+        ]
+      },
+      {
+        "request": 3,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "code": "hardware"
+          },
+          {
+            "code": "office"
+          }
+        ]
+      },
+      {
+        "request": 1,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "category": "hardware",
+            "id": "SKU7",
+            "quantity": 8,
+            "revision": 4
+          },
+          {
+            "category": "office",
+            "id": "SKU8",
+            "quantity": 9,
+            "revision": 5
+          },
+          {
+            "category": "hardware",
+            "id": "SKU9",
+            "quantity": 10,
+            "revision": 6
+          }
+        ]
+      }
+    ],
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:catalog:CategoryController#lookup(List<String>)"
+      ],
+      [
+        "",
+        "executes",
+        "method:gateway:InventoryGateway#listProducts()"
+      ],
+      [
+        "",
+        "executes",
+        "method:warehouse:StockController#listProducts()"
+      ],
+      [
+        "method:catalog:CategoryController#lookup(List<String>)",
+        "data",
+        "res:table:catalog.categories"
+      ],
+      [
+        "method:gateway:InventoryGateway#listProducts()",
+        "remote",
+        "method:catalog:CategoryController#lookup(List<String>)"
+      ],
+      [
+        "method:gateway:InventoryGateway#listProducts()",
+        "remote",
+        "method:warehouse:StockController#listProducts()"
+      ],
+      [
+        "method:warehouse:StockController#listProducts()",
+        "data",
+        "res:table:warehouse.products"
+      ]
+    ],
+    "outcome": "returned",
+    "diagnostics": [],
+    "call_effects": [
+      {
+        "model_version": "native-map-noop/1",
+        "operation": "foreach",
+        "callsite": "method:gateway:InventoryGateway#listProducts():14",
+        "iterations": 2,
+        "guards": [
+          {
+            "line": 14,
+            "key": "hardware",
+            "condition": "(categoryMap.get(code)==null)",
+            "value": false
+          },
+          {
+            "line": 14,
+            "key": "office",
+            "condition": "(categoryMap.get(code)==null)",
+            "value": false
+          }
+        ],
+        "heap_roots": [],
+        "resource_writes": [],
+        "global_footprint": "none",
+        "callbacks": [],
+        "completions": [
+          "normal"
+        ]
+      }
+    ],
+    "knowledge_losses": [
+      {
+        "sequence": 1,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "gateway/Api.java",
+          "line": 7,
+          "end_line": 7,
+          "method": "method:gateway:InventoryGateway#listProducts()"
+        },
+        "callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32",
+        "source_sha256": "03f7fe0b994947c851bbda2cb5d2233c784fdaee372a23d14a5e18dd8545806c",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 1,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "read_locations": [],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": {
+          "entry": "method:gateway:InventoryGateway#listProducts()",
+          "request_event_reference": "requests[0]",
+          "bound_arguments_reference": "requests[0].bound_arguments",
+          "provenance": [],
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 2,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "warehouse/Api.java",
+          "line": 6,
+          "end_line": 6,
+          "method": "method:warehouse:StockController#listProducts()"
+        },
+        "callsite": "call:method:warehouse:StockController#listProducts()@6:84",
+        "source_sha256": "2c056b70775c44c30bdf9915d5712fb03883aeffc1ba2e3ce73dac164f642fb3",
+        "declared_type": "Stock",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 3,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "read_locations": [],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": {
+          "entry": "method:warehouse:StockController#listProducts()",
+          "request_event_reference": "requests[1]",
+          "bound_arguments_reference": "requests[1].bound_arguments",
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32"
+          },
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 3,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "gateway/Api.java",
+          "line": 12,
+          "end_line": 12,
+          "method": "method:gateway:InventoryGateway#listProducts()"
+        },
+        "callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31",
+        "source_sha256": "03f7fe0b994947c851bbda2cb5d2233c784fdaee372a23d14a5e18dd8545806c",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 6,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ]
+        ],
+        "actual_effect_count": 3,
+        "actual_effects": [
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU7"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU8"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU9"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+          }
+        ],
+        "read_locations": [
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 0
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 1
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 2
+          }
+        ],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": {
+          "entry": "method:gateway:InventoryGateway#listProducts()",
+          "request_event_reference": "requests[0]",
+          "bound_arguments_reference": "requests[0].bound_arguments",
+          "provenance": [],
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 4,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "catalog/Api.java",
+          "line": 4,
+          "end_line": 4,
+          "method": "method:catalog:CategoryController#lookup(List<String>)"
+        },
+        "callsite": "call:method:catalog:CategoryController#lookup(List<String>)@4:149",
+        "source_sha256": "5f872e1d4a2753d3aeca92d39b62384695081326eb393ba3aa1e438be30b13a8",
+        "declared_type": "Categories",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 8,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:catalog:CategoryController#lookup(List<String>)"
+          ],
+          [
+            "",
+            "executes",
+            "method:catalog:CategoryController#lookup(List<String>)"
+          ]
+        ],
+        "actual_effect_count": 3,
+        "actual_effects": [
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU7"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU8"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU9"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+          }
+        ],
+        "read_locations": [
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 0
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 1
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 2
+          }
+        ],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 3,
+        "producer_lineage": {
+          "entry": "method:catalog:CategoryController#lookup(List<String>)",
+          "request_event_reference": "requests[2]",
+          "bound_arguments_reference": "requests[2].bound_arguments",
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31"
+          },
+          "history_length": 0
+        }
+      }
+    ],
+    "data_operations": [
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU7"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+      },
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU8"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+      },
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU9"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+      },
+      {
+        "method": "method:catalog:CategoryController#lookup(List<String>)",
+        "resource": "res:table:catalog.categories",
+        "operation": "findByCodeIn",
+        "arguments": [
+          [
+            "hardware",
+            "office"
+          ]
+        ],
+        "source_site": "call:method:catalog:CategoryController#lookup(List<String>)@4:149",
+        "argument_kinds": [
+          null
+        ],
+        "request_id": 3,
+        "uncertain_write": false,
+        "collection_shapes": [
+          {
+            "path": "arguments/0",
+            "size": 2,
+            "order": "unspecified"
+          }
+        ],
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:catalog:CategoryController#lookup(List<String>)@4:149"
+      }
+    ],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "catalog.categories": 2,
+        "warehouse.products": 3
+      },
+      "unknown_tables": [],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "class_initialization": {},
+      "join_losses": [],
+      "static_fields": {},
+      "tables": {
+        "warehouse.products": [
+          {
+            "id": "SKU7",
+            "category": "hardware",
+            "revision": 4,
+            "quantity": 8
+          },
+          {
+            "id": "SKU8",
+            "category": "office",
+            "revision": 5,
+            "quantity": 9
+          },
+          {
+            "id": "SKU9",
+            "category": "hardware",
+            "revision": 6,
+            "quantity": 10
+          }
+        ],
+        "catalog.categories": [
+          {
+            "code": "hardware"
+          },
+          {
+            "code": "office"
+          }
+        ]
+      }
+    },
+    "heap_after": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        },
+        "class_initialization": {
+          "$id": "h11",
+          "kind": "dict",
+          "fields": {}
+        },
+        "static_fields": {
+          "$id": "h12",
+          "kind": "dict",
+          "fields": {}
+        }
+      }
+    },
+    "decisions": {
+      "1:method:gateway:InventoryGateway#listProducts():13:unordered-collection-next": 0
+    },
+    "exploration": {
+      "complete": true,
+      "path_limit": 4,
+      "completion_budget": 8,
+      "completion_splits": 0,
+      "completed": 2,
+      "proven_infeasible": 0,
+      "infeasible_exclusion": null,
+      "limits": []
+    }
+  },
+  {
+    "n": 1,
+    "wire": {
+      "deployment": "gateway",
+      "method": "GET",
+      "url": "/inventory",
+      "path": [
+        "inventory"
+      ],
+      "query": {},
+      "query_complete": true,
+      "headers": {},
+      "body": {
+        "missing": true
+      },
+      "actor": {
+        "unknown": true
+      },
+      "session": {
+        "unknown": true
+      },
+      "body_properties": {},
+      "provenance": []
+    },
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:gateway:InventoryGateway#listProducts()",
+        "reason": "scenario request",
+        "request": {
+          "deployment": "gateway",
+          "method": "GET",
+          "url": "/inventory",
+          "path": [
+            "inventory"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": {
+            "missing": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": []
+        },
+        "authorization_checked": false,
+        "bound_arguments": []
+      },
+      {
+        "id": 2,
+        "entry": "method:warehouse:StockController#listProducts()",
+        "reason": "call:method:gateway:InventoryGateway#listProducts()@7:32",
+        "request": {
+          "deployment": "warehouse",
+          "method": "GET",
+          "url": "http://warehouse/products",
+          "path": [
+            "products"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": null,
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": []
+      },
+      {
+        "id": 3,
+        "entry": "method:catalog:CategoryController#lookup(List<String>)",
+        "reason": "call:method:gateway:InventoryGateway#listProducts()@12:31",
+        "request": {
+          "collection_shapes": [
+            {
+              "path": "body",
+              "size": 2,
+              "order": "unspecified"
+            }
+          ],
+          "deployment": "catalog",
+          "method": "POST",
+          "url": "http://catalog/categories",
+          "path": [
+            "categories"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "body": [
+            "hardware",
+            "office"
+          ],
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "codes",
+            "declared_type": "java.util.List<java.lang.String>",
+            "native_kind": null,
+            "value": [
+              "hardware",
+              "office"
+            ],
+            "collection_shapes": [
+              {
+                "path": "value",
+                "size": 2,
+                "order": "unspecified"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "result": [
+      {
+        "category": "hardware",
+        "id": "SKU7",
+        "quantity": 8,
+        "revision": 4
+      },
+      {
+        "category": "office",
+        "id": "SKU8",
+        "quantity": 9,
+        "revision": 5
+      },
+      {
+        "category": "hardware",
+        "id": "SKU9",
+        "quantity": 10,
+        "revision": 6
+      }
+    ],
+    "responses": [
+      {
+        "request": 2,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "category": "hardware",
+            "id": "SKU7",
+            "quantity": 8,
+            "revision": 4
+          },
+          {
+            "category": "office",
+            "id": "SKU8",
+            "quantity": 9,
+            "revision": 5
+          },
+          {
+            "category": "hardware",
+            "id": "SKU9",
+            "quantity": 10,
+            "revision": 6
+          }
+        ]
+      },
+      {
+        "request": 3,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "code": "hardware"
+          },
+          {
+            "code": "office"
+          }
+        ]
+      },
+      {
+        "request": 1,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "category": "hardware",
+            "id": "SKU7",
+            "quantity": 8,
+            "revision": 4
+          },
+          {
+            "category": "office",
+            "id": "SKU8",
+            "quantity": 9,
+            "revision": 5
+          },
+          {
+            "category": "hardware",
+            "id": "SKU9",
+            "quantity": 10,
+            "revision": 6
+          }
+        ]
+      }
+    ],
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:catalog:CategoryController#lookup(List<String>)"
+      ],
+      [
+        "",
+        "executes",
+        "method:gateway:InventoryGateway#listProducts()"
+      ],
+      [
+        "",
+        "executes",
+        "method:warehouse:StockController#listProducts()"
+      ],
+      [
+        "method:catalog:CategoryController#lookup(List<String>)",
+        "data",
+        "res:table:catalog.categories"
+      ],
+      [
+        "method:gateway:InventoryGateway#listProducts()",
+        "remote",
+        "method:catalog:CategoryController#lookup(List<String>)"
+      ],
+      [
+        "method:gateway:InventoryGateway#listProducts()",
+        "remote",
+        "method:warehouse:StockController#listProducts()"
+      ],
+      [
+        "method:warehouse:StockController#listProducts()",
+        "data",
+        "res:table:warehouse.products"
+      ]
+    ],
+    "outcome": "returned",
+    "diagnostics": [],
+    "call_effects": [
+      {
+        "model_version": "native-map-noop/1",
+        "operation": "foreach",
+        "callsite": "method:gateway:InventoryGateway#listProducts():14",
+        "iterations": 2,
+        "guards": [
+          {
+            "line": 14,
+            "key": "hardware",
+            "condition": "(categoryMap.get(code)==null)",
+            "value": false
+          },
+          {
+            "line": 14,
+            "key": "office",
+            "condition": "(categoryMap.get(code)==null)",
+            "value": false
+          }
+        ],
+        "heap_roots": [],
+        "resource_writes": [],
+        "global_footprint": "none",
+        "callbacks": [],
+        "completions": [
+          "normal"
+        ]
+      }
+    ],
+    "knowledge_losses": [
+      {
+        "sequence": 1,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "gateway/Api.java",
+          "line": 7,
+          "end_line": 7,
+          "method": "method:gateway:InventoryGateway#listProducts()"
+        },
+        "callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32",
+        "source_sha256": "03f7fe0b994947c851bbda2cb5d2233c784fdaee372a23d14a5e18dd8545806c",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 1,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "read_locations": [],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": {
+          "entry": "method:gateway:InventoryGateway#listProducts()",
+          "request_event_reference": "requests[0]",
+          "bound_arguments_reference": "requests[0].bound_arguments",
+          "provenance": [],
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 2,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "warehouse/Api.java",
+          "line": 6,
+          "end_line": 6,
+          "method": "method:warehouse:StockController#listProducts()"
+        },
+        "callsite": "call:method:warehouse:StockController#listProducts()@6:84",
+        "source_sha256": "2c056b70775c44c30bdf9915d5712fb03883aeffc1ba2e3ce73dac164f642fb3",
+        "declared_type": "Stock",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 3,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "read_locations": [],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": {
+          "entry": "method:warehouse:StockController#listProducts()",
+          "request_event_reference": "requests[1]",
+          "bound_arguments_reference": "requests[1].bound_arguments",
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32"
+          },
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 3,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "gateway/Api.java",
+          "line": 12,
+          "end_line": 12,
+          "method": "method:gateway:InventoryGateway#listProducts()"
+        },
+        "callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31",
+        "source_sha256": "03f7fe0b994947c851bbda2cb5d2233c784fdaee372a23d14a5e18dd8545806c",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 6,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ]
+        ],
+        "actual_effect_count": 3,
+        "actual_effects": [
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU7"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU8"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU9"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+          }
+        ],
+        "read_locations": [
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 0
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 1
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 2
+          }
+        ],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": {
+          "entry": "method:gateway:InventoryGateway#listProducts()",
+          "request_event_reference": "requests[0]",
+          "bound_arguments_reference": "requests[0].bound_arguments",
+          "provenance": [],
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 4,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "catalog/Api.java",
+          "line": 4,
+          "end_line": 4,
+          "method": "method:catalog:CategoryController#lookup(List<String>)"
+        },
+        "callsite": "call:method:catalog:CategoryController#lookup(List<String>)@4:149",
+        "source_sha256": "5f872e1d4a2753d3aeca92d39b62384695081326eb393ba3aa1e438be30b13a8",
+        "declared_type": "Categories",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 8,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:catalog:CategoryController#lookup(List<String>)"
+          ],
+          [
+            "",
+            "executes",
+            "method:catalog:CategoryController#lookup(List<String>)"
+          ]
+        ],
+        "actual_effect_count": 3,
+        "actual_effects": [
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU7"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU8"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU9"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+          }
+        ],
+        "read_locations": [
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 0
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 1
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 2
+          }
+        ],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 3,
+        "producer_lineage": {
+          "entry": "method:catalog:CategoryController#lookup(List<String>)",
+          "request_event_reference": "requests[2]",
+          "bound_arguments_reference": "requests[2].bound_arguments",
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31"
+          },
+          "history_length": 0
+        }
+      }
+    ],
+    "data_operations": [
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU7"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+      },
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU8"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+      },
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU9"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+      },
+      {
+        "method": "method:catalog:CategoryController#lookup(List<String>)",
+        "resource": "res:table:catalog.categories",
+        "operation": "findByCodeIn",
+        "arguments": [
+          [
+            "hardware",
+            "office"
+          ]
+        ],
+        "source_site": "call:method:catalog:CategoryController#lookup(List<String>)@4:149",
+        "argument_kinds": [
+          null
+        ],
+        "request_id": 3,
+        "uncertain_write": false,
+        "collection_shapes": [
+          {
+            "path": "arguments/0",
+            "size": 2,
+            "order": "unspecified"
+          }
+        ],
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:catalog:CategoryController#lookup(List<String>)@4:149"
+      }
+    ],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "catalog.categories": 2,
+        "warehouse.products": 3
+      },
+      "unknown_tables": [],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "class_initialization": {},
+      "join_losses": [],
+      "static_fields": {},
+      "tables": {
+        "warehouse.products": [
+          {
+            "id": "SKU7",
+            "category": "hardware",
+            "revision": 4,
+            "quantity": 8
+          },
+          {
+            "id": "SKU8",
+            "category": "office",
+            "revision": 5,
+            "quantity": 9
+          },
+          {
+            "id": "SKU9",
+            "category": "hardware",
+            "revision": 6,
+            "quantity": 10
+          }
+        ],
+        "catalog.categories": [
+          {
+            "code": "hardware"
+          },
+          {
+            "code": "office"
+          }
+        ]
+      }
+    },
+    "heap_after": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        },
+        "class_initialization": {
+          "$id": "h11",
+          "kind": "dict",
+          "fields": {}
+        },
+        "static_fields": {
+          "$id": "h12",
+          "kind": "dict",
+          "fields": {}
+        }
+      }
+    },
+    "decisions": {
+      "1:method:gateway:InventoryGateway#listProducts():13:unordered-collection-next": 1
+    },
+    "exploration": {
+      "complete": true,
+      "path_limit": 4,
+      "completion_budget": 8,
+      "completion_splits": 0,
+      "completed": 2,
+      "proven_infeasible": 0,
+      "infeasible_exclusion": null,
+      "limits": []
+    }
+  },
+  {
+    "n": 2,
+    "wire": {
+      "deployment": "gateway",
+      "method": "POST",
+      "url": "/inventory/reserve",
+      "path": [
+        "inventory",
+        "reserve"
+      ],
+      "query": {},
+      "query_complete": true,
+      "headers": {
+        "content-type": [
+          "application/json"
+        ]
+      },
+      "body": {
+        "id": "SKU8",
+        "revision": 5
+      },
+      "actor": {
+        "unknown": true
+      },
+      "session": {
+        "unknown": true
+      },
+      "body_properties": {},
+      "provenance": []
+    },
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:gateway:InventoryGateway#reserveProduct(ProductRequest)",
+        "reason": "scenario request",
+        "request": {
+          "deployment": "gateway",
+          "method": "POST",
+          "url": "/inventory/reserve",
+          "path": [
+            "inventory",
+            "reserve"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "body": {
+            "id": "SKU8",
+            "revision": 5
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": []
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "input",
+            "declared_type": "ProductRequest",
+            "native_kind": null,
+            "value": {
+              "__type__": "ProductRequest",
+              "__http_entity__": false,
+              "id": "SKU8",
+              "revision": 5
+            }
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "entry": "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+        "reason": "call:method:gateway:InventoryGateway#reserveProduct(ProductRequest)@17:16",
+        "request": {
+          "deployment": "warehouse",
+          "method": "POST",
+          "url": "http://warehouse/products/SKU8/reserve",
+          "path": [
+            "products",
+            "SKU8",
+            "reserve"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "body": {
+            "id": "SKU8",
+            "revision": 5
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#reserveProduct(ProductRequest)@17:16"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "native_kind": "String",
+            "value": "SKU8"
+          },
+          {
+            "name": "input",
+            "declared_type": "ProductRequest",
+            "native_kind": null,
+            "value": {
+              "__type__": "ProductRequest",
+              "__http_entity__": false,
+              "id": "SKU8",
+              "revision": 5
+            }
+          }
+        ]
+      }
+    ],
+    "result": {
+      "category": "office",
+      "id": "SKU8",
+      "quantity": 8,
+      "revision": 6
+    },
+    "responses": [
+      {
+        "request": 2,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": {
+          "category": "office",
+          "id": "SKU8",
+          "quantity": 8,
+          "revision": 6
+        }
+      },
+      {
+        "request": 1,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": {
+          "category": "office",
+          "id": "SKU8",
+          "quantity": 8,
+          "revision": 6
+        }
+      }
+    ],
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:gateway:InventoryGateway#reserveProduct(ProductRequest)"
+      ],
+      [
+        "",
+        "executes",
+        "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+      ],
+      [
+        "method:gateway:InventoryGateway#reserveProduct(ProductRequest)",
+        "remote",
+        "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+      ],
+      [
+        "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+        "data",
+        "res:table:warehouse.products"
+      ]
+    ],
+    "outcome": "returned",
+    "diagnostics": [],
+    "call_effects": [],
+    "knowledge_losses": [
+      {
+        "sequence": 1,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "gateway/Api.java",
+          "line": 17,
+          "end_line": 17,
+          "method": "method:gateway:InventoryGateway#reserveProduct(ProductRequest)"
+        },
+        "callsite": "call:method:gateway:InventoryGateway#reserveProduct(ProductRequest)@17:16",
+        "source_sha256": "03f7fe0b994947c851bbda2cb5d2233c784fdaee372a23d14a5e18dd8545806c",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 1,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#reserveProduct(ProductRequest)"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "read_locations": [],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": {
+          "entry": "method:gateway:InventoryGateway#reserveProduct(ProductRequest)",
+          "request_event_reference": "requests[0]",
+          "bound_arguments_reference": "requests[0].bound_arguments",
+          "provenance": [],
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 2,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "warehouse/Api.java",
+          "line": 8,
+          "end_line": 8,
+          "method": "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+        },
+        "callsite": "call:method:warehouse:StockController#reserveProduct(String,ProductRequest)@8:26",
+        "source_sha256": "2c056b70775c44c30bdf9915d5712fb03883aeffc1ba2e3ce73dac164f642fb3",
+        "declared_type": "Stock",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 3,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#reserveProduct(ProductRequest)"
+          ],
+          [
+            "method:gateway:InventoryGateway#reserveProduct(ProductRequest)",
+            "remote",
+            "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "read_locations": [],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": {
+          "entry": "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+          "request_event_reference": "requests[1]",
+          "bound_arguments_reference": "requests[1].bound_arguments",
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#reserveProduct(ProductRequest)@17:16"
+          },
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 3,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "warehouse/Api.java",
+          "line": 9,
+          "end_line": 9,
+          "method": "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+        },
+        "callsite": "call:method:warehouse:StockController#reserveProduct(String,ProductRequest)@9:48",
+        "source_sha256": "2c056b70775c44c30bdf9915d5712fb03883aeffc1ba2e3ce73dac164f642fb3",
+        "declared_type": "Stock",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 4,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#reserveProduct(ProductRequest)"
+          ],
+          [
+            "method:gateway:InventoryGateway#reserveProduct(ProductRequest)",
+            "remote",
+            "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+          ],
+          [
+            "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+            "data",
+            "res:table:warehouse.products"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU8"
+            ],
+            "source_site": "call:method:warehouse:StockController#reserveProduct(String,ProductRequest)@8:26",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#reserveProduct(String,ProductRequest)@8:26"
+          }
+        ],
+        "read_locations": [
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 0
+          }
+        ],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": {
+          "entry": "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+          "request_event_reference": "requests[1]",
+          "bound_arguments_reference": "requests[1].bound_arguments",
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#reserveProduct(ProductRequest)@17:16"
+          },
+          "history_length": 0
+        }
+      }
+    ],
+    "data_operations": [
+      {
+        "method": "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU8"
+        ],
+        "source_site": "call:method:warehouse:StockController#reserveProduct(String,ProductRequest)@8:26",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#reserveProduct(String,ProductRequest)@8:26"
+      },
+      {
+        "method": "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+        "resource": "res:table:warehouse.products",
+        "operation": "save",
+        "arguments": [
+          {
+            "__type__": "Product",
+            "id": "SKU8",
+            "category": "office",
+            "revision": 6,
+            "quantity": 8
+          }
+        ],
+        "source_site": "call:method:warehouse:StockController#reserveProduct(String,ProductRequest)@9:48",
+        "argument_kinds": [
+          null
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#reserveProduct(String,ProductRequest)@9:48"
+      }
+    ],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "catalog.categories": 2,
+        "warehouse.products": 3
+      },
+      "unknown_tables": [],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "class_initialization": {},
+      "join_losses": [],
+      "static_fields": {},
+      "tables": {
+        "warehouse.products": [
+          {
+            "id": "SKU7",
+            "category": "hardware",
+            "revision": 4,
+            "quantity": 8
+          },
+          {
+            "id": "SKU8",
+            "category": "office",
+            "revision": 6,
+            "quantity": 8,
+            "__type__": "Product"
+          },
+          {
+            "id": "SKU9",
+            "category": "hardware",
+            "revision": 6,
+            "quantity": 10
+          }
+        ],
+        "catalog.categories": [
+          {
+            "code": "hardware"
+          },
+          {
+            "code": "office"
+          }
+        ]
+      }
+    },
+    "heap_after": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        },
+        "class_initialization": {
+          "$id": "h11",
+          "kind": "dict",
+          "fields": {}
+        },
+        "static_fields": {
+          "$id": "h12",
+          "kind": "dict",
+          "fields": {}
+        }
+      }
+    },
+    "decisions": {},
+    "exploration": {
+      "complete": true,
+      "path_limit": 4,
+      "completion_budget": 8,
+      "completion_splits": 0,
+      "completed": 1,
+      "proven_infeasible": 0,
+      "infeasible_exclusion": null,
+      "limits": []
+    }
+  },
+  {
+    "n": 2,
+    "wire": {
+      "deployment": "gateway",
+      "method": "POST",
+      "url": "/inventory/reserve",
+      "path": [
+        "inventory",
+        "reserve"
+      ],
+      "query": {},
+      "query_complete": true,
+      "headers": {
+        "content-type": [
+          "application/json"
+        ]
+      },
+      "body": {
+        "id": "SKU8",
+        "revision": 5
+      },
+      "actor": {
+        "unknown": true
+      },
+      "session": {
+        "unknown": true
+      },
+      "body_properties": {},
+      "provenance": []
+    },
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:gateway:InventoryGateway#reserveProduct(ProductRequest)",
+        "reason": "scenario request",
+        "request": {
+          "deployment": "gateway",
+          "method": "POST",
+          "url": "/inventory/reserve",
+          "path": [
+            "inventory",
+            "reserve"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "body": {
+            "id": "SKU8",
+            "revision": 5
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": []
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "input",
+            "declared_type": "ProductRequest",
+            "native_kind": null,
+            "value": {
+              "__type__": "ProductRequest",
+              "__http_entity__": false,
+              "id": "SKU8",
+              "revision": 5
+            }
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "entry": "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+        "reason": "call:method:gateway:InventoryGateway#reserveProduct(ProductRequest)@17:16",
+        "request": {
+          "deployment": "warehouse",
+          "method": "POST",
+          "url": "http://warehouse/products/SKU8/reserve",
+          "path": [
+            "products",
+            "SKU8",
+            "reserve"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "body": {
+            "id": "SKU8",
+            "revision": 5
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#reserveProduct(ProductRequest)@17:16"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "native_kind": "String",
+            "value": "SKU8"
+          },
+          {
+            "name": "input",
+            "declared_type": "ProductRequest",
+            "native_kind": null,
+            "value": {
+              "__type__": "ProductRequest",
+              "__http_entity__": false,
+              "id": "SKU8",
+              "revision": 5
+            }
+          }
+        ]
+      }
+    ],
+    "result": {
+      "category": "office",
+      "id": "SKU8",
+      "quantity": 8,
+      "revision": 6
+    },
+    "responses": [
+      {
+        "request": 2,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": {
+          "category": "office",
+          "id": "SKU8",
+          "quantity": 8,
+          "revision": 6
+        }
+      },
+      {
+        "request": 1,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": {
+          "category": "office",
+          "id": "SKU8",
+          "quantity": 8,
+          "revision": 6
+        }
+      }
+    ],
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:gateway:InventoryGateway#reserveProduct(ProductRequest)"
+      ],
+      [
+        "",
+        "executes",
+        "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+      ],
+      [
+        "method:gateway:InventoryGateway#reserveProduct(ProductRequest)",
+        "remote",
+        "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+      ],
+      [
+        "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+        "data",
+        "res:table:warehouse.products"
+      ]
+    ],
+    "outcome": "returned",
+    "diagnostics": [],
+    "call_effects": [],
+    "knowledge_losses": [
+      {
+        "sequence": 1,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "gateway/Api.java",
+          "line": 17,
+          "end_line": 17,
+          "method": "method:gateway:InventoryGateway#reserveProduct(ProductRequest)"
+        },
+        "callsite": "call:method:gateway:InventoryGateway#reserveProduct(ProductRequest)@17:16",
+        "source_sha256": "03f7fe0b994947c851bbda2cb5d2233c784fdaee372a23d14a5e18dd8545806c",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 1,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#reserveProduct(ProductRequest)"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "read_locations": [],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": {
+          "entry": "method:gateway:InventoryGateway#reserveProduct(ProductRequest)",
+          "request_event_reference": "requests[0]",
+          "bound_arguments_reference": "requests[0].bound_arguments",
+          "provenance": [],
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 2,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "warehouse/Api.java",
+          "line": 8,
+          "end_line": 8,
+          "method": "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+        },
+        "callsite": "call:method:warehouse:StockController#reserveProduct(String,ProductRequest)@8:26",
+        "source_sha256": "2c056b70775c44c30bdf9915d5712fb03883aeffc1ba2e3ce73dac164f642fb3",
+        "declared_type": "Stock",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 3,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#reserveProduct(ProductRequest)"
+          ],
+          [
+            "method:gateway:InventoryGateway#reserveProduct(ProductRequest)",
+            "remote",
+            "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "read_locations": [],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": {
+          "entry": "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+          "request_event_reference": "requests[1]",
+          "bound_arguments_reference": "requests[1].bound_arguments",
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#reserveProduct(ProductRequest)@17:16"
+          },
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 3,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "warehouse/Api.java",
+          "line": 9,
+          "end_line": 9,
+          "method": "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+        },
+        "callsite": "call:method:warehouse:StockController#reserveProduct(String,ProductRequest)@9:48",
+        "source_sha256": "2c056b70775c44c30bdf9915d5712fb03883aeffc1ba2e3ce73dac164f642fb3",
+        "declared_type": "Stock",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 4,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#reserveProduct(ProductRequest)"
+          ],
+          [
+            "method:gateway:InventoryGateway#reserveProduct(ProductRequest)",
+            "remote",
+            "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+          ],
+          [
+            "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+            "data",
+            "res:table:warehouse.products"
+          ]
+        ],
+        "actual_effect_count": 1,
+        "actual_effects": [
+          {
+            "method": "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU8"
+            ],
+            "source_site": "call:method:warehouse:StockController#reserveProduct(String,ProductRequest)@8:26",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#reserveProduct(String,ProductRequest)@8:26"
+          }
+        ],
+        "read_locations": [
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 0
+          }
+        ],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": {
+          "entry": "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+          "request_event_reference": "requests[1]",
+          "bound_arguments_reference": "requests[1].bound_arguments",
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#reserveProduct(ProductRequest)@17:16"
+          },
+          "history_length": 0
+        }
+      }
+    ],
+    "data_operations": [
+      {
+        "method": "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU8"
+        ],
+        "source_site": "call:method:warehouse:StockController#reserveProduct(String,ProductRequest)@8:26",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#reserveProduct(String,ProductRequest)@8:26"
+      },
+      {
+        "method": "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+        "resource": "res:table:warehouse.products",
+        "operation": "save",
+        "arguments": [
+          {
+            "__type__": "Product",
+            "id": "SKU8",
+            "category": "office",
+            "revision": 6,
+            "quantity": 8
+          }
+        ],
+        "source_site": "call:method:warehouse:StockController#reserveProduct(String,ProductRequest)@9:48",
+        "argument_kinds": [
+          null
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#reserveProduct(String,ProductRequest)@9:48"
+      }
+    ],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "catalog.categories": 2,
+        "warehouse.products": 3
+      },
+      "unknown_tables": [],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "class_initialization": {},
+      "join_losses": [],
+      "static_fields": {},
+      "tables": {
+        "warehouse.products": [
+          {
+            "id": "SKU7",
+            "category": "hardware",
+            "revision": 4,
+            "quantity": 8
+          },
+          {
+            "id": "SKU8",
+            "category": "office",
+            "revision": 6,
+            "quantity": 8,
+            "__type__": "Product"
+          },
+          {
+            "id": "SKU9",
+            "category": "hardware",
+            "revision": 6,
+            "quantity": 10
+          }
+        ],
+        "catalog.categories": [
+          {
+            "code": "hardware"
+          },
+          {
+            "code": "office"
+          }
+        ]
+      }
+    },
+    "heap_after": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        },
+        "class_initialization": {
+          "$id": "h11",
+          "kind": "dict",
+          "fields": {}
+        },
+        "static_fields": {
+          "$id": "h12",
+          "kind": "dict",
+          "fields": {}
+        }
+      }
+    },
+    "decisions": {},
+    "exploration": {
+      "complete": true,
+      "path_limit": 4,
+      "completion_budget": 8,
+      "completion_splits": 0,
+      "completed": 1,
+      "proven_infeasible": 0,
+      "infeasible_exclusion": null,
+      "limits": []
+    }
+  },
+  {
+    "n": 3,
+    "wire": {
+      "deployment": "gateway",
+      "method": "GET",
+      "url": "/inventory",
+      "path": [
+        "inventory"
+      ],
+      "query": {},
+      "query_complete": true,
+      "headers": {},
+      "body": {
+        "missing": true
+      },
+      "actor": {
+        "unknown": true
+      },
+      "session": {
+        "unknown": true
+      },
+      "body_properties": {},
+      "provenance": []
+    },
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:gateway:InventoryGateway#listProducts()",
+        "reason": "scenario request",
+        "request": {
+          "deployment": "gateway",
+          "method": "GET",
+          "url": "/inventory",
+          "path": [
+            "inventory"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": {
+            "missing": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": []
+        },
+        "authorization_checked": false,
+        "bound_arguments": []
+      },
+      {
+        "id": 2,
+        "entry": "method:warehouse:StockController#listProducts()",
+        "reason": "call:method:gateway:InventoryGateway#listProducts()@7:32",
+        "request": {
+          "deployment": "warehouse",
+          "method": "GET",
+          "url": "http://warehouse/products",
+          "path": [
+            "products"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": null,
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": []
+      },
+      {
+        "id": 3,
+        "entry": "method:catalog:CategoryController#lookup(List<String>)",
+        "reason": "call:method:gateway:InventoryGateway#listProducts()@12:31",
+        "request": {
+          "collection_shapes": [
+            {
+              "path": "body",
+              "size": 2,
+              "order": "unspecified"
+            }
+          ],
+          "deployment": "catalog",
+          "method": "POST",
+          "url": "http://catalog/categories",
+          "path": [
+            "categories"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "body": [
+            "hardware",
+            "office"
+          ],
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "codes",
+            "declared_type": "java.util.List<java.lang.String>",
+            "native_kind": null,
+            "value": [
+              "hardware",
+              "office"
+            ],
+            "collection_shapes": [
+              {
+                "path": "value",
+                "size": 2,
+                "order": "unspecified"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "result": [
+      {
+        "category": "hardware",
+        "id": "SKU7",
+        "quantity": 8,
+        "revision": 4
+      },
+      {
+        "category": "office",
+        "id": "SKU8",
+        "quantity": 8,
+        "revision": 6
+      },
+      {
+        "category": "hardware",
+        "id": "SKU9",
+        "quantity": 10,
+        "revision": 6
+      }
+    ],
+    "responses": [
+      {
+        "request": 2,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "category": "hardware",
+            "id": "SKU7",
+            "quantity": 8,
+            "revision": 4
+          },
+          {
+            "category": "office",
+            "id": "SKU8",
+            "quantity": 8,
+            "revision": 6
+          },
+          {
+            "category": "hardware",
+            "id": "SKU9",
+            "quantity": 10,
+            "revision": 6
+          }
+        ]
+      },
+      {
+        "request": 3,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "code": "hardware"
+          },
+          {
+            "code": "office"
+          }
+        ]
+      },
+      {
+        "request": 1,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "category": "hardware",
+            "id": "SKU7",
+            "quantity": 8,
+            "revision": 4
+          },
+          {
+            "category": "office",
+            "id": "SKU8",
+            "quantity": 8,
+            "revision": 6
+          },
+          {
+            "category": "hardware",
+            "id": "SKU9",
+            "quantity": 10,
+            "revision": 6
+          }
+        ]
+      }
+    ],
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:catalog:CategoryController#lookup(List<String>)"
+      ],
+      [
+        "",
+        "executes",
+        "method:gateway:InventoryGateway#listProducts()"
+      ],
+      [
+        "",
+        "executes",
+        "method:warehouse:StockController#listProducts()"
+      ],
+      [
+        "method:catalog:CategoryController#lookup(List<String>)",
+        "data",
+        "res:table:catalog.categories"
+      ],
+      [
+        "method:gateway:InventoryGateway#listProducts()",
+        "remote",
+        "method:catalog:CategoryController#lookup(List<String>)"
+      ],
+      [
+        "method:gateway:InventoryGateway#listProducts()",
+        "remote",
+        "method:warehouse:StockController#listProducts()"
+      ],
+      [
+        "method:warehouse:StockController#listProducts()",
+        "data",
+        "res:table:warehouse.products"
+      ]
+    ],
+    "outcome": "returned",
+    "diagnostics": [],
+    "call_effects": [
+      {
+        "model_version": "native-map-noop/1",
+        "operation": "foreach",
+        "callsite": "method:gateway:InventoryGateway#listProducts():14",
+        "iterations": 2,
+        "guards": [
+          {
+            "line": 14,
+            "key": "hardware",
+            "condition": "(categoryMap.get(code)==null)",
+            "value": false
+          },
+          {
+            "line": 14,
+            "key": "office",
+            "condition": "(categoryMap.get(code)==null)",
+            "value": false
+          }
+        ],
+        "heap_roots": [],
+        "resource_writes": [],
+        "global_footprint": "none",
+        "callbacks": [],
+        "completions": [
+          "normal"
+        ]
+      }
+    ],
+    "knowledge_losses": [
+      {
+        "sequence": 1,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "gateway/Api.java",
+          "line": 7,
+          "end_line": 7,
+          "method": "method:gateway:InventoryGateway#listProducts()"
+        },
+        "callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32",
+        "source_sha256": "03f7fe0b994947c851bbda2cb5d2233c784fdaee372a23d14a5e18dd8545806c",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 1,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "read_locations": [],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": {
+          "entry": "method:gateway:InventoryGateway#listProducts()",
+          "request_event_reference": "requests[0]",
+          "bound_arguments_reference": "requests[0].bound_arguments",
+          "provenance": [],
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 2,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "warehouse/Api.java",
+          "line": 6,
+          "end_line": 6,
+          "method": "method:warehouse:StockController#listProducts()"
+        },
+        "callsite": "call:method:warehouse:StockController#listProducts()@6:84",
+        "source_sha256": "2c056b70775c44c30bdf9915d5712fb03883aeffc1ba2e3ce73dac164f642fb3",
+        "declared_type": "Stock",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 3,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "read_locations": [],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": {
+          "entry": "method:warehouse:StockController#listProducts()",
+          "request_event_reference": "requests[1]",
+          "bound_arguments_reference": "requests[1].bound_arguments",
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32"
+          },
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 3,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "gateway/Api.java",
+          "line": 12,
+          "end_line": 12,
+          "method": "method:gateway:InventoryGateway#listProducts()"
+        },
+        "callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31",
+        "source_sha256": "03f7fe0b994947c851bbda2cb5d2233c784fdaee372a23d14a5e18dd8545806c",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 6,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ]
+        ],
+        "actual_effect_count": 3,
+        "actual_effects": [
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU7"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU8"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU9"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+          }
+        ],
+        "read_locations": [
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 0
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 1
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 2
+          }
+        ],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": {
+          "entry": "method:gateway:InventoryGateway#listProducts()",
+          "request_event_reference": "requests[0]",
+          "bound_arguments_reference": "requests[0].bound_arguments",
+          "provenance": [],
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 4,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "catalog/Api.java",
+          "line": 4,
+          "end_line": 4,
+          "method": "method:catalog:CategoryController#lookup(List<String>)"
+        },
+        "callsite": "call:method:catalog:CategoryController#lookup(List<String>)@4:149",
+        "source_sha256": "5f872e1d4a2753d3aeca92d39b62384695081326eb393ba3aa1e438be30b13a8",
+        "declared_type": "Categories",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 8,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:catalog:CategoryController#lookup(List<String>)"
+          ],
+          [
+            "",
+            "executes",
+            "method:catalog:CategoryController#lookup(List<String>)"
+          ]
+        ],
+        "actual_effect_count": 3,
+        "actual_effects": [
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU7"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU8"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU9"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+          }
+        ],
+        "read_locations": [
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 0
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 1
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 2
+          }
+        ],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 3,
+        "producer_lineage": {
+          "entry": "method:catalog:CategoryController#lookup(List<String>)",
+          "request_event_reference": "requests[2]",
+          "bound_arguments_reference": "requests[2].bound_arguments",
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31"
+          },
+          "history_length": 0
+        }
+      }
+    ],
+    "data_operations": [
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU7"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+      },
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU8"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+      },
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU9"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+      },
+      {
+        "method": "method:catalog:CategoryController#lookup(List<String>)",
+        "resource": "res:table:catalog.categories",
+        "operation": "findByCodeIn",
+        "arguments": [
+          [
+            "hardware",
+            "office"
+          ]
+        ],
+        "source_site": "call:method:catalog:CategoryController#lookup(List<String>)@4:149",
+        "argument_kinds": [
+          null
+        ],
+        "request_id": 3,
+        "uncertain_write": false,
+        "collection_shapes": [
+          {
+            "path": "arguments/0",
+            "size": 2,
+            "order": "unspecified"
+          }
+        ],
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:catalog:CategoryController#lookup(List<String>)@4:149"
+      }
+    ],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "catalog.categories": 2,
+        "warehouse.products": 3
+      },
+      "unknown_tables": [],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "class_initialization": {},
+      "join_losses": [],
+      "static_fields": {},
+      "tables": {
+        "warehouse.products": [
+          {
+            "id": "SKU7",
+            "category": "hardware",
+            "revision": 4,
+            "quantity": 8
+          },
+          {
+            "id": "SKU8",
+            "category": "office",
+            "revision": 6,
+            "quantity": 8,
+            "__type__": "Product"
+          },
+          {
+            "id": "SKU9",
+            "category": "hardware",
+            "revision": 6,
+            "quantity": 10
+          }
+        ],
+        "catalog.categories": [
+          {
+            "code": "hardware"
+          },
+          {
+            "code": "office"
+          }
+        ]
+      }
+    },
+    "heap_after": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        },
+        "class_initialization": {
+          "$id": "h11",
+          "kind": "dict",
+          "fields": {}
+        },
+        "static_fields": {
+          "$id": "h12",
+          "kind": "dict",
+          "fields": {}
+        }
+      }
+    },
+    "decisions": {
+      "1:method:gateway:InventoryGateway#listProducts():13:unordered-collection-next": 0
+    },
+    "exploration": {
+      "complete": true,
+      "path_limit": 4,
+      "completion_budget": 8,
+      "completion_splits": 0,
+      "completed": 2,
+      "proven_infeasible": 0,
+      "infeasible_exclusion": null,
+      "limits": []
+    }
+  },
+  {
+    "n": 3,
+    "wire": {
+      "deployment": "gateway",
+      "method": "GET",
+      "url": "/inventory",
+      "path": [
+        "inventory"
+      ],
+      "query": {},
+      "query_complete": true,
+      "headers": {},
+      "body": {
+        "missing": true
+      },
+      "actor": {
+        "unknown": true
+      },
+      "session": {
+        "unknown": true
+      },
+      "body_properties": {},
+      "provenance": []
+    },
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:gateway:InventoryGateway#listProducts()",
+        "reason": "scenario request",
+        "request": {
+          "deployment": "gateway",
+          "method": "GET",
+          "url": "/inventory",
+          "path": [
+            "inventory"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": {
+            "missing": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": []
+        },
+        "authorization_checked": false,
+        "bound_arguments": []
+      },
+      {
+        "id": 2,
+        "entry": "method:warehouse:StockController#listProducts()",
+        "reason": "call:method:gateway:InventoryGateway#listProducts()@7:32",
+        "request": {
+          "deployment": "warehouse",
+          "method": "GET",
+          "url": "http://warehouse/products",
+          "path": [
+            "products"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": null,
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": []
+      },
+      {
+        "id": 3,
+        "entry": "method:catalog:CategoryController#lookup(List<String>)",
+        "reason": "call:method:gateway:InventoryGateway#listProducts()@12:31",
+        "request": {
+          "collection_shapes": [
+            {
+              "path": "body",
+              "size": 2,
+              "order": "unspecified"
+            }
+          ],
+          "deployment": "catalog",
+          "method": "POST",
+          "url": "http://catalog/categories",
+          "path": [
+            "categories"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "body": [
+            "hardware",
+            "office"
+          ],
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "codes",
+            "declared_type": "java.util.List<java.lang.String>",
+            "native_kind": null,
+            "value": [
+              "hardware",
+              "office"
+            ],
+            "collection_shapes": [
+              {
+                "path": "value",
+                "size": 2,
+                "order": "unspecified"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "result": [
+      {
+        "category": "hardware",
+        "id": "SKU7",
+        "quantity": 8,
+        "revision": 4
+      },
+      {
+        "category": "office",
+        "id": "SKU8",
+        "quantity": 8,
+        "revision": 6
+      },
+      {
+        "category": "hardware",
+        "id": "SKU9",
+        "quantity": 10,
+        "revision": 6
+      }
+    ],
+    "responses": [
+      {
+        "request": 2,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "category": "hardware",
+            "id": "SKU7",
+            "quantity": 8,
+            "revision": 4
+          },
+          {
+            "category": "office",
+            "id": "SKU8",
+            "quantity": 8,
+            "revision": 6
+          },
+          {
+            "category": "hardware",
+            "id": "SKU9",
+            "quantity": 10,
+            "revision": 6
+          }
+        ]
+      },
+      {
+        "request": 3,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "code": "hardware"
+          },
+          {
+            "code": "office"
+          }
+        ]
+      },
+      {
+        "request": 1,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "category": "hardware",
+            "id": "SKU7",
+            "quantity": 8,
+            "revision": 4
+          },
+          {
+            "category": "office",
+            "id": "SKU8",
+            "quantity": 8,
+            "revision": 6
+          },
+          {
+            "category": "hardware",
+            "id": "SKU9",
+            "quantity": 10,
+            "revision": 6
+          }
+        ]
+      }
+    ],
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:catalog:CategoryController#lookup(List<String>)"
+      ],
+      [
+        "",
+        "executes",
+        "method:gateway:InventoryGateway#listProducts()"
+      ],
+      [
+        "",
+        "executes",
+        "method:warehouse:StockController#listProducts()"
+      ],
+      [
+        "method:catalog:CategoryController#lookup(List<String>)",
+        "data",
+        "res:table:catalog.categories"
+      ],
+      [
+        "method:gateway:InventoryGateway#listProducts()",
+        "remote",
+        "method:catalog:CategoryController#lookup(List<String>)"
+      ],
+      [
+        "method:gateway:InventoryGateway#listProducts()",
+        "remote",
+        "method:warehouse:StockController#listProducts()"
+      ],
+      [
+        "method:warehouse:StockController#listProducts()",
+        "data",
+        "res:table:warehouse.products"
+      ]
+    ],
+    "outcome": "returned",
+    "diagnostics": [],
+    "call_effects": [
+      {
+        "model_version": "native-map-noop/1",
+        "operation": "foreach",
+        "callsite": "method:gateway:InventoryGateway#listProducts():14",
+        "iterations": 2,
+        "guards": [
+          {
+            "line": 14,
+            "key": "hardware",
+            "condition": "(categoryMap.get(code)==null)",
+            "value": false
+          },
+          {
+            "line": 14,
+            "key": "office",
+            "condition": "(categoryMap.get(code)==null)",
+            "value": false
+          }
+        ],
+        "heap_roots": [],
+        "resource_writes": [],
+        "global_footprint": "none",
+        "callbacks": [],
+        "completions": [
+          "normal"
+        ]
+      }
+    ],
+    "knowledge_losses": [
+      {
+        "sequence": 1,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "gateway/Api.java",
+          "line": 7,
+          "end_line": 7,
+          "method": "method:gateway:InventoryGateway#listProducts()"
+        },
+        "callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32",
+        "source_sha256": "03f7fe0b994947c851bbda2cb5d2233c784fdaee372a23d14a5e18dd8545806c",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 1,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "read_locations": [],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": {
+          "entry": "method:gateway:InventoryGateway#listProducts()",
+          "request_event_reference": "requests[0]",
+          "bound_arguments_reference": "requests[0].bound_arguments",
+          "provenance": [],
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 2,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "warehouse/Api.java",
+          "line": 6,
+          "end_line": 6,
+          "method": "method:warehouse:StockController#listProducts()"
+        },
+        "callsite": "call:method:warehouse:StockController#listProducts()@6:84",
+        "source_sha256": "2c056b70775c44c30bdf9915d5712fb03883aeffc1ba2e3ce73dac164f642fb3",
+        "declared_type": "Stock",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 3,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "read_locations": [],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": {
+          "entry": "method:warehouse:StockController#listProducts()",
+          "request_event_reference": "requests[1]",
+          "bound_arguments_reference": "requests[1].bound_arguments",
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32"
+          },
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 3,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "gateway/Api.java",
+          "line": 12,
+          "end_line": 12,
+          "method": "method:gateway:InventoryGateway#listProducts()"
+        },
+        "callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31",
+        "source_sha256": "03f7fe0b994947c851bbda2cb5d2233c784fdaee372a23d14a5e18dd8545806c",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 6,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ]
+        ],
+        "actual_effect_count": 3,
+        "actual_effects": [
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU7"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU8"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU9"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+          }
+        ],
+        "read_locations": [
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 0
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 1
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 2
+          }
+        ],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": {
+          "entry": "method:gateway:InventoryGateway#listProducts()",
+          "request_event_reference": "requests[0]",
+          "bound_arguments_reference": "requests[0].bound_arguments",
+          "provenance": [],
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 4,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "catalog/Api.java",
+          "line": 4,
+          "end_line": 4,
+          "method": "method:catalog:CategoryController#lookup(List<String>)"
+        },
+        "callsite": "call:method:catalog:CategoryController#lookup(List<String>)@4:149",
+        "source_sha256": "5f872e1d4a2753d3aeca92d39b62384695081326eb393ba3aa1e438be30b13a8",
+        "declared_type": "Categories",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 8,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:catalog:CategoryController#lookup(List<String>)"
+          ],
+          [
+            "",
+            "executes",
+            "method:catalog:CategoryController#lookup(List<String>)"
+          ]
+        ],
+        "actual_effect_count": 3,
+        "actual_effects": [
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU7"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU8"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU9"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+          }
+        ],
+        "read_locations": [
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 0
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 1
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 2
+          }
+        ],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 3,
+        "producer_lineage": {
+          "entry": "method:catalog:CategoryController#lookup(List<String>)",
+          "request_event_reference": "requests[2]",
+          "bound_arguments_reference": "requests[2].bound_arguments",
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31"
+          },
+          "history_length": 0
+        }
+      }
+    ],
+    "data_operations": [
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU7"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+      },
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU8"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+      },
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU9"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+      },
+      {
+        "method": "method:catalog:CategoryController#lookup(List<String>)",
+        "resource": "res:table:catalog.categories",
+        "operation": "findByCodeIn",
+        "arguments": [
+          [
+            "hardware",
+            "office"
+          ]
+        ],
+        "source_site": "call:method:catalog:CategoryController#lookup(List<String>)@4:149",
+        "argument_kinds": [
+          null
+        ],
+        "request_id": 3,
+        "uncertain_write": false,
+        "collection_shapes": [
+          {
+            "path": "arguments/0",
+            "size": 2,
+            "order": "unspecified"
+          }
+        ],
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:catalog:CategoryController#lookup(List<String>)@4:149"
+      }
+    ],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "catalog.categories": 2,
+        "warehouse.products": 3
+      },
+      "unknown_tables": [],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "class_initialization": {},
+      "join_losses": [],
+      "static_fields": {},
+      "tables": {
+        "warehouse.products": [
+          {
+            "id": "SKU7",
+            "category": "hardware",
+            "revision": 4,
+            "quantity": 8
+          },
+          {
+            "id": "SKU8",
+            "category": "office",
+            "revision": 6,
+            "quantity": 8,
+            "__type__": "Product"
+          },
+          {
+            "id": "SKU9",
+            "category": "hardware",
+            "revision": 6,
+            "quantity": 10
+          }
+        ],
+        "catalog.categories": [
+          {
+            "code": "hardware"
+          },
+          {
+            "code": "office"
+          }
+        ]
+      }
+    },
+    "heap_after": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        },
+        "class_initialization": {
+          "$id": "h11",
+          "kind": "dict",
+          "fields": {}
+        },
+        "static_fields": {
+          "$id": "h12",
+          "kind": "dict",
+          "fields": {}
+        }
+      }
+    },
+    "decisions": {
+      "1:method:gateway:InventoryGateway#listProducts():13:unordered-collection-next": 1
+    },
+    "exploration": {
+      "complete": true,
+      "path_limit": 4,
+      "completion_budget": 8,
+      "completion_splits": 0,
+      "completed": 2,
+      "proven_infeasible": 0,
+      "infeasible_exclusion": null,
+      "limits": []
+    }
+  },
+  {
+    "n": 3,
+    "wire": {
+      "deployment": "gateway",
+      "method": "GET",
+      "url": "/inventory",
+      "path": [
+        "inventory"
+      ],
+      "query": {},
+      "query_complete": true,
+      "headers": {},
+      "body": {
+        "missing": true
+      },
+      "actor": {
+        "unknown": true
+      },
+      "session": {
+        "unknown": true
+      },
+      "body_properties": {},
+      "provenance": []
+    },
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:gateway:InventoryGateway#listProducts()",
+        "reason": "scenario request",
+        "request": {
+          "deployment": "gateway",
+          "method": "GET",
+          "url": "/inventory",
+          "path": [
+            "inventory"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": {
+            "missing": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": []
+        },
+        "authorization_checked": false,
+        "bound_arguments": []
+      },
+      {
+        "id": 2,
+        "entry": "method:warehouse:StockController#listProducts()",
+        "reason": "call:method:gateway:InventoryGateway#listProducts()@7:32",
+        "request": {
+          "deployment": "warehouse",
+          "method": "GET",
+          "url": "http://warehouse/products",
+          "path": [
+            "products"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": null,
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": []
+      },
+      {
+        "id": 3,
+        "entry": "method:catalog:CategoryController#lookup(List<String>)",
+        "reason": "call:method:gateway:InventoryGateway#listProducts()@12:31",
+        "request": {
+          "collection_shapes": [
+            {
+              "path": "body",
+              "size": 2,
+              "order": "unspecified"
+            }
+          ],
+          "deployment": "catalog",
+          "method": "POST",
+          "url": "http://catalog/categories",
+          "path": [
+            "categories"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "body": [
+            "hardware",
+            "office"
+          ],
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "codes",
+            "declared_type": "java.util.List<java.lang.String>",
+            "native_kind": null,
+            "value": [
+              "hardware",
+              "office"
+            ],
+            "collection_shapes": [
+              {
+                "path": "value",
+                "size": 2,
+                "order": "unspecified"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "result": [
+      {
+        "category": "hardware",
+        "id": "SKU7",
+        "quantity": 8,
+        "revision": 4
+      },
+      {
+        "category": "office",
+        "id": "SKU8",
+        "quantity": 8,
+        "revision": 6
+      },
+      {
+        "category": "hardware",
+        "id": "SKU9",
+        "quantity": 10,
+        "revision": 6
+      }
+    ],
+    "responses": [
+      {
+        "request": 2,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "category": "hardware",
+            "id": "SKU7",
+            "quantity": 8,
+            "revision": 4
+          },
+          {
+            "category": "office",
+            "id": "SKU8",
+            "quantity": 8,
+            "revision": 6
+          },
+          {
+            "category": "hardware",
+            "id": "SKU9",
+            "quantity": 10,
+            "revision": 6
+          }
+        ]
+      },
+      {
+        "request": 3,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "code": "hardware"
+          },
+          {
+            "code": "office"
+          }
+        ]
+      },
+      {
+        "request": 1,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "category": "hardware",
+            "id": "SKU7",
+            "quantity": 8,
+            "revision": 4
+          },
+          {
+            "category": "office",
+            "id": "SKU8",
+            "quantity": 8,
+            "revision": 6
+          },
+          {
+            "category": "hardware",
+            "id": "SKU9",
+            "quantity": 10,
+            "revision": 6
+          }
+        ]
+      }
+    ],
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:catalog:CategoryController#lookup(List<String>)"
+      ],
+      [
+        "",
+        "executes",
+        "method:gateway:InventoryGateway#listProducts()"
+      ],
+      [
+        "",
+        "executes",
+        "method:warehouse:StockController#listProducts()"
+      ],
+      [
+        "method:catalog:CategoryController#lookup(List<String>)",
+        "data",
+        "res:table:catalog.categories"
+      ],
+      [
+        "method:gateway:InventoryGateway#listProducts()",
+        "remote",
+        "method:catalog:CategoryController#lookup(List<String>)"
+      ],
+      [
+        "method:gateway:InventoryGateway#listProducts()",
+        "remote",
+        "method:warehouse:StockController#listProducts()"
+      ],
+      [
+        "method:warehouse:StockController#listProducts()",
+        "data",
+        "res:table:warehouse.products"
+      ]
+    ],
+    "outcome": "returned",
+    "diagnostics": [],
+    "call_effects": [
+      {
+        "model_version": "native-map-noop/1",
+        "operation": "foreach",
+        "callsite": "method:gateway:InventoryGateway#listProducts():14",
+        "iterations": 2,
+        "guards": [
+          {
+            "line": 14,
+            "key": "hardware",
+            "condition": "(categoryMap.get(code)==null)",
+            "value": false
+          },
+          {
+            "line": 14,
+            "key": "office",
+            "condition": "(categoryMap.get(code)==null)",
+            "value": false
+          }
+        ],
+        "heap_roots": [],
+        "resource_writes": [],
+        "global_footprint": "none",
+        "callbacks": [],
+        "completions": [
+          "normal"
+        ]
+      }
+    ],
+    "knowledge_losses": [
+      {
+        "sequence": 1,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "gateway/Api.java",
+          "line": 7,
+          "end_line": 7,
+          "method": "method:gateway:InventoryGateway#listProducts()"
+        },
+        "callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32",
+        "source_sha256": "03f7fe0b994947c851bbda2cb5d2233c784fdaee372a23d14a5e18dd8545806c",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 1,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "read_locations": [],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": {
+          "entry": "method:gateway:InventoryGateway#listProducts()",
+          "request_event_reference": "requests[0]",
+          "bound_arguments_reference": "requests[0].bound_arguments",
+          "provenance": [],
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 2,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "warehouse/Api.java",
+          "line": 6,
+          "end_line": 6,
+          "method": "method:warehouse:StockController#listProducts()"
+        },
+        "callsite": "call:method:warehouse:StockController#listProducts()@6:84",
+        "source_sha256": "2c056b70775c44c30bdf9915d5712fb03883aeffc1ba2e3ce73dac164f642fb3",
+        "declared_type": "Stock",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 3,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "read_locations": [],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": {
+          "entry": "method:warehouse:StockController#listProducts()",
+          "request_event_reference": "requests[1]",
+          "bound_arguments_reference": "requests[1].bound_arguments",
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32"
+          },
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 3,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "gateway/Api.java",
+          "line": 12,
+          "end_line": 12,
+          "method": "method:gateway:InventoryGateway#listProducts()"
+        },
+        "callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31",
+        "source_sha256": "03f7fe0b994947c851bbda2cb5d2233c784fdaee372a23d14a5e18dd8545806c",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 6,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ]
+        ],
+        "actual_effect_count": 3,
+        "actual_effects": [
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU7"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU8"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU9"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+          }
+        ],
+        "read_locations": [
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 0
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 1
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 2
+          }
+        ],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": {
+          "entry": "method:gateway:InventoryGateway#listProducts()",
+          "request_event_reference": "requests[0]",
+          "bound_arguments_reference": "requests[0].bound_arguments",
+          "provenance": [],
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 4,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "catalog/Api.java",
+          "line": 4,
+          "end_line": 4,
+          "method": "method:catalog:CategoryController#lookup(List<String>)"
+        },
+        "callsite": "call:method:catalog:CategoryController#lookup(List<String>)@4:149",
+        "source_sha256": "5f872e1d4a2753d3aeca92d39b62384695081326eb393ba3aa1e438be30b13a8",
+        "declared_type": "Categories",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 8,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:catalog:CategoryController#lookup(List<String>)"
+          ],
+          [
+            "",
+            "executes",
+            "method:catalog:CategoryController#lookup(List<String>)"
+          ]
+        ],
+        "actual_effect_count": 3,
+        "actual_effects": [
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU7"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU8"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU9"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+          }
+        ],
+        "read_locations": [
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 0
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 1
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 2
+          }
+        ],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 3,
+        "producer_lineage": {
+          "entry": "method:catalog:CategoryController#lookup(List<String>)",
+          "request_event_reference": "requests[2]",
+          "bound_arguments_reference": "requests[2].bound_arguments",
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31"
+          },
+          "history_length": 0
+        }
+      }
+    ],
+    "data_operations": [
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU7"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+      },
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU8"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+      },
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU9"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+      },
+      {
+        "method": "method:catalog:CategoryController#lookup(List<String>)",
+        "resource": "res:table:catalog.categories",
+        "operation": "findByCodeIn",
+        "arguments": [
+          [
+            "hardware",
+            "office"
+          ]
+        ],
+        "source_site": "call:method:catalog:CategoryController#lookup(List<String>)@4:149",
+        "argument_kinds": [
+          null
+        ],
+        "request_id": 3,
+        "uncertain_write": false,
+        "collection_shapes": [
+          {
+            "path": "arguments/0",
+            "size": 2,
+            "order": "unspecified"
+          }
+        ],
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:catalog:CategoryController#lookup(List<String>)@4:149"
+      }
+    ],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "catalog.categories": 2,
+        "warehouse.products": 3
+      },
+      "unknown_tables": [],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "class_initialization": {},
+      "join_losses": [],
+      "static_fields": {},
+      "tables": {
+        "warehouse.products": [
+          {
+            "id": "SKU7",
+            "category": "hardware",
+            "revision": 4,
+            "quantity": 8
+          },
+          {
+            "id": "SKU8",
+            "category": "office",
+            "revision": 6,
+            "quantity": 8,
+            "__type__": "Product"
+          },
+          {
+            "id": "SKU9",
+            "category": "hardware",
+            "revision": 6,
+            "quantity": 10
+          }
+        ],
+        "catalog.categories": [
+          {
+            "code": "hardware"
+          },
+          {
+            "code": "office"
+          }
+        ]
+      }
+    },
+    "heap_after": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        },
+        "class_initialization": {
+          "$id": "h11",
+          "kind": "dict",
+          "fields": {}
+        },
+        "static_fields": {
+          "$id": "h12",
+          "kind": "dict",
+          "fields": {}
+        }
+      }
+    },
+    "decisions": {
+      "1:method:gateway:InventoryGateway#listProducts():13:unordered-collection-next": 0
+    },
+    "exploration": {
+      "complete": true,
+      "path_limit": 4,
+      "completion_budget": 8,
+      "completion_splits": 0,
+      "completed": 2,
+      "proven_infeasible": 0,
+      "infeasible_exclusion": null,
+      "limits": []
+    }
+  },
+  {
+    "n": 3,
+    "wire": {
+      "deployment": "gateway",
+      "method": "GET",
+      "url": "/inventory",
+      "path": [
+        "inventory"
+      ],
+      "query": {},
+      "query_complete": true,
+      "headers": {},
+      "body": {
+        "missing": true
+      },
+      "actor": {
+        "unknown": true
+      },
+      "session": {
+        "unknown": true
+      },
+      "body_properties": {},
+      "provenance": []
+    },
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:gateway:InventoryGateway#listProducts()",
+        "reason": "scenario request",
+        "request": {
+          "deployment": "gateway",
+          "method": "GET",
+          "url": "/inventory",
+          "path": [
+            "inventory"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": {
+            "missing": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": []
+        },
+        "authorization_checked": false,
+        "bound_arguments": []
+      },
+      {
+        "id": 2,
+        "entry": "method:warehouse:StockController#listProducts()",
+        "reason": "call:method:gateway:InventoryGateway#listProducts()@7:32",
+        "request": {
+          "deployment": "warehouse",
+          "method": "GET",
+          "url": "http://warehouse/products",
+          "path": [
+            "products"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": null,
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": []
+      },
+      {
+        "id": 3,
+        "entry": "method:catalog:CategoryController#lookup(List<String>)",
+        "reason": "call:method:gateway:InventoryGateway#listProducts()@12:31",
+        "request": {
+          "collection_shapes": [
+            {
+              "path": "body",
+              "size": 2,
+              "order": "unspecified"
+            }
+          ],
+          "deployment": "catalog",
+          "method": "POST",
+          "url": "http://catalog/categories",
+          "path": [
+            "categories"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "body": [
+            "hardware",
+            "office"
+          ],
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "codes",
+            "declared_type": "java.util.List<java.lang.String>",
+            "native_kind": null,
+            "value": [
+              "hardware",
+              "office"
+            ],
+            "collection_shapes": [
+              {
+                "path": "value",
+                "size": 2,
+                "order": "unspecified"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "result": [
+      {
+        "category": "hardware",
+        "id": "SKU7",
+        "quantity": 8,
+        "revision": 4
+      },
+      {
+        "category": "office",
+        "id": "SKU8",
+        "quantity": 8,
+        "revision": 6
+      },
+      {
+        "category": "hardware",
+        "id": "SKU9",
+        "quantity": 10,
+        "revision": 6
+      }
+    ],
+    "responses": [
+      {
+        "request": 2,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "category": "hardware",
+            "id": "SKU7",
+            "quantity": 8,
+            "revision": 4
+          },
+          {
+            "category": "office",
+            "id": "SKU8",
+            "quantity": 8,
+            "revision": 6
+          },
+          {
+            "category": "hardware",
+            "id": "SKU9",
+            "quantity": 10,
+            "revision": 6
+          }
+        ]
+      },
+      {
+        "request": 3,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "code": "hardware"
+          },
+          {
+            "code": "office"
+          }
+        ]
+      },
+      {
+        "request": 1,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json",
+        "body": [
+          {
+            "category": "hardware",
+            "id": "SKU7",
+            "quantity": 8,
+            "revision": 4
+          },
+          {
+            "category": "office",
+            "id": "SKU8",
+            "quantity": 8,
+            "revision": 6
+          },
+          {
+            "category": "hardware",
+            "id": "SKU9",
+            "quantity": 10,
+            "revision": 6
+          }
+        ]
+      }
+    ],
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:catalog:CategoryController#lookup(List<String>)"
+      ],
+      [
+        "",
+        "executes",
+        "method:gateway:InventoryGateway#listProducts()"
+      ],
+      [
+        "",
+        "executes",
+        "method:warehouse:StockController#listProducts()"
+      ],
+      [
+        "method:catalog:CategoryController#lookup(List<String>)",
+        "data",
+        "res:table:catalog.categories"
+      ],
+      [
+        "method:gateway:InventoryGateway#listProducts()",
+        "remote",
+        "method:catalog:CategoryController#lookup(List<String>)"
+      ],
+      [
+        "method:gateway:InventoryGateway#listProducts()",
+        "remote",
+        "method:warehouse:StockController#listProducts()"
+      ],
+      [
+        "method:warehouse:StockController#listProducts()",
+        "data",
+        "res:table:warehouse.products"
+      ]
+    ],
+    "outcome": "returned",
+    "diagnostics": [],
+    "call_effects": [
+      {
+        "model_version": "native-map-noop/1",
+        "operation": "foreach",
+        "callsite": "method:gateway:InventoryGateway#listProducts():14",
+        "iterations": 2,
+        "guards": [
+          {
+            "line": 14,
+            "key": "hardware",
+            "condition": "(categoryMap.get(code)==null)",
+            "value": false
+          },
+          {
+            "line": 14,
+            "key": "office",
+            "condition": "(categoryMap.get(code)==null)",
+            "value": false
+          }
+        ],
+        "heap_roots": [],
+        "resource_writes": [],
+        "global_footprint": "none",
+        "callbacks": [],
+        "completions": [
+          "normal"
+        ]
+      }
+    ],
+    "knowledge_losses": [
+      {
+        "sequence": 1,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "gateway/Api.java",
+          "line": 7,
+          "end_line": 7,
+          "method": "method:gateway:InventoryGateway#listProducts()"
+        },
+        "callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32",
+        "source_sha256": "03f7fe0b994947c851bbda2cb5d2233c784fdaee372a23d14a5e18dd8545806c",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 1,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "read_locations": [],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": {
+          "entry": "method:gateway:InventoryGateway#listProducts()",
+          "request_event_reference": "requests[0]",
+          "bound_arguments_reference": "requests[0].bound_arguments",
+          "provenance": [],
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 2,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "warehouse/Api.java",
+          "line": 6,
+          "end_line": 6,
+          "method": "method:warehouse:StockController#listProducts()"
+        },
+        "callsite": "call:method:warehouse:StockController#listProducts()@6:84",
+        "source_sha256": "2c056b70775c44c30bdf9915d5712fb03883aeffc1ba2e3ce73dac164f642fb3",
+        "declared_type": "Stock",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 3,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ]
+        ],
+        "actual_effect_count": 0,
+        "actual_effects": [],
+        "read_locations": [],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 2,
+        "producer_lineage": {
+          "entry": "method:warehouse:StockController#listProducts()",
+          "request_event_reference": "requests[1]",
+          "bound_arguments_reference": "requests[1].bound_arguments",
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@7:32"
+          },
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 3,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "gateway/Api.java",
+          "line": 12,
+          "end_line": 12,
+          "method": "method:gateway:InventoryGateway#listProducts()"
+        },
+        "callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31",
+        "source_sha256": "03f7fe0b994947c851bbda2cb5d2233c784fdaee372a23d14a5e18dd8545806c",
+        "declared_type": "org.springframework.web.client.RestTemplate",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 6,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ]
+        ],
+        "actual_effect_count": 3,
+        "actual_effects": [
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU7"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU8"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU9"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+          }
+        ],
+        "read_locations": [
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 0
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 1
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 2
+          }
+        ],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 1,
+        "producer_lineage": {
+          "entry": "method:gateway:InventoryGateway#listProducts()",
+          "request_event_reference": "requests[0]",
+          "bound_arguments_reference": "requests[0].bound_arguments",
+          "provenance": [],
+          "history_length": 0
+        }
+      },
+      {
+        "sequence": 4,
+        "phase": "input_or_value",
+        "cause": "unresolved identifier",
+        "location": {
+          "file": "catalog/Api.java",
+          "line": 4,
+          "end_line": 4,
+          "method": "method:catalog:CategoryController#lookup(List<String>)"
+        },
+        "callsite": "call:method:catalog:CategoryController#lookup(List<String>)@4:149",
+        "source_sha256": "5f872e1d4a2753d3aeca92d39b62384695081326eb393ba3aa1e438be30b13a8",
+        "declared_type": "Categories",
+        "runtime_kind": null,
+        "before": {
+          "knowledge": "unknown"
+        },
+        "after": {
+          "knowledge": "unknown"
+        },
+        "completion": "unresolved",
+        "guards": [],
+        "assumptions": [],
+        "prefix_event_count": 8,
+        "prefix_edges": [
+          [
+            "",
+            "executes",
+            "method:gateway:InventoryGateway#listProducts()"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "",
+            "executes",
+            "method:warehouse:StockController#listProducts()"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:warehouse:StockController#listProducts()",
+            "data",
+            "res:table:warehouse.products"
+          ],
+          [
+            "method:gateway:InventoryGateway#listProducts()",
+            "remote",
+            "method:catalog:CategoryController#lookup(List<String>)"
+          ],
+          [
+            "",
+            "executes",
+            "method:catalog:CategoryController#lookup(List<String>)"
+          ]
+        ],
+        "actual_effect_count": 3,
+        "actual_effects": [
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU7"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU8"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+          },
+          {
+            "method": "method:warehouse:StockController#listProducts()",
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "arguments": [
+              "SKU9"
+            ],
+            "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+            "argument_kinds": [
+              "String"
+            ],
+            "request_id": 2,
+            "uncertain_write": false,
+            "sql_emitted": true,
+            "datastore_event": true,
+            "transactional": false,
+            "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+          }
+        ],
+        "read_locations": [
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 0
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 1
+          },
+          {
+            "resource": "res:table:warehouse.products",
+            "operation": "findById",
+            "request_id": 2,
+            "data_operation_index": 2
+          }
+        ],
+        "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+        "possible_write_footprint": [],
+        "widened_locations": [],
+        "request_id": 3,
+        "producer_lineage": {
+          "entry": "method:catalog:CategoryController#lookup(List<String>)",
+          "request_event_reference": "requests[2]",
+          "bound_arguments_reference": "requests[2].bound_arguments",
+          "provenance": {
+            "source_callsite": "call:method:gateway:InventoryGateway#listProducts()@12:31"
+          },
+          "history_length": 0
+        }
+      }
+    ],
+    "data_operations": [
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU7"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:84",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:84"
+      },
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU8"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:107",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:107"
+      },
+      {
+        "method": "method:warehouse:StockController#listProducts()",
+        "resource": "res:table:warehouse.products",
+        "operation": "findById",
+        "arguments": [
+          "SKU9"
+        ],
+        "source_site": "call:method:warehouse:StockController#listProducts()@6:130",
+        "argument_kinds": [
+          "String"
+        ],
+        "request_id": 2,
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:warehouse:StockController#listProducts()@6:130"
+      },
+      {
+        "method": "method:catalog:CategoryController#lookup(List<String>)",
+        "resource": "res:table:catalog.categories",
+        "operation": "findByCodeIn",
+        "arguments": [
+          [
+            "hardware",
+            "office"
+          ]
+        ],
+        "source_site": "call:method:catalog:CategoryController#lookup(List<String>)@4:149",
+        "argument_kinds": [
+          null
+        ],
+        "request_id": 3,
+        "uncertain_write": false,
+        "collection_shapes": [
+          {
+            "path": "arguments/0",
+            "size": 2,
+            "order": "unspecified"
+          }
+        ],
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:catalog:CategoryController#lookup(List<String>)@4:149"
+      }
+    ],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "catalog.categories": 2,
+        "warehouse.products": 3
+      },
+      "unknown_tables": [],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "class_initialization": {},
+      "join_losses": [],
+      "static_fields": {},
+      "tables": {
+        "warehouse.products": [
+          {
+            "id": "SKU7",
+            "category": "hardware",
+            "revision": 4,
+            "quantity": 8
+          },
+          {
+            "id": "SKU8",
+            "category": "office",
+            "revision": 6,
+            "quantity": 8,
+            "__type__": "Product"
+          },
+          {
+            "id": "SKU9",
+            "category": "hardware",
+            "revision": 6,
+            "quantity": 10
+          }
+        ],
+        "catalog.categories": [
+          {
+            "code": "hardware"
+          },
+          {
+            "code": "office"
+          }
+        ]
+      }
+    },
+    "heap_after": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        },
+        "class_initialization": {
+          "$id": "h11",
+          "kind": "dict",
+          "fields": {}
+        },
+        "static_fields": {
+          "$id": "h12",
+          "kind": "dict",
+          "fields": {}
+        }
+      }
+    },
+    "decisions": {
+      "1:method:gateway:InventoryGateway#listProducts():13:unordered-collection-next": 1
+    },
+    "exploration": {
+      "complete": true,
+      "path_limit": 4,
+      "completion_budget": 8,
+      "completion_splits": 0,
+      "completed": 2,
+      "proven_infeasible": 0,
+      "infeasible_exclusion": null,
+      "limits": []
+    }
+  }
+]

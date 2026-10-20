@@ -1,0 +1,58 @@
+.......F...FF...............                                             [100%]
+=================================== FAILURES ===================================
+______ test_unmodifiable_including_empty_operations[iterator().remove()] _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-271/test_unmodifiable_including_em6')
+mutation = 'iterator().remove()'
+
+    @pytest.mark.parametrize('mutation',['add(7)','set(0,7)','remove(0)','clear()','addAll(Arrays.asList(7))','removeAll(Arrays.asList(1))','iterator().remove()'])
+    def test_unmodifiable_including_empty_operations(tmp_path,mutation):
+        p,db,ids=make(tmp_path,'List<Integer> xs=new ArrayList<>();List<Integer> out=xs.stream().toList();out.'+mutation+';return 9;')
+        e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
+>       assert any('UnsupportedOperationException' in w for w in e.warnings),e.warnings
+E       AssertionError: {'uncaught Java exception: java.lang.IllegalStateException'}
+E       assert False
+E        +  where False = any(<generator object test_unmodifiable_including_empty_operations.<locals>.<genexpr> at 0x10425fed0>)
+
+code/tests/test_stream_materialization.py:32: AssertionError
+____ test_unordered_callbacks_enumerated_without_inventing_encounter_order _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-271/test_unordered_callbacks_enume0')
+
+    def test_unordered_callbacks_enumerated_without_inventing_encounter_order(tmp_path):
+        p,db,ids=make(tmp_path,'return new HashSet<Integer>(Arrays.asList(1,2)).stream().map(x->visit(x)).toList();')
+        outcomes=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=4)
+>       assert {tuple(o['result']) for o in outcomes}=={(3,6),(6,3)}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_stream_materialization.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x104170940>
+
+>   assert {tuple(o['result']) for o in outcomes}=={(3,6),(6,3)}
+            ^^^^^^^^^^^^^^^^^^
+E   TypeError: 'Unknown' object is not iterable
+
+code/tests/test_stream_materialization.py:52: TypeError
+________________ test_boxed_types_and_no_wire_mutability_marker ________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-271/test_boxed_types_and_no_wire_m0')
+
+    def test_boxed_types_and_no_wire_mutability_marker(tmp_path):
+        p,db,ids=make(tmp_path,'return Arrays.asList(true,1,1L,null).stream().toList();')
+        e=Engine(p,ScenarioState(db));result=e.run(ids['Api.entry'],{})
+>       assert list(result)==[True,1,1,None] and result.kinds[:3]==['java.lang.Boolean','java.lang.Integer','java.lang.Long']
+E       AssertionError: assert ([True, 1, 1, None] == [True, 1, 1, None]
+E         
+E         Use -v to get more diff and ['Boolean', 'Integer', 'Long'] == ['java.lang.B...va.lang.Long']
+E         
+E         At index 0 diff: 'Boolean' != 'java.lang.Boolean'
+E         Use -v to get more diff)
+
+code/tests/test_stream_materialization.py:59: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_stream_materialization.py::test_unmodifiable_including_empty_operations[iterator().remove()]
+FAILED code/tests/test_stream_materialization.py::test_unordered_callbacks_enumerated_without_inventing_encounter_order
+FAILED code/tests/test_stream_materialization.py::test_boxed_types_and_no_wire_mutability_marker
+3 failed, 25 passed in 0.26s

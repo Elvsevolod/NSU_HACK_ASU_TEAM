@@ -1,0 +1,1742 @@
+--- a/analyzer/absence_contracts.py
++++ b/analyzer/absence_contracts.py
+@@ -41,6 +41,32 @@
+         if body is None:continue
+         receivers={name for name,typ in p.parameters(mid) if p.resolve_type(typ,method['module'],method['file'])==owner}
+         if not receivers:continue
++        for use in (n for n in walk(body) if n.type=='identifier' and text(n) in receivers):
++            parent=use.parent
++            if parent.type=='formal_parameter' and parent.child_by_field_name('name')==use:continue
++            if parent.type=='method_invocation' and parent.child_by_field_name('object')==use:
++                name=text(parent.child_by_field_name('name'));args=parent.child_by_field_name('arguments')
++                if args.named_children or not name.startswith('get'):return False
++                member=name[3:4].lower()+name[4:]
++                candidates=p.inherited_methods(owner,name,0)
++                source=[p.ast[target] for target in candidates if p.ast.get(target) is not None]
++                if source:
++                    statements=source[0].child_by_field_name('body')
++                    statements=statements.named_children if statements else []
++                    if len(source)!=1 or len(statements)!=1 or statements[0].type!='return_statement' or len(statements[0].named_children)!=1 or text(statements[0].named_children[0]) not in (member,'this.'+member):return False
++                else:
++                    from .bean_properties import generated_accessor
++                    if generated_accessor(p,owner,name,0,engine.standard_type) is None:return False
++                continue
++            if parent.type=='argument_list' and parent.parent.type=='method_invocation':
++                call=parent.parent;index=parent.named_children.index(use)
++                sites=p.by_line.get((mid,call.start_point.row+1,text(call.child_by_field_name('name'))),())
++                targets={target for site in sites for target in p.edges.get(site,{}).get('calls',())}
++                if targets and all(len(p.parameters(target))>index and p.resolve_type(p.parameters(target)[index][1],
++                        p.methods[target]['module'],p.methods[target]['file'])==owner and p.ast.get(target) is not None for target in targets):continue
++            # No equivalence claim after a DTO alias, field capture, return,
++            # cast, unknown call or any other unproved observation/escape.
++            return False
+         reads=[n for n in walk(body) if n.type=='method_invocation' and text(n.child_by_field_name('object')) in receivers
+                and text(n.child_by_field_name('name'))==getter and not n.child_by_field_name('arguments').named_children]
+         if any(n.type=='field_access' and text(n.child_by_field_name('object')) in receivers and
+--- a/analyzer/actors.py
++++ b/analyzer/actors.py
+@@ -9,7 +9,15 @@
+ 
+ def actor_role(action):
+     match = re.match(r'^\s*as\s+(?:(?:a|an|the)\s+)?([\w-]+)\s*,', action, re.I)
+-    return match[1].lower() if match else U
++    if match:return canonical_role(match[1])
++    patterns=(r'\b(?:log\s*in|sign\s*in)\s+as\s+(?:(?:a|an|the)\s+)?([\w-]+)',
++        r'\b(?:log\s*in|sign\s*in)\b.*?\bwith\s+(?:the\s+)?([\w-]+)[\x27’]s\s+(?:username|credentials?|account)',
++        r'\b(?:log\s*in|sign\s*in)\s+with\s+(?:the\s+)?([\w-]+)\s+(?:account|credentials?)',
++        r'^\s*(?:switch|return)\s+(?:back\s+)?to\s+(?:the\s+)?([\w-]+)(?:\s+account)?[,.]?\s*$')
++    for pattern in patterns:
++        match=re.search(pattern,action,re.I)
++        if match:return canonical_role(match[1])
++    return U
+ 
+ 
+ def declared_roles(project, entry):
+--- a/analyzer/contracts.py
++++ b/analyzer/contracts.py
+@@ -107,6 +107,8 @@
+ def read_static_context(raw):
+     spans, limited, credentials = context_spans(raw)
+     facts = {}
++    from .credential_scopes import from_context
++    actor_facts,default_actor,credential_problems=from_context(raw,spans,credentials)
+     clock = None
+     for pair in credentials:
+         for name, ref in pair.items():
+@@ -126,7 +128,8 @@
+     unresolved = ['System clock is unknown'] if clock is None else []
+     if limited:
+         unresolved.append('Context span budget exceeded')
+-    return {'facts': facts, 'clock': clock, 'unresolved': unresolved, 'raw': deepcopy(raw),
++    return {'facts': facts, 'actor_facts':actor_facts,'default_actor':default_actor,
++            'clock': clock, 'unresolved': unresolved+credential_problems, 'raw': deepcopy(raw),
+             'choice_rules': choice_rules(raw)}
+ 
+ 
+@@ -414,14 +417,14 @@
+                         proposal['unresolved'].append('Source selector conflict or alternate UI path after blocked request: '+blocked['site'])
+                 from .actors import actor_role
+                 for proposal in proposals:
+-                    proposal['actor'] = actor_role(action)
++                    proposal['actor'] = proposal['state'].browser.get('actor',U)
+                 # Equal-scored endpoints are an ambiguity, not a lexical win.
+                 tied = [candidate for candidate_score, _, candidate in ranked
+                         if abs(candidate_score-score) < 1e-9 and candidate['entry'] != contract['entry']]
+                 for candidate in tied:
+                     if candidate['site'] is None:
+                         alternative = self._bind(action, state, candidate, score)
+-                        alternative['actor'] = actor_role(action)
++                        alternative['actor'] = alternative['state'].browser.get('actor',U)
+                         proposals.append(alternative)
+                 if tied:
+                     detail['unresolved'].append('Ambiguous equally ranked source endpoints')
+@@ -487,7 +490,10 @@
+         mid, site = contract['entry'], contract['site']
+         path_state = deepcopy(state)
+         from .actors import actor_role
+-        path_state.select_actor(actor_role(action))
++        from .credential_scopes import selected_actor,facts_for
++        path_state.select_actor(selected_actor(action,state,self.context))
++        actor=path_state.browser.get('actor',U)
++        context_facts=facts_for(self.context,actor)
+         fields = self.project.request_fields(mid)
+         params, bindings, unresolved_units = {}, {}, {}
+         dom_preparation = {}
+@@ -630,10 +636,9 @@
+                 continue
+             if re.search(r'\bnew\b',action,re.I) and intent(action)!=1 and any(
+                     word in {'username','password','login','email'} for word in [normalized(key)]):
+-                actor=actor_role(action)
+                 for index in range(len(state.input_journal)-1,-1,-1):
+                     item=state.input_journal[index]
+-                    if actor is not U and item.get('actor',U) not in (U,actor):continue
++                    if actor is not U and item.get('actor',U)!=actor:continue
+                     if intent(item.get('action',''))!=1:continue
+                     matches=[(name,stored) for name,stored in item.get('parameters',{}).items() if normalized(name)==normalized(key)]
+                     if len(matches)==1:
+@@ -646,7 +651,11 @@
+                 bind(key, '' if typ.split('.')[-1] == 'String' else False,
+                      'context', absence[0], absence[1])
+                 continue
+-            for name, fact in self.context['facts'].items():
++            if re.search(r'\b(?:log\s*in|sign\s*in|authenticate)\b',action,re.I) and normalized(key) in ('username','password','login','email') and actor is not U and key not in context_facts:
++                params.pop(key,None)
++                bindings[key]={'source':'actor_context','reference':str(actor),'quote':'', 'resolved':False,
++                    'reason':'No established credentials for actor '+str(actor)}
++            for name, fact in context_facts.items():
+                 if normalized(name) == normalized(key):
+                     if fact['kind'] == 'credential' and re.search(r'\bnew\b', action, re.I):
+                         if intent(action) == 1:
+@@ -666,7 +675,7 @@
+                                     bind(key, matching[0][1], 'history', matching[0][0])
+                                     break
+                         continue
+-                    bind(key, fact['value'], 'context', name, fact.get('quote', ''))
++                    bind(key, fact['value'], 'context', 'actor['+str(actor)+'].'+name if fact.get('kind')=='credential' else name, fact.get('quote', ''))
+             if key in params and not contains_unknown(params[key]):
+                 if not (params[key] == '' and intent(action) != 1 and (key.lower().endswith('id') or key in ('id', 'key'))):
+                     continue
+@@ -779,6 +788,7 @@
+                             preparation.extend(refs)
+         problems = ['Unknown input: ' + key for key, typ in fields.items()
+                     if (key not in params or contains_unknown(params[key])) and not http_headers_type(typ)]
++        problems.extend(binding['reason'] for binding in bindings.values() if binding.get('source')=='actor_context' and binding.get('reason'))
+         problems.extend('Unknown input unit: '+key for key,binding in bindings.items() if binding.get('reference')=='unit:unresolved')
+         problems.extend(absence_problems)
+         if site and len(site.get('compound_request_sites',[])) > 1:
+--- a/analyzer/credential_scopes.py
++++ b/analyzer/credential_scopes.py
+@@ -0,0 +1,54 @@
++"""Credential ownership is evidence from context, never from startup defaults."""
++import re
++from .actors import canonical_role
++from .state import U
++
++
++def from_context(raw,spans,pairs):
++    actors={};unowned=[]
++    def add(actor,facts):
++        if actor in actors:
++            if any(actors[actor].get(name,{}).get('value')!=fact['value'] for name,fact in facts.items()):
++                actors[actor]={}
++                message='Conflicting credential sets for actor '+actor
++                if message not in unowned:unowned.append(message)
++        else:actors[actor]=facts
++    for pair in pairs:
++        username=spans[pair['username']]
++        source=str(username['source']);text=str(raw.get(source,'')) if isinstance(raw,dict) else str(raw)
++        position=text.find(username['quote'])
++        prefix=re.split(r'[;\n]',text[:max(0,position)])[-1]
++        owner=re.fullmatch(r'([\w-]+)[ _-](?:account|credentials?)',source,re.I)
++        role=re.search(r'\b(?:the\s+)?([\w-]+)\s+is\s+(?:the\s+)?(?:pre-registered\s+)?(?:user|account)\b',prefix,re.I)
++        labelled=re.search(r'\b([\w-]+)\s+(?:credentials?|account)\b',prefix,re.I)
++        actor=canonical_role((owner or role or labelled)[1]) if owner or role or labelled else canonical_role(str(username['value']))
++        facts={name:{**spans[ref],'kind':'credential','reference':ref,'actor':actor} for name,ref in pair.items()}
++        add(actor,facts)
++    for group in ('actors','accounts'):
++        values=raw.get(group) if isinstance(raw,dict) else None
++        for actor,value in values.items() if isinstance(values,dict) else []:
++            if not isinstance(value,dict) or not all(isinstance(value.get(k),str) for k in ('username','password')):continue
++            identity=canonical_role(actor)
++            facts={name:{'value':value[name],'quote':value[name],'source':group+'.'+actor+'.'+name,
++                'reference':group+'.'+actor+'.'+name,'kind':'credential','actor':identity} for name in ('username','password')}
++            add(identity,facts)
++    chosen=canonical_role(raw['default_actor']) if isinstance(raw,dict) and isinstance(raw.get('default_actor'),str) else next(iter(actors)) if len(actors)==1 else U
++    default=chosen if chosen in actors else U
++    return actors,default,unowned
++
++
++def selected_actor(action,state,context):
++    from .actors import actor_role
++    explicit=actor_role(action)
++    if explicit is not U:return explicit
++    current=state.browser.get('actor',U)
++    return current if current is not U else context.get('default_actor',U)
++
++
++def facts_for(context,actor):
++    scoped=context.get('actor_facts')
++    if scoped is None:
++        return {name:fact for name,fact in context.get('facts',{}).items()
++            if fact.get('kind')!='credential' or actor is U or fact.get('actor')==actor}
++    return {**{name:fact for name,fact in context.get('facts',{}).items() if fact.get('kind')!='credential'},
++        **scoped.get(actor,{})}
+--- a/analyzer/engine.py
++++ b/analyzer/engine.py
+@@ -183,6 +183,7 @@
+             result.opaque=a.opaque or b.opaque
+             result.fixed_size=a.fixed_size if a.fixed_size==b.fixed_size else None
+             result.flavor=a.flavor if a.flavor==b.flavor else None
++            result.order_known=a.order_known and b.order_known
+             return result
+         if isinstance(a,JavaListIterator) or isinstance(b,JavaListIterator):
+             if not isinstance(a,JavaListIterator) or not isinstance(b,JavaListIterator):return U
+@@ -508,6 +509,10 @@
+                 request_event=next(event for event in self.request_events if event['id']==frame['request_id'])
+                 request_event['binding_candidate_arguments']=[{'name':name,'declared_type':render_source_type(self.p,typ,self.p.methods[frame['entry']],{},self.standard_type) or typ,
+                     'value':deepcopy(value,node_memo)} for (name,typ),value in zip(self.p.parameters(frame['entry']),args)]
++                from .java_sets import shapes
++                for argument,value in zip(request_event['binding_candidate_arguments'],args):
++                    shape=shapes(value,'value')
++                    if shape:argument['collection_shapes']=shape
+                 from .http_validation import validate
+                 validate(self,frame['entry'],args)
+             except BindingFailure as failure:
+@@ -820,6 +825,7 @@
+         before_return_kind,before_reference_kind=self.current_return_kind,self.last_reference_kind
+         return_kinds,reference_kinds=[],[]
+         original = {'env': env, 'values': values, 'browser': before.browser,
++                    'actor_browsers':before.actor_browsers,'beans':before.bean_instances,
+                     'history': before.history, 'params': self.params, 'opaque_heap': self.opaque_heap,
+                     'managed': {unit: frame['managed'] for unit, frame in before.transactions.items()}}
+         alternatives, states, results, controls = [], [], [], []
+@@ -888,6 +894,7 @@
+                 left, left_copies = clone_environment(original)
+             self.state = join_states(states)
+         self.state.browser, self.state.history = original['browser'], original['history']
++        self.state.actor_browsers,self.state.bean_instances=original['actor_browsers'],original['beans']
+         for unit, managed in original['managed'].items():
+             if unit in self.state.transactions:self.state.transactions[unit]['managed'] = managed
+         self.params = original['params']
+@@ -987,6 +994,8 @@
+         elif actual in natives and any(self.standard_type(wanted,name) for name in ('java.lang.Number','java.io.Serializable','java.lang.Comparable')):
+             if not self.standard_type(wanted,'java.lang.Number') or actual in ('Byte','Short','Integer','Long','Float','Double'):return value
+             if value is not U:raise JavaThrow({'__type__':'ClassCastException'})
++        elif isinstance(value,JavaList) and value.flavor=='HashSet' and any(self.standard_type(wanted,'java.util.'+name) for name in ('Set','HashSet','Collection')):return value
++        elif isinstance(value,JavaList) and value.flavor=='HashSet' and self.standard_type(wanted,'java.util.List'):raise JavaThrow({'__type__':'ClassCastException'})
+         elif isinstance(value,JavaList) and not isinstance(value,JavaArray) and (any(self.standard_type(wanted,'java.util.'+name) for name in ('List','Collection')) or self.standard_type(wanted,'java.lang.Iterable')):
+             return value
+         elif isinstance(value,JavaMap) and self.standard_type(wanted,'java.util.Map'):return value
+@@ -1178,6 +1187,8 @@
+     def lvalue_read(self,slot):
+         if not self.lvalue_valid(slot):return U
+         _,kind,obj,key=slot
++        if kind=='array' and len(obj)>1 and not getattr(obj,'order_known',True):
++            self.approximate=True;self.warnings.add('array encounter order is unspecified: '+text(slot[0]));return U
+         return obj[key] if kind=='array' else obj.get(key,U)
+ 
+     def lvalue_write(self,slot,value,reference_kind=None,reference_type=''):
+@@ -1200,6 +1211,11 @@
+                 self.approximate=True
+                 self.warnings.add('reference array store runtime component type is not modeled: '+text(node))
+                 value=U
++        if kind=='array' and len(obj)>1 and not getattr(obj,'order_known',True):
++            self.approximate=True;self.warnings.add('array store position has unspecified prior order: '+text(node))
++            for index in range(len(obj)):obj.set_value(index,U,None)
++            obj.opaque=True
++            return
+         if kind=='field' and isinstance(obj,JavaRecord):
+             receiver=self.source_qualifier_type(node)
+             meta=self.p.methods[self.method]
+@@ -1318,9 +1334,11 @@
+                 self.fallback(self.method)
+                 return U,None
+             name = text(node.child_by_field_name('name'))
++            from .map_loop_proof import prove as map_noop
++            if map_noop(self,node,values,env):return U,None
+             if self.commuting_map_copy(node,values,env):return U,None
+             certain=isinstance(values,list) or isinstance(values,JavaMapView) and isinstance(values.backing.mapping,dict)
+-            native_iteration=isinstance(values,JavaList) and not isinstance(values,JavaArray)
++            native_iteration=isinstance(values,JavaList) and (not isinstance(values,JavaArray) or not values.order_known)
+             reason=self.method+':'+str(node.start_point.row+1)
+             items = (self.view_items(values,env,reason) if isinstance(values,JavaMapView) else
+                      native_list_iteration(self,values,reason) if native_iteration else values if isinstance(values,list) else [U])
+@@ -1920,6 +1938,8 @@
+             if arr is None:raise JavaThrow({'__type__':'NullPointerException'})
+             if isinstance(arr,list) and type(idx) is int and not 0<=idx<len(arr):
+                 raise JavaThrow({'__type__':'ArrayIndexOutOfBoundsException'})
++            if isinstance(arr,list) and len(arr)>1 and not getattr(arr,'order_known',True):
++                self.approximate=True;self.warnings.add('array encounter order is unspecified: '+text(node));return U
+             if isinstance(arr,JavaArray) and type(idx) is int and 0<=idx<len(arr):self.remember_reference_kind(arr.kinds[idx])
+             return U if self.opaque(arr) else arr[idx] if isinstance(arr, list) and isinstance(idx, int) and 0 <= idx < len(arr) else U
+         if typ == 'expression_statement':
+@@ -2560,6 +2580,9 @@
+             self.remember_reference_kind('String')
+             return obj.enum_name
+         if not targets:
++            from .spring_formatter import call as formatter_call
++            handled,value=formatter_call(self,node,name,obj,args,reason)
++            if handled:return value
+             from .jjwt import native_call as jwt_call
+             handled,value=jwt_call(self,node,name,obj,args,reason)
+             if handled:return value
+@@ -2602,6 +2625,7 @@
+                 kinds=args[0].kinds if args and isinstance(args[0],JavaList) else None
+                 obj=JavaList(args[0] if args and isinstance(args[0],list) else (),kinds)
+                 obj.flavor=collection_name
++                obj.order_known=collection_name!='HashSet' and (not args or getattr(args[0],'order_known',True))
+                 obj.opaque=bool(args and isinstance(args[0],JavaList) and args[0].opaque)
+         if not targets and name=='sort' and args and isinstance(args[0],list) and len(args[0])<=1 and not self.opaque(args[0]) and not getattr(args[0],'opaque',False) and self.standard_type(text(objnode),'org.springframework.beans.support.PropertyComparator'):
+             return None
+@@ -3318,6 +3342,8 @@
+             self.warnings.add('unsupported stream operation: ' + reason + ' ' + name)
+             return True, U
+         obj['lifecycle']['consumed'] = True
++        if len(obj['__stream__'])>1 and not getattr(obj['__stream__'],'order_known',True):
++            raise AnalysisBoundary('stream encounter order needs isolated callback continuations: '+reason,category='unsupported_semantics')
+         if len(obj['__stream__']) > 10000:
+             self.warnings.add('stream collection budget exceeded: ' + reason)
+             self.fallback(self.method)
+@@ -3624,6 +3650,9 @@
+             operation = {'method': mid, 'resource': rid, 'operation': name,
+                          'arguments': deepcopy(args), 'source_site': reason,
+                          'uncertain_write': bool(self.uncertain)}
++            from .java_sets import shapes
++            shape=shapes(args,'arguments')
++            if shape:operation['collection_shapes']=shape
+             if name.startswith(('save','insert','delete')):
+                 persistence.queue(self,operation)
+             else:
+--- a/analyzer/frontend.py
++++ b/analyzer/frontend.py
+@@ -623,7 +623,15 @@
+                 if conditional_body:
+                     body_complete = False
+                     body = {key: expression for key, expression in body.items() if key not in conditional_body}
+-                success = config.get('success')
++                callback_contract=None
++                callback_nodes={}
++                if function=='$http':
++                    from .frontend_angular import callbacks
++                    callback_nodes,callback_contract=callbacks(self,path,tree,call,pages)
++                    success=callback_nodes.get('success')
++                    if not callback_nodes and call.parent is not None and call.parent.type=='member_expression' and text(call.parent.child_by_field_name('property')) in ('success','error'):
++                        self.unsupported.append('Unproven AngularJS legacy response callback: '+str(path.relative_to(project.root))+':'+str(call.start_point.row+1))
++                else:success = config.get('success')
+                 effects = []
+                 response_definitions = {}
+                 response_name = 'response'
+@@ -744,7 +752,7 @@
+                         else:
+                             options.append(option)
+                 failure_effects=[]
+-                error=config.get('error')
++                error=callback_nodes.get('error') if function=='$http' else config.get('error')
+                 if error is not None:
+                     for failed_call in walk(error):
+                         if failed_call.type!='call_expression':continue
+@@ -755,6 +763,9 @@
+                             failure_effects.append({'space':'storage','key':literal(values[0]),'expr':'undefined','delete':True,
+                                 'conditions':request_guards(failed_call,error)})
+                 self.sites[sid] = {'id': sid, 'file': path.relative_to(project.root).as_posix(),
++                                   'callback_contract':callback_contract,
++                                   'callback_parameters':{name:[text(p) for p in node.child_by_field_name('parameters').named_children]
++                                      for name,node in callback_nodes.items()},
+                                    'page': pages[0][0].relative_to(project.root).as_posix() if pages else path.relative_to(project.root).as_posix(),
+                                    'line': call.start_point.row + 1, 'handlers': handlers, 'verb': verb,
+                                    'vue_component':vue_method,
+@@ -1457,6 +1468,11 @@
+                 return
+             raise
+         env = {**self.script_values(site,state,callback=True),**event_values,site['response_name']: deepcopy(response)}
++        if site.get('callback_contract'):
++            parameters=site.get('callback_parameters',{}).get('error' if type(status) is int and status>=400 else 'success',[])
++            if parameters:env[parameters[0]]=deepcopy(response)
++            if len(parameters)>1:env[parameters[1]]=status
++            for parameter in parameters[2:]:env[parameter]=U
+         if 'response_this' in site:
+             env['this']=state.browser['form'] if site['response_this'] else U
+             env.setdefault('that',U)
+--- a/analyzer/frontend_angular.py
++++ b/analyzer/frontend_angular.py
+@@ -0,0 +1,83 @@
++"""Bounded legacy AngularJS $http promise callbacks, tied to their AST call."""
++import re
++from urllib.parse import urlsplit
++
++
++def callbacks(frontend,path,tree,call,pages):
++    from .frontend import text,walk,ancestor,FUNCTIONS,redeclares
++    found={};current=call
++    while current.parent is not None and current.parent.type=='member_expression':
++        member=current.parent
++        if member.child_by_field_name('object')!=current:break
++        method=text(member.child_by_field_name('property'))
++        outer=member.parent
++        if method not in ('success','error') or outer.type!='call_expression' or outer.child_by_field_name('function')!=member:break
++        args=outer.child_by_field_name('arguments').named_children
++        if len(args)!=1 or args[0].type not in FUNCTIONS:return {},None
++        if method in found:return {},None
++        found[method]=args[0];current=outer
++    if not found:return {},None
++    if text(call.child_by_field_name('function'))!='$http':return {},None
++    scope=ancestor(call.parent,(*FUNCTIONS,'program'));injected=None
++    while scope is not None and scope.type!='program':
++        params=scope.child_by_field_name('parameters')
++        names=[text(n) for n in params.named_children] if params else []
++        if '$http' in names:injected=scope;break
++        if redeclares(scope,'$http',None):return {},None
++        scope=ancestor(scope.parent,(*FUNCTIONS,'program'))
++    if injected is None:return {},None
++    # A parameter is an Angular service only in a source-proven registration.
++    registration=injected.parent.parent if injected.parent is not None and injected.parent.type=='arguments' else None
++    if registration is None or registration.type!='call_expression':return {},None
++    function=registration.child_by_field_name('function')
++    if function.type!='member_expression' or text(function.child_by_field_name('property')) not in ('controller','run','factory','service'):return {},None
++    receiver=function.child_by_field_name('object')
++    module_calls=[]
++    if receiver.type=='call_expression':module_calls=[receiver]
++    elif receiver.type=='identifier':
++        for variable in walk(tree.root_node):
++            if variable.type=='variable_declarator' and text(variable.child_by_field_name('name'))==text(receiver):
++                module_calls.append(variable.child_by_field_name('value'))
++    if len(module_calls)!=1 or module_calls[0] is None or module_calls[0].type!='call_expression' or text(module_calls[0].child_by_field_name('function'))!='angular.module':return {},None
++    module_name=text(receiver) if receiver.type=='identifier' else None
++    for node in walk(tree.root_node):
++        if node.type=='assignment_expression' and text(node.child_by_field_name('left')) in ('angular',module_name):return {},None
++        if node.type=='call_expression':
++            invoked=text(node.child_by_field_name('function'));args=node.child_by_field_name('arguments').named_children
++            if invoked.endswith(('.decorator','.factory','.service','.value','.constant','.provider')) and args and text(args[0]) in ('"$http"',"'$http'"):return {},None
++            if '.interceptors' in invoked:return {},None
++    enclosing=registration.parent
++    while enclosing is not None:
++        if enclosing.type in FUNCTIONS:
++            params=enclosing.child_by_field_name('parameters')
++            if params and any(text(param) in ('angular',module_name) for param in params.named_children):return {},None
++        enclosing=enclosing.parent
++    for node in walk(injected):
++        if node.type in ('variable_declarator','assignment_expression'):
++            target=node.child_by_field_name('name' if node.type=='variable_declarator' else 'left')
++            if text(target)=='$http':return {},None
++    if any(node.type=='variable_declarator' and text(node.child_by_field_name('name'))=='angular' for node in walk(tree.root_node)):return {},None
++    versions=set()
++    for page_path,page in pages:
++        for src in page.scripts:
++            address=urlsplit(src)
++            if address.netloc in ('ajax.googleapis.com','code.angularjs.org'):
++                match=re.search(r'/(1\.\d+\.\d+)/angular(?:\.min)?\.js$',address.path)
++                if match:versions.add(match[1])
++                continue
++            vendor=(page_path.parent/src).resolve()
++            if not vendor.is_relative_to(frontend.project.root.resolve()) or not vendor.is_file():continue
++            head=vendor.read_bytes()[:1024].decode(errors='replace')
++            match=re.search(r'@license AngularJS v(1\.\d+\.\d+)',head)
++            if match:versions.add(match[1])
++    if len(versions)!=1:return {},None
++    version=versions.pop()
++    if tuple(map(int,version.split('.')))>(1,5,11):return {},None
++    for node in walk(tree.root_node):
++        if node.type=='call_expression' and text(node.child_by_field_name('function')).endswith('.useLegacyPromiseExtensions'):
++            args=node.child_by_field_name('arguments').named_children
++            if len(args)!=1 or text(args[0])!='true':return {},None
++    contract={'library':'AngularJS','version':version,'response_argument':'response.data',
++        'request_byte':call.start_byte,'request_line':call.start_point.row+1,
++        'callbacks':{name:{'line':node.start_point.row+1,'byte':node.start_byte} for name,node in found.items()}}
++    return found,contract
+--- a/analyzer/http_json.py
++++ b/analyzer/http_json.py
+@@ -56,7 +56,9 @@
+                 if unwrap is True:value=[value]
+                 else:return fail('HTTP array scalar coercion requires a supported codec policy')
+             decoded=[decode(child,element,context,bindings,certain) for child in value]
+-            return JavaArray(decoded,component,[decoded_kind(child,element,context,bindings) for child in decoded])
++            result=JavaArray(decoded,component,[decoded_kind(child,element,context,bindings) for child in decoded])
++            result.order_known=getattr(value,'order_known',True)
++            return result
+         if isinstance(value,JsonText):
+             if standard_type(base,'java.lang.String',context) or standard_type(base,'java.lang.Object',context):return deepcopy(value)
+             return fail('JSON text scalar is incompatible with the requested structured type')
+@@ -97,7 +99,9 @@
+                 return fail('HTTP collection shape or generic type is not modeled')
+             element=arguments[0] if arguments else 'java.lang.Object'
+             decoded=[decode(child,element,context,bindings,certain) for child in value]
+-            return JavaList(decoded,[decoded_kind(child,element,context,bindings) for child in decoded])
++            result=JavaList(decoded,[decoded_kind(child,element,context,bindings) for child in decoded])
++            result.order_known=getattr(value,'order_known',True)
++            return result
+         owner=project.resolve_type(base,context['module'],context['file'])
+         if owner in project.enum_members:
+             constants=[project.enum_objects[key] for key in project.enum_members[owner]]
+--- a/analyzer/java_lists.py
++++ b/analyzer/java_lists.py
+@@ -9,6 +9,7 @@
+ def has_next(iterator):
+     values=iterator['backing'];index=iterator['index']
+     if type(index) is not int or values.opaque:return U
++    if 'remaining' in iterator:return bool(iterator['remaining'])
+     if values.flavor=='LinkedList' or values.flavor=='Arrays.ArrayList':return index<len(values)
+     if values.flavor=='ArrayList' or index<=len(values):return index!=len(values)
+     return U
+@@ -26,11 +27,18 @@
+         if count>=64:
+             engine.warnings.add('loop collection widened after 64 elements')
+             engine.fallback(engine.method);yield U,None;return
+-        index=iterator['index'];iterator['index']=index+1;count+=1
++        if 'remaining' in iterator:
++            from .java_sets import next_index
++            index=next_index(engine,iterator,reason)
++        else:index=iterator['index']
++        iterator['index']+=1;count+=1
+         yield values[index],values.kinds[index]
+ 
+ 
+ def call(engine,name,obj,args,kinds,nodes,node,reason):
++    from .java_sets import call as set_call,next_index
++    handled,result=set_call(engine,name,obj,args,kinds,reason)
++    if handled:return handled,result
+     if getattr(obj,'unmodifiable',False) and name in ('add','addAll','remove','removeAll','retainAll','clear','set','sort','replaceAll'):
+         raise JavaThrow({'__type__':'UnsupportedOperationException'})
+     def unresolved(message,backing=None):
+@@ -57,7 +65,8 @@
+         if obj['expected'] is None or values.structural_version is None:return unresolved('List iterator structural version is unresolved')
+         if obj['expected']!=values.structural_version:raise JavaThrow({'__type__':'ConcurrentModificationException'})
+         if name=='next':
+-            index=obj['index']
++            index=next_index(engine,obj,reason) if 'remaining' in obj else obj['index']
++            if index is None:raise JavaThrow({'__type__':'NoSuchElementException'})
+             if index>=len(values):raise JavaThrow({'__type__':'NoSuchElementException'})
+             obj['index']=index+1;obj['last']=index
+             return True,engine.native_read_cast(values[index],values.kinds[index],node,reason)
+@@ -65,6 +74,7 @@
+         if type(obj['last']) is not int:return unresolved('List iterator removal cursor is unresolved',values)
+         if not resizable(values):return unresolved('List mutability is unresolved',values)
+         values.pop(obj['last']);obj['index']=obj['last'];obj['last']=None;obj['expected']=values.structural_version
++        if 'remaining' in obj:obj['remaining']=[index-1 if index>obj['index'] else index for index in obj['remaining']]
+         return True,None
+     if not isinstance(obj,JavaList) or isinstance(obj,JavaArray):return False,U
+     if name=='clear' and not args:
+@@ -85,6 +95,11 @@
+         obj.set_value(index,value,kinds[1])
+         return True,engine.native_read_cast(old,kind,node,reason)
+     if name=='iterator' and not args:return True,JavaListIterator(obj)
++    if not getattr(obj,'order_known',True) and name in ('get','set','remove','indexOf','lastIndexOf') and args:
++        if name=='remove' and compiled_type(engine,nodes[0]) not in ('byte','short','char','int'):pass
++        elif name in ('get','set','remove') and type(args[0]) is int and not 0<=args[0]<len(obj):
++            raise JavaThrow({'__type__':'IndexOutOfBoundsException'})
++        elif len(obj)>1:return unresolved('List encounter order is unresolved',obj if name in ('set','remove') else None)
+     if name=='isEmpty' and not args:return True,not obj
+     if name=='equals' and len(args)==1:
+         other=args[0]
+@@ -93,6 +108,7 @@
+             return (True,False) if other is None or isinstance(other,(JavaArray,str,int,float,bool)) else unresolved('List equality receiver class is unresolved')
+         if other.opaque:return unresolved('List equality contents are unresolved')
+         if len(obj)!=len(other):return True,False
++        if len(obj)>1 and (not obj.order_known or not other.order_known):return unresolved('List equality encounter order is unresolved')
+         unknown=False
+         for index,value in enumerate(obj):
+             equal=engine.collection_membership(JavaList([other[index]],[other.kinds[index]]),value,'contains',reason,obj.kinds[index])
+@@ -122,7 +138,9 @@
+     if name in ('removeAll','retainAll') and len(args)==1:
+         other=args[0]
+         if other is None:raise JavaThrow({'__type__':'NullPointerException'})
+-        if not isinstance(other,JavaList) or other.opaque:return unresolved('List bulk membership is unresolved',obj)
++        if not isinstance(other,JavaList) or other.opaque:
++            from .engine import AnalysisBoundary
++            raise AnalysisBoundary('List bulk membership is unresolved: '+reason,category='unsupported_semantics')
+         kept=[];evidence=[]
+         for index,value in enumerate(obj):
+             contains=engine.collection_membership(other,value,'contains',reason,obj.kinds[index])
+--- a/analyzer/java_sets.py
++++ b/analyzer/java_sets.py
+@@ -0,0 +1,92 @@
++"""Standard HashSet with known scalar equality, without an encounter order."""
++from .native_storage import JavaList
++from .boxed_values import boxed_equal
++from .state import U
++
++
++def shapes(value,path='body',seen=None):
++    seen=set() if seen is None else seen
++    if not isinstance(value,(dict,list)) or id(value) in seen:return []
++    seen.add(id(value));result=[]
++    if isinstance(value,JavaList) and not value.order_known:
++        result.append({'path':path,'size':None if value.opaque else len(value),'order':'unspecified'})
++    children=value.items() if isinstance(value,dict) else enumerate(value)
++    for key,child in children:result.extend(shapes(child,path+'/'+str(key),seen))
++    return result
++
++
++def next_index(engine,iterator,reason):
++    remaining=iterator['remaining']
++    if not remaining:return None
++    selected=engine.choose(reason+':unordered-collection-next',list(range(len(remaining)))) if len(remaining)>1 else 0
++    if selected is None:
++        from .engine import CompletionRequired,AnalysisBoundary
++        if not engine.allow_completion_splits:raise AnalysisBoundary('collection encounter order needs a continuation: '+reason)
++        raise CompletionRequired(str(engine.branch_index)+':'+reason+':unordered-collection-next',list(range(len(remaining))))
++    return remaining.pop(selected)
++
++
++def call(engine,name,values,args,kinds,reason):
++    if not isinstance(values,JavaList) or values.flavor!='HashSet':return False,U
++    def boundary(message,write=False):
++        engine.approximate=True;engine.warnings.add('Java Set '+message+': '+reason)
++        engine.operation_issues[('java_set_boundary',message)]+=1
++        if write:values.opaque=True
++        return True,U
++    def index(value,kind):
++        if value is not None and kind not in ('String','Integer','Long','Short','Byte','Character','Boolean'):
++            from .engine import AnalysisBoundary
++            raise AnalysisBoundary('Java Set element equality/hash callbacks are outside the scalar contract: '+reason,category='unsupported_semantics')
++        if value is not None and (kind not in ('String','Integer','Long','Short','Byte','Character','Boolean') or
++            type(value) not in (str,int,bool)):return U
++        for i,item in enumerate(values):
++            equal=boxed_equal(value,item,kind,values.kinds[i],lambda a,b:a==b)
++            if equal is True:return i
++            if equal is U:return U
++        return -1
++    if name=='clear' and not args:values.clear();return True,None
++    if values.opaque:return boundary('membership is unresolved',name in ('add','addAll','remove','removeAll','retainAll'))
++    if name in ('size','isEmpty') and not args:return True,len(values) if name=='size' else not values
++    if name in ('add','contains','remove') and len(args)==1:
++        found=index(args[0],kinds[0])
++        if found is U:return boundary('element equality or hash contract is unresolved',name!='contains')
++        if name=='contains':return True,found!=-1
++        if name=='add':
++            if found!=-1:return True,False
++            values.append(args[0],kinds[0]);return True,True
++        if found==-1:return True,False
++        values.pop(found);return True,True
++    if name in ('addAll','removeAll','retainAll') and len(args)==1:
++        other=args[0]
++        if other is None:
++            from .java_exceptions import JavaThrow
++            raise JavaThrow({'__type__':'NullPointerException'})
++        if not isinstance(other,JavaList) or other.opaque:return boundary('bulk membership is unresolved',True)
++        if any(value is not None and kind not in ('String','Integer','Long','Short','Byte','Character','Boolean') for value,kind in zip(other,other.kinds)):
++            from .engine import AnalysisBoundary
++            raise AnalysisBoundary('Java Set bulk equality/hash callbacks are outside the scalar contract: '+reason,category='unsupported_semantics')
++        if name=='addAll':
++            changed=False
++            for value,kind in zip(list(other),list(other.kinds)):
++                _,result=call(engine,'add',values,[value],[kind],reason)
++                if result is U:return True,U
++                changed|=result
++            return True,changed
++        kept=[];kept_kinds=[]
++        for value,kind in zip(values,values.kinds):
++            comparisons=[boxed_equal(value,item,kind,other.kinds[i],lambda a,b:a==b) for i,item in enumerate(other)]
++            present=True if True in comparisons else U if U in comparisons else False
++            if present is U:return boundary('bulk element equality is unresolved',True)
++            if present==(name=='retainAll'):kept.append(value);kept_kinds.append(kind)
++        changed=len(kept)!=len(values)
++        if changed:values[:]=kept;values.kinds[:]=kept_kinds
++        return True,changed
++    if name=='iterator' and not args:return False,U
++    if name=='equals' and len(args)==1:
++        other=args[0]
++        if not isinstance(other,JavaList) or other.flavor!='HashSet':return True,False
++        if other.opaque:return boundary('equality contents are unresolved')
++        if len(values)!=len(other):return True,False
++        found=[index(value,kind) for value,kind in zip(other,other.kinds)]
++        return boundary('equality is unresolved') if U in found else (True,all(i!=-1 for i in found))
++    return boundary('operation is outside the supported scalar contract: '+name)
+--- a/analyzer/map_loop_proof.py
++++ b/analyzer/map_loop_proof.py
+@@ -0,0 +1,114 @@
++"""Prove only native Map loops whose pure guards are false for every member.
++
++This evaluator never invokes source code and never writes the execution heap.
++An unsupported expression rejects the proof; ordinary replay then handles it.
++"""
++from .java_collections import JavaMap,JavaMapView,JavaMapEntry,JavaRecord
++from .native_storage import JavaList
++from .generic_types import type_parts
++from .map_keys import key_spec
++from .project import text
++from .state import U
++
++
++class OutsideProof(Exception):pass
++
++
++def prove(engine,node,view,env):
++    if not isinstance(view,JavaMapView):return False
++    source=view.backing
++    if source.flavor not in ('HashMap','LinkedHashMap') or not isinstance(source.mapping,dict):return False
++    entries=source.entries()
++    if len(entries)>64:return False
++    written=text(node.child_by_field_name('type'));base,parameters=type_parts(written)
++    def fits(value,kind,typ):
++        typ,_=type_parts(typ)
++        if value is U:return False
++        if value is None:return typ not in ('boolean','byte','short','int','long','char','float','double')
++        if engine.standard_type(typ,'java.lang.Object'):return True
++        scalar=engine.native_scalar_type(typ)
++        if scalar:return scalar==kind
++        if isinstance(value,JavaList) and any(engine.standard_type(typ,'java.util.'+t) for t in ('List','Collection')):
++            return value.flavor!='HashSet'
++        return isinstance(value,JavaRecord) and engine.record_proves_type(value,typ)
++    entry_type=engine.standard_type(base,'java.util.Map.Entry') or base=='Map.Entry' and engine.standard_type('Map','java.util.Map')
++    if view.kind=='entries' and (not entry_type or parameters is None or len(parameters)!=2):return False
++    body=node.child_by_field_name('body')
++    statements=[c for c in body.named_children if c.type not in ('line_comment','block_comment')] if body.type=='block' else [body]
++    guards=[]
++    def expression(n,local):
++        if n is None:raise OutsideProof()
++        kind,raw=n.type,text(n)
++        if kind=='identifier':
++            if raw in local:return local[raw]
++            value=env.get(raw,U)
++            if isinstance(value,JavaMap) and value.flavor in ('HashMap','LinkedHashMap') and isinstance(value.mapping,dict):return value,None
++            raise OutsideProof()
++        if kind=='null_literal':return None,None
++        if kind in ('true','false'):return kind=='true','Boolean'
++        if kind=='parenthesized_expression':return expression(n.named_children[0],local)
++        if kind=='unary_expression' and raw.startswith('!'):
++            value,_=expression(n.named_children[-1],local)
++            if type(value) is not bool:raise OutsideProof()
++            return not value,'Boolean'
++        if kind=='binary_expression':
++            op=text(n.child_by_field_name('operator'))
++            left,_=expression(n.child_by_field_name('left'),local)
++            if op in ('&&','||'):
++                if type(left) is not bool:raise OutsideProof()
++                if left==(op=='||'):return left,'Boolean'
++                right,_=expression(n.child_by_field_name('right'),local)
++                if type(right) is not bool:raise OutsideProof()
++                return right,'Boolean'
++            right,_=expression(n.child_by_field_name('right'),local)
++            if op not in ('==','!=') or left is U or right is U:raise OutsideProof()
++            if left is None or right is None:equal=left is None and right is None
++            elif type(left) is bool and type(right) is bool:equal=left==right
++            else:raise OutsideProof()
++            return equal if op=='==' else not equal,'Boolean'
++        if kind=='method_invocation':
++            receiver,_=expression(n.child_by_field_name('object'),local)
++            name=text(n.child_by_field_name('name'));args=n.child_by_field_name('arguments').named_children
++            if isinstance(receiver,JavaMapEntry) and not args and name in ('getKey','getValue'):
++                slot=receiver.backing.slot(receiver.key)
++                if slot is U or slot is None:raise OutsideProof()
++                return (slot['key'],slot['kind']) if name=='getKey' else (slot['value'],slot.get('value_kind'))
++            if isinstance(receiver,JavaMap) and len(args)==1 and name in ('get','containsKey'):
++                value,kind=expression(args[0],local)
++                key=key_spec(value,kind)
++                if key is None:raise OutsideProof()
++                slot=receiver.slot(key)
++                if slot is U:raise OutsideProof()
++                if name=='containsKey':return slot is not None,'Boolean'
++                return (None,None) if slot is None else (slot['value'],slot.get('value_kind'))
++        raise OutsideProof()
++    try:
++        for entry in entries:
++            if view.kind=='entries':
++                if not fits(entry['key'],entry['kind'],parameters[0]) or not fits(entry['value'],entry.get('value_kind'),parameters[1]):return False
++                item=JavaMapEntry(source,entry);actual=None
++            else:
++                item=entry['key'] if view.kind=='keys' else entry['value']
++                actual=entry['kind'] if view.kind=='keys' else entry.get('value_kind')
++                if not fits(item,actual,written):return False
++            local={text(node.child_by_field_name('name')):(item,actual)}
++            for statement in statements:
++                if statement.type=='local_variable_declaration':
++                    declared=text(statement.child_by_field_name('type'))
++                    for variable in statement.named_children:
++                        if variable.type!='variable_declarator':continue
++                        value,kind=expression(variable.child_by_field_name('value'),local)
++                        if not fits(value,kind,declared):raise OutsideProof()
++                        local[text(variable.child_by_field_name('name'))]=value,kind
++                elif statement.type=='if_statement' and statement.child_by_field_name('alternative') is None:
++                    value,_=expression(statement.child_by_field_name('condition'),local)
++                    if value is not False:raise OutsideProof()
++                    guards.append({'line':statement.start_point.row+1,'key':entry['key'],'condition':text(statement.child_by_field_name('condition')),'value':False})
++                else:raise OutsideProof()
++    except OutsideProof:return False
++    if entries and not guards:return False
++    engine.effect_events.append({'model_version':'native-map-noop/1','operation':'foreach',
++        'callsite':engine.method+':'+str(node.start_point.row+1),'iterations':len(entries),
++        'guards':guards,'heap_roots':[],'resource_writes':[],'global_footprint':'none',
++        'callbacks':[],'completions':['normal']})
++    return True
+--- a/analyzer/models.py
++++ b/analyzer/models.py
+@@ -224,7 +224,14 @@
+                     return U
+                 if optional_value(item):return convert(item['optional'])
+                 return {key:convert(child) for key,child in item.items()}
+-            return [convert(child) for child in item]
++            if getattr(item,'opaque',False):
++                if unresolved:unresolved('Java collection contents or membership are unknown at the JSON boundary')
++                return U
++            result=[convert(child) for child in item]
++            if not getattr(item,'order_known',True):
++                from .native_storage import JavaList
++                result=JavaList(result);result.order_known=False
++            return result
+         finally:
+             active.remove(id(item))
+     return convert(value)
+--- a/analyzer/native_arrays.py
++++ b/analyzer/native_arrays.py
+@@ -8,7 +8,9 @@
+         self.component=component
+ 
+     def copy(self):
+-        return JavaArray(self,self.component,self.kinds)
++        result=JavaArray(self,self.component,self.kinds)
++        result.order_known=self.order_known
++        return result
+ 
+ 
+ class ArrayListView(ReadOnlyList):
+--- a/analyzer/native_storage.py
++++ b/analyzer/native_storage.py
+@@ -100,6 +100,7 @@
+         self.opaque=False
+         self.fixed_size=False
+         self.flavor='ArrayList'
++        self.order_known=True
+ 
+     def append(self, value, kind=None):
+         super().append(value)
+@@ -188,6 +189,7 @@
+         """Shallow clone: new allocation, copied kinds, shared elements."""
+         result=JavaList(self,self.kinds)
+         result.opaque,result.fixed_size,result.flavor=self.opaque,self.fixed_size,self.flavor
++        result.order_known=self.order_known
+         return result
+ 
+     def __copy__(self):
+@@ -215,7 +217,7 @@
+         self.flavor='List'
+ 
+     def __getattr__(self,name):
+-        if name in ('kinds','structural_version','opaque'):
++        if name in ('kinds','structural_version','opaque','order_known'):
+             backing=self.__dict__.get('backing')
+             if backing is not None:return getattr(backing,name)
+         raise AttributeError(name)
+@@ -232,4 +234,5 @@
+     """Interpreter-owned cursor; JSON properties cannot forge this carrier."""
+     def __init__(self,backing):
+         super().__init__(backing=backing,index=0,last=None,expected=backing.structural_version)
++        if not getattr(backing,'order_known',True):self['remaining']=list(range(len(backing)))
+         self.java_identity=JavaIdentity()
+--- a/analyzer/portable.py
++++ b/analyzer/portable.py
+@@ -63,26 +63,42 @@
+     report['constraints'] = not args.no_constraints
+     args.output.parent.mkdir(parents=True, exist_ok=True)
+     args.report.parent.mkdir(parents=True, exist_ok=True)
++    timings={'analysis_seconds':0.0,'submission_validation_seconds':0.0,
++             'submission_serialization_seconds':0.0,'report_serialization_seconds':0.0}
+ 
+     def save():
++        phase=time.perf_counter()
+         validate(project, submission)
++        timings['submission_validation_seconds']+=time.perf_counter()-phase
++        phase=time.perf_counter()
+         args.output.write_text(json.dumps(submission, ensure_ascii=False, indent=2) + '\n')
++        timings['submission_serialization_seconds']+=time.perf_counter()-phase
+         report['elapsed_seconds'] = time.perf_counter() - started
+-        report['analysis_seconds'] = report['elapsed_seconds'] - prepared
++        report['analysis_seconds'] = timings['analysis_seconds']
++        report['elapsed_boundary']='before current report write; complete phase timings are in the adjacent -timings.json'
++        report['serialization_seconds_before_current_report_write']={key:value for key,value in timings.items() if 'serialization' in key}
+         report['peak_rss_bytes'] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * (1 if sys.platform == 'darwin' else 1024)
+         report['submission_sha256'] = sha256(args.output)
++        phase=time.perf_counter()
+         with args.report.open('w') as stream:
+             json.dump(report,stream,ensure_ascii=True,separators=(',',':'),default=serial)
+             stream.write('\n')
++        timings['report_serialization_seconds']+=time.perf_counter()-phase
+ 
+     for scenario in scenarios:
++        phase=time.perf_counter()
+         block, detail = analyze(project, frontend, retrieval, None, database, context, scenario,
+                                 args.path_limit, ContractGrounder,
+                                 partial(run_paths, constraints=not args.no_constraints), args.graph_policy)
++        timings['analysis_seconds']+=time.perf_counter()-phase
+         submission['scenarios'][scenario['id']] = block
+         report['scenarios'][scenario['id']] = detail
+         save()
+     report['run_complete'] = True
+     save()
++    timings.update(preparation_seconds=prepared,end_to_end_seconds=time.perf_counter()-started,
++                   end_boundary='after final report write, before timing/audit sidecars',
++                   index_constructions=1,scenario_count=len(scenarios),model_calls=0,external_llm_api_calls=0)
++    args.report.with_name(args.report.stem+'-timings.json').write_text(json.dumps(timings,indent=2)+'\n')
+     print(json.dumps({'seconds': report['elapsed_seconds'], 'preparation_seconds': prepared,
+                       'edges': dict(Counter(e['relation'] for b in submission['scenarios'].values() for e in b['edges']))}))
+--- a/analyzer/request.py
++++ b/analyzer/request.py
+@@ -38,6 +38,7 @@
+ @dataclass(frozen=True)
+ class FrozenList:
+     items: tuple
++    order_known: bool = True
+ 
+ 
+ def freeze(value):
+@@ -46,7 +47,7 @@
+     if isinstance(value, dict):
+         return FrozenMap(tuple((key, freeze(child)) for key, child in value.items()))
+     if isinstance(value, list):
+-        return FrozenList(tuple(freeze(child) for child in value))
++        return FrozenList(tuple(freeze(child) for child in value),getattr(value,'order_known',True))
+     if isinstance(value, tuple):
+         return FrozenList(tuple(freeze(child) for child in value))
+     return value
+@@ -56,7 +57,11 @@
+     if isinstance(value, FrozenMap):
+         return {key: thaw(child) for key, child in value.items}
+     if isinstance(value, FrozenList):
+-        return [thaw(child) for child in value.items]
++        items=[thaw(child) for child in value.items]
++        if not value.order_known:
++            from .native_storage import JavaList
++            items=JavaList(items);items.order_known=False
++        return items
+     if isinstance(value, tuple) and len(value) == 3 and value[0] == 'json_text':
+         return JsonText(thaw(value[1]), value[2])
+     return value
+@@ -107,7 +112,9 @@
+         return thaw(self.address)
+ 
+     def record(self):
+-        return {'deployment': self.deployment, 'method': self.method, 'url': self.url,
++        from .java_sets import shapes
++        shape=shapes(self.body)
++        return {**({'collection_shapes':shape} if shape else {}),'deployment': self.deployment, 'method': self.method, 'url': self.url,
+                 'path': [thaw(part) for part in self.path] if self.path is not None else U,
+                 'query': thaw(self.query), 'query_complete': self.query_complete,
+                 'headers': self.headers, 'body': self.body,
+--- a/analyzer/resource_effects.py
++++ b/analyzer/resource_effects.py
+@@ -1,4 +1,58 @@
+ """Read/write classification for source-backed fallback closures."""
++import json,re
++from .generic_types import type_parts
++from .project import text
++
++
++def proven_read(project,site):
++    """Abstract Spring Data reads require a bounded declaration/query proof."""
++    node=project.nodes[site];meta=project.methods[node['method']]
++    receiver=node.get('receiver_type')
++    if not isinstance(receiver,str) or not isinstance(node.get('arg_count'),int):return False
++    owner=project.resolve_type(receiver,meta['module'],meta['file'])
++    if owner is None:return False
++    def standard(name,fqn,context):
++        if project.resolve_type(name,context['module'],context['file']):return False
++        if name==fqn:return True
++        if name!=fqn.rsplit('.',1)[-1]:return False
++        imports=[match[1] for n in project.trees[context['file']].root_node.named_children if n.type=='import_declaration'
++                 for match in [re.search(r'\bimport\s+([\w.*]+)\s*;',text(n))] if match]
++        explicit=[name for name in imports if name.rsplit('.',1)[-1]==fqn.rsplit('.',1)[-1]]
++        return explicit==[fqn] or not explicit and (fqn.startswith('java.lang.') or fqn.rsplit('.',1)[0]+'.*' in imports)
++    pending=[owner];seen=set();repository=False
++    while pending:
++        current=pending.pop()
++        if current in seen:continue
++        seen.add(current);context=project.nodes[current]
++        for written in project.generic_parents.get(current,()):
++            base,_=type_parts(written)
++            parent=project.resolve_type(base,context['module'],context['file'])
++            if parent:pending.append(parent);continue
++            for fqn in ('org.springframework.data.jpa.repository.JpaRepository','org.springframework.data.repository.CrudRepository',
++                        'org.springframework.data.mongodb.repository.MongoRepository'):
++                repository |= standard(base,fqn,context)
++    if not repository:return False
++    name=node.get('callee') or ''
++    declared=[mid for mid in project.inherited_methods(owner,name,node.get('arg_count',0))]
++    explicit_read=False
++    for mid in declared:
++        method=project.methods[mid]
++        if not method.get('abstract'):return False
++        for annotation in method.get('annotations',[]):
++            if standard(annotation['name'],'java.lang.Override',method):continue
++            if not standard(annotation['name'],'org.springframework.data.jpa.repository.Query',method):return False
++            literal=re.fullmatch(r'\(\s*(?:value\s*=\s*)?("(?:\\.|[^"\\])*")(?:\s*,\s*nativeQuery\s*=\s*(?:true|false))?\s*\)',annotation.get('args',''))
++            if not literal:return False
++            try:query=json.loads(literal[1])
++            except ValueError:return False
++            parsed=project.repository_queries.get((project.nodes[method['owner']]['fqn'],name))
++            # Only a complete, function-free single-table SELECT whose where
++            # predicates were parsed by the existing bounded query model.
++            if parsed is None or not re.fullmatch(r'\s*(?:select\s+(?:\*|[\w$]+(?:\.\*)?)\s+)?from\s+[\w.$]+(?:\s+(?:as\s+)?(?!where\b)[\w$]+)?(?:\s+where\s+.+)?\s*',query,re.I):return False
++            explicit_read=True
++    return explicit_read or name in ('findAll','findAllById','findById','count','existsById','getOne','getById','getReferenceById') or bool(
++        re.fullmatch(r'(?:find|read|get|query|search|stream|count|exists)[A-Z]\w*By[A-Z]\w*',name) or
++        re.fullmatch(r'(?:find|read|get|query|search|stream|count|exists)By[A-Z]\w*',name))
+ 
+ 
+ def possible_writes(project, methods, data, active_transaction=False):
+@@ -17,8 +71,7 @@
+         node=project.nodes[site]
+         accessed=project.edges.get(site,{}).get('data_access',set()) & resources
+         observed.update(accessed)
+-        operation=node.get('callee','')
+-        if not operation.startswith(('find','query','get','read','exists','count','select','stream')):
++        if accessed and not proven_read(project,site):
+             writes.update(accessed)
+     # A graph-only data edge without an operation witness remains a possible write.
+     result=writes | (resources-observed)
+--- a/analyzer/spring_formatter.py
++++ b/analyzer/spring_formatter.py
+@@ -0,0 +1,60 @@
++"""Default Spring 5 ToStringCreator effects; formatted identity text stays symbolic."""
++from dataclasses import dataclass
++from .java_collections import JavaRecord,is_symbolic
++from .java_exceptions import JavaThrow
++from .project import text
++from .state import U
++
++
++@dataclass
++class Creator:
++    origin: str
++
++
++def call(engine,node,name,obj,args,reason):
++    def boundary(message):
++        from .engine import AnalysisBoundary
++        raise AnalysisBoundary('Spring ToStringCreator '+message+': '+reason,category='unsupported_semantics')
++    def style(value,seen):
++        if value is None or type(value) in (str,bool,int,float):return
++        if is_symbolic(value):
++            if value.get('__type__','').rsplit('.',1)[-1] in ('String','Boolean','Byte','Short','Integer','Long','Float','Double','Character'):return
++            boundary('symbolic value callback type is unknown')
++        if value is U:boundary('value runtime type/callback is unknown')
++        if id(value) in seen:boundary('recursive formatting')
++        seen=seen|{id(value)}
++        if isinstance(value,list):
++            if getattr(value,'opaque',False) or not getattr(value,'order_known',True):boundary('collection order or contents are unknown')
++            for child in value:style(child,seen)
++            return
++        if isinstance(value,JavaRecord):
++            meta=engine.p.methods[engine.method]
++            owner=engine.p.resolve_type(value.declared_type,meta['module'],meta['file'])
++            if not owner:boundary('appended object source is unavailable')
++            targets=[mid for mid in engine.p.inherited_methods(owner,'toString',0) if not engine.p.methods[mid].get('abstract')]
++            if len(targets)>1:boundary('appended object toString dispatch is ambiguous')
++            if targets:
++                try:engine.invoke(targets[0],[],value,reason+' default value styling callback')
++                finally:
++                    if engine.last_invoke_started:engine.add(engine.method,'calls',targets[0],reason+' default value styling callback')
++            return # No override: Object.toString uses class and identity, without source mutation.
++        boundary('value styling overload is not modeled')
++    if name=='<init>' and engine.standard_type(text(node.child_by_field_name('type')),'org.springframework.core.style.ToStringCreator'):
++        if len(args)!=1:boundary('custom styler overload is not modeled')
++        if args[0] is U:boundary('owner runtime type is unknown')
++        if args[0] is None:raise JavaThrow({'__type__':'IllegalArgumentException'})
++        if isinstance(args[0],list):boundary('array owner styleStart is not modeled')
++        return True,Creator(reason)
++    if not isinstance(obj,Creator):return False,U
++    if name=='append' and len(args) in (1,2):
++        if len(args)==2 and not isinstance(args[0],str):boundary('field name is not a known String')
++        style(args[-1],set())
++        engine.effect_events.append({'model_version':'spring-default-tostring/1','operation':'append',
++            'callsite':reason,'heap_roots':[],'resource_writes':[],
++            'callbacks':'source toString dispatched above when present','completions':['normal']})
++        return True,obj
++    if name=='toString' and not args:
++        engine.remember_reference_kind('String')
++        return True,{'__symbol__':'spring-style:'+obj.origin,'__type__':'String',
++                     '__constraints__':['non_null'],'__generation__':'Spring default class/identity formatting'}
++    boundary('operation is not modeled')
+--- a/analyzer/state.py
++++ b/analyzer/state.py
+@@ -186,6 +186,8 @@
+     def select_actor(self,actor):
+         """Separate browser sessions only on an explicitly named actor switch."""
+         if actor is U:return
++        from .actors import canonical_role
++        actor=canonical_role(actor)
+         current=self.browser.get('actor',U)
+         if current==actor:return
+         if current is not U:self.actor_browsers[current]=self.browser
+--- a/tests/test_absence_escape.py
++++ b/tests/test_absence_escape.py
+@@ -0,0 +1,20 @@
++import pytest
++from analyzer.absence_contracts import empty_equivalent
++from analyzer.engine import Engine
++from analyzer.state import ScenarioState
++from builders import build
++
++
++@pytest.mark.parametrize('tail',[
++    'Credentials alias=input;return alias.getChallenge()==null;',
++    'saved=input;return saved.getChallenge()==null;',
++    'return inspect((Object)input);',
++])
++def test_absence_proof_declines_unproven_alias_or_escape(tmp_path,tail):
++    p,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.util.StringUtils;import lombok.Data;
++      @Data class Credentials{private String challenge;}
++      class Api{Credentials saved;@PostMapping("/login")boolean login(@RequestBody Credentials input){
++        if(!StringUtils.isEmpty(input.getChallenge())){return false;}'''+tail+'''}
++        boolean inspect(Object escaped){return ((Credentials)escaped).getChallenge()==null;}}'''})
++    e=Engine(p,ScenarioState(db));e.method=ids['Api.login']
++    assert not empty_equivalent(e,ids['Api.login'],'challenge')
+--- a/tests/test_actor_credentials_flow.py
++++ b/tests/test_actor_credentials_flow.py
+@@ -0,0 +1,87 @@
++from datetime import datetime
++import pytest
++from analyzer.__main__ import analyze
++from analyzer.actors import actor_role
++from analyzer.contracts import ContractGrounder,ContractIndex,read_static_context
++from analyzer.frontend import Frontend
++from analyzer.state import ScenarioState,U
++from builders import build
++from test_angular_legacy_session import UI,attach
++from test_jjwt_authenticated_requests import JWT_SOURCE
++from test_regression_authentication import SOURCE
++
++
++def fixture(root):
++    (root/'pom.xml').write_text('<project><dependencies><dependency><groupId>io.jsonwebtoken</groupId><artifactId>jjwt</artifactId><version>0.8.0</version></dependency></dependencies></project>')
++    security=SOURCE.replace('new Profile(name,"{noop}secret",','new Profile(name,name.equals("bob")?"{noop}bravo":"{noop}secret",')
++    api=JWT_SOURCE.replace('Credentials{public String name;','Credentials{public String username;').replace('input.name,','input.username,')
++    p,db,ids=build(root,{'Security.java':security,'Web.java':api})
++    attach(root,UI.replace('data:{name:$("#name").val()','data:{username:$("#username").val()'))
++    return p,db,ids
++
++
++def test_two_actor_credentials_login_callbacks_headers_and_return_keep_ownership(tmp_path):
++    project,db,_=fixture(tmp_path);frontend=Frontend(project)
++    context=read_static_context({'accounts':{'alice':{'username':'alice','password':'secret'},
++        'bob':{'username':'bob','password':'bravo'}},'date':'System clock 18 October 2026'})
++    scenario={'id':'two-actors','steps':[{'n':i+1,'action':action} for i,action in enumerate([
++        'Log in as alice with username and password','As alice, read protected',
++        'Log in as bob with username and password','As bob, read protected','As alice, read protected'])]}
++    _,report=analyze(project,frontend,ContractIndex(project,frontend),None,db,context,scenario,path_limit=4,grounder_type=ContractGrounder)
++    rows=[step['alternatives'][0] for step in report['steps']]
++    assert rows[0]['parameters']['username']=='alice' and rows[0]['parameters']['password']=='secret'
++    assert rows[2]['parameters']['username']=='bob' and rows[2]['parameters']['password']=='bravo'
++    first=rows[0]['result']['token'];second=rows[2]['result']['token']
++    assert first!=second
++    assert rows[1]['request']['headers']['authorization']==['Bearer '+first]
++    assert rows[3]['request']['headers']['authorization']==['Bearer '+second]
++    assert rows[3]['responses'][-1]['status']==403
++    assert rows[4]['request']['headers']['authorization']==['Bearer '+first] and rows[4]['result']=='protected-data'
++    assert [row['request']['actor'] for row in rows]==['alice','alice','bob','bob','alice']
++    assert rows[0]['bindings']['username']['reference']=='actor[alice].username'
++
++
++def test_missing_admin_context_never_borrows_passenger_defaults_or_init_password(tmp_path):
++    p,db,ids=fixture(tmp_path);frontend=Frontend(p)
++    context=read_static_context({'account':'The passenger is the pre-registered user alice / secret'})
++    grounder=ContractGrounder(p,frontend,ContractIndex(p,frontend),None,context)
++    proposals,_=grounder.step("Log in to the admin console with the administrator's username and password",ScenarioState(db))
++    assert proposals
++    for proposal in proposals:
++        assert proposal['actor']=='admin'
++        assert proposal['params'].get('username',U) is U
++        assert proposal['params'].get('password',U) is U
++        assert any('No established credentials for actor admin' in message for message in proposal['unresolved'])
++
++
++def test_role_aliases_share_one_browser_namespace_and_preserve_other_actor(tmp_path):
++    _,db,_=build(tmp_path,{'Api.java':'class Api{void entry(){}}'})
++    state=ScenarioState(db);state.select_actor('administrator');state.browser['storage']['staff']='one'
++    state.select_actor('passenger');state.browser['storage']['visitor']='two'
++    state.select_actor('admin')
++    assert state.browser['actor']=='admin' and state.browser['storage']=={'staff':'one'}
++    state.select_actor('passenger');assert state.browser['storage']=={'visitor':'two'}
++
++
++@pytest.mark.parametrize('text,actor',[
++    ("Log in to the admin console with the administrator's username and password",'admin'),
++    ('Log in as a passenger with username and password','passenger'),
++    ('Sign in with the administrator account','admin'),
++    ('As administrator, list documents','admin'),('Return to alice','alice'),
++])
++def test_explicit_actor_paraphrases(text,actor):
++    assert actor_role(text)==actor
++
++
++def test_natural_context_credentials_are_owned_and_identical_repeats_do_not_conflict():
++    context=read_static_context({'description':'The reader is the user alice / secret; the editor is the user bob / bravo; the reader is the user alice / secret'})
++    assert context['actor_facts']['reader']['username']['value']=='alice'
++    assert context['actor_facts']['editor']['password']['value']=='bravo'
++    assert not any('Conflicting' in message for message in context['unresolved'])
++
++
++def test_conflicting_context_sources_do_not_select_a_last_writer():
++    context=read_static_context({'description':'The alice is the user alice / secret',
++                                'accounts':{'alice':{'username':'alice','password':'different'}}})
++    assert context['actor_facts']['alice']=={}
++    assert any('Conflicting credential sets for actor alice' in message for message in context['unresolved'])
+--- a/tests/test_angular_legacy_session.py
++++ b/tests/test_angular_legacy_session.py
+@@ -0,0 +1,98 @@
++from datetime import datetime
++import pytest
++from analyzer.__main__ import analyze
++from analyzer.contracts import ContractGrounder,ContractIndex
++from analyzer.frontend import Frontend
++from analyzer.state import ScenarioState,U
++from builders import build
++from test_jjwt_authenticated_requests import fixture
++
++
++UI='''angular.module("app",[]).controller("Session",function($scope,$http){
++ $scope.login=function(){$http({method:"POST",url:"/login",data:{name:$("#name").val(),password:$("#password").val()}})
++ .success(function(data,status){if(status==200 && data.name){sessionStorage.setItem("login_token",data.token);}})
++ .error(function(failure){sessionStorage.removeItem("login_token");});};
++ $scope.read=function(){$http({method:"GET",url:"/protected",headers:{Authorization:"Bearer "+sessionStorage.getItem("login_token")}});};
++});'''
++JQUERY_UI='''function login(){$.ajax({type:"POST",url:"/login",contentType:"application/json",
++ data:JSON.stringify({name:$("#name").val(),password:$("#password").val()}),
++ success:function(data){sessionStorage.setItem("login_token",data.token);},
++ error:function(){sessionStorage.removeItem("login_token");}});}
++ function read(){$.ajax({type:"GET",url:"/protected",headers:{Authorization:"Bearer "+sessionStorage.getItem("login_token")}});}'''
++
++
++def attach(root,ui=UI,version='1.5.8'):
++    (root/'ui.js').write_text(ui)
++    (root/'page.html').write_text('<html ng-app="app"><script src="https://code.angularjs.org/'+version+'/angular.js"></script><script src="ui.js"></script></html>')
++
++
++@pytest.mark.parametrize('ui',[UI,JQUERY_UI])
++def test_source_login_token_passes_angular_storage_into_protected_http_without_insertion(tmp_path,ui):
++    project,db,ids=fixture(tmp_path);attach(tmp_path,ui)
++    frontend=Frontend(project)
++    scenario={'id':'angular-session','steps':[{'n':1,'action':'As alice, login name "alice" password "secret"'},
++        {'n':2,'action':'As alice, read protected'}]}
++    _,trace=analyze(project,frontend,ContractIndex(project,frontend),None,db,
++        {'facts':{},'unresolved':[],'clock':datetime(2026,10,18)},scenario,path_limit=4,grounder_type=ContractGrounder)
++    login=trace['steps'][0]['alternatives'][0];read=trace['steps'][1]['alternatives'][0]
++    assert isinstance(login['result']['token'],str)
++    assert login['state_after']['browser']['storage']['login_token']==login['result']['token']
++    assert read['request']['headers']['authorization']==['Bearer '+login['result']['token']]
++    assert read['result']=='protected-data'
++
++
++def test_failed_source_login_does_not_populate_storage_and_next_filter_refuses(tmp_path):
++    p,db,_=fixture(tmp_path);attach(tmp_path)
++    frontend=Frontend(p)
++    _,trace=analyze(p,frontend,ContractIndex(p,frontend),None,db,{'facts':{},'unresolved':[],'clock':datetime(2026,10,18)},
++        {'id':'bad-login','steps':[{'n':1,'action':'As alice, login name "alice" password "wrong"'},
++                                 {'n':2,'action':'As alice, read protected'}]},path_limit=4,grounder_type=ContractGrounder)
++    login=trace['steps'][0]['alternatives'][0];read=trace['steps'][1]['alternatives'][0]
++    assert login['responses'][-1]['status']==401 and login['state_after']['browser']['storage']=={}
++    assert read['responses'][-1]['status']==401 and read['outcome']=='request stopped by filter'
++
++
++def test_adjacent_http_calls_keep_their_own_success_callback_and_error_guard(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''class Api{@GetMapping("/first")String first(){return "one";}
++      @GetMapping("/second")String second(){return "two";}}'''})
++    attach(tmp_path,'''var app=angular.module("app",[]);app.controller("Session",function($http){
++      $http({url:"/first",method:"GET"}).success(function(data){sessionStorage.setItem("first",data);});
++      $http({url:"/second",method:"GET"}).success(function(data){sessionStorage.setItem("second",data);})
++        .error(function(){sessionStorage.removeItem("second");});});''')
++    frontend=Frontend(p);state=ScenarioState(db)
++    first=next(s for s in frontend.sites.values() if ids['Api.first'] in s['handlers'])
++    second=next(s for s in frontend.sites.values() if ids['Api.second'] in s['handlers'])
++    frontend.apply_response(first,'one',state,200)
++    assert state.browser['storage']=={'first':'one'}
++    frontend.apply_response(second,'two',state,200)
++    assert state.browser['storage']=={'first':'one','second':'two'}
++    frontend.apply_response(second,U,state,401)
++    assert state.browser['storage']=={'first':'one'}
++
++
++@pytest.mark.parametrize('source,version',[
++    ('function inner($http){$http({url:"/first",method:"GET"}).success(function(data){sessionStorage.setItem("unsafe",data);});}inner(fake);','1.5.8'),
++    ('$http({url:"/first",method:"GET"}).then(function(response){sessionStorage.setItem("unsafe",response);});','1.5.8'),
++    ('$http({url:"/first",method:"GET"}).success(function(data){sessionStorage.setItem("unsafe",data);});','1.8.2'),
++])
++def test_shadowed_injection_then_envelope_and_removed_api_are_not_legacy_success(tmp_path,source,version):
++    p,db,_=build(tmp_path,{'Api.java':'class Api{@GetMapping("/first")String first(){return "value";}}'})
++    attach(tmp_path,'angular.module("app",[]).controller("Session",function($http){'+source+'});',version)
++    frontend=Frontend(p);state=ScenarioState(db)
++    for site in frontend.sites.values():frontend.apply_response(site,'value',state,200)
++    assert state.browser['storage']=={}
++
++
++@pytest.mark.parametrize('prefix,suffix',[
++    ('var app=angular.module("app",[]);app=fake;', ''),
++    ('function register(angular){', '}'),
++    ('angular.module("app",[]).decorator("$http",function(){return fake;});', ''),
++])
++def test_reassigned_module_shadowed_angular_and_custom_http_are_not_native(tmp_path,prefix,suffix):
++    p,db,_=build(tmp_path,{'Api.java':'class Api{@GetMapping("/first")String first(){return "value";}}'})
++    registration=('app' if 'var app=' in prefix else 'angular.module("app",[])')
++    attach(tmp_path,prefix+registration+'''.controller("Session",function($http){
++      $http({url:"/first",method:"GET"}).success(function(data){sessionStorage.setItem("unsafe",data);});});'''+suffix)
++    frontend=Frontend(p);state=ScenarioState(db)
++    for site in frontend.sites.values():frontend.apply_response(site,'value',state,200)
++    assert state.browser['storage']=={} and frontend.unsupported
+--- a/tests/test_fallback_read_effects.py
++++ b/tests/test_fallback_read_effects.py
+@@ -10,7 +10,8 @@
+     ('store.findById("p1");','@Transactional',True),
+ ])
+ def test_fallback_preserves_proven_reads_and_invalidates_possible_writes(tmp_path,operation,annotation,unknown):
+-    project,db,ids=build(tmp_path,{'Api.java':'''class Api{Store store;'''+annotation+''' void entry(){'''+operation+'''}}
++    project,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.data.jpa.repository.JpaRepository;
++      class Api{Store store;'''+annotation+''' void entry(){'''+operation+'''}}
+       @Entity @Table(name="parcels") class Parcel{@Id String id;}
+       interface Store extends JpaRepository<Parcel,String>{Parcel findById(String id);Parcel save(Parcel value);}'''},
+       rows={'parcels':[{'id':'p1'}]})
+@@ -18,3 +19,46 @@
+     engine.fallback(ids['Api.entry'])
+     assert (('service','parcels') in engine.state.database.unknown_tables) is unknown
+     assert (ids['Api.entry'],'data','res:table:service.parcels') in engine.candidate_edges
++
++
++@pytest.mark.parametrize('signature',[
++    '@Procedure int getNextNumber();',
++    '@Modifying @Query("update Parcel p set p.id = ?1") int getById(String id);',
++    'default Parcel getById(String id){return save(new Parcel());}',
++])
++def test_read_prefix_does_not_prove_repository_read_effects(tmp_path,signature):
++    method='getNextNumber()' if 'getNextNumber' in signature else 'getById("p1")'
++    p,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.data.jpa.repository.JpaRepository;
++      class Api{Store store;void entry(){store.'''+method+''';}}
++      @Entity @Table(name="parcels")class Parcel{@Id String id;}
++      interface Store extends JpaRepository<Parcel,String>{'''+signature+''' Parcel save(Parcel value);}'''},
++      rows={'parcels':[{'id':'p1'}]})
++    e=Engine(p,ScenarioState(db));e.method=ids['Api.entry'];e.fallback(ids['Api.entry'])
++    assert ('service','parcels') in e.state.database.unknown_tables
++
++
++def test_missing_call_receiver_metadata_is_unknown_write_not_a_crash(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.data.jpa.repository.JpaRepository;
++      class Api{Store store;void entry(){store.findById("p1");}}
++      @Entity @Table(name="parcels")class Parcel{@Id String id;}
++      interface Store extends JpaRepository<Parcel,String>{Parcel findById(String id);}'''},rows={'parcels':[{'id':'p1'}]})
++    for site in p.sites[ids['Api.entry']]:p.nodes[site]['receiver_type']=None
++    e=Engine(p,ScenarioState(db));e.method=ids['Api.entry'];e.fallback(ids['Api.entry'])
++    assert ('service','parcels') in e.state.database.unknown_tables
++
++
++@pytest.mark.parametrize('annotation,unknown',[
++    ('@Override',False),
++    ('@Query("SELECT p from Parcel p where p.id = ?1")',False),
++    ('@Query(value="SELECT * from parcels where id in ?1",nativeQuery=true)',False),
++    ('@Query("SELECT bumpSequence(p.id) from Parcel p")',True),
++    ('@Query(value="SELECT * from parcels; DELETE from parcels",nativeQuery=true)',True),
++])
++def test_read_effect_proof_uses_supported_source_query_not_arbitrary_annotations(tmp_path,annotation,unknown):
++    p,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.data.jpa.repository.JpaRepository;
++      import org.springframework.data.jpa.repository.Query;
++      class Api{Store store;void entry(){store.findById("p1");}}
++      @Entity @Table(name="parcels")class Parcel{@Id String id;}
++      interface Store extends JpaRepository<Parcel,String>{'''+annotation+''' Parcel findById(String id);}'''},rows={'parcels':[{'id':'p1'}]})
++    e=Engine(p,ScenarioState(db));e.method=ids['Api.entry'];e.fallback(ids['Api.entry'])
++    assert (('service','parcels') in e.state.database.unknown_tables) is unknown
+--- a/tests/test_hashset_membership.py
++++ b/tests/test_hashset_membership.py
+@@ -0,0 +1,109 @@
++import pytest
++from analyzer.engine import Engine
++from analyzer.paths import run_paths
++from analyzer.request import Request
++from analyzer.state import ScenarioState,U
++from builders import build
++
++
++def run(tmp_path,body):
++    project,db,ids=build(tmp_path,{'Api.java':'import java.util.*;class Api{Object entry(){'+body+'}}'})
++    engine=Engine(project,ScenarioState(db))
++    return engine.run(ids['Api.entry'],{}),engine
++
++
++def test_duplicate_add_cardinality_membership_remove_and_null(tmp_path):
++    result,engine=run(tmp_path,'''Set<String> codes=new HashSet<>();
++      boolean first=codes.add("A");boolean second=codes.add("A");
++      codes.add(null);codes.add(null);int count=codes.size();
++      boolean has=codes.contains("A");boolean removed=codes.remove("A");
++      boolean again=codes.remove("A");return Arrays.asList(first,second,count,has,removed,again,codes.size(),codes.contains(null));''')
++    assert result==[True,False,2,True,True,False,1,True]
++    assert not engine.approximate
++
++
++def test_copy_preserves_membership_and_does_not_invent_encounter_order(tmp_path):
++    result,engine=run(tmp_path,'''Set<String> codes=new HashSet<>();codes.add("B");codes.add("A");codes.add("B");
++       List<String> copied=new ArrayList<>(codes);return copied;''')
++    assert len(result)==2 and set(result)=={'A','B'}
++    assert result.order_known is False
++    assert not engine.approximate
++
++
++def test_order_dependent_list_index_stays_unresolved(tmp_path):
++    result,engine=run(tmp_path,'''Set<String> codes=new HashSet<>();codes.add("B");codes.add("A");
++       List<String> copied=new ArrayList<>(codes);return copied.get(0);''')
++    assert result is U and any('order' in warning.lower() for warning in engine.warnings)
++
++
++def test_unknown_encounter_order_does_not_hide_known_bounds_failure(tmp_path):
++    result,engine=run(tmp_path,'''Set<String> codes=new HashSet<>();codes.add("B");codes.add("A");
++       try{return new ArrayList<>(codes).get(4);}catch(IndexOutOfBoundsException failure){return "rejected";}''')
++    assert result=='rejected'
++
++
++def test_java_boolean_integer_and_wrapper_width_remain_distinct(tmp_path):
++    result,_=run(tmp_path,'''Set<Object> values=new HashSet<>();values.add(true);values.add(1);values.add(1L);
++       return values.size();''')
++    assert result==3
++
++
++def test_unknown_key_invalidates_only_set_knowledge(tmp_path):
++    project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{
++      int entry(String key){Set<String> codes=new HashSet<>();codes.add("A");codes.add(key);return codes.size();}}'''})
++    engine=Engine(project,ScenarioState(db))
++    assert engine.run(ids['Api.entry'],{'key':U}) is U
++    assert any('Set' in warning for warning in engine.warnings)
++
++
++def test_user_collection_and_user_equality_are_not_native_string_set(tmp_path):
++    project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;
++      class Product{public boolean equals(Object other){return true;}public int hashCode(){return 7;}}
++      class Api{int entry(){Set<Product> values=new HashSet<>();values.add(new Product());values.add(new Product());return values.size();}}'''})
++    engine=Engine(project,ScenarioState(db))
++    assert engine.run(ids['Api.entry'],{}) is U
++    assert any('Set' in warning for warning in engine.warnings)
++    assert engine.outcome=='unsupported_semantics boundary'
++
++
++def test_unknown_source_hash_callback_does_not_get_a_fabricated_normal_continuation(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Product{public int hashCode(){throw new IllegalStateException();}}
++      class Api{int entry(){Set<Product> values=new HashSet<>();values.add(new Product());return after();}int after(){return 99;}}'''})
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
++    assert e.outcome=='unsupported_semantics boundary'
++    assert ('','executes',ids['Api.after']) not in e.edges
++
++
++@pytest.mark.parametrize('limit',[1,4,8])
++def test_set_iteration_never_claims_one_specific_first_element(tmp_path,limit):
++    project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{
++      String entry(){Set<String> values=new HashSet<>();values.add("A");values.add("B");
++        for(String value:values){return value;}return "empty";}}'''})
++    outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{},limit=limit)
++    returned={row['result'] for row in outcomes if row['engine'].outcome=='returned'}
++    assert returned=={'A','B'}
++
++
++def test_request_freeze_keeps_unspecified_order_metadata(tmp_path):
++    values,_=run(tmp_path,'''Set<String> codes=new HashSet<>();codes.add("B");codes.add("A");return new ArrayList<>(codes);''')
++    request=Request.http('warehouse','POST','/lookup',body=values)
++    assert request.body.order_known is False
++    assert request.record()['collection_shapes']==[{'path':'body','size':2,'order':'unspecified'}]
++
++
++def test_http_array_decode_does_not_turn_set_order_into_an_index_fact(tmp_path):
++    from analyzer.native_storage import JavaList
++    p,db,ids=build(tmp_path,{'Api.java':'''class Api{@PostMapping("/batch")String batch(@RequestBody String[] codes){return codes[0];}}'''})
++    values=JavaList(['B','A']);values.order_known=False
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.batch'],Request.http('service','POST','/batch',body=values)) is U
++    assert any('array encounter order' in warning for warning in e.warnings)
++
++
++def test_copy_stream_does_not_fabricate_callback_encounter_order(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import java.util.stream.Collectors;
++      class Api{Object entry(){Set<String> values=new HashSet<>();values.add("B");values.add("A");
++        return new ArrayList<>(values).stream().map(v->observe(v)).collect(Collectors.toList());}
++        String observe(String value){return value;}}'''})
++    paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=4)
++    assert all(r['result'] is U and r['engine'].outcome=='unsupported_semantics boundary' for r in paths)
++    assert all(('','executes',ids['Api.observe']) not in r['engine'].edges for r in paths)
+--- a/tests/test_inventory_collection_journey.py
++++ b/tests/test_inventory_collection_journey.py
+@@ -0,0 +1,135 @@
++"""Multi-item independent catalog/warehouse HTTP + NL regression, not a holdout."""
++import json
++import pytest
++from analyzer.project import Project
++from analyzer.state import ScenarioState
++from analyzer.request import Request
++from analyzer.paths import run_paths
++from analyzer.frontend import Frontend
++from analyzer.contracts import ContractIndex,ContractGrounder
++from analyzer.__main__ import analyze
++from builders import build
++
++GATEWAY='''import java.util.*;import org.springframework.web.client.RestTemplate;
++ class ProductView{public String id;public String category;public int revision;public int quantity;}
++ class Category{public String code;}
++ class ProductRequest{public String id;public int revision;}
++ class InventoryGateway{RestTemplate rest;
++  @GetMapping("/inventory") List<ProductView> listProducts(){
++   ProductView[] received=rest.getForObject("http://warehouse/products",ProductView[].class);
++   List<ProductView> products=new ArrayList<>(Arrays.asList(received));Set<String> codes=new HashSet<>();
++   Map<String,List<ProductView>> groups=new HashMap<>();
++   for(ProductView product:products){codes.add(product.category);
++    if(groups.get(product.category)==null){groups.put(product.category,new ArrayList<>());}groups.get(product.category).add(product);}
++   Category[] categories=rest.postForObject("http://catalog/categories",new ArrayList<>(codes),Category[].class);
++   Map<String,Category> categoryMap=new HashMap<>();for(Category category:categories){categoryMap.put(category.code,category);}
++   for(String code:groups.keySet()){if(categoryMap.get(code)==null){products.removeAll(groups.get(code));}}
++   return products;}
++  @PostMapping("/inventory/reserve") ProductView reserveProduct(@RequestBody ProductRequest input){
++   return rest.postForObject("http://warehouse/products/"+input.id+"/reserve",input,ProductView.class);}}
++'''
++WAREHOUSE='''import java.util.*;import org.springframework.data.jpa.repository.JpaRepository;import org.springframework.http.*;
++ @Entity @Table(name="products")class Product{@Id public String id;public String category;public int revision;public int quantity;}
++ class ProductRequest{public String id;public int revision;}
++ interface Stock extends JpaRepository<Product,String>{Product findById(String id);Product save(Product product);}
++ class StockController{Stock stock;
++  @GetMapping("/products") List<Product> listProducts(){return Arrays.asList(stock.findById("SKU7"),stock.findById("SKU8"),stock.findById("SKU9"));}
++  @PostMapping("/products/{id}/reserve") ResponseEntity<Product> reserveProduct(@PathVariable String id,@RequestBody ProductRequest input){
++   Product product=stock.findById(id);if(product.revision!=input.revision){return new ResponseEntity<Product>(null,HttpStatus.CONFLICT);}
++   product.quantity--;product.revision++;stock.save(product);return ResponseEntity.ok(product);}}
++'''
++CATALOG='''import java.util.*;import org.springframework.data.jpa.repository.JpaRepository;
++ @Entity @Table(name="categories")class Category{@Id public String code;}
++ interface Categories extends JpaRepository<Category,String>{List<Category> findByCodeIn(List<String> codes);}
++ class CategoryController{Categories categories;@PostMapping("/categories")List<Category> lookup(@RequestBody List<String> codes){return categories.findByCodeIn(codes);}}
++'''
++
++
++def fixture(root,gateway=GATEWAY,catalog=CATALOG):
++    merged={'project':'inventory','nodes':{},'edges':[]};ids={};databases=[]
++    for module,source,rows in [('gateway',gateway,{}),('warehouse',WAREHOUSE,{'products':[
++        {'id':'SKU7','category':'hardware','revision':4,'quantity':8},
++        {'id':'SKU8','category':'office','revision':5,'quantity':9},
++        {'id':'SKU9','category':'hardware','revision':6,'quantity':10}]}),
++        ('catalog',catalog,{'categories':[{'code':'hardware'},{'code':'office'}]})]:
++        p,db,local=build(root/module,{'Api.java':source},module=module,rows=rows)
++        databases.append(db)
++        for node in p.skeleton['nodes'].values():
++            if node.get('file'):node['file']=module+'/'+node['file']
++            for origin in node.get('origin',[]):origin['file']=module+'/'+origin['file']
++        merged['nodes'].update(p.skeleton['nodes']);merged['edges'].extend(p.skeleton['edges'])
++        ids.update({module+'.'+key:value for key,value in local.items()})
++    db=databases[0]
++    for other in databases[1:]:
++        for key,value in other.tables.raw_items():db.tables[key]=value
++    (root/'skeleton.json').write_text(json.dumps(merged))
++    (root/'gateway/ui.js').write_text('''new Vue({data:{products:[]},methods:{
++      listProducts(){var vm=this;$.ajax({url:"/inventory",type:"GET",success:function(data){vm.products=data;}});},
++      reserveProduct(item){$.ajax({url:"/inventory/reserve",type:"POST",contentType:"application/json",data:JSON.stringify({id:item.id,revision:item.revision})});}}});''')
++    (root/'gateway/page.html').write_text('''<script src="ui.js"></script><button @click="listProducts">List products</button>
++      <div v-for="item in products"><button @click="reserveProduct(item)">Reserve product</button></div>''')
++    return Project(root/'skeleton.json',root),db,ids
++
++
++@pytest.mark.parametrize('limit',[1,4,8])
++def test_batch_unique_membership_noop_and_following_http_request(tmp_path,limit):
++    p,db,ids=fixture(tmp_path);state=ScenarioState(db)
++    paths=run_paths(p,state,ids['gateway.InventoryGateway.listProducts'],Request.http('gateway','GET','/inventory'),limit=limit)
++    assert len(paths)==1
++    engine=paths[0]['engine'];products=paths[0]['result']
++    assert [r['id'] for r in products]==['SKU7','SKU8','SKU9']
++    assert not engine.approximate and not engine.state.database.unknown_tables
++    batch=next(row for row in engine.request_events if row['entry']==ids['catalog.CategoryController.lookup'])
++    codes=batch['bound_arguments'][0]['value']
++    assert len(codes)==2 and set(codes)=={'hardware','office'}
++    assert any(row.get('model_version')=='native-map-noop/1' for row in engine.effect_events)
++    chosen=products[1]
++    request=Request.http('gateway','POST','/inventory/reserve',body={'id':chosen['id'],'revision':chosen['revision']})
++    written=run_paths(p,engine.state,ids['gateway.InventoryGateway.reserveProduct'],request,limit=limit)
++    assert len(written)==1 and written[0]['result']=={'id':'SKU8','category':'office','revision':6,'quantity':8}
++    state=written[0]['state']
++    assert len(state.database.tables[('warehouse','products')])==3 and not state.database.unknown_tables
++    assert state.database.tables[('warehouse','products')][0]['quantity']==8
++
++
++def test_nl_selects_observed_product_and_rereads_changed_state(tmp_path):
++    p,db,ids=fixture(tmp_path);frontend=Frontend(p)
++    _,trace=analyze(p,frontend,ContractIndex(p,frontend),None,db,{'facts':{},'unresolved':[],'choice_rules':[]},
++        {'id':'inventory','steps':[{'n':1,'action':'List products'},{'n':2,'action':'Reserve second product'},
++                                  {'n':3,'action':'List products'}]},path_limit=4,grounder_type=ContractGrounder)
++    second=trace['steps'][1]['alternatives']
++    assert len(second)==1 and second[0]['entry']==ids['gateway.InventoryGateway.reserveProduct']
++    assert second[0]['request']['body']=={'id':'SKU8','revision':5}
++    assert second[0]['result']=={'id':'SKU8','category':'office','revision':6,'quantity':8}
++    assert trace['steps'][2]['alternatives'][0]['result'][1]==second[0]['result']
++
++
++def test_missing_category_declines_noop_and_exposes_generic_membership_boundary(tmp_path):
++    from analyzer.state import U
++    p,db,ids=fixture(tmp_path);db.tables[('catalog','categories')]=[{'code':'hardware'}]
++    paths=run_paths(p,ScenarioState(db),ids['gateway.InventoryGateway.listProducts'],Request.http('gateway','GET','/inventory'),limit=4)
++    assert paths and all(path['result'] is U for path in paths)
++    assert all(any('membership is unresolved' in message for message in path['engine'].warnings) for path in paths)
++    assert all(not any(e.get('model_version')=='native-map-noop/1' for e in path['engine'].effect_events) for path in paths)
++    assert all(not path['state'].database.unknown_tables for path in paths)
++
++
++def test_remote_effect_inside_false_filter_is_not_omitted(tmp_path):
++    gateway=GATEWAY.replace('for(String code:groups.keySet()){','for(String code:groups.keySet()){rest.postForObject("http://catalog/audit",code,String.class);')
++    catalog=CATALOG+'class Audit{@PostMapping("/audit")String accept(@RequestBody String code){return "seen";}}'
++    p,db,ids=fixture(tmp_path,gateway,catalog)
++    paths=run_paths(p,ScenarioState(db),ids['gateway.InventoryGateway.listProducts'],Request.http('gateway','GET','/inventory'),limit=4)
++    assert paths and all(len(path['result'])==3 for path in paths)
++    for path in paths:
++        e=path['engine'];assert not any(e.get('model_version')=='native-map-noop/1' for e in e.effect_events)
++        assert (ids['gateway.InventoryGateway.listProducts'],'remote',ids['catalog.Audit.accept']) in e.edges
++        assert len([r for r in e.request_events if r['entry']==ids['catalog.Audit.accept']])==2
++
++
++def test_stale_product_revision_refuses_before_save(tmp_path):
++    p,db,ids=fixture(tmp_path)
++    request=Request.http('warehouse','POST','/products/SKU8/reserve',body={'id':'SKU8','revision':1})
++    path=run_paths(p,ScenarioState(db),ids['warehouse.StockController.reserveProduct'],request,limit=4)[0]
++    e=path['engine'];assert e.http_responses[-1]['status']==409
++    assert [o['operation'] for o in e.data_operations]==['findById']
++    assert e.state.database.tables[('warehouse','products')][1]['revision']==5
+--- a/tests/test_map_noop_filter.py
++++ b/tests/test_map_noop_filter.py
+@@ -0,0 +1,75 @@
++import pytest
++from analyzer.engine import Engine
++from analyzer.paths import run_paths
++from analyzer.state import ScenarioState,U
++from builders import build
++
++
++SOURCE='''import java.util.*;class Api{
++ String entry(){Map<String,List<String>> groups=new HashMap<>();
++ groups.put("hardware",Arrays.asList("SKU7"));groups.put("office",Arrays.asList("SKU8"));groups.put("garden",Arrays.asList("SKU9"));
++ Map<String,String> catalog=new HashMap<>();catalog.put("hardware","active");catalog.put("office","active");catalog.put("garden","active");
++ List<String> items=new ArrayList<>(Arrays.asList("SKU7","SKU8","SKU9"));
++ for(Map.Entry<String,List<String>> entry:groups.entrySet()){
++   String category=entry.getKey();if(catalog.get(category)==null){items.removeAll(entry.getValue());}}
++ return items.get(1);}}'''
++
++
++@pytest.mark.parametrize('limit',[1,4,8])
++def test_pure_false_guards_keep_membership_without_order_choices(tmp_path,limit):
++    p,db,ids=build(tmp_path,{'Api.java':SOURCE})
++    paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=limit)
++    assert len(paths)==1 and paths[0]['result']=='SKU8'
++    assert paths[0]['engine'].outcome=='returned' and not paths[0]['engine'].approximate
++    assert any(e.get('model_version')=='native-map-noop/1' for e in paths[0]['engine'].effect_events)
++
++
++def test_entry_value_null_checks_are_supported_without_calling_source(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{int entry(){
++      Map<String,String> lookup=new HashMap<>();lookup.put("SKU7","active");lookup.put("SKU8","active");int count=2;
++      for(Map.Entry<String,String> entry:lookup.entrySet()){if(entry.getValue()==null){count--;}}
++      return count;}}'''})
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==2 and not e.approximate
++
++
++@pytest.mark.parametrize('body',[
++    'return entry.getKey();',
++    'String key=entry.getKey();if(key!=null){return key;}',
++    'alias.clear();',
++])
++def test_observable_order_or_alias_writes_do_not_get_noop_summary(tmp_path,body):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{String entry(){
++      Map<String,String> values=new HashMap<>();values.put("A","ready");values.put("B","ready");Map<String,String> alias=values;
++      for(Map.Entry<String,String> entry:values.entrySet()){'''+body+'''}return "after";}}'''})
++    paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=8)
++    assert all(not any(event.get('model_version')=='native-map-noop/1' for event in row['engine'].effect_events) for row in paths)
++    if body.startswith('return'):assert {row['result'] for row in paths}=={'A','B'}
++    if body.startswith('alias'):assert any(row['engine'].outcome=='uncaught application exception' for row in paths)
++
++
++def test_false_source_callback_is_still_executed_and_exported(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{
++      boolean absent(String key){return false;}int entry(){Map<String,String> values=new HashMap<>();
++       values.put("A","ready");values.put("B","ready");int count=2;
++       for(String key:values.keySet()){if(absent(key)){count--;}}return count;}}'''})
++    paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=8)
++    assert all(row['result']==2 and ('','executes',ids['Api.absent']) in row['engine'].edges for row in paths)
++    assert all(not any(event.get('model_version')=='native-map-noop/1' for event in row['engine'].effect_events) for row in paths)
++
++
++def test_null_receiver_throw_is_not_eliminated(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{String entry(){
++      Map<String,String> values=new HashMap<>();values.put("A",null);values.put("B",null);
++      try{for(String key:values.keySet()){if(values.get(key).isEmpty()){return "bad";}}}
++      catch(NullPointerException failure){return "failed";}return "after";}}'''})
++    paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=8)
++    assert all(row['result']=='failed' for row in paths)
++    assert all(not any(event.get('model_version')=='native-map-noop/1' for event in row['engine'].effect_events) for row in paths)
++
++
++def test_unknown_predicate_does_not_get_false_guard_proof(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{int entry(String missing){
++      Map<String,String> values=new HashMap<>();values.put("A",missing);values.put("B",missing);int count=2;
++      for(String key:values.keySet()){if(values.get(key)==null){count--;}}return count;}}'''})
++    paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{'missing':U},limit=1)
++    assert all(not any(event.get('model_version')=='native-map-noop/1' for event in row['engine'].effect_events) for row in paths)
+--- a/tests/test_singleton_join_identity.py
++++ b/tests/test_singleton_join_identity.py
+@@ -0,0 +1,16 @@
++from analyzer.engine import Engine
++from analyzer.state import ScenarioState,U
++from builders import build
++
++
++def test_joined_singleton_receiver_and_cache_share_later_writes(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.stereotype.Component;
++      import javax.annotation.PostConstruct;
++      @Component class Counter {int revision;@PostConstruct void init(){revision=7;}
++        int set(boolean flag){if(flag){revision=8;}else{revision=9;}revision=10;return revision;}
++        int read(){return revision;}}
++      class Api {Counter counter;int write(boolean flag){return counter.set(flag);}int read(){return counter.read();}}'''})
++    first=Engine(p,ScenarioState(db),conservative=True)
++    assert first.run(ids['Api.write'],{'flag':U})==10
++    second=Engine(p,first.state)
++    assert second.run(ids['Api.read'],{})==10
+--- a/tests/test_spring_formatter_effects.py
++++ b/tests/test_spring_formatter_effects.py
+@@ -0,0 +1,41 @@
++import pytest
++from analyzer.engine import Engine
++from analyzer.paths import run_paths
++from analyzer.state import ScenarioState
++from builders import build
++
++
++@pytest.mark.parametrize('formatting',[False,True])
++def test_native_formatter_keeps_owner_id_and_source_getter(tmp_path,formatting):
++    project,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.core.style.ToStringCreator;
++      import org.slf4j.Logger;
++      class Owner {int id=7;int getId(){return id;}
++        public String toString(){return new ToStringCreator(this).append("id",getId()).toString();}}
++      class Api {Logger log;int entry(){Owner owner=new Owner();'''+
++      ('log.info("{}",owner);' if formatting else '')+'''return owner.id;}}'''})
++    state=ScenarioState(db);state.context['logging']={'enabled':True}
++    outcomes=run_paths(project,state,ids['Api.entry'],{},limit=1)
++    assert {row['result'] for row in outcomes}=={7}
++    assert all((('', 'executes',ids['Owner.getId']) in row['engine'].edges) is formatting for row in outcomes)
++    assert not any(event['operation']=='append' and event['model_version']=='opaque-java-call/1'
++                   for row in outcomes for event in row['engine'].effect_events)
++
++
++@pytest.mark.parametrize('throws',[False,True])
++def test_appended_source_to_string_keeps_mutation_and_throw(tmp_path,throws):
++    project,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.core.style.ToStringCreator;
++      class Value {int count;public String toString(){count++;'''+
++      ('throw new IllegalStateException();' if throws else 'return "value";')+'''}}
++      class Api {int entry(){Value value=new Value();try{new ToStringCreator(this).append("v",value);}
++        catch(IllegalStateException failure){return value.count+10;}return value.count;}}'''})
++    engine=Engine(project,ScenarioState(db))
++    assert engine.run(ids['Api.entry'],{})==(11 if throws else 1)
++    assert ('', 'executes',ids['Value.toString']) in engine.edges
++    assert (ids['Api.entry'],'calls',ids['Value.toString']) in engine.edges
++
++
++def test_source_formatter_name_is_not_native(tmp_path):
++    project,db,ids=build(tmp_path,{'Api.java':'''class ToStringCreator {int n;
++      ToStringCreator append(String key,int value){n=value;return this;}}
++      class Api {int entry(){ToStringCreator creator=new ToStringCreator();creator.append("x",19);return creator.n;}}'''})
++    assert Engine(project,ScenarioState(db)).run(ids['Api.entry'],{})==19

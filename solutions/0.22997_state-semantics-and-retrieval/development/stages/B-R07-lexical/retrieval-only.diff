@@ -1,0 +1,31 @@
+--- A/contracts.py
++++ B/contracts.py
+@@ -134,7 +134,11 @@
+ 
+ 
+ class ContractIndex:
++    tokenize=staticmethod(tokens)
++    query_intent=staticmethod(intent)
++
+     def __init__(self, project, frontend):
++        tokens=self.tokenize
+         self.project, self.frontend = project, frontend
+         self.contracts, docs, extra_docs = {}, {}, {}
+         for mid, verb, route in project.ix.handlers:
+@@ -189,6 +193,7 @@
+         self.extra = BM25(extra_docs)
+ 
+     def rank(self, action, active_page=None, scenario_text=''):
++        tokens=self.tokenize
+         # Weight the direct object before qualifications about related entities.
+         from .actors import actor_role, declared_roles,canonical_role
+         actor = actor_role(action)
+@@ -200,7 +205,7 @@
+         if re.match(r'^(?:open|view|show|inspect|read)\b', focus, re.I) and re.search(r'\bdetails?\b', focus, re.I):
+             focus = re.sub(r'\b(?:cheapest|quickest|newest|oldest|latest)\b', '', focus, flags=re.I)
+         query = tokens(focus)
+-        wanted = intent(action)
++        wanted = self.query_intent(action)
+         verb_words = {word for group in VERBS for word in group}
+         objects = [word for word in query if word not in verb_words]
+         object_words = set(objects) - {'all', 'detail', 'first', 'second', 'third', 'new'}

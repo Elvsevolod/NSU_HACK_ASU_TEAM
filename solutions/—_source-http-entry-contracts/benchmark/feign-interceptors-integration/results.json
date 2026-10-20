@@ -1,0 +1,261 @@
+{
+  "passed": true,
+  "runs": [
+    {
+      "label": "legacy-analysis",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/compare_public_corpus.py",
+        "--fixtures",
+        "validation_inputs/legacy-real",
+        "--output",
+        "benchmark/feign-interceptors-integration/legacy",
+        "--candidate-only"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.6599294999978156
+    },
+    {
+      "label": "legacy-state",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_legacy_state.py",
+        "--reports",
+        "benchmark/feign-interceptors-integration/legacy",
+        "--output",
+        "benchmark/feign-interceptors-integration/legacy/checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.04666779100080021
+    },
+    {
+      "label": "main",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/run_real_journey.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--output",
+        "benchmark/feign-interceptors-integration/main",
+        "--path-limit",
+        "4"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.3112175419992127
+    },
+    {
+      "label": "main-values",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_real_journey.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-main.oracle-v3.json",
+        "--trace",
+        "benchmark/feign-interceptors-integration/main/trace.json",
+        "--output",
+        "benchmark/feign-interceptors-integration/main/checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.045464415998139884
+    },
+    {
+      "label": "main-semantic",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_semantic_projection.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-main.oracle-v3.json",
+        "--trace",
+        "benchmark/feign-interceptors-integration/main/trace.json",
+        "--output",
+        "benchmark/feign-interceptors-integration/main/semantic-checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.04234179199920618
+    },
+    {
+      "label": "main-mutations",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_journey_mutations.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-main.oracle-v3.json",
+        "--trace",
+        "benchmark/feign-interceptors-integration/main/trace.json",
+        "--output",
+        "benchmark/feign-interceptors-integration/main/mutations"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.47799679200034006
+    },
+    {
+      "label": "additional",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/run_additional_journey.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--output",
+        "benchmark/feign-interceptors-integration/additional"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.25639858299837215
+    },
+    {
+      "label": "additional-values",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_additional_journey.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-additional.oracle-v3.json",
+        "--trace",
+        "benchmark/feign-interceptors-integration/additional/trace.json",
+        "--output",
+        "benchmark/feign-interceptors-integration/additional/checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.04704025000319234
+    },
+    {
+      "label": "additional-semantic",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_semantic_projection.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-additional.oracle-v3.json",
+        "--trace",
+        "benchmark/feign-interceptors-integration/additional/trace.json",
+        "--output",
+        "benchmark/feign-interceptors-integration/additional/semantic-checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.04347095900084241
+    },
+    {
+      "label": "additional-mutations",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_additional_mutations.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-additional.oracle-v3.json",
+        "--trace",
+        "benchmark/feign-interceptors-integration/additional/trace.json",
+        "--output",
+        "benchmark/feign-interceptors-integration/additional/mutations"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.25699320800049463
+    },
+    {
+      "label": "document",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/run_document_journey.py",
+        "--output",
+        "benchmark/feign-interceptors-integration/document"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.2580974590018741
+    },
+    {
+      "label": "document-mutations",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_document_mutations.py",
+        "--input",
+        "benchmark/feign-interceptors-integration/document"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.04132329099957133
+    },
+    {
+      "label": "actor-singleton-http",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_boundary_wires.py",
+        "--output",
+        "benchmark/feign-interceptors-integration/boundary-wires"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.25967908299935516
+    },
+    {
+      "label": "flow-witnesses",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/export_flow_witnesses.py",
+        "--output",
+        "benchmark/feign-interceptors-integration/flow-witnesses"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.5941961249991436
+    },
+    {
+      "label": "cart",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/run_cart_profile.py",
+        "--output",
+        "benchmark/feign-interceptors-integration/cart"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.9471448329968553
+    },
+    {
+      "label": "cart-check",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_cart_profile.py",
+        "--trace",
+        "benchmark/feign-interceptors-integration/cart",
+        "--output",
+        "benchmark/feign-interceptors-integration/cart/checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.08940420799990534
+    },
+    {
+      "label": "cart-mutations",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_cart_mutations.py",
+        "--trace",
+        "benchmark/feign-interceptors-integration/cart",
+        "--output",
+        "benchmark/feign-interceptors-integration/cart/mutations"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 1.2245955409998714
+    }
+  ],
+  "targets_started": false
+}

@@ -1,0 +1,2194 @@
+{
+  "before": "base",
+  "after": "parent30",
+  "steps_compared": 103,
+  "steps": [
+    {
+      "scenario": "S0",
+      "step": 1,
+      "action": "Log in with username and password",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 4,
+        "executes": 12,
+        "data": 3
+      },
+      "after": {
+        "calls": 4,
+        "executes": 12,
+        "data": 3
+      }
+    },
+    {
+      "scenario": "S0",
+      "step": 2,
+      "action": "Open the contact book",
+      "added": [],
+      "removed": [],
+      "before": {
+        "data": 1,
+        "calls": 1,
+        "executes": 2
+      },
+      "after": {
+        "data": 1,
+        "calls": 1,
+        "executes": 2
+      }
+    },
+    {
+      "scenario": "S0",
+      "step": 3,
+      "action": "Refresh the list of orders for high-speed (GaoTie/DongChe) trains",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 7,
+        "executes": 11,
+        "data": 1
+      },
+      "after": {
+        "calls": 7,
+        "executes": 11,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S0",
+      "step": 4,
+      "action": "Refresh the list of orders for regular ('Other' type) trains",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 6,
+        "calls": 2,
+        "data": 1
+      },
+      "after": {
+        "executes": 6,
+        "calls": 2,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S0",
+      "step": 5,
+      "action": "Refresh the list of orders filtered by the 'Paid' status",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 4,
+        "executes": 9,
+        "data": 1
+      },
+      "after": {
+        "calls": 4,
+        "executes": 9,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S0",
+      "step": 6,
+      "action": "Look up the luggage consignments registered on the account",
+      "added": [],
+      "removed": [],
+      "before": {
+        "data": 1,
+        "executes": 2,
+        "calls": 1
+      },
+      "after": {
+        "data": 1,
+        "executes": 2,
+        "calls": 1
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 1,
+      "action": "Log in with username and password",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 12,
+        "calls": 4,
+        "data": 3
+      },
+      "after": {
+        "executes": 12,
+        "calls": 4,
+        "data": 3
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 2,
+      "action": "Search high-speed (GaoTie/DongChe) trains from Shanghai to Suzhou departing on 1 October 2026",
+      "added": [
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#getServiceUrl(java.lang.String)"
+        ],
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-common:edu.fudan.common.util.JsonUtils#object2Json(java.lang.Object)"
+        ],
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "remote",
+          "method:ts-price-service:price.controller.PriceController#query(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "method:ts-price-service:price.controller.PriceController#query(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "data",
+          "res:table:ts-price-service.price_config"
+        ],
+        [
+          "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "data",
+          "res:table:ts-route-service.route_distances"
+        ],
+        [
+          "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "data",
+          "res:table:ts-route-service.route_stations"
+        ],
+        [
+          "scenario:S1",
+          "executes",
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "scenario:S1",
+          "executes",
+          "method:ts-price-service:price.controller.PriceController#query(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "scenario:S1",
+          "executes",
+          "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ]
+      ],
+      "removed": [],
+      "before": {
+        "executes": 27,
+        "remote": 4,
+        "calls": 29,
+        "data": 4
+      },
+      "after": {
+        "calls": 33,
+        "remote": 5,
+        "executes": 30,
+        "data": 7
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 3,
+      "action": "Open the details of the first trip found",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 25,
+        "calls": 23,
+        "remote": 3,
+        "data": 3
+      },
+      "after": {
+        "executes": 25,
+        "calls": 23,
+        "remote": 3,
+        "data": 3
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 4,
+      "action": "View the food menu offered on this trip",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 2,
+        "calls": 1,
+        "data": 1
+      },
+      "after": {
+        "executes": 2,
+        "calls": 1,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 5,
+      "action": "Open the contact book and take the first contact",
+      "added": [],
+      "removed": [],
+      "before": {
+        "data": 1,
+        "executes": 2,
+        "calls": 1
+      },
+      "after": {
+        "data": 1,
+        "executes": 2,
+        "calls": 1
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 6,
+      "action": "Book one first-class seat on the trip for this contact, with food on the train, assurance (insurance) of the first type and luggage consignment of 2 kg to a consignee",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 6,
+        "executes": 5
+      },
+      "after": {
+        "calls": 6,
+        "executes": 5
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 7,
+      "action": "Refresh the list of orders",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 8,
+        "calls": 7,
+        "data": 1
+      },
+      "after": {
+        "executes": 8,
+        "calls": 7,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 8,
+      "action": "Open the new order",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 2,
+        "data": 1,
+        "executes": 3
+      },
+      "after": {
+        "calls": 2,
+        "data": 1,
+        "executes": 3
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 9,
+      "action": "Check the price of the order",
+      "added": [],
+      "removed": [],
+      "before": {
+        "data": 1,
+        "executes": 2,
+        "calls": 1
+      },
+      "after": {
+        "data": 1,
+        "executes": 2,
+        "calls": 1
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 10,
+      "action": "Pay for the order from the internal account balance",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 7,
+        "calls": 4,
+        "data": 2,
+        "remote": 2
+      },
+      "after": {
+        "executes": 7,
+        "calls": 4,
+        "data": 2,
+        "remote": 2
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 11,
+      "action": "Collect the ticket for the order",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 13,
+        "calls": 11,
+        "remote": 3,
+        "data": 3
+      },
+      "after": {
+        "executes": 13,
+        "calls": 11,
+        "remote": 3,
+        "data": 3
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 12,
+      "action": "Enter the station (board the train) with the order",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 16,
+        "calls": 14,
+        "remote": 4,
+        "data": 4
+      },
+      "after": {
+        "executes": 16,
+        "calls": 14,
+        "remote": 4,
+        "data": 4
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 13,
+      "action": "Look up the luggage consignment record of the order",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 2,
+        "data": 1,
+        "calls": 1
+      },
+      "after": {
+        "executes": 2,
+        "data": 1,
+        "calls": 1
+      }
+    },
+    {
+      "scenario": "S1",
+      "step": 14,
+      "action": "Look up the assurance (insurance) record of the order",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 2,
+        "calls": 1,
+        "data": 1
+      },
+      "after": {
+        "executes": 2,
+        "calls": 1,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 1,
+      "action": "Log in with username and password",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 12,
+        "calls": 4,
+        "data": 3
+      },
+      "after": {
+        "executes": 12,
+        "calls": 4,
+        "data": 3
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 2,
+      "action": "Search regular trains (the 'Other' train type, not high-speed) from Shanghai to Nanjing departing on 1 October 2026",
+      "added": [
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#getServiceUrl(java.lang.String)"
+        ],
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-common:edu.fudan.common.util.JsonUtils#object2Json(java.lang.Object)"
+        ],
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "remote",
+          "method:ts-price-service:price.controller.PriceController#query(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "method:ts-price-service:price.controller.PriceController#query(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "data",
+          "res:table:ts-price-service.price_config"
+        ],
+        [
+          "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "data",
+          "res:table:ts-route-service.route_distances"
+        ],
+        [
+          "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "data",
+          "res:table:ts-route-service.route_stations"
+        ],
+        [
+          "scenario:S2",
+          "executes",
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "scenario:S2",
+          "executes",
+          "method:ts-price-service:price.controller.PriceController#query(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "scenario:S2",
+          "executes",
+          "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ]
+      ],
+      "removed": [],
+      "before": {
+        "calls": 29,
+        "executes": 27,
+        "remote": 4,
+        "data": 4
+      },
+      "after": {
+        "calls": 33,
+        "executes": 30,
+        "remote": 5,
+        "data": 7
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 3,
+      "action": "Open the details of the first trip found",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 25,
+        "calls": 23,
+        "remote": 3,
+        "data": 3
+      },
+      "after": {
+        "executes": 25,
+        "calls": 23,
+        "remote": 3,
+        "data": 3
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 4,
+      "action": "Browse the food stores at Suzhou station",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 1,
+        "data": 2,
+        "executes": 2
+      },
+      "after": {
+        "calls": 1,
+        "data": 2,
+        "executes": 2
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 5,
+      "action": "Open the contact book and take the first contact",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 2,
+        "data": 1,
+        "calls": 1
+      },
+      "after": {
+        "executes": 2,
+        "data": 1,
+        "calls": 1
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 6,
+      "action": "Book one first-class seat on the regular train for this contact, with food from a station store, no assurance (insurance) and no luggage consignment",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 5,
+        "calls": 6
+      },
+      "after": {
+        "executes": 5,
+        "calls": 6
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 7,
+      "action": "Refresh the list of orders",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 7,
+        "executes": 8,
+        "data": 1
+      },
+      "after": {
+        "calls": 7,
+        "executes": 8,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 8,
+      "action": "Pay for the order from the internal account balance",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 7,
+        "calls": 4,
+        "remote": 2,
+        "data": 2
+      },
+      "after": {
+        "executes": 7,
+        "calls": 4,
+        "remote": 2,
+        "data": 2
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 9,
+      "action": "Ask how much would be refunded if the order were cancelled",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 9,
+        "remote": 1,
+        "calls": 8,
+        "data": 1
+      },
+      "after": {
+        "executes": 9,
+        "remote": 1,
+        "calls": 8,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 10,
+      "action": "Cancel the order",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 8,
+        "remote": 1,
+        "calls": 7,
+        "data": 1
+      },
+      "after": {
+        "executes": 8,
+        "remote": 1,
+        "calls": 7,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 11,
+      "action": "Book another first-class seat on the same regular train for the same contact with the same station food",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 5,
+        "executes": 8,
+        "remote": 1,
+        "data": 1
+      },
+      "after": {
+        "calls": 5,
+        "executes": 8,
+        "remote": 1,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 12,
+      "action": "Refresh the list of orders",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 7,
+        "executes": 8,
+        "data": 1
+      },
+      "after": {
+        "calls": 7,
+        "executes": 8,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 13,
+      "action": "Pay for the new order from the internal account balance",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 7,
+        "calls": 4,
+        "remote": 2,
+        "data": 2
+      },
+      "after": {
+        "executes": 7,
+        "calls": 4,
+        "remote": 2,
+        "data": 2
+      }
+    },
+    {
+      "scenario": "S2",
+      "step": 14,
+      "action": "Rebook the paid ticket to a second-class seat on the same regular train (the cheaper ticket: the difference is refunded to the internal balance)",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 4,
+        "executes": 6
+      },
+      "after": {
+        "calls": 4,
+        "executes": 6
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 1,
+      "action": "Log in with username and password",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 12,
+        "calls": 4,
+        "data": 3
+      },
+      "after": {
+        "executes": 12,
+        "calls": 4,
+        "data": 3
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 2,
+      "action": "Search high-speed (GaoTie/DongChe) trains from Shanghai to Suzhou departing on 1 October 2026",
+      "added": [
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#getServiceUrl(java.lang.String)"
+        ],
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-common:edu.fudan.common.util.JsonUtils#object2Json(java.lang.Object)"
+        ],
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "remote",
+          "method:ts-price-service:price.controller.PriceController#query(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "method:ts-price-service:price.controller.PriceController#query(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "data",
+          "res:table:ts-price-service.price_config"
+        ],
+        [
+          "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "data",
+          "res:table:ts-route-service.route_distances"
+        ],
+        [
+          "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "data",
+          "res:table:ts-route-service.route_stations"
+        ],
+        [
+          "scenario:S3",
+          "executes",
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "scenario:S3",
+          "executes",
+          "method:ts-price-service:price.controller.PriceController#query(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "scenario:S3",
+          "executes",
+          "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ]
+      ],
+      "removed": [],
+      "before": {
+        "executes": 27,
+        "remote": 4,
+        "calls": 29,
+        "data": 4
+      },
+      "after": {
+        "executes": 30,
+        "calls": 33,
+        "remote": 5,
+        "data": 7
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 3,
+      "action": "Open the details of the first trip found",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 25,
+        "calls": 23,
+        "remote": 3,
+        "data": 3
+      },
+      "after": {
+        "executes": 25,
+        "calls": 23,
+        "remote": 3,
+        "data": 3
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 4,
+      "action": "Browse the food stores at Suzhou station",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 2,
+        "calls": 1,
+        "data": 2
+      },
+      "after": {
+        "executes": 2,
+        "calls": 1,
+        "data": 2
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 5,
+      "action": "Open the contact book and take the first contact",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 2,
+        "calls": 1,
+        "data": 1
+      },
+      "after": {
+        "executes": 2,
+        "calls": 1,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 6,
+      "action": "Add a new contact (a companion with an ID card) to the contact book",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 1,
+        "executes": 2,
+        "data": 1
+      },
+      "after": {
+        "calls": 1,
+        "executes": 2,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 7,
+      "action": "Book a first-class seat on the trip for the first contact, with food from a station store, assurance (insurance) of the first type and a luggage consignment of 0.5 kg to a consignee",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 6,
+        "executes": 5
+      },
+      "after": {
+        "calls": 6,
+        "executes": 5
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 8,
+      "action": "Book a second-class seat on the same trip for the new contact, without food, assurance or consignment",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 6,
+        "executes": 5
+      },
+      "after": {
+        "calls": 6,
+        "executes": 5
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 9,
+      "action": "Refresh the list of orders",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 8,
+        "calls": 7,
+        "data": 1
+      },
+      "after": {
+        "executes": 8,
+        "calls": 7,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 10,
+      "action": "Open the first new order",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 3,
+        "calls": 2,
+        "data": 1
+      },
+      "after": {
+        "executes": 3,
+        "calls": 2,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 11,
+      "action": "Open the second new order",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 3,
+        "calls": 2,
+        "data": 1
+      },
+      "after": {
+        "executes": 3,
+        "calls": 2,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 12,
+      "action": "Pay for the first order from the internal account balance",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 4,
+        "data": 2,
+        "remote": 2,
+        "executes": 7
+      },
+      "after": {
+        "calls": 4,
+        "data": 2,
+        "remote": 2,
+        "executes": 7
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 13,
+      "action": "Pay for the second order from the internal account balance",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 4,
+        "data": 2,
+        "remote": 2,
+        "executes": 7
+      },
+      "after": {
+        "calls": 4,
+        "data": 2,
+        "remote": 2,
+        "executes": 7
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 14,
+      "action": "Check what a 0.5 kg consignment within the region costs",
+      "added": [],
+      "removed": [],
+      "before": {
+        "data": 1,
+        "executes": 2,
+        "calls": 1
+      },
+      "after": {
+        "data": 1,
+        "executes": 2,
+        "calls": 1
+      }
+    },
+    {
+      "scenario": "S3",
+      "step": 15,
+      "action": "Look at the list of assurance types",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 5,
+        "calls": 4
+      },
+      "after": {
+        "executes": 5,
+        "calls": 4
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 1,
+      "action": "Register a new passenger account (username, password, gender, ID document, e-mail)",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 4,
+        "calls": 3,
+        "data": 1
+      },
+      "after": {
+        "executes": 4,
+        "calls": 3,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 2,
+      "action": "Log in with the new username and password",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 4,
+        "calls": 2,
+        "data": 1
+      },
+      "after": {
+        "executes": 4,
+        "calls": 2,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 3,
+      "action": "Add a contact (the passenger themselves) to the empty contact book",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 2,
+        "data": 1,
+        "calls": 1
+      },
+      "after": {
+        "executes": 2,
+        "data": 1,
+        "calls": 1
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 4,
+      "action": "Search high-speed (GaoTie/DongChe) trains from Shanghai to Suzhou departing on 1 October 2026",
+      "added": [
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#getServiceUrl(java.lang.String)"
+        ],
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-common:edu.fudan.common.util.JsonUtils#object2Json(java.lang.Object)"
+        ],
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "remote",
+          "method:ts-price-service:price.controller.PriceController#query(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "method:ts-price-service:price.controller.PriceController#query(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "data",
+          "res:table:ts-price-service.price_config"
+        ],
+        [
+          "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "data",
+          "res:table:ts-route-service.route_distances"
+        ],
+        [
+          "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "data",
+          "res:table:ts-route-service.route_stations"
+        ],
+        [
+          "scenario:S4",
+          "executes",
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "scenario:S4",
+          "executes",
+          "method:ts-price-service:price.controller.PriceController#query(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "scenario:S4",
+          "executes",
+          "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ]
+      ],
+      "removed": [],
+      "before": {
+        "remote": 4,
+        "calls": 29,
+        "executes": 27,
+        "data": 4
+      },
+      "after": {
+        "calls": 33,
+        "remote": 5,
+        "executes": 30,
+        "data": 7
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 5,
+      "action": "Open the details of the first trip found",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 25,
+        "calls": 23,
+        "remote": 3,
+        "data": 3
+      },
+      "after": {
+        "executes": 25,
+        "calls": 23,
+        "remote": 3,
+        "data": 3
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 6,
+      "action": "View the food menu offered on this trip",
+      "added": [],
+      "removed": [],
+      "before": {
+        "data": 1,
+        "executes": 2,
+        "calls": 1
+      },
+      "after": {
+        "data": 1,
+        "executes": 2,
+        "calls": 1
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 7,
+      "action": "Book a first-class seat on the trip for the new contact, with food on the train and assurance (insurance) of the first type, without consignment",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 6,
+        "executes": 5
+      },
+      "after": {
+        "calls": 6,
+        "executes": 5
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 8,
+      "action": "Refresh the list of orders",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 8,
+        "calls": 7,
+        "data": 1
+      },
+      "after": {
+        "executes": 8,
+        "calls": 7,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 9,
+      "action": "Open the new order",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 3,
+        "calls": 2,
+        "data": 1
+      },
+      "after": {
+        "executes": 3,
+        "calls": 2,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 10,
+      "action": "Check the price of the order",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 2,
+        "data": 1,
+        "calls": 1
+      },
+      "after": {
+        "executes": 2,
+        "data": 1,
+        "calls": 1
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 11,
+      "action": "Pay for the order: the internal balance is empty, so the payment is completed through the external payment channel",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 7,
+        "calls": 4,
+        "data": 2,
+        "remote": 2
+      },
+      "after": {
+        "executes": 7,
+        "calls": 4,
+        "data": 2,
+        "remote": 2
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 12,
+      "action": "Ask how much would be refunded if the paid order were cancelled",
+      "added": [],
+      "removed": [],
+      "before": {
+        "remote": 1,
+        "executes": 9,
+        "calls": 8,
+        "data": 1
+      },
+      "after": {
+        "remote": 1,
+        "executes": 9,
+        "calls": 8,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 13,
+      "action": "Cancel the paid order (the refund goes back to the internal balance)",
+      "added": [],
+      "removed": [],
+      "before": {
+        "remote": 1,
+        "executes": 8,
+        "calls": 7,
+        "data": 1
+      },
+      "after": {
+        "remote": 1,
+        "executes": 8,
+        "calls": 7,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S4",
+      "step": 14,
+      "action": "Refresh the list of orders filtered by the 'Cancel' status",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 6,
+        "calls": 4,
+        "data": 1
+      },
+      "after": {
+        "executes": 6,
+        "calls": 4,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 1,
+      "action": "Log in with username and password",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 4,
+        "executes": 12,
+        "data": 3
+      },
+      "after": {
+        "calls": 4,
+        "executes": 12,
+        "data": 3
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 2,
+      "action": "Advanced search: the cheapest trips from Shanghai to Nanjing on 1 October 2026",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 14,
+        "executes": 11,
+        "remote": 1
+      },
+      "after": {
+        "calls": 14,
+        "executes": 11,
+        "remote": 1
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 3,
+      "action": "Advanced search: the quickest trips from Shanghai to Nanjing on 1 October 2026",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 14,
+        "executes": 11,
+        "remote": 1
+      },
+      "after": {
+        "calls": 14,
+        "executes": 11,
+        "remote": 1
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 4,
+      "action": "Advanced search: the trips with the fewest stops from Shanghai to Nanjing on 1 October 2026",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 14,
+        "executes": 11,
+        "remote": 1
+      },
+      "after": {
+        "calls": 14,
+        "executes": 11,
+        "remote": 1
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 5,
+      "action": "Ask for trips with a transfer at Suzhou (Shanghai \u2014 Suzhou \u2014 Nanjing) on 1 October 2026",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 12,
+        "calls": 11,
+        "remote": 1
+      },
+      "after": {
+        "executes": 12,
+        "calls": 11,
+        "remote": 1
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 6,
+      "action": "Open the details of the cheapest trip found (a regular, 'Other'-type train)",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 25,
+        "calls": 23,
+        "remote": 3,
+        "data": 3
+      },
+      "after": {
+        "executes": 25,
+        "calls": 23,
+        "remote": 3,
+        "data": 3
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 7,
+      "action": "Open the contact book and take the first contact",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 2,
+        "data": 1,
+        "calls": 1
+      },
+      "after": {
+        "executes": 2,
+        "data": 1,
+        "calls": 1
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 8,
+      "action": "Book a first-class seat on the cheapest (regular) trip for this contact, without food, assurance or consignment",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 17,
+        "calls": 16,
+        "remote": 3
+      },
+      "after": {
+        "executes": 17,
+        "calls": 16,
+        "remote": 3
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 9,
+      "action": "Refresh the list of orders",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 8,
+        "calls": 7,
+        "data": 1
+      },
+      "after": {
+        "executes": 8,
+        "calls": 7,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 10,
+      "action": "Pay for the order from the internal account balance",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 4,
+        "data": 2,
+        "executes": 7,
+        "remote": 2
+      },
+      "after": {
+        "calls": 4,
+        "data": 2,
+        "executes": 7,
+        "remote": 2
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 11,
+      "action": "Collect the ticket for the order",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 13,
+        "calls": 11,
+        "remote": 3,
+        "data": 3
+      },
+      "after": {
+        "executes": 13,
+        "calls": 11,
+        "remote": 3,
+        "data": 3
+      }
+    },
+    {
+      "scenario": "S5",
+      "step": 12,
+      "action": "Enter the station (board the train) with the order",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 16,
+        "calls": 14,
+        "remote": 4,
+        "data": 4
+      },
+      "after": {
+        "executes": 16,
+        "calls": 14,
+        "remote": 4,
+        "data": 4
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 1,
+      "action": "Log in to the admin console with the administrator's username and password",
+      "added": [],
+      "removed": [
+        [
+          "method:ts-auth-service:auth.security.UserDetailsServiceImpl#loadUserByUsername(java.lang.String)",
+          "data",
+          "res:table:ts-auth-service.user_roles"
+        ],
+        [
+          "method:ts-auth-service:auth.security.jwt.JWTProvider#createToken(auth.entity.User)",
+          "calls",
+          "method:ts-auth-service:auth.entity.User#getUsername()"
+        ],
+        [
+          "method:ts-auth-service:auth.service.impl.TokenServiceImpl#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-auth-service:auth.security.jwt.JWTProvider#createToken(auth.entity.User)"
+        ],
+        [
+          "method:ts-auth-service:auth.service.impl.TokenServiceImpl#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+          "data",
+          "res:table:ts-auth-service.auth_user"
+        ],
+        [
+          "scenario:S6",
+          "executes",
+          "method:ts-auth-service:auth.entity.User#getAuthorities()"
+        ],
+        [
+          "scenario:S6",
+          "executes",
+          "method:ts-auth-service:auth.entity.User#getPassword()"
+        ],
+        [
+          "scenario:S6",
+          "executes",
+          "method:ts-auth-service:auth.entity.User#getUsername()"
+        ],
+        [
+          "scenario:S6",
+          "executes",
+          "method:ts-auth-service:auth.entity.User#isAccountNonExpired()"
+        ],
+        [
+          "scenario:S6",
+          "executes",
+          "method:ts-auth-service:auth.entity.User#isAccountNonLocked()"
+        ],
+        [
+          "scenario:S6",
+          "executes",
+          "method:ts-auth-service:auth.entity.User#isCredentialsNonExpired()"
+        ],
+        [
+          "scenario:S6",
+          "executes",
+          "method:ts-auth-service:auth.entity.User#isEnabled()"
+        ],
+        [
+          "scenario:S6",
+          "executes",
+          "method:ts-auth-service:auth.security.jwt.JWTProvider#createToken(auth.entity.User)"
+        ]
+      ],
+      "before": {
+        "executes": 12,
+        "calls": 4,
+        "data": 3
+      },
+      "after": {
+        "executes": 4,
+        "calls": 2,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 2,
+      "action": "Add a new station Ning Bo with a stay time of 5 minutes",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 10,
+        "calls": 7,
+        "remote": 1
+      },
+      "after": {
+        "executes": 10,
+        "calls": 7,
+        "remote": 1
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 3,
+      "action": "Add a new train type GaoTieSix with 100 second-class and 30 first-class seats and an average speed of 300",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 11,
+        "calls": 8,
+        "remote": 1,
+        "data": 1
+      },
+      "after": {
+        "executes": 11,
+        "calls": 8,
+        "remote": 1,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 4,
+      "action": "Add a new route Shanghai \u2014 Suzhou \u2014 Ning Bo with distances 0, 100 and 250",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 8,
+        "calls": 6,
+        "remote": 2,
+        "data": 1
+      },
+      "after": {
+        "executes": 8,
+        "calls": 6,
+        "remote": 2,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 5,
+      "action": "Add a price configuration for train type GaoTieSix on the new route: basic rate 0.5, first-class rate 1.2",
+      "added": [],
+      "removed": [],
+      "before": {
+        "remote": 1,
+        "calls": 8,
+        "executes": 11,
+        "data": 1
+      },
+      "after": {
+        "remote": 1,
+        "calls": 8,
+        "executes": 11,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 6,
+      "action": "Add a new high-speed trip G9101 of type GaoTieSix on the new route from Shanghai via Suzhou to Ning Bo, departing 09:00 and arriving 12:00",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 7,
+        "calls": 5,
+        "remote": 1,
+        "data": 1
+      },
+      "after": {
+        "executes": 7,
+        "calls": 5,
+        "remote": 1,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 7,
+      "action": "Log in as a passenger with username and password",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 12,
+        "calls": 4,
+        "data": 3
+      },
+      "after": {
+        "executes": 12,
+        "calls": 4,
+        "data": 3
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 8,
+      "action": "Search high-speed (GaoTie/DongChe) trains from Shanghai to Ning Bo departing on 1 October 2026",
+      "added": [],
+      "removed": [
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryTrainTypeByNames(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-common:edu.fudan.common.util.JsonUtils#conveterObject(java.lang.Object,java.lang.Class)"
+        ],
+        [
+          "method:ts-common:edu.fudan.common.util.JsonUtils#conveterObject(java.lang.Object,java.lang.Class)",
+          "calls",
+          "method:ts-common:edu.fudan.common.util.JsonUtils#json2Object(java.lang.String,java.lang.Class)"
+        ],
+        [
+          "method:ts-common:edu.fudan.common.util.JsonUtils#conveterObject(java.lang.Object,java.lang.Class)",
+          "calls",
+          "method:ts-common:edu.fudan.common.util.JsonUtils#object2Json(java.lang.Object)"
+        ],
+        [
+          "scenario:S6",
+          "executes",
+          "method:ts-common:edu.fudan.common.util.JsonUtils#conveterObject(java.lang.Object,java.lang.Class)"
+        ],
+        [
+          "scenario:S6",
+          "executes",
+          "method:ts-common:edu.fudan.common.util.JsonUtils#json2Object(java.lang.String,java.lang.Class)"
+        ],
+        [
+          "scenario:S6",
+          "executes",
+          "method:ts-common:edu.fudan.common.util.JsonUtils#object2Json(java.lang.Object)"
+        ]
+      ],
+      "before": {
+        "executes": 24,
+        "remote": 3,
+        "calls": 25,
+        "data": 3
+      },
+      "after": {
+        "executes": 21,
+        "remote": 3,
+        "calls": 22,
+        "data": 3
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 9,
+      "action": "Open the details of the new trip found",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 19,
+        "remote": 2,
+        "calls": 17,
+        "data": 2
+      },
+      "after": {
+        "executes": 19,
+        "remote": 2,
+        "calls": 17,
+        "data": 2
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 10,
+      "action": "Open the contact book and take the first contact",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 2,
+        "data": 1,
+        "calls": 1
+      },
+      "after": {
+        "executes": 2,
+        "data": 1,
+        "calls": 1
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 11,
+      "action": "Book a first-class seat on the new trip for this contact, without food, assurance or consignment",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 17,
+        "calls": 16,
+        "remote": 3
+      },
+      "after": {
+        "executes": 17,
+        "calls": 16,
+        "remote": 3
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 12,
+      "action": "Refresh the list of orders",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 7,
+        "executes": 8,
+        "data": 1
+      },
+      "after": {
+        "calls": 7,
+        "executes": 8,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 13,
+      "action": "Pay for the order from the internal account balance",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 7,
+        "calls": 4,
+        "data": 2,
+        "remote": 2
+      },
+      "after": {
+        "executes": 7,
+        "calls": 4,
+        "data": 2,
+        "remote": 2
+      }
+    },
+    {
+      "scenario": "S6",
+      "step": 14,
+      "action": "As the administrator, open the list of all orders in the system",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 4,
+        "executes": 7,
+        "remote": 2,
+        "data": 2
+      },
+      "after": {
+        "calls": 4,
+        "executes": 7,
+        "remote": 2,
+        "data": 2
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 1,
+      "action": "Log in with username and password",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 12,
+        "calls": 4,
+        "data": 3
+      },
+      "after": {
+        "executes": 12,
+        "calls": 4,
+        "data": 3
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 2,
+      "action": "Search high-speed (GaoTie/DongChe) trains from Shanghai to Suzhou departing on 1 October 2026",
+      "added": [
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#getServiceUrl(java.lang.String)"
+        ],
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-common:edu.fudan.common.util.JsonUtils#object2Json(java.lang.Object)"
+        ],
+        [
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "remote",
+          "method:ts-price-service:price.controller.PriceController#query(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "method:ts-price-service:price.controller.PriceController#query(java.util.List,org.springframework.http.HttpHeaders)",
+          "calls",
+          "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)",
+          "data",
+          "res:table:ts-price-service.price_config"
+        ],
+        [
+          "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "data",
+          "res:table:ts-route-service.route_distances"
+        ],
+        [
+          "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "data",
+          "res:table:ts-route-service.route_stations"
+        ],
+        [
+          "scenario:S7",
+          "executes",
+          "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryPriceConfigByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "scenario:S7",
+          "executes",
+          "method:ts-price-service:price.controller.PriceController#query(java.util.List,org.springframework.http.HttpHeaders)"
+        ],
+        [
+          "scenario:S7",
+          "executes",
+          "method:ts-price-service:price.service.PriceServiceImpl#findByRouteIdsAndTrainTypes(java.util.List,org.springframework.http.HttpHeaders)"
+        ]
+      ],
+      "removed": [],
+      "before": {
+        "executes": 27,
+        "remote": 4,
+        "calls": 29,
+        "data": 4
+      },
+      "after": {
+        "executes": 30,
+        "calls": 33,
+        "remote": 5,
+        "data": 7
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 3,
+      "action": "Open the contact book and take the first contact",
+      "added": [],
+      "removed": [],
+      "before": {
+        "data": 1,
+        "executes": 2,
+        "calls": 1
+      },
+      "after": {
+        "data": 1,
+        "executes": 2,
+        "calls": 1
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 4,
+      "action": "Book a first-class seat on the first trip found for this contact, with a luggage consignment of 3 kg to a consignee, without food or assurance",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 5,
+        "calls": 6
+      },
+      "after": {
+        "executes": 5,
+        "calls": 6
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 5,
+      "action": "Refresh the list of orders",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 8,
+        "calls": 7,
+        "data": 1
+      },
+      "after": {
+        "executes": 8,
+        "calls": 7,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 6,
+      "action": "Pay for the order from the internal account balance",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 7,
+        "calls": 4,
+        "remote": 2,
+        "data": 2
+      },
+      "after": {
+        "executes": 7,
+        "calls": 4,
+        "remote": 2,
+        "data": 2
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 7,
+      "action": "Collect the ticket for the order",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 13,
+        "calls": 11,
+        "remote": 3,
+        "data": 3
+      },
+      "after": {
+        "executes": 13,
+        "calls": 11,
+        "remote": 3,
+        "data": 3
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 8,
+      "action": "Ask how much would be refunded for the collected order",
+      "added": [],
+      "removed": [],
+      "before": {
+        "remote": 1,
+        "executes": 9,
+        "calls": 8,
+        "data": 1
+      },
+      "after": {
+        "remote": 1,
+        "executes": 9,
+        "calls": 8,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 9,
+      "action": "Try to cancel the collected order (the system refuses)",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 8,
+        "remote": 1,
+        "calls": 7,
+        "data": 1
+      },
+      "after": {
+        "executes": 8,
+        "remote": 1,
+        "calls": 7,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 10,
+      "action": "Try to rebook the collected order onto the second high-speed trip found (the system refuses)",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 8,
+        "calls": 5,
+        "remote": 1,
+        "data": 1
+      },
+      "after": {
+        "executes": 8,
+        "calls": 5,
+        "remote": 1,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 11,
+      "action": "Look up the luggage consignment of the order",
+      "added": [],
+      "removed": [],
+      "before": {
+        "calls": 1,
+        "executes": 2,
+        "data": 1
+      },
+      "after": {
+        "calls": 1,
+        "executes": 2,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 12,
+      "action": "Change the consignee's name and phone number in the consignment",
+      "added": [],
+      "removed": [],
+      "before": {
+        "remote": 1,
+        "executes": 5,
+        "calls": 3,
+        "data": 1
+      },
+      "after": {
+        "remote": 1,
+        "executes": 5,
+        "calls": 3,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 13,
+      "action": "Refresh the list of orders filtered by travel date (September \u2014 December 2026)",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 8,
+        "calls": 6,
+        "data": 1
+      },
+      "after": {
+        "executes": 8,
+        "calls": 6,
+        "data": 1
+      }
+    },
+    {
+      "scenario": "S7",
+      "step": 14,
+      "action": "Refresh the list of orders filtered by purchase date (today)",
+      "added": [],
+      "removed": [],
+      "before": {
+        "executes": 7,
+        "calls": 5,
+        "data": 1
+      },
+      "after": {
+        "executes": 7,
+        "calls": 5,
+        "data": 1
+      }
+    }
+  ]
+}

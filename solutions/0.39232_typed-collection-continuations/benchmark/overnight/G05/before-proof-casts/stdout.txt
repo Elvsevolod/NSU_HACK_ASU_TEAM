@@ -1,0 +1,49 @@
+F.....F                                                                  [100%]
+=================================== FAILURES ===================================
+__________ test_array_in_polluted_map_cannot_skip_required_cast[True] __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-258/test_array_in_polluted_map_can0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1026ae010>
+proof_enabled = True
+
+    @pytest.mark.parametrize('proof_enabled', [True, False])
+    def test_array_in_polluted_map_cannot_skip_required_cast(tmp_path, monkeypatch, proof_enabled):
+        import analyzer.map_loop_proof as proof
+        if not proof_enabled:
+            monkeypatch.setattr(proof, 'prove', lambda *args: False)
+        p, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;class Api{
+          void touch(){throw new IllegalStateException();}
+          String entry(){Map raw=new HashMap();raw.put("x","v".split(","));
+            Map<String,List<String>> typed=raw;
+            try{for(Map.Entry<String,List<String>> entry:typed.entrySet()){
+              List<String> values=entry.getValue();if(values==null){touch();}}}
+            catch(ClassCastException failure){return "cast";}return "after";}}'''})
+        engine = Engine(p, ScenarioState(db))
+>       assert engine.run(ids['Api.entry'], {}) == 'cast'
+E       AssertionError: assert 'after' == 'cast'
+E         
+E         - cast
+E         + after
+
+code/tests/test_map_proof_casts.py:21: AssertionError
+__________ test_set_collection_false_guard_proof_is_side_effect_free ___________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-258/test_set_collection_false_guar0')
+
+    def test_set_collection_false_guard_proof_is_side_effect_free(tmp_path):
+        p, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;class Api{int entry(){
+          Map<String,Collection<String>> values=new HashMap<>();values.put("x",new HashSet<String>());
+          for(Map.Entry<String,Collection<String>> entry:values.entrySet()){
+            Collection<String> group=entry.getValue();if(group==null){return 1;}}
+          return values.size();}}'''})
+        engine = Engine(p, ScenarioState(db))
+        assert engine.run(ids['Api.entry'], {}) == 1
+>       assert any(event.get('model_version') == 'native-map-noop/1' for event in engine.effect_events)
+E       assert False
+E        +  where False = any(<generator object test_set_collection_false_guard_proof_is_side_effect_free.<locals>.<genexpr> at 0x102662ea0>)
+
+code/tests/test_map_proof_casts.py:59: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_map_proof_casts.py::test_array_in_polluted_map_cannot_skip_required_cast[True]
+FAILED code/tests/test_map_proof_casts.py::test_set_collection_false_guard_proof_is_side_effect_free
+2 failed, 5 passed in 0.14s

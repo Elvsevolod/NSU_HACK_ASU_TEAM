@@ -1,0 +1,37 @@
+........................................................................ [  4%]
+........................................................................ [  9%]
+........................................................................ [ 13%]
+........................................................................ [ 18%]
+........................................................................ [ 23%]
+........................................................................ [ 27%]
+........................................................................ [ 32%]
+........................................................................ [ 37%]
+........................................................................ [ 41%]
+........................................................................ [ 46%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 60%]
+........................................................................ [ 65%]
+........................................................................ [ 69%]
+........................................................................ [ 74%]
+........................................................................ [ 79%]
+...................................................F.F.................. [ 83%]
+........................................................................ [ 88%]
+........................................................................ [ 93%]
+........................................................................ [ 97%]
+................................                                         [100%]
+=================================== FAILURES ===================================
+______ test_orm_reflection_root_is_suppressed_but_its_nested_helper_runs _______
+solutions/—_request-event-foundation/code/tests/test_review_projection.py:24: in test_orm_reflection_root_is_suppressed_but_its_nested_helper_runs
+    assert (ids['Item.<init>'],'calls',ids['Item.helper']) in e.edges
+E   AssertionError: assert ('method:service:Item#<init>()', 'calls', 'method:service:Item#helper()') in {('', 'executes', 'method:service:Api#entry()'), ('', 'executes', 'method:service:Item#helper()'), ('method:service:Api#entry()', 'data', 'res:table:service.items')}
+E    +  where {('', 'executes', 'method:service:Api#entry()'), ('', 'executes', 'method:service:Item#helper()'), ('method:service:Api#entry()', 'data', 'res:table:service.items')} = <analyzer.engine.Engine object at 0x1089a4450>.edges
+_____________ test_json_and_orm_use_the_same_reflection_root_rule ______________
+solutions/—_request-event-foundation/code/tests/test_review_projection.py:46: in test_json_and_orm_use_the_same_reflection_root_rule
+    assert (ids['Item.<init>'],'calls',ids['Item.helper']) in e.edges
+E   AssertionError: assert ('method:service:Item#<init>()', 'calls', 'method:service:Item#helper()') in {('', 'executes', 'method:service:Api#entry(Item)'), ('', 'executes', 'method:service:Item#helper()')}
+E    +  where {('', 'executes', 'method:service:Api#entry(Item)'), ('', 'executes', 'method:service:Item#helper()')} = <analyzer.engine.Engine object at 0x1089827d0>.edges
+=========================== short test summary info ============================
+FAILED solutions/—_request-event-foundation/code/tests/test_review_projection.py::test_orm_reflection_root_is_suppressed_but_its_nested_helper_runs
+FAILED solutions/—_request-event-foundation/code/tests/test_review_projection.py::test_json_and_orm_use_the_same_reflection_root_rule
+2 failed, 1542 passed in 4.51s

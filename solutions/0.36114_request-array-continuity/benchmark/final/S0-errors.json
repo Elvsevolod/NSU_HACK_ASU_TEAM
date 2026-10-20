@@ -1,0 +1,108 @@
+{
+  "executes": {
+    "fp": [
+      [
+        "scenario:S0",
+        "executes",
+        "method:ts-order-service:order.entity.OrderInfo#setLoginId(java.lang.String)"
+      ]
+    ],
+    "fn": [
+      [
+        "scenario:S0",
+        "executes",
+        "method:ts-common:edu.fudan.common.security.jwt.JWTFilter#doFilterInternal(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse,javax.servlet.FilterChain)"
+      ],
+      [
+        "scenario:S0",
+        "executes",
+        "method:ts-common:edu.fudan.common.util.StringUtils#String2Date(java.lang.String)"
+      ],
+      [
+        "scenario:S0",
+        "executes",
+        "method:ts-order-other-service:other.entity.Order#<init>()"
+      ],
+      [
+        "scenario:S0",
+        "executes",
+        "method:ts-order-service:order.entity.Order#<init>()"
+      ],
+      [
+        "scenario:S0",
+        "executes",
+        "method:ts-order-service:order.entity.OrderInfo#getState()"
+      ]
+    ]
+  },
+  "calls": {
+    "fp": [],
+    "fn": [
+      [
+        "method:ts-auth-service:auth.service.impl.TokenServiceImpl#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-auth-service:auth.entity.User#getPassword()"
+      ],
+      [
+        "method:ts-order-other-service:other.entity.Order#<init>()",
+        "calls",
+        "method:ts-common:edu.fudan.common.entity.OrderStatus#getCode()"
+      ],
+      [
+        "method:ts-order-other-service:other.entity.Order#<init>()",
+        "calls",
+        "method:ts-common:edu.fudan.common.entity.SeatClass#getCode()"
+      ],
+      [
+        "method:ts-order-other-service:other.entity.Order#<init>()",
+        "calls",
+        "method:ts-common:edu.fudan.common.util.StringUtils#Date2String(java.util.Date)"
+      ],
+      [
+        "method:ts-order-service:order.entity.Order#<init>()",
+        "calls",
+        "method:ts-common:edu.fudan.common.entity.OrderStatus#getCode()"
+      ],
+      [
+        "method:ts-order-service:order.entity.Order#<init>()",
+        "calls",
+        "method:ts-common:edu.fudan.common.entity.SeatClass#getCode()"
+      ],
+      [
+        "method:ts-order-service:order.entity.Order#<init>()",
+        "calls",
+        "method:ts-common:edu.fudan.common.util.StringUtils#Date2String(java.util.Date)"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrders(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-common:edu.fudan.common.util.StringUtils#String2Date(java.lang.String)"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrders(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.entity.OrderInfo#getState()"
+      ]
+    ]
+  },
+  "remote": {
+    "fp": [],
+    "fn": []
+  },
+  "data": {
+    "fp": [
+      [
+        "method:ts-auth-service:auth.security.UserDetailsServiceImpl#loadUserByUsername(java.lang.String)",
+        "data",
+        "res:table:ts-auth-service.user_roles"
+      ]
+    ],
+    "fn": [
+      [
+        "method:ts-auth-service:auth.service.impl.TokenServiceImpl#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+        "data",
+        "res:table:ts-auth-service.user_roles"
+      ]
+    ]
+  }
+}

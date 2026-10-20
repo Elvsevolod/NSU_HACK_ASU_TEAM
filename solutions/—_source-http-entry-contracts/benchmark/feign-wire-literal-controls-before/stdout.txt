@@ -1,0 +1,82 @@
+FFF.                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_literal_method_uri_uses_the_literal_encoding_contract[/items/a b-/items/a%20b] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-116/test_literal_method_uri_uses_t0')
+route = '/items/a b', encoded = '/items/a%20b'
+
+    @pytest.mark.parametrize('route,encoded',[
+        ('/items/a b','/items/a%20b'),
+        ('/items/пример','/items/%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80'),
+        ('/items/100%','/items/100%25'),
+        ('/items/a:b','/items/a:b'),
+    ])
+    def test_literal_method_uri_uses_the_literal_encoding_contract(tmp_path,route,encoded):
+        source=IMPORTS+'''@FeignClient(name="service",url="http://service:8080")interface Client{
+          @GetMapping("'''+route+'''")String read();}
+          class Api{Client client;String entry(){return client.read();}}
+          @RestController class Target{@GetMapping("'''+route+'''")String read(){return "right";}}'''
+        p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
+        assert e.run(ids['Api.entry'],{})=='right' and not e.approximate
+>       assert outbound(e)[0]['request']['url']=='http://service:8080'+encoded
+E       AssertionError: assert 'http://servi...080/items/a b' == 'http://servi...0/items/a%20b'
+E         
+E         - http://service:8080/items/a%20b
+E         ?                            ^^^
+E         + http://service:8080/items/a b
+E         ?                            ^
+
+code/tests/test_feign_wire_controls33.py:121: AssertionError
+_ test_literal_method_uri_uses_the_literal_encoding_contract[/items/\u043f\u0440\u0438\u043c\u0435\u0440-/items/%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-116/test_literal_method_uri_uses_t1')
+route = '/items/пример', encoded = '/items/%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80'
+
+    @pytest.mark.parametrize('route,encoded',[
+        ('/items/a b','/items/a%20b'),
+        ('/items/пример','/items/%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80'),
+        ('/items/100%','/items/100%25'),
+        ('/items/a:b','/items/a:b'),
+    ])
+    def test_literal_method_uri_uses_the_literal_encoding_contract(tmp_path,route,encoded):
+        source=IMPORTS+'''@FeignClient(name="service",url="http://service:8080")interface Client{
+          @GetMapping("'''+route+'''")String read();}
+          class Api{Client client;String entry(){return client.read();}}
+          @RestController class Target{@GetMapping("'''+route+'''")String read(){return "right";}}'''
+        p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
+        assert e.run(ids['Api.entry'],{})=='right' and not e.approximate
+>       assert outbound(e)[0]['request']['url']=='http://service:8080'+encoded
+E       AssertionError: assert 'http://servi.../items/пример' == 'http://servi...C%D0%B5%D1%80'
+E         
+E         - http://service:8080/items/%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80
+E         + http://service:8080/items/пример
+
+code/tests/test_feign_wire_controls33.py:121: AssertionError
+_ test_literal_method_uri_uses_the_literal_encoding_contract[/items/100%-/items/100%25] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-116/test_literal_method_uri_uses_t2')
+route = '/items/100%', encoded = '/items/100%25'
+
+    @pytest.mark.parametrize('route,encoded',[
+        ('/items/a b','/items/a%20b'),
+        ('/items/пример','/items/%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80'),
+        ('/items/100%','/items/100%25'),
+        ('/items/a:b','/items/a:b'),
+    ])
+    def test_literal_method_uri_uses_the_literal_encoding_contract(tmp_path,route,encoded):
+        source=IMPORTS+'''@FeignClient(name="service",url="http://service:8080")interface Client{
+          @GetMapping("'''+route+'''")String read();}
+          class Api{Client client;String entry(){return client.read();}}
+          @RestController class Target{@GetMapping("'''+route+'''")String read(){return "right";}}'''
+        p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Api.entry'],{})=='right' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'right')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x102d88a90>.run
+
+code/tests/test_feign_wire_controls33.py:120: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_feign_wire_controls33.py::test_literal_method_uri_uses_the_literal_encoding_contract[/items/a b-/items/a%20b]
+FAILED code/tests/test_feign_wire_controls33.py::test_literal_method_uri_uses_the_literal_encoding_contract[/items/\u043f\u0440\u0438\u043c\u0435\u0440-/items/%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80]
+FAILED code/tests/test_feign_wire_controls33.py::test_literal_method_uri_uses_the_literal_encoding_contract[/items/100%-/items/100%25]
+3 failed, 1 passed, 12 deselected in 0.13s

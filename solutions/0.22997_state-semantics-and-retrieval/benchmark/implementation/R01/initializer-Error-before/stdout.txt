@@ -1,0 +1,19 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_initializer_error_is_not_wrapped_in_exception_in_initializer_error ____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-34/test_initializer_error_is_not_0')
+
+    def test_initializer_error_is_not_wrapped_in_exception_in_initializer_error(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''class Material{static{throw new Error();}static int read(){return 9;}}
+          class Api{int entry(){try{return Material.read();}catch(ExceptionInInitializerError ex){return 1;}catch(Error ex){return 2;}}}'''})
+>       e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==2
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 1 == 2
+E        +  where 1 = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1020cce90>.run
+
+code/tests/test_static_storage.py:75: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_static_storage.py::test_initializer_error_is_not_wrapped_in_exception_in_initializer_error
+1 failed, 12 deselected in 0.13s

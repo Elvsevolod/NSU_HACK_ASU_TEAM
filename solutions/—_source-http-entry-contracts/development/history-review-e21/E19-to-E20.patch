@@ -1,0 +1,74 @@
+--- E19-selected-response-origin/analyzer/contracts.py
++++ E20-response-only-history/analyzer/contracts.py
+@@ -493,15 +493,10 @@
+                 not isinstance(obj,dict)):continue
+             _,fqn,tid=object_scope(self.project,item,obj)
+             if fqn not in types:continue
++            contract={**contract,'history_result_only':True}
+             proposal=self._bind(action,state,contract,row['score'])
+             name=pars[0]['name'];proof=proposal['bindings'].get(name,{})
+-            reference=proof.get('reference','');selection=None
+-            selected_ref=re.fullmatch(r'history\[(\d+)\]\.selected_objects\[(\d+)\]\.value',reference)
+-            if selected_ref:
+-                i,j=map(int,selected_ref.groups());objects=state.history[i].get('selected_objects',[])
+-                if not isinstance(objects,list) or j>=len(objects):continue
+-                selection=objects[j];reference=selection.get('reference','')
+-                if not isinstance(reference,str) or not re.fullmatch(r'history\['+str(i)+r'\]\.result\.[\w$]+',reference):continue
++            reference=proof.get('reference','')
+             match=re.fullmatch(r'history\[(\d+)\]\.(?:result|created_objects\[\d+\])\.([\w$]+)',reference)
+             if (proposal['unresolved'] or proof.get('source')!='history' or not match or int(match[1])<number or
+                 not proof.get('producer_observation',{}).get('digest')):continue
+@@ -510,8 +505,6 @@
+                 selected.get('entry') not in self.project.methods or
+                 not isinstance(record,dict) or object_scope(self.project,selected,record)[1]!=fqn or
+                 result_shape(self.project,selected.get('entry'))!=(types,False)):continue
+-            if selection and (selection.get('qualified_type')!=fqn or selection.get('producer_entry')!=selected['entry'] or
+-                key(selection.get('value',U),include_origins=True)!=key(proposal['params'].get(name,U),include_origins=True)):continue
+             field=match[2];layout=self.project.type_fields.get(tid,{}).get(field,{})
+             engine=Engine(self.project,proposal['state'])
+             kind=engine.declared_kind(pars[0]['type'],self.project.methods[mid])
+@@ -852,7 +845,8 @@
+                 if bindings.get(key, {}).get('source') == 'ui':
+                     params.pop(key)
+                     bindings[key]['resolved'] = False
+-            previous = related_selection_value(self.project,mid,key,action,state.history,ui_scope=(site or {}).get('reference_scope')) or history_value(self.project, mid, key, action, state.history,ui_scope=(site or {}).get('reference_scope'))
++            result_only=contract.get('history_result_only',False)
++            previous = (None if result_only else related_selection_value(self.project,mid,key,action,state.history,ui_scope=(site or {}).get('reference_scope'))) or history_value(self.project, mid, key, action, state.history,use_selection=not result_only,ui_scope=(site or {}).get('reference_scope'))
+             if previous:
+                 bind(key, previous[1], 'history', previous[0])
+         for key in fields:
+--- E19-selected-response-origin/tests/test_history_request_choice33.py
++++ E20-response-only-history/tests/test_history_request_choice33.py
+@@ -142,9 +142,26 @@
+     elif mutation=='other-producer':selected['producer_entry']=ids['ParcelController.create']
+     later['selected_objects']=[selected];state.history.append(later)
+     proposals,detail=g.step('Read the parcel just created again',state)
+-    assert bool(proposals)==(mutation in (None,'other-type'))
+-    if mutation is None:
+-        assert proposals[0]['bindings']['id']['reference']=='history[1].selected_objects[0].value'
+-        assert detail['source_history_constraint']['response_reference']=='history[1].result.id'
+-    if mutation=='other-type':
+-        assert proposals[0]['bindings']['id']['reference']=='history[1].result.id'
++    if mutation=='unknown-path':
++        assert not proposals and detail['unresolved']
++        return
++    # Selection bookkeeping does not replace the actual complete response.
++    assert len(proposals)==1 and proposals[0]['params']=={'id':7}
++    assert proposals[0]['bindings']['id']['reference']=='history[1].result.id'
++    assert detail['source_history_constraint']['response_reference']=='history[1].result.id'
++
++
++def test_string_update_response_cannot_replace_the_last_typed_identity_producer(tmp_path):
++    p,ids,g,state=fixture(tmp_path,'''@PutMapping("/parcels/{id}")
++      String update(@PathVariable Long id){return "updated";}''')
++    read=deepcopy(state.history[0]);read.update(step=2,entry=ids['ParcelController.getById'],action='Read parcel')
++    state.history.append(read)
++    updated=deepcopy(read);updated.update(step=3,entry=ids['ParcelController.update'],action='Update parcel',
++        parameters={'id':7},result='updated',selected_objects=[{'entity':['parcel'],'value':7,
++            'reference':'history[2].parameters.id','qualified_type':'Parcel','deployment':'service',
++            'producer_entry':ids['ParcelController.update'],'object':deepcopy(read['result'])}])
++    state.history.append(updated)
++    proposals,detail=g.step('Read the parcel just created again',state)
++    assert len(proposals)==1 and proposals[0]['params']=={'id':7}
++    assert proposals[0]['bindings']['id']['reference']=='history[1].result.id'
++    assert detail['source_history_constraint']['value_producer']['step']==2

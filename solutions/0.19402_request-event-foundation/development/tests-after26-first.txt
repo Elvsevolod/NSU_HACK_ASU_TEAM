@@ -1,0 +1,61 @@
+........................................................................ [  4%]
+........................................................................ [  9%]
+........................................................................ [ 14%]
+........................................................................ [ 18%]
+........................................................................ [ 23%]
+........................................................................ [ 28%]
+........................................................................ [ 32%]
+........................................................................ [ 37%]
+..........................F.F........................................... [ 42%]
+........................................................................ [ 46%]
+...................................................................FF... [ 51%]
+........................................................................ [ 56%]
+........................................................................ [ 60%]
+........................................................................ [ 65%]
+........................................................................ [ 70%]
+........................................................................ [ 74%]
+........................................................................ [ 79%]
+........................................................................ [ 84%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+.........................                                                [100%]
+=================================== FAILURES ===================================
+_______ test_past_creation_identity_survives_later_uncertain_table_state _______
+solutions/—_request-event-foundation/code/tests/test_historical_creation.py:29: in test_past_creation_identity_survives_later_uncertain_table_state
+    created=report['steps'][0]['alternatives'][0]['created_objects'][0]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   IndexError: list index out of range
+----------------------------- Captured stdout call -----------------------------
+invoices step 1 paths 1
+invoices step 2 paths 1
+____ test_created_identity_does_not_claim_a_live_row_after_a_modeled_delete ____
+solutions/—_request-event-foundation/code/tests/test_historical_creation.py:71: in test_created_identity_does_not_claim_a_live_row_after_a_modeled_delete
+    assert alternative['created_objects'][0]['__persistence_observation__']=='modeled_absent'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   IndexError: list index out of range
+----------------------------- Captured stdout call -----------------------------
+invoices step 1 paths 1
+_ test_unobserved_property_presence_retains_both_omission_and_callback_failure _
+solutions/—_request-event-foundation/code/tests/test_json_bean_lifecycle.py:182: in test_unobserved_property_presence_retains_both_omission_and_callback_failure
+    assert {o['engine'].outcome for o in outcomes}=={'returned','HTTP error response'}
+E   AssertionError: assert {'HTTP bindin...', 'returned'} == {'HTTP error ...', 'returned'}
+E     
+E     Extra items in the left set:
+E     'HTTP binding failure'
+E     Extra items in the right set:
+E     'HTTP error response'
+E     Use -v to get more diff
+___ test_known_present_unknown_value_cannot_skip_a_guaranteed_setter_failure ___
+solutions/—_request-event-foundation/code/tests/test_json_bean_lifecycle.py:197: in test_known_present_unknown_value_cannot_skip_a_guaranteed_setter_failure
+    assert e.outcome=='HTTP error response'
+E   AssertionError: assert 'HTTP binding failure' == 'HTTP error response'
+E     
+E     - HTTP error response
+E     + HTTP binding failure
+=========================== short test summary info ============================
+FAILED solutions/—_request-event-foundation/code/tests/test_historical_creation.py::test_past_creation_identity_survives_later_uncertain_table_state
+FAILED solutions/—_request-event-foundation/code/tests/test_historical_creation.py::test_created_identity_does_not_claim_a_live_row_after_a_modeled_delete
+FAILED solutions/—_request-event-foundation/code/tests/test_json_bean_lifecycle.py::test_unobserved_property_presence_retains_both_omission_and_callback_failure
+FAILED solutions/—_request-event-foundation/code/tests/test_json_bean_lifecycle.py::test_known_present_unknown_value_cannot_skip_a_guaranteed_setter_failure
+4 failed, 1533 passed in 4.91s

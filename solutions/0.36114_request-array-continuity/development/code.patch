@@ -1,0 +1,1915 @@
+--- parent28/analyzer/__main__.py
++++ solution29/analyzer/__main__.py
+@@ -165,6 +165,8 @@
+                                                         for (kind,name),count in sorted(engine.operation_issues.items())],
+                                     'data_operations': engine.data_operations,
+                                     'events': [{**event, 'edge': pack({tuple(event['edge'])}, scenario['id'])[0]} for event in engine.events],
++                                    'semantic_callbacks':engine.semantic_callbacks,
++                                    'reflection_edges':pack(engine.reflection_edges,scenario['id']),
+                                     'assumptions': {key:value for value,key in engine.assumption_registry.items()},
+                                     'event_contexts': engine.event_contexts,
+                                     'requests': engine.request_events,
+@@ -172,7 +174,7 @@
+                                     'call_effects': engine.effect_events,
+                                     'persistence': engine.persistence_events,
+                                     'static_candidates': pack(engine.candidate_edges, scenario['id']),
+-                                    'state_after': following.snapshot(), 'edges': pack(engine.edges, scenario['id'])})
++                                    'state_after': following.snapshot(full=True), 'edges': pack(engine.edges, scenario['id'])})
+         if len(next_states) > path_limit:
+             union = set().union(*(item[1] for item in next_states))
+             must = set.intersection(*(item[2] for item in next_states))
+--- parent28/analyzer/absence_contracts.py
++++ solution29/analyzer/absence_contracts.py
+@@ -0,0 +1,68 @@
++"""A narrowly proven consumer equivalence: omitted/null/empty String input.
++
++Only default-null bean properties observed through Spring StringUtils.isEmpty
++are covered. Other observations retain a distinct wire-value constraint.
++"""
++from .project import walk,text
++
++
++def empty_equivalent(engine, entry, field):
++    p=engine.p;meta=p.methods[entry]
++    parameters=[item for item in p.http_parameters(entry) if item['kind']=='RequestBody']
++    if len(parameters)!=1:return False
++    owner=p.resolve_type(parameters[0]['type'],meta['module'],meta['file'])
++    info=p.type_fields.get(owner,{}).get(field)
++    if not info or info['type'] not in ('String','java.lang.String') or info['has_initializer']:return False
++    if any(m['owner']==owner and m['name']=='<init>' for m in p.methods.values()):return False
++    getter='get'+field[:1].upper()+field[1:]
++    getters=p.inherited_methods(owner,getter,0)
++    source_getters=[p.ast[mid] for mid in getters if p.ast.get(mid) is not None]
++    if source_getters:
++        if len(source_getters)!=1:return False
++        body=source_getters[0].child_by_field_name('body')
++        statements=body.named_children if body is not None else []
++        if len(statements)!=1 or statements[0].type!='return_statement':return False
++        expression=statements[0].named_children
++        if len(expression)!=1 or text(expression[0]) not in (field,'this.'+field):return False
++    else:
++        from .bean_properties import generated_accessor
++        accessor=generated_accessor(p,owner,getter,0,engine.standard_type)
++        if accessor is None or accessor['member']!=field:return False
++    found=False
++    def empty_call(node,names,context):
++        if node is None:return False
++        if node.type=='parenthesized_expression' and len(node.named_children)==1:return empty_call(node.named_children[0],names,context)
++        if node.type!='method_invocation' or text(node.child_by_field_name('name'))!='isEmpty':return False
++        args=node.child_by_field_name('arguments')
++        return (len(args.named_children)==1 and text(args.named_children[0]) in names and
++                engine.standard_type(text(node.child_by_field_name('object')),'org.springframework.util.StringUtils',context))
++    for mid in p.ix.closure({entry})[0]:
++        method=p.methods[mid];body=p.ast.get(mid)
++        if body is None:continue
++        receivers={name for name,typ in p.parameters(mid) if p.resolve_type(typ,method['module'],method['file'])==owner}
++        if not receivers:continue
++        reads=[n for n in walk(body) if n.type=='method_invocation' and text(n.child_by_field_name('object')) in receivers
++               and text(n.child_by_field_name('name'))==getter and not n.child_by_field_name('arguments').named_children]
++        if any(n.type=='field_access' and text(n.child_by_field_name('object')) in receivers and
++               text(n.child_by_field_name('field'))==field for n in walk(body)):return False
++        for read in reads:
++            names={text(read)};local=None
++            if read.parent.type=='variable_declarator' and read.parent.child_by_field_name('value')==read:
++                local=text(read.parent.child_by_field_name('name'));names.add(local)
++            occurrences=[n for n in walk(body) if n.type=='identifier' and text(n)==local and
++                not (n.parent.type=='variable_declarator' and n.parent.child_by_field_name('name')==n)] if local else [read]
++            for node in occurrences:
++                call=node.parent.parent if node.parent.type=='argument_list' else None
++                if empty_call(call,names,method):found=True;continue
++                ancestor=node.parent;guarded=False
++                while ancestor is not None and ancestor!=body:
++                    if ancestor.type=='if_statement':
++                        condition=ancestor.child_by_field_name('condition')
++                        while condition.type=='parenthesized_expression':condition=condition.named_children[0]
++                        if condition.type=='unary_expression' and text(condition.child_by_field_name('operator'))=='!' and empty_call(condition.child_by_field_name('operand'),names,method):
++                            consequence=ancestor.child_by_field_name('consequence')
++                            guarded=consequence.start_byte<=node.start_byte<consequence.end_byte
++                            if guarded:break
++                    ancestor=ancestor.parent
++                if not guarded:return False
++    return found
+--- parent28/analyzer/actors.py
++++ solution29/analyzer/actors.py
+@@ -1,6 +1,10 @@
+ """Actor language constrains contracts without inventing an authenticated session."""
+ import re
+ from .state import U
++
++
++def canonical_role(role):
++    return {'administrator':'admin'}.get(role.lower(),role.lower())
+ 
+ 
+ def actor_role(action):
+--- parent28/analyzer/bean_initialization.py
++++ solution29/analyzer/bean_initialization.py
+@@ -0,0 +1,41 @@
++"""Local startup fields for an explicitly annotated, no-arg Spring bean.
++
++Startup is analyzed separately from scenario execution. Source startup with
++remote/data effects or an explicit constructor stays outside this contract.
++"""
++from .state import U
++from .bean_lifecycle import BeanLifecycle
++from .heap_join import widen
++
++
++def initialized_receiver(engine, mid):
++    owner=engine.p.methods[mid]['owner'];meta=engine.p.nodes[owner]
++    annotations={a['name'].rsplit('.',1)[-1] for a in meta.get('annotations',[])}
++    if not annotations & {'Component','Service','Controller','RestController'}:return U
++    methods=[target for target,m in engine.p.methods.items() if m['owner']==owner]
++    callbacks=[target for target in methods if any(a['name'].rsplit('.',1)[-1]=='PostConstruct'
++               for a in engine.p.methods[target].get('annotations',[]))]
++    if len(callbacks)!=1 or engine.p.parameters(callbacks[0]) or any(engine.p.methods[t]['name']=='<init>' for t in methods):return U
++    _,_,remote,data=engine.p.ix.closure(set(callbacks))
++    if remote or data:return U
++    unit=engine.p.ix.unit_of(mid);key=(unit,owner)
++    if key in engine.state.bean_instances:return engine.state.bean_instances[key]
++    from .engine import Engine,AlternativeRequired,AnalysisBoundary
++    from .java_exceptions import JavaThrow
++    from copy import deepcopy
++    bootstrap=Engine(engine.p,deepcopy(engine.state));bootstrap.method=mid
++    obj=BeanLifecycle(bootstrap,'source bean startup').allocate(owner,meta['fqn'],meta,{},lambda _:None,'source')
++    try:
++        bootstrap.initialize_instance(owner,obj,'source bean startup')
++        bootstrap.invoke(callbacks[0],[],obj,'source bean startup')
++        if bootstrap.approximate:raise AnalysisBoundary('unsupported local initializer')
++    except (AlternativeRequired,AnalysisBoundary,JavaThrow):
++        bootstrap.approximate=True
++        widen(obj)
++        engine.assume('local bean initialization is unresolved: '+owner)
++        engine.warnings.add('local bean initialization is unresolved: '+owner)
++    engine.state.bean_instances[key]=obj
++    engine.effect_events.append({'model_version':'source-local-bean-startup/1','operation':'PostConstruct',
++        'owner':owner,'callbacks':callbacks,'scenario_execution':False,'resource_writes':[],
++        'complete':not bootstrap.approximate})
++    return obj
+--- parent28/analyzer/bean_lifecycle.py
++++ solution29/analyzer/bean_lifecycle.py
+@@ -40,10 +40,18 @@
+         context=getattr(obj,'_json_receiver_context',None) or self.p.nodes[owner]
+         receiver=getattr(obj,'_json_receiver_type',None) or obj.declared_type
+         generic=call_context(self.p,mid,receiver,context,list(argument_types),None,self.e.standard_type)[:2]
++        from .event_values import witness
++        event={'method':mid,'role':role,'reason':self.reason,'arguments':witness(args),
++               'projection':'exported setter' if role=='setter' else 'reflection root excluded',
++               'outcome':'started'}
++        self.e.semantic_callbacks.append(event)
+         try:
+-            return self.e.invoke(mid,args,obj,'JSON '+role+' callback: '+self.reason,generic,kinds,
+-                                 export_method=role!='constructor')
++            result=self.e.invoke(mid,args,obj,'JSON '+role+' callback: '+self.reason,generic,kinds,
++                                 export_method=role=='setter')
++            event['result']=witness([result]);event['outcome']='returned'
++            return result
+         except JavaThrow as failure:
++            event['outcome']='threw'
+             thrown=failure.value.get('__type__',U) if isinstance(failure.value,dict) else U
+             if assignable(thrown,'java.lang.Error',self.p) is True:raise
+             raise mapping_failure(role=='getter') from None
+@@ -234,9 +242,19 @@
+             self.write(obj,prop,decoded,kind_of(decoded,typ,meta,field_bindings),rendered,issue)
+         if pending:
+             issue('JSON property presence is unobserved; optional writes and callback effects are conservatively retained')
++            footprints=[self.writer_field(prop) for prop in pending]
++            # Unknown callbacks may change the receiver arbitrarily. A proven
++            # direct assignment only changes its own declaring-class field.
++            independent=all(field is not None for field in footprints) and all(
++                self.writer_field(props[name]) is not None for name in value if name in props)
+             for prop in pending:
+                 if prop['kind']=='method':
+                     self.e.executed(prop['member'],'unobserved JSON property presence: possible setter')
+-                    self.e.fallback(prop['member'])
+-            widen(obj)
++                    if not independent:self.e.fallback(prop['member'])
++            if independent:
++                for _,field in set().union(*footprints):
++                    obj[field]=U
++                    obj._native_field_kinds.pop(field,None)
++                    obj._field_reference_types.pop(field,None)
++            else:widen(obj)
+         return obj
+--- parent28/analyzer/call_effects.py
++++ solution29/analyzer/call_effects.py
+@@ -28,7 +28,9 @@
+         seen.add(current)
+         methods = [mid for mid, meta in project.methods.items() if meta['owner'] == current]
+         if methods:
+-            resources.update(target for _, target in project.ix.closure(set(methods))[3])
++            from .resource_effects import possible_writes
++            closure=project.ix.closure(set(methods))
++            resources.update(possible_writes(project,closure[0],closure[3]))
+         meta = project.nodes[current]
+         for field in project.type_fields.get(current, {}).values():
+             target = project.resolve_type(field['type'], meta.get('module'), field.get('file'))
+--- parent28/analyzer/contracts.py
++++ solution29/analyzer/contracts.py
+@@ -166,6 +166,8 @@
+                     nouns = set(tokens(owner + ' ' + ' '.join(route)))
+                     hints = {i for word in tokens(ui_name) if word not in nouns for i, group in enumerate(VERBS) if word in group}
+                     actual_intent = next(iter(hints)) if len(hints) == 1 else None
++                if actual_intent is None and verb=='GET' and result_collection:
++                    actual_intent=0
+                 self.contracts[key] = {'entry': mid, 'site': site, 'verb': verb,
+                                        'route': route, 'primary': primary,
+                                        'intent': actual_intent,
+@@ -173,7 +175,7 @@
+                                        'operation_words': set(tokens(name)),
+                                        'input_entities': [entity_words(p['type']) for p in project.http_parameters(mid)
+                                                           if p['kind'] == 'RequestBody' and project.resolve_type(p['type'], project.methods[mid]['module'], project.methods[mid]['file']) in project.type_fields],
+-                                       'result_collection':bool(re.search(r'\b(?:List|Collection|Set|Iterable|Page|Slice)\s*<|\[\]', project.methods[mid].get('return_raw', ''))),
++                                       'result_collection':bool(re.search(r'\b(?:List|ArrayList|LinkedList|Collection|Set|Iterable|Page|Slice)\s*<|\[\]', project.methods[mid].get('return_raw', ''))),
+                                        'inferred_result_collection':result_collection,
+                                        'required_paths': [p['name'] for p in project.http_parameters(mid) if p['kind'] == 'PathVariable' and p['required']],
+                                        'ui_inputs': set(tokens(' '.join(ui_fields))),
+@@ -185,11 +187,11 @@
+ 
+     def rank(self, action, active_page=None, scenario_text=''):
+         # Weight the direct object before qualifications about related entities.
+-        from .actors import actor_role, declared_roles
++        from .actors import actor_role, declared_roles,canonical_role
+         actor = actor_role(action)
+         action = re.sub(r'^as\b.*?,\s*|^(?:try\s+to|please)\s+', '', action, flags=re.I)
+         focus = re.split(r'\b(?:for|with|without|from|departing|filtered|on|onto)\b', action, 1, flags=re.I)[0]
+-        if re.search(r'\b(?:record|instance|entry|details?)\s+of\b',focus,re.I):
++        if re.search(r'\bof\b',focus,re.I) and not re.search(r'\b(?:list|collection|set|array|group|number|count)\s+of\b',focus,re.I):
+             focus=re.split(r'\bof\b',focus,1,flags=re.I)[0]
+         focus = re.sub(r'\([^)]*\)', ' ', focus)
+         if re.match(r'^(?:open|view|show|inspect|read)\b', focus, re.I) and re.search(r'\bdetails?\b', focus, re.I):
+@@ -213,12 +215,14 @@
+         for key in set(base) | set(extra):
+             contract = self.contracts[key]
+             allowed_roles = declared_roles(self.project, contract['entry'])
+-            if actor is not U and allowed_roles and actor not in allowed_roles:
++            if actor is not U and allowed_roles and canonical_role(actor) not in {canonical_role(role) for role in allowed_roles}:
+                 continue
+             score = base.get(key, 0) + 0.15 * extra.get(key, 0)
+             if frozenset(contract['owner_entity']) in contextual:
+                 score *= 4
+             primary = set(contract['primary'])
++            if actor is not U and {actor,canonical_role(actor)} & primary:
++                score*=2
+             score += 2 * sum(self.bm25.idf.get(word, 0) for word in objects if word in primary)
+             actual = contract['intent']
+             if wanted is not None:
+@@ -238,9 +242,9 @@
+                 option_matches = [o for o in contract['site']['options'] if option_label_matches(o['label'], action)]
+                 if option_matches:
+                     score *= 2
+-            entities = contract['inferred_result_entities'] if use_payload_contract else contract['result_entities']
++            entities = contract['inferred_result_entities'] if use_payload_contract or collection_action else contract['result_entities']
+             qualifier=re.split(r'\b(?:of|for)\b',action,1,flags=re.I)
+-            if len(qualifier)==2:
++            if use_payload_contract and len(qualifier)==2:
+                 reference_words=set(ntoks(qualifier[1]))
+                 parameter_entities=[entity_words(name) for name in contract['required_paths'] if entity_words(name)]
+                 by_name=re.search(r'By([A-Z][\w]*?)(?:Id|$)',self.project.methods[contract['entry']]['name'])
+@@ -255,7 +259,7 @@
+                            / (1 + 3 * len(entity - object_words)) for entity in entities if entity]
+                 if factors:
+                     score *= max(factors)
+-            if collection_action and contract['result_collection']:
++            if collection_action and contract['inferred_result_collection']:
+                 score *= 2.5
+                 action_words = set(tokens(action))
+                 missing_paths = [name for name in contract['required_paths']
+@@ -276,14 +280,14 @@
+             # repeating the lexical verb "list" in its method name.
+             compatible = {}
+             for score, _, contract in result:
+-                if contract['result_collection'] and not contract.get('unmentioned_paths'):
+-                    for entity in contract['result_entities']:
++                if contract['inferred_result_collection'] and not contract.get('unmentioned_paths'):
++                    for entity in contract['inferred_result_entities']:
+                         if entity:
+                             identity = frozenset(entity)
+                             compatible[identity] = max(score, compatible.get(identity, 0))
+             adjusted = []
+             for score, key, contract in result:
+-                bounds = [compatible[frozenset(entity)] for entity in contract['result_entities']
++                bounds = [compatible[frozenset(entity)] for entity in contract['inferred_result_entities']
+                           if contract.get('unmentioned_paths') and frozenset(entity) in compatible]
+                 adjusted.append((min(score, max(bounds)) if bounds else score, key, contract))
+             result = adjusted
+@@ -843,10 +847,14 @@
+         wire_conflicts=list(ui_value_conflicts)
+         for key in known_absent:
+             reference=bindings.get(key,{}).get('reference','')
+-            if key in params and bindings.get(key,{}).get('source')!='ui' and ':omitted' not in reference:
++            from .absence_contracts import empty_equivalent
++            equivalent=(bindings.get(key,{}).get('source')=='context' and params.get(key,U)==''
++                        and absent_field(self.context.get('raw',{}),key) and empty_equivalent(Engine(self.project,path_state),mid,key))
++            if key in params and bindings.get(key,{}).get('source')!='ui' and ':omitted' not in reference and not equivalent:
+                 wire_conflicts.append(key)
+             if ':omitted' not in reference:params.pop(key,None)
+-            bindings[key]={'source':'ui_absence','reference':site['id']+':omitted-json-property','quote':'','resolved':True}
++            bindings[key]={'source':'ui_absence','reference':site['id']+':omitted-json-property','quote':'','resolved':True,
++                           **({'consumer_equivalence':'default null and empty String satisfy Spring StringUtils.isEmpty'} if equivalent else {})}
+         params=RequestInputs(params,omissions,flat_bodies,unknowns)
+         return {'entry': mid, 'site': site, 'state': path_state, 'params': params, 'bindings': bindings,
+                 'body_omissions':{name:sorted(fields) for name,fields in omissions.items()},
+--- parent28/analyzer/engine.py
++++ solution29/analyzer/engine.py
+@@ -31,7 +31,7 @@
+ from .source_conversions import compiled_type,declaration_erasure,consumer_type,storage_type,PRIMITIVES
+ from .boxed_values import NO_KIND,boxed_equal
+ from .native_storage import JavaFrame,JavaList,JavaListIterator,ReadOnlyList
+-from .native_arrays import JavaArray
++from .native_arrays import JavaArray,ArrayListView
+ from .java_lists import call as native_list_call,iteration as native_list_iteration
+ from .reference_scalars import equal as scalar_reference_equal
+ from .context_key import fingerprint
+@@ -158,10 +158,10 @@
+             return JavaFrame(values,kinds)
+         if isinstance(a,JavaList) or isinstance(b,JavaList):
+             if isinstance(a,ReadOnlyList) or isinstance(b,ReadOnlyList):
+-                if not isinstance(a,ReadOnlyList) or not isinstance(b,ReadOnlyList):return U
++                if type(a) is not type(b):return U
+                 backing=merge(a.backing,b.backing,active,memo)
+                 if not isinstance(backing,JavaList):return U
+-                result=ReadOnlyList(backing)
++                result=type(a)(backing)
+                 result.java_identity=a.java_identity if a.java_identity is b.java_identity else None
+                 return result
+             from .persistence import LazyCollection
+@@ -258,6 +258,7 @@
+         self.filter_frames = []
+         self.operation_issues=Counter()
+         self.events, self.request_events = [], []
++        self.semantic_callbacks, self.reflection_edges = [], set()
+         self.http_responses = []
+         self.candidate_edges = set()
+         self.guard_stack, self.execution_assumptions = [], []
+@@ -295,6 +296,7 @@
+ 
+     def add(self, source, relation, target, reason, values=None):
+         if relation=='calls' and self.invocation_projection==(source,False):
++            self.reflection_edges.add((source,relation,target))
+             return
+         self.edges.add((source, relation, target))
+         self.evidence[(source, relation, target)].add(reason)
+@@ -340,6 +342,7 @@
+ 
+     def executed(self, mid, reason, values=None):
+         if self.invocation_projection==(mid,False):
++            self.reflection_edges.add(('', 'executes', mid))
+             return
+         self.add('', 'executes', mid, reason,values)
+ 
+@@ -379,8 +382,11 @@
+             self.warnings.add(str(boundary))
+             self.fallback(entry)
+             message='unobserved continuation after completion budget: '+entry
++            from .resource_effects import possible_writes
++            closure=self.p.ix.closure({entry})
++            writable=possible_writes(self.p,closure[0],closure[3],bool(self.state.transactions))
+             for _,relation,rid in self.candidate_edges:
+-                if relation!='data':continue
++                if relation!='data' or rid not in writable:continue
+                 rows=self.state.database.rows(self.p.nodes[rid])
+                 if rows is not None:self.state.database.invalidate(rows)
+                 self.state.resource_assumptions.setdefault(rid,[]).append(message)
+@@ -675,6 +681,10 @@
+         self.last_invoke_kind=NO_KIND
+         self.last_invoke_started=False
+         meta = self.p.methods[mid]
++        if (receiver is None or receiver is U) and 'static' not in self.method_modifiers(mid):
++            from .bean_initialization import initialized_receiver
++            initialized=initialized_receiver(self,mid)
++            if initialized is not U:receiver=initialized
+         if self.p.profile_status(meta['owner']) is U:
+             self.approximate=True
+             self.warnings.add('unsupported Spring profile expression; candidate retained as possible: '+mid)
+@@ -784,12 +794,14 @@
+         cache=self.p.__dict__.setdefault('_fallback_closure_cache',{})
+         if mid not in cache:cache[mid]=self.p.ix.closure({mid})
+         methods, calls, remote, data = cache[mid]
++        from .resource_effects import possible_writes
++        writable=possible_writes(self.p,methods,data,bool(self.state.transactions))
+         for method in methods:
+             self.candidate_edges.add(('', 'executes', method))
+         for relation, pairs in [('calls', calls), ('remote', remote), ('data', data)]:
+             for source, target in pairs:
+                 self.candidate_edges.add((source, relation, target))
+-                if relation == 'data':
++                if relation == 'data' and target in writable:
+                     rows = self.state.database.rows(self.p.nodes[target])
+                     if rows is not None:
+                         self.state.database.invalidate(rows)
+@@ -811,7 +823,7 @@
+                     'history': before.history, 'params': self.params, 'opaque_heap': self.opaque_heap,
+                     'managed': {unit: frame['managed'] for unit, frame in before.transactions.items()}}
+         alternatives, states, results, controls = [], [], [], []
+-        diagnostic_names=('events','request_events','http_responses','effect_events','persistence_events','data_operations')
++        diagnostic_names=('events','request_events','http_responses','effect_events','persistence_events','data_operations','semantic_callbacks')
+         prefix={name:len(getattr(self,name)) for name in diagnostic_names}
+         segments=[]
+         try:
+@@ -1076,6 +1088,8 @@
+             obj._unchecked_generic_fields=set(getattr(obj,'_unchecked_generic_fields',()))|names
+ 
+     def field_read(self,node,obj,name,info=None):
++        if isinstance(obj,JavaEnumValue) and info:
++            self.remember_reference_kind(self.declared_kind(info['type'],self.p.nodes[info['declaring_type']]))
+         if isinstance(obj,JavaRecord):
+             if self.field_slot(node,obj,name)[1]=='unresolved':return U
+             kinds=getattr(obj,'_native_field_kinds',{})
+@@ -1176,9 +1190,16 @@
+             elif kind=='unresolved' and isinstance(obj,dict) and key is not None:obj[key]=U
+             return
+         if kind=='array' and self.source_type(node) not in ('byte','short','char','int','long','float','double','boolean') and value is not None:
+-            self.approximate=True
+-            self.warnings.add('reference array store runtime component type is not modeled: '+text(node))
+-            value=U
++            if isinstance(obj,JavaArray):
++                try:value=self.reference_check(value,reference_kind,obj.component,text(node))
++                except JavaThrow as failure:
++                    if exception_type(failure.value)==native_type('ClassCastException'):
++                        raise JavaThrow({'__type__':'ArrayStoreException'}) from None
++                    raise
++            else:
++                self.approximate=True
++                self.warnings.add('reference array store runtime component type is not modeled: '+text(node))
++                value=U
+         if kind=='field' and isinstance(obj,JavaRecord):
+             receiver=self.source_qualifier_type(node)
+             meta=self.p.methods[self.method]
+@@ -1189,7 +1210,8 @@
+                 obj._field_reference_types={**getattr(obj,'_field_reference_types',{}),key:reference_type}
+                 scope=member_scope(self.p,receiver,info['declaring_type'],meta)
+                 if scope is None or scope[1]:self.mark_raw_record(obj,owner)
+-        obj[key]=value
++        if kind=='array' and isinstance(obj,JavaArray):obj.set_value(key,value,reference_kind)
++        else:obj[key]=value
+         if kind=='local' and isinstance(obj,JavaFrame):obj.kinds[key]=reference_kind
+ 
+     def increment_value(self,old,node,delta):
+@@ -1677,6 +1699,9 @@
+             root=text(qualifier).split('.')[0]
+             meta=self.p.methods[self.method]
+             class_name=qualifier.type in ('identifier','scoped_identifier','field_access') and root not in env and root not in self.variable_types and root not in self.p.type_fields.get(meta['owner'],{})
++            if class_name and field=='HS256' and self.standard_type(text(qualifier),'io.jsonwebtoken.SignatureAlgorithm'):
++                from .jjwt import Algorithm
++                return Algorithm(field)
+             if field in JavaJsonMapper.defaults and ((class_name and self.standard_type(text(qualifier),'com.fasterxml.jackson.databind.DeserializationFeature'))
+                     or self.standard_type(self.source_type(qualifier),'com.fasterxml.jackson.databind.DeserializationFeature')):
+                 if not class_name:self.value(qualifier,env)
+@@ -1976,6 +2001,13 @@
+         kind,raw=node.type,text(node)
+         meta=self.p.methods[self.method]
+         if kind=='string_literal':return 'java.lang.String'
++        if kind=='class_literal':
++            written=raw.removesuffix('.class')
++            target=self.declared_type(written) or written
++            if target in PRIMITIVES or target=='void':
++                target='java.lang.'+{'boolean':'Boolean','byte':'Byte','short':'Short','char':'Character',
++                    'int':'Integer','long':'Long','float':'Float','double':'Double','void':'Void'}[target]
++            return 'java.lang.Class<'+target+'>'
+         if kind=='character_literal':return 'char'
+         if kind in ('true','false'):return 'boolean'
+         if kind in ('decimal_integer_literal','decimal_floating_point_literal'):return self.numeric_type(node)
+@@ -2528,6 +2560,9 @@
+             self.remember_reference_kind('String')
+             return obj.enum_name
+         if not targets:
++            from .jjwt import native_call as jwt_call
++            handled,value=jwt_call(self,node,name,obj,args,reason)
++            if handled:return value
+             from .security import native_call
+             handled,value=native_call(self,node,name,obj,args,env,reason)
+             if handled:return value
+@@ -2632,7 +2667,7 @@
+             for index,target in enumerate(targets):
+                 value,_=invoke_alternative(target,env,[args,obj])
+                 result=value if index==0 else merge(result,value)
+-        if wiring.get('data_access'):
++        if wiring.get('data_access') and not any(not self.p.methods[target].get('abstract') for target in targets):
+             return self.repository(mid, cs, args, sorted(wiring['data_access']), reason)
+         remote = sorted(wiring.get('remote_call', set()) | wiring.get('message_delivery', set()))
+         http_verb = (args[1] if name=='exchange' and len(args)>1 and isinstance(args[1],str) else
+@@ -2882,6 +2917,7 @@
+                 if len(args)==1 and compiled_type(self,source_nodes[0]).endswith('[]'):
+                     component=compiled_type(self,source_nodes[0])[:-2]
+                     if component in PRIMITIVES:value=JavaList([args[0]],[None])
++                    elif isinstance(args[0],JavaArray):value=ArrayListView(args[0])
+                     else:
+                         self.approximate=True
+                         self.warnings.add('Arrays.asList array backing and runtime component type are not fully modeled: '+reason)
+@@ -2975,6 +3011,11 @@
+             return result
+         if name in ('orElseThrow','get') and optional_value(obj):
+             value = member(obj, 'optional')
++            if '__repository_presence__' in obj:
++                from .repository_values import presence
++                present=presence(self,obj,reason)
++                if present is True:return value
++                if present is False:value=None
+             self.remember_reference_kind(obj.get('__optional_kind__',NO_KIND))
+             if value is not U and value is not None:
+                 return value
+@@ -3009,6 +3050,10 @@
+                 if control=='throw':raise JavaThrow(result)
+             else:visit(present,env,[value,args])
+             return None
++        if name in ('isPresent','isEmpty') and optional_value(obj) and '__repository_presence__' in obj:
++            from .repository_values import presence
++            present=presence(self,obj,reason)
++            return present if name=='isPresent' or present is U else not present
+         if name == 'isPresent' and optional_value(obj):
+             val = member(obj, 'optional')
+             return val is not None if val is not U else U
+@@ -3589,6 +3634,8 @@
+             if rows is None or resource.get('collection_of'):
+                 self.approximate = True
+                 self.warnings.add('ORM access is approximated from static mapping: ' + rid)
++                from .repository_values import unknown_result
++                result=unknown_result(self,cs)
+                 continue
+             entity = self.p.entities.get(rid)
+             if name.startswith(('save', 'insert', 'delete')):
+@@ -3745,7 +3792,8 @@
+                     record=persistence.attach_collections(self,rid,record,reason)
+                 materialized.append(persistence.manage(self,rid,record))
+             if unknown_query:
+-                result = U
++                from .repository_values import unknown_result
++                result = unknown_result(self,cs)
+                 continue
+             # Repository declarations are indexed even though their bodies are abstract.
+             declared_owner=self.p.resolve_type(cs.get('receiver_type',''),self.p.methods[mid]['module'],self.p.methods[mid]['file'])
+--- parent28/analyzer/frontend.py
++++ solution29/analyzer/frontend.py
+@@ -1272,6 +1272,8 @@
+                 if fn in (local_calls or {}):
+                     return local_calls[fn](vals)
+                 if fn in ('sessionStorage.getItem', 'localStorage.getItem') and vals and isinstance(vals[0], str):
++                    if vals[0] not in state.browser['storage']:
++                        state.limitations.append('Source storage consumer has no established value: '+vals[0])
+                     return state.browser['storage'].get(vals[0], U)
+                 if fn == 'JSON.stringify' and vals:
+                     return vals[0]
+--- parent28/analyzer/hashing.py
++++ solution29/analyzer/hashing.py
+@@ -18,6 +18,9 @@
+     for file, source in sorted(project.sources.items()):
+         digest.update(file.encode())
+         digest.update(source)
++    for file, source in sorted(project.dependency_sources.items()):
++        digest.update(file.encode())
++        digest.update(source)
+     for file in sorted(front_files(str(project.root))):
+         digest.update(str(Path(file).relative_to(project.root)).encode())
+         digest.update(Path(file).read_bytes())
+--- parent28/analyzer/http_json.py
++++ solution29/analyzer/http_json.py
+@@ -14,6 +14,7 @@
+ from .generic_types import type_parts,resolve,bind_parameters,declaring_bindings
+ from .source_generics import render,member_scope
+ from .native_storage import JavaList
++from .native_arrays import JavaArray
+ 
+ 
+ def decode_response(project,payload,response_type,meta,standard_type,unresolved,codec=None,certain=True,lifecycle=None):
+@@ -42,6 +43,20 @@
+                     raise JavaThrow({'__type__':ExceptionBound('com.fasterxml.jackson.databind.JsonMappingException')})
+                 return fail('HTTP JSON null for a primitive needs a codec default/failure policy')
+             return None
++        if written.endswith('[]'):
++            element=written[:-2]
++            component=render(project,element,context,bindings,standard_type)
++            if not component:return fail('HTTP array component type is unresolved: '+written)
++            if component in ('byte','char') and isinstance(value,str):
++                return fail('HTTP byte/char array text representation requires a supported specialized codec')
++            if not isinstance(value,list):
++                unwrap=codec.get('ACCEPT_SINGLE_VALUE_AS_ARRAY',U) if codec is not None and certain else U
++                if unwrap is False:
++                    raise JavaThrow({'__type__':ExceptionBound('com.fasterxml.jackson.databind.JsonMappingException')})
++                if unwrap is True:value=[value]
++                else:return fail('HTTP array scalar coercion requires a supported codec policy')
++            decoded=[decode(child,element,context,bindings,certain) for child in value]
++            return JavaArray(decoded,component,[decoded_kind(child,element,context,bindings) for child in decoded])
+         if isinstance(value,JsonText):
+             if standard_type(base,'java.lang.String',context) or standard_type(base,'java.lang.Object',context):return deepcopy(value)
+             return fail('JSON text scalar is incompatible with the requested structured type')
+--- parent28/analyzer/java_collections.py
++++ solution29/analyzer/java_collections.py
+@@ -30,7 +30,8 @@
+ 
+ class JavaJsonMapper(dict):
+     """Exact native constructor, with separately observed codec settings."""
+-    defaults={'FAIL_ON_UNKNOWN_PROPERTIES':True,'FAIL_ON_NULL_FOR_PRIMITIVES':False,'FAIL_ON_IGNORED_PROPERTIES':False}
++    defaults={'FAIL_ON_UNKNOWN_PROPERTIES':True,'FAIL_ON_NULL_FOR_PRIMITIVES':False,'FAIL_ON_IGNORED_PROPERTIES':False,
++              'ACCEPT_SINGLE_VALUE_AS_ARRAY':False}
+     def __init__(self,flags=None,identity=...):
+         super().__init__(__json_mapper__=True)
+         self.flags=dict(self.defaults if flags is None else flags)
+--- parent28/analyzer/java_exceptions.py
++++ solution29/analyzer/java_exceptions.py
+@@ -16,7 +16,7 @@
+     'IllegalArgumentException':'RuntimeException','IllegalStateException':'RuntimeException',
+     'NumberFormatException':'IllegalArgumentException','NullPointerException':'RuntimeException',
+     'NoSuchElementException':'RuntimeException','ArithmeticException':'RuntimeException',
+-    'ClassCastException':'RuntimeException',
++    'ClassCastException':'RuntimeException','ArrayStoreException':'RuntimeException',
+     'IndexOutOfBoundsException':'RuntimeException','ArrayIndexOutOfBoundsException':'IndexOutOfBoundsException',
+     'StringIndexOutOfBoundsException':'IndexOutOfBoundsException',
+     'IOException':'Exception','FileNotFoundException':'IOException',
+@@ -36,6 +36,9 @@
+     'AccountExpiredException':'AccountStatusException','CredentialsExpiredException':'AccountStatusException',
+     'FeignException':'RuntimeException',
+     'TransactionException':'RuntimeException','UnexpectedRollbackException':'TransactionException',
++    'JwtException':'RuntimeException','MalformedJwtException':'JwtException','UnsupportedJwtException':'JwtException',
++    'SignatureException':'JwtException','ClaimJwtException':'JwtException',
++    'ExpiredJwtException':'ClaimJwtException','PrematureJwtException':'ClaimJwtException',
+ }
+ 
+ NATIVE_TYPES={name:'java.lang.'+name for name in PARENTS}
+@@ -53,6 +56,8 @@
+     'org.springframework.security.core.userdetails':('UsernameNotFoundException',),
+     'feign':('FeignException',),
+     'org.springframework.transaction':('TransactionException','UnexpectedRollbackException'),
++    'io.jsonwebtoken':('JwtException','MalformedJwtException','UnsupportedJwtException','SignatureException',
++        'ClaimJwtException','ExpiredJwtException','PrematureJwtException'),
+ }.items() for name in names})
+ 
+ 
+--- parent28/analyzer/java_lists.py
++++ solution29/analyzer/java_lists.py
+@@ -1,6 +1,6 @@
+ """Bounded native List operations; values and runtime classes stay separate."""
+ from .native_storage import JavaList,JavaListIterator
+-from .native_arrays import JavaArray
++from .native_arrays import JavaArray,ArrayListView
+ from .java_exceptions import JavaThrow
+ from .state import U
+ from .source_conversions import compiled_type
+@@ -71,6 +71,19 @@
+         if obj and not resizable(obj):return unresolved('List mutability is unresolved',obj)
+         obj.clear();return True,None
+     if obj.opaque:return unresolved('List contents or length are unresolved')
++    if isinstance(obj,ArrayListView) and name=='set' and len(args)==2:
++        index,value=args
++        if type(index) is not int:return unresolved('Array list set index is unresolved',obj.backing)
++        if not 0<=index<len(obj):raise JavaThrow({'__type__':'IndexOutOfBoundsException'})
++        try:value=engine.reference_check(value,kinds[1],obj.backing.component,reason)
++        except JavaThrow as failure:
++            from .java_exceptions import native_type
++            if native_type(failure.value.get('__type__'))==native_type('ClassCastException'):
++                raise JavaThrow({'__type__':'ArrayStoreException'}) from None
++            raise
++        old,kind=obj[index],obj.kinds[index]
++        obj.set_value(index,value,kinds[1])
++        return True,engine.native_read_cast(old,kind,node,reason)
+     if name=='iterator' and not args:return True,JavaListIterator(obj)
+     if name=='isEmpty' and not args:return True,not obj
+     if name=='equals' and len(args)==1:
+--- parent28/analyzer/jjwt.py
++++ solution29/analyzer/jjwt.py
+@@ -0,0 +1,126 @@
++"""Bounded JJWT 0.8.0: explicit claims, HS256, standard compact JWS.
++
++No assumed identity/session, provider, key, clock or successful verification.
++Other versions, algorithms, serializers and unknown claims stop explicitly.
++"""
++import base64
++import hashlib
++import hmac
++import json
++from datetime import datetime, timedelta
++from copy import deepcopy
++from .java_collections import JavaMap
++from .native_arrays import JavaArray
++from .java_exceptions import JavaThrow
++from .library_versions import declared_version
++from .project import text
++from .state import U
++
++
++class Algorithm(str): pass
++class Claims(JavaMap): pass
++class Builder(dict): pass
++class Parser(dict): pass
++class Jws(dict): pass
++class Encoder: pass
++
++
++def boundary(reason):
++    from .engine import AnalysisBoundary
++    raise AnalysisBoundary('JJWT 0.8.0 contract boundary: '+reason,category='unsupported_semantics')
++
++
++def key(value):
++    if isinstance(value,str):
++        try:return base64.b64decode(value,validate=True)
++        except ValueError:raise JavaThrow({'__type__':'IllegalArgumentException'}) from None
++    if isinstance(value,JavaArray) and value.component=='byte' and all(type(item) is int for item in value):
++        return bytes(item%256 for item in value)
++    boundary('signing key representation is unresolved')
++
++
++def encoded(value):
++    return base64.urlsafe_b64encode(json.dumps(value,separators=(',',':'),ensure_ascii=False,allow_nan=False).encode()).rstrip(b'=').decode()
++
++
++def decoded(value):
++    return json.loads(base64.urlsafe_b64decode(value+'='*((-len(value))%4)))
++
++
++def seconds(value):
++    if not isinstance(value,datetime):boundary('claim date or analysis clock is unknown')
++    return int((value-datetime(1970,1,1)).total_seconds())
++
++
++def native_call(engine,node,name,receiver,args,reason):
++    qualifier=node.child_by_field_name('object')
++    declared=engine.source_type(qualifier)
++    if name=='getBytes' and not args and isinstance(receiver,str) and receiver.isascii() and engine.standard_type(declared,'java.lang.String'):
++        return True,JavaArray(receiver.encode('ascii'),'byte',['Byte']*len(receiver))
++    if name=='getEncoder' and not args and engine.standard_type(text(qualifier),'java.util.Base64'):
++        return True,Encoder()
++    if isinstance(receiver,Encoder) and name=='encodeToString' and len(args)==1:
++        if not isinstance(args[0],JavaArray) or args[0].component!='byte':boundary('Base64 byte input is unobserved')
++        engine.remember_reference_kind('String')
++        return True,base64.b64encode(bytes(item%256 for item in args[0])).decode()
++    static=engine.standard_type(text(qualifier),'io.jsonwebtoken.Jwts')
++    if not static and not isinstance(receiver,(Claims,Builder,Parser,Jws)):return False,U
++    if declared_version(engine.p,engine.p.methods[engine.method],'io.jsonwebtoken','jjwt')!='0.8.0':
++        boundary('source dependency must explicitly select supported version 0.8.0')
++    if static:
++        if name=='claims' and not args:return True,Claims({},flavor='LinkedHashMap')
++        if name=='builder' and not args:return True,Builder(claims=Claims({},flavor='LinkedHashMap'))
++        if name=='parser' and not args:return True,Parser()
++        boundary('unsupported Jwts factory overload: '+name)
++    claim_names={'Subject':'sub','Expiration':'exp','IssuedAt':'iat','NotBefore':'nbf','Issuer':'iss','Audience':'aud','Id':'jti'}
++    if isinstance(receiver,(Claims,Builder)):
++        claims=receiver['claims'] if isinstance(receiver,Builder) else receiver
++        if name.startswith('set') and name[3:] in claim_names and len(args)==1:
++            value=args[0];field=claim_names[name[3:]]
++            if value is None:claims.remove({'kind':'String','key':field})
++            else:claims.put({'kind':'String','key':field},seconds(value) if field in ('exp','iat','nbf') else value,None)
++            return True,receiver
++        if isinstance(receiver,Claims):
++            if name.startswith('get') and name[3:] in claim_names and not args:
++                field=claim_names[name[3:]];value=claims.mapping.get(field)
++                return True,datetime(1970,1,1)+timedelta(seconds=value) if field in ('exp','iat','nbf') and type(value) is int else value
++            # Map methods retain their ordinary Java Map contracts.
++            if name in ('put','get','remove','size','isEmpty','containsKey','entrySet','keySet','values'):return False,U
++        if isinstance(receiver,Builder):
++            if name=='setClaims' and len(args)==1 and isinstance(args[0],JavaMap):
++                receiver['claims']=deepcopy(args[0]);return True,receiver
++            if name=='signWith' and len(args)==2:
++                if not isinstance(args[0],Algorithm) or args[0]!='HS256':boundary('only observed HS256 is supported')
++                receiver['key']=key(args[1]);return True,receiver
++            if name=='compact' and not args:
++                if not receiver.get('key'):boundary('nonempty signing key is not proven')
++                payload=engine.json_wire(claims,reason)
++                try:message=encoded({'alg':'HS256'})+'.'+encoded(payload)
++                except (TypeError,ValueError):boundary('claims contain unresolved or unsupported JSON values')
++                signature=base64.urlsafe_b64encode(hmac.new(receiver['key'],message.encode(),hashlib.sha256).digest()).rstrip(b'=').decode()
++                engine.remember_reference_kind('String')
++                return True,message+'.'+signature
++    if isinstance(receiver,Parser):
++        if name=='setSigningKey' and len(args)==1:receiver['key']=key(args[0]);return True,receiver
++        if name=='parseClaimsJws' and len(args)==1:
++            token=args[0]
++            if not isinstance(token,str) or not token:raise JavaThrow({'__type__':'IllegalArgumentException'})
++            try:
++                header,payload,signature=token.split('.')
++                metadata=decoded(header);claims=decoded(payload)
++                if not isinstance(metadata,dict):raise ValueError('non-object header')
++            except (ValueError,TypeError,UnicodeError):raise JavaThrow({'__type__':'io.jsonwebtoken.MalformedJwtException'}) from None
++            if metadata.get('alg')!='HS256':raise JavaThrow({'__type__':'io.jsonwebtoken.UnsupportedJwtException'})
++            if not receiver.get('key'):boundary('parser signing key is unknown')
++            expected=base64.urlsafe_b64encode(hmac.new(receiver['key'],(header+'.'+payload).encode(),hashlib.sha256).digest()).rstrip(b'=').decode()
++            if not hmac.compare_digest(expected,signature):raise JavaThrow({'__type__':'io.jsonwebtoken.SignatureException'})
++            if not isinstance(claims,dict):raise JavaThrow({'__type__':'io.jsonwebtoken.MalformedJwtException'})
++            if any(field in claims for field in ('exp','nbf')):
++                seconds(engine.state.now)
++                now=(engine.state.now-datetime(1970,1,1)).total_seconds()
++                if any(type(claims[field]) not in (int,float) for field in ('exp','nbf') if field in claims):boundary('non-numeric temporal claims')
++                if 'exp' in claims and now>claims['exp']:raise JavaThrow({'__type__':'io.jsonwebtoken.ExpiredJwtException'})
++                if 'nbf' in claims and now<claims['nbf']:raise JavaThrow({'__type__':'io.jsonwebtoken.PrematureJwtException'})
++            return True,Jws(body=Claims(claims,flavor='LinkedHashMap'))
++    if isinstance(receiver,Jws) and name=='getBody' and not args:return True,receiver['body']
++    boundary('unsupported fluent operation: '+name)
+--- parent28/analyzer/json_codec.py
++++ solution29/analyzer/json_codec.py
+@@ -61,7 +61,7 @@
+         token=args[1]
+         if name=='convertValue':
+             base,_=type_parts(token.written)
+-            target=project.resolve_type(base,token.context['module'],token.context['file'])
++            target=None if token.written.endswith('[]') else project.resolve_type(base,token.context['module'],token.context['file'])
+             ancestry=set()
+             pending=[tid for tid,node in project.nodes.items() if node['kind']=='type' and isinstance(args[0],JavaRecord) and node['fqn']==args[0].declared_type]
+             while pending:
+--- parent28/analyzer/library_versions.py
++++ solution29/analyzer/library_versions.py
+@@ -0,0 +1,23 @@
++"""Explicit Maven dependency evidence; no resolution, download or build."""
++import xml.etree.ElementTree as ET
++from pathlib import PurePosixPath
++
++
++def declared_version(project, meta, group, artifact):
++    cache=project.__dict__.setdefault('_declared_dependency_versions',{})
++    key=(meta['file'],group,artifact)
++    if key in cache:return cache[key]
++    for parent in PurePosixPath(meta['file']).parents:
++        name=(parent/'pom.xml').as_posix()
++        source=project.dependency_sources.get(name)
++        if source is None:continue
++        try:root=ET.fromstring(source)
++        except ET.ParseError:continue
++        dependencies=root.find('{*}dependencies')
++        versions=[dependency.findtext('{*}version') for dependency in dependencies or ()
++            if dependency.findtext('{*}groupId')==group and dependency.findtext('{*}artifactId')==artifact]
++        if versions:
++            value=versions[0] if len(set(versions))==1 else None
++            cache[key]=value;return value
++    cache[key]=None
++    return None
+--- parent28/analyzer/native_arrays.py
++++ solution29/analyzer/native_arrays.py
+@@ -1,5 +1,5 @@
+ """Explicit array evidence for typed adapter inputs; no JVM allocation model."""
+-from .native_storage import JavaList
++from .native_storage import JavaList,ReadOnlyList
+ 
+ 
+ class JavaArray(JavaList):
+@@ -9,3 +9,14 @@
+ 
+     def copy(self):
+         return JavaArray(self,self.component,self.kinds)
++
++
++class ArrayListView(ReadOnlyList):
++    """Arrays.asList reference-array view; size is fixed, elements writable."""
++    def __init__(self,backing):
++        super().__init__(backing)
++        self.unmodifiable=False
++        self.flavor='Arrays.ArrayList'
++
++    def set_value(self,index,value,kind=None):self.backing.set_value(index,value,kind)
++    def __setitem__(self,index,value):self.backing[index]=value
+--- parent28/analyzer/native_contracts.py
++++ solution29/analyzer/native_contracts.py
+@@ -24,6 +24,11 @@
+ def resolve(receiver, name, arguments, standard):
+     base,types=type_parts(receiver)
+     count=len(arguments)
++    if standard(base,'javax.servlet.http.HttpServletRequest') and (
++            name in ('getRequestURI','getMethod') and count==0 or name=='getHeader' and count==1):
++        return NativeCall('javax.servlet.http.HttpServletRequest',name,tuple(arguments),'java.lang.String',(),('normal','java.lang.NullPointerException'))
++    if standard(base,'io.jsonwebtoken.Claims') and name in ('getSubject','getIssuer','getAudience','getId') and not arguments:
++        return NativeCall('io.jsonwebtoken.Claims',name,(),'java.lang.String')
+     optional=standard(base,'java.util.Optional')
+     entity=any(standard(base,'org.springframework.http.'+kind) for kind in ('ResponseEntity','HttpEntity'))
+     if optional and count==0 and name in ('get','isPresent','isEmpty'):
+@@ -69,8 +74,10 @@
+         'completions':contract.completions,'uncertainty_class':'known_operation_unknown_value'})
+     completion=engine.choose(reason+':native-completion',list(contract.completions)) if engine.path_replay else 'normal'
+     if completion is None:
+-        from .engine import AnalysisBoundary
+-        raise AnalysisBoundary('native completion requires an isolated continuation: '+reason)
++        from .engine import CompletionRequired,AnalysisBoundary
++        if not engine.allow_completion_splits:
++            raise AnalysisBoundary('native completion requires an isolated continuation: '+reason)
++        raise CompletionRequired(str(engine.branch_index)+':'+reason+':native-completion',list(contract.completions))
+     if completion!='normal':raise JavaThrow({'__type__':completion})
+     engine.assume('normal completion of native observer with unknown receiver: '+reason)
+     return U
+--- parent28/analyzer/paths.py
++++ solution29/analyzer/paths.py
+@@ -15,6 +15,7 @@
+         joined.database.unknown_tables.update(other.database.unknown_tables)
+         joined.browser = merge(joined.browser, other.browser)
+         joined.actor_browsers = merge(joined.actor_browsers,other.actor_browsers)
++        joined.bean_instances = merge(joined.bean_instances,other.bean_instances)
+         joined.input_journal=[merge(a,b) for a,b in zip(joined.input_journal,other.input_journal)]
+         joined.history = [merge(a, b) for a, b in zip(joined.history, other.history)]
+         joined.symbol_sequence = max(joined.symbol_sequence, other.symbol_sequence)
+--- parent28/analyzer/persistence.py
++++ solution29/analyzer/persistence.py
+@@ -257,7 +257,8 @@
+         typ = native_type(typ) if isinstance(typ,str) else typ
+         runtime = assignable(typ, 'java.lang.RuntimeException', engine.p)
+         error = assignable(typ, 'java.lang.Error', engine.p)
+-        rollback = True if runtime is True or error is True else U if U in (runtime,error) else False
++        failure_rollback = True if runtime is True or error is True else U if U in (runtime,error) else False
++        rollback = True if rollback is True or failure_rollback is True else U if U in (rollback,failure_rollback) else False
+     if not tx['supported'] or rollback is U:
+         for operation in tx['pending']:engine.candidate_edges.add((operation['method'],'data',operation['resource']))
+         for key in tx['writes']:engine.state.database.unknown_tables.add(key)
+--- parent28/analyzer/portable.py
++++ solution29/analyzer/portable.py
+@@ -72,7 +72,7 @@
+         report['peak_rss_bytes'] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * (1 if sys.platform == 'darwin' else 1024)
+         report['submission_sha256'] = sha256(args.output)
+         with args.report.open('w') as stream:
+-            json.dump(report,stream,ensure_ascii=False,separators=(',',':'),default=serial)
++            json.dump(report,stream,ensure_ascii=True,separators=(',',':'),default=serial)
+             stream.write('\n')
+ 
+     for scenario in scenarios:
+--- parent28/analyzer/project.py
++++ solution29/analyzer/project.py
+@@ -24,6 +24,12 @@
+     yield node
+     for child in node.named_children:
+         yield from walk(child)
++
++
++def body_members(body):
++    for child in body.named_children if body else []:
++        if child.type=='enum_body_declarations':yield from child.named_children
++        else:yield child
+ 
+ 
+ def keywords(node):
+@@ -52,6 +58,8 @@
+         self.route_warnings = list(dict.fromkeys(str(item.message) for item in caught))
+         self.nodes = self.ix.N
+         self.root = Path(root)
++        self.dependency_sources={path.relative_to(self.root).as_posix():path.read_bytes()
++                                 for path in sorted(self.root.rglob('pom.xml')) if path.is_file()}
+         self.methods = {k: v for k, v in self.nodes.items() if v['kind'] == 'method'}
+         self.client_routes=[route for route in self.ix.handlers if any(a['name'].split('.')[-1]=='FeignClient'
+             for a in self.nodes[self.methods[route[0]]['owner']].get('annotations',[]))]
+@@ -101,7 +109,7 @@
+                 if decl.type not in ('class_declaration', 'enum_declaration') or not declaration_matches(decl,meta['fqn']): continue
+                 body = decl.child_by_field_name('body')
+                 fields = []
+-                for field in body.named_children if body else []:
++                for field in body_members(body):
+                     if field.type != 'field_declaration': continue
+                     for var in field.named_children:
+                         if var.type != 'variable_declarator': continue
+@@ -391,7 +399,7 @@
+                     strategy=re.search(r'\bstrategy\s*=\s*"([^"]+)"',options)
+                     if key and strategy:generators[key[1]]=strategy[1]
+             body = decl.child_by_field_name('body')
+-            for field in body.named_children if body else []:
++            for field in body_members(body):
+                 if field.type=='field_declaration' and 'static' in keywords(field):
+                     self.static_field_types.setdefault(tid,{}).update({text(var.child_by_field_name('name')):text(field.child_by_field_name('type'))
+                         for var in field.named_children if var.type=='variable_declarator'})
+@@ -658,6 +666,7 @@
+                     continue
+                 key = re.sub(r'_([a-z])', lambda m: m[1].upper(), field['column'])
+                 val = facts.get(name, facts.get(key,U))
++                if field['type']=='boolean' and type(val) is int and val in (0,1):val=bool(val)
+                 if field['type'].split('.')[-1] == 'Date' and target is None and val is not None:
+                     val = date_value(val)
+                 if isinstance(val, list) and re.search(r'(?:List|Set|Collection)<(?:String|Integer|Long|Double)>', field['type']):
+--- parent28/analyzer/provenance.py
++++ solution29/analyzer/provenance.py
+@@ -96,7 +96,7 @@
+ 
+ 
+ def entity_words(value):
+-    value = re.sub(r'(Controller|Service|Impl|Request|Response|Dto|Info|Entity|Input)$', '', value.split('.')[-1], flags=re.I)
++    value = re.sub(r'(Controller|Service|Impl|Request|Response|Dto|Info|Entity|Input|View)$', '', value.split('.')[-1], flags=re.I)
+     return set(ntoks(value)) - {'get', 'find', 'query', 'lookup', 'read', 'create', 'new', 'id', 'key'}
+ 
+ 
+--- parent28/analyzer/repository_values.py
++++ solution29/analyzer/repository_values.py
+@@ -0,0 +1,48 @@
++"""Spring Data 2.x query wrappers, independent of query content knowledge."""
++from .generic_types import type_parts
++from .native_storage import JavaList
++from .state import U
++
++
++def unknown_result(engine, call):
++    p=engine.p;meta=p.methods[engine.method]
++    owner=p.resolve_type(call.get('receiver_type',''),meta['module'],meta['file'])
++    pending=[owner];seen=set();supported=False
++    while pending:
++        current=pending.pop()
++        if current is None or current in seen:continue
++        seen.add(current);context=p.nodes[current]
++        for written in p.generic_parents.get(current,()):
++            base,_=type_parts(written)
++            supported |= any(engine.standard_type(base,fqn,context) for fqn in (
++                'org.springframework.data.jpa.repository.JpaRepository',
++                'org.springframework.data.repository.CrudRepository'))
++            pending.append(p.resolve_type(base,context['module'],context['file']))
++    if not supported:return U
++    declared=[(mid,m) for mid,m in p.methods.items() if m['owner']==owner and m['name']==call['callee']]
++    if any(not m.get('abstract') for _,m in declared):return U
++    written=declared[0][1].get('return_raw','') if len(declared)==1 else (
++        'java.util.Optional' if call['callee']=='findById' else 'java.util.List' if call['callee']=='findAll' else '')
++    base,_=type_parts(written)
++    context=declared[0][1] if len(declared)==1 else p.nodes[owner]
++    if engine.standard_type(base,'java.util.Optional',context):
++        return {'__optional__':True,'optional':U,'__repository_presence__':U}
++    if engine.standard_type(base,'java.util.List',context):
++        result=JavaList();result.opaque=True
++        return result
++    return U
++
++
++def presence(engine, value, reason):
++    known=value.get('__repository_presence__',U)
++    if known is not U:return known
++    if not engine.path_replay:return U
++    label=reason+':repository-optional-presence'
++    selected=engine.choose(label,[False,True])
++    if selected is None:
++        from .engine import CompletionRequired,AnalysisBoundary
++        if not engine.allow_completion_splits:raise AnalysisBoundary('repository presence needs an isolated continuation: '+reason)
++        raise CompletionRequired(str(engine.branch_index)+':'+label,[False,True])
++    value['__repository_presence__']=selected
++    if not selected:value['optional']=None
++    return selected
+--- parent28/analyzer/resource_effects.py
++++ solution29/analyzer/resource_effects.py
+@@ -0,0 +1,26 @@
++"""Read/write classification for source-backed fallback closures."""
++
++
++def possible_writes(project, methods, data, active_transaction=False):
++    resources={target for _,target in data}
++    cache=project.__dict__.setdefault('_source_write_resources',{})
++    key=(frozenset(methods),frozenset(data),active_transaction)
++    if key in cache:return cache[key]
++    # An open persistence context can flush managed changes without save().
++    transactional=active_transaction or any(any(a['name'].rsplit('.',1)[-1]=='Transactional'
++        for a in [*project.methods[mid].get('annotations',[]),
++                  *project.nodes[project.methods[mid]['owner']].get('annotations',[])]) for mid in methods)
++    if transactional:
++        cache[key]=resources;return resources
++    observed=set();writes=set()
++    for site in (site for mid in methods for site in project.sites.get(mid,())):
++        node=project.nodes[site]
++        accessed=project.edges.get(site,{}).get('data_access',set()) & resources
++        observed.update(accessed)
++        operation=node.get('callee','')
++        if not operation.startswith(('find','query','get','read','exists','count','select','stream')):
++            writes.update(accessed)
++    # A graph-only data edge without an operation witness remains a possible write.
++    result=writes | (resources-observed)
++    cache[key]=result
++    return result
+--- parent28/analyzer/result_contracts.py
++++ solution29/analyzer/result_contracts.py
+@@ -17,7 +17,7 @@
+         for name in re.findall(r'[\w.$]+',written):
+             owner=project.resolve_type(name,meta['module'],meta['file'])
+             if owner in project.type_fields and not project.type_variables.get(owner):found.add(project.nodes[owner]['fqn'])
+-        collection=bool(re.search(r'\b(?:List|Collection|Set|Iterable|Page|Slice)\s*<|\[\]',written))
++        collection=bool(re.search(r'\b(?:List|ArrayList|LinkedList|Collection|Set|Iterable|Page|Slice)\s*<|\[\]',written))
+         return found,collection
+     declared=types(meta.get('return_raw',''))
+     node=project.ast.get(mid)
+--- parent28/analyzer/source_generics.py
++++ solution29/analyzer/source_generics.py
+@@ -12,6 +12,10 @@
+         'java.util.Map.Entry','java.util.stream.Stream','java.util.Date','java.util.Calendar','java.util.UUID',
+         'org.springframework.http.ResponseEntity','org.springframework.http.HttpEntity','org.springframework.http.HttpHeaders',
+         'org.springframework.http.HttpStatus','org.springframework.http.HttpMethod',
++        'javax.servlet.ServletRequest','javax.servlet.FilterChain','javax.servlet.http.HttpServletRequest','javax.servlet.http.HttpServletResponse',
++        'org.springframework.security.authentication.AuthenticationManager',
++        'org.springframework.security.core.Authentication','org.springframework.security.core.AuthenticationException',
++        'io.jsonwebtoken.Claims','io.jsonwebtoken.JwtBuilder','io.jsonwebtoken.JwtParser','io.jsonwebtoken.Jws',
+         'org.springframework.core.ParameterizedTypeReference','org.springframework.web.client.RestTemplate',
+         'com.fasterxml.jackson.databind.ObjectMapper','com.fasterxml.jackson.databind.DeserializationFeature',
+         'com.fasterxml.jackson.databind.JavaType','com.fasterxml.jackson.databind.type.TypeFactory',
+--- parent28/analyzer/state.py
++++ solution29/analyzer/state.py
+@@ -179,6 +179,7 @@
+         self.resource_assumptions = {}
+         self.unscoped_state_assumptions = []
+         self.transactions = {}
++        self.bean_instances = {}
+         self.actor_browsers = {}
+         self.input_journal = []
+ 
+@@ -212,10 +213,12 @@
+                 '__distinct_from__':[v for v in existing if isinstance(v,(str,int,float,bool))],
+                 '__distinct_symbols__':[v['__symbol__'] for v in existing if isinstance(v,dict) and '__symbol__' in v]}
+ 
+-    def snapshot(self):
++    def snapshot(self,full=False):
+         return {'browser': deepcopy(self.browser),
+                 'history': [{k: item.get(k) for k in ('step', 'entry', 'action')} for item in self.history],
+                 'clock': self.now, 'database_rows': self.database.summary(),
+                 'unknown_tables':[schema+'.'+table for schema,table in sorted(self.database.unknown_tables)],
+                 'analysis_assumptions':list(self.analysis_assumptions),
+-                'limitations': list(self.limitations)}
++                'limitations': list(self.limitations),
++                **({'tables':{schema+'.'+table:(U if (schema,table) in self.database.unknown_tables else deepcopy(rows))
++                              for (schema,table),rows in self.database.tables.raw_items()}} if full else {})}
+--- parent28/tests/builders.py
++++ solution29/tests/builders.py
+@@ -4,7 +4,7 @@
+ from pathlib import Path
+ from tree_sitter import Language, Parser
+ import tree_sitter_java
+-from analyzer.project import Project, text, walk
++from analyzer.project import Project, text, walk, body_members
+ from analyzer.state import Database
+ 
+ 
+@@ -38,7 +38,7 @@
+     ids, methods = {}, []
+     for name, decl in declarations.items():
+         body = decl.child_by_field_name('body')
+-        for node in body.named_children:
++        for node in body_members(body):
+             if node.type not in ('method_declaration', 'constructor_declaration'):
+                 continue
+             method_name = '<init>' if node.type == 'constructor_declaration' else text(node.child_by_field_name('name'))
+--- parent28/tests/test_absence_consumer_equivalence.py
++++ solution29/tests/test_absence_consumer_equivalence.py
+@@ -0,0 +1,32 @@
++import pytest
++from analyzer.contracts import ContractGrounder,ContractIndex,read_static_context
++from analyzer.frontend import Frontend
++from analyzer.engine import Engine
++from analyzer.request import grounded_request
++from analyzer.state import ScenarioState
++from builders import build
++
++
++@pytest.mark.parametrize('consumer,equivalent',[
++ ('if(!StringUtils.isEmpty(input.getChallenge())){return "challenge";}return "approved";',True),
++ ('String code=input.getChallenge();if(!StringUtils.isEmpty(code)){return code;}return "approved";',True),
++ ('if(input.getChallenge()==null){return "null";}return "empty";',False),
++])
++def test_context_absence_respects_the_actual_consumer(tmp_path,consumer,equivalent):
++    p,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.util.StringUtils;import lombok.Data;
++      @Data class Credentials{private String username;private String password;private String challenge;}
++      class Api{@PostMapping("/login") String login(@RequestBody Credentials input){'''+consumer+'}}'})
++    (tmp_path/'ui.js').write_text('''function login(){$.ajax({url:"/login",type:"POST",contentType:"application/json",
++      data:JSON.stringify({username:$("#username").val(),password:$("#password").val()})});}''')
++    f=Frontend(p);context=read_static_context({'account':'User alice / secret, no challenge at login'})
++    grounder=ContractGrounder(p,f,ContractIndex(p,f),None,context)
++    proposals,_=grounder.step('Log in with username and password',ScenarioState(db))
++    assert len(proposals)==1
++    proposal=proposals[0]
++    assert (proposal['site'] is not None) is equivalent
++    request=grounded_request(p,proposal['entry'],proposal['params'])
++    e=Engine(p,proposal['state']);result=e.run(proposal['entry'],request)
++    if equivalent:
++        assert 'challenge' not in request.body and result=='approved'
++        assert proposal['bindings']['challenge']['consumer_equivalence']
++    else:assert request.body['challenge']=='' and result=='empty'
+--- parent28/tests/test_collection_request_scope.py
++++ solution29/tests/test_collection_request_scope.py
+@@ -0,0 +1,28 @@
++from analyzer.contracts import ContractIndex
++from analyzer.frontend import Frontend
++from analyzer.result_contracts import result_shape
++from builders import build
++
++
++def test_nested_concrete_collection_and_explicit_role_select_full_list(tmp_path):
++    project,_,ids=build(tmp_path,{'Api.java':'''import java.util.*;import org.springframework.http.ResponseEntity;
++      class Envelope<T>{int status;T data;Envelope(int value,T items){status=value;data=items;}}
++      class Invoice{String id;}class Filter{String owner;}
++      class AdminInvoiceController{
++       @GetMapping("/admin/invoices") ResponseEntity allInvoices(){ArrayList<Invoice> items=new ArrayList<>();
++         return ResponseEntity.ok(new Envelope<>(1,items));}}
++      class InvoiceController{
++       @PostMapping("/invoices/filter") Envelope<List<Invoice>> refreshInvoices(@RequestBody Filter filter){return null;}}
++      '''})
++    entities,collection=result_shape(project,ids['AdminInvoiceController.allInvoices'])
++    assert collection and 'Invoice' in entities
++    index=ContractIndex(project,Frontend(project))
++    assert index.rank('As the administrator, open the list of all invoices')[0][2]['entry']==ids['AdminInvoiceController.allInvoices']
++
++
++def test_administrator_role_alias_matches_source_admin_annotation(tmp_path):
++    project,_,ids=build(tmp_path,{'Api.java':'''import java.util.*;
++      class Invoice{String id;}class AdminInvoiceController{
++       @PreAuthorize("hasRole('ADMIN')") @GetMapping("/invoices") List<Invoice> getAllInvoices(){return null;}}
++      '''})
++    assert ContractIndex(project,Frontend(project)).rank('As the administrator, show all invoices')[0][2]['entry']==ids['AdminInvoiceController.getAllInvoices']
+--- parent28/tests/test_document_array_journey.py
++++ solution29/tests/test_document_array_journey.py
+@@ -0,0 +1,123 @@
++"""A source-only independent workflow; expected edges are checker-owned.
++
++Read HTTP list -> Class<T> array -> choose row -> partial DTO -> persist ->
++remote rejection -> fallback -> reread. Explicit HTTP and NL are separate.
++"""
++import json
++from analyzer.project import Project
++from analyzer.engine import Engine
++from analyzer.state import ScenarioState
++from analyzer.request import Request
++from analyzer.frontend import Frontend
++from analyzer.contracts import ContractIndex,ContractGrounder
++from builders import build
++
++
++PORTAL='''import java.util.*;import org.springframework.web.client.RestTemplate;
++ import org.springframework.http.*;import com.fasterxml.jackson.databind.ObjectMapper;
++ class DocumentView{public String id;public int revision;public boolean approved;}
++ class Approval{public String id;public int revision;public boolean approved;}
++ class PortalGateway{RestTemplate rest;
++  <T>T decode(String text,Class<T> type){return new ObjectMapper().readValue(text,type);}
++  @GetMapping("/library") List<DocumentView> listDocuments(){
++   String text=rest.getForObject("http://docs/documents",String.class);
++   return Arrays.asList(decode(text,DocumentView[].class));}
++  @PostMapping("/library/approve") DocumentView approveDocument(@RequestBody Approval input){
++   return rest.postForObject("http://docs/documents/"+input.id+"/approve",input,DocumentView.class);}
++ }'''
++DOCS='''import java.util.*;import org.springframework.web.client.*;import org.springframework.http.*;
++ import org.springframework.data.jpa.repository.JpaRepository;
++ @Entity @Table(name="documents")class Document{@Id public String id;public int revision;public boolean approved;}
++ class Approval{public String id;public int revision;public boolean approved;}
++ interface Store extends JpaRepository<Document,String>{List<Document> findAll();Document findById(String id);Document save(Document value);}
++ class DocumentController{Store store;RestTemplate rest;
++  @GetMapping("/documents") List<Document> listDocuments(){return store.findAll();}
++  @PostMapping("/documents/{id}/approve") ResponseEntity<Document> approveDocument(@PathVariable String id,@RequestBody Approval input){
++   Document value=store.findById(id);if(value.revision!=input.revision){return new ResponseEntity<Document>(null,HttpStatus.CONFLICT);}
++   value.approved=input.approved;value.revision++;store.save(value);
++   try{rest.postForObject("http://audit/events",id,String.class);}catch(HttpServerErrorException failure){fallback();}
++   return ResponseEntity.ok(value);}
++  void fallback(){}
++ }'''
++AUDIT='''import org.springframework.http.*;class AuditController{
++ @PostMapping("/events") ResponseEntity<String> accept(@RequestBody String id){return new ResponseEntity<String>(null,HttpStatus.SERVICE_UNAVAILABLE);}}'''
++
++
++def fixture(root):
++    merged={'project':'documents','nodes':{},'edges':[]};ids={};database=None
++    for module,source in [('portal',PORTAL),('docs',DOCS),('audit',AUDIT)]:
++        project,db,local=build(root/module,{'Api.java':source},module=module,
++             rows={'documents':[{'id':'D7','revision':7,'approved':0}]} if module=='docs' else {})
++        for node in project.skeleton['nodes'].values():
++            if node.get('file'):node['file']=module+'/'+node['file']
++            for origin in node.get('origin',[]):origin['file']=module+'/'+origin['file']
++        merged['nodes'].update(project.skeleton['nodes']);merged['edges'].extend(project.skeleton['edges'])
++        ids.update({module+'.'+key:value for key,value in local.items()})
++        if module=='docs':database=db
++    (root/'skeleton.json').write_text(json.dumps(merged))
++    (root/'portal/ui.js').write_text('''new Vue({data:{documents:[]},methods:{
++      listDocuments(){var vm=this;$.ajax({url:"/library",type:"GET",success:function(data){vm.documents=data;}});},
++      approveDocument(item){var input={id:item.id,revision:item.revision,approved:true};
++       $.ajax({url:"/library/approve",type:"POST",contentType:"application/json",data:JSON.stringify(input)});}
++      }});''')
++    (root/'portal/page.html').write_text('''<script src="ui.js"></script><button @click="listDocuments">List documents</button>
++      <table><tr v-for="item in documents"><td>{{item.id}}</td><td><button @click="approveDocument(item)">Approve document</button></td></tr></table>''')
++    return Project(root/'skeleton.json',root),database,ids
++
++
++def expected(ids,write=False):
++    get=lambda name:ids[name]
++    if not write:
++        portal=get('portal.PortalGateway.listDocuments');server=get('docs.DocumentController.listDocuments');decode=get('portal.PortalGateway.decode')
++        return {('', 'executes',mid) for mid in [portal,server,decode]} | {
++          (portal,'calls',decode),(portal,'remote',server),(server,'data','res:table:docs.documents')}
++    portal=get('portal.PortalGateway.approveDocument');server=get('docs.DocumentController.approveDocument')
++    fallback=get('docs.DocumentController.fallback');audit=get('audit.AuditController.accept')
++    return {('', 'executes',mid) for mid in [portal,server,fallback,audit]} | {
++       (server,'calls',fallback),(portal,'remote',server),(server,'remote',audit),
++       (server,'data','res:table:docs.documents')}
++
++
++def test_explicit_http_array_selection_and_state_continuity(tmp_path):
++    project,db,ids=fixture(tmp_path);state=ScenarioState(db)
++    first=Engine(project,state);rows=first.run(ids['portal.PortalGateway.listDocuments'],Request.http('portal','GET','/library'))
++    assert rows==[{'id':'D7','revision':7,'approved':False}]
++    assert first.edges==expected(ids)
++    body={'id':rows[0]['id'],'revision':rows[0]['revision'],'approved':True}
++    second=Engine(project,first.state)
++    result=second.run(ids['portal.PortalGateway.approveDocument'],Request.http('portal','POST','/library/approve',body=body))
++    assert result=={'id':'D7','revision':8,'approved':True}
++    assert second.edges==expected(ids,True)
++    bound=second.request_events[0]['bound_arguments'][0]['value']
++    assert (bound['id'],bound['revision'],bound['approved'])==('D7',7,True)
++    assert [row['operation'] for row in second.data_operations]==['findById','save']
++    assert [row['status'] for row in second.http_responses if not row.get('entered',False)]==[]
++    third=Engine(project,second.state)
++    assert third.run(ids['portal.PortalGateway.listDocuments'],Request.http('portal','GET','/library'))==[result]
++    assert third.edges==expected(ids)
++    assert not third.state.database.unknown_tables
++
++
++def test_natural_language_selects_actual_array_result_in_next_request(tmp_path):
++    project,db,ids=fixture(tmp_path);frontend=Frontend(project)
++    from analyzer.__main__ import analyze
++    scenario={'id':'independent-documents','steps':[{'n':1,'action':'List documents'},
++        {'n':2,'action':'Approve the first document'},{'n':3,'action':'List documents'}]}
++    _,trace=analyze(project,frontend,ContractIndex(project,frontend),None,db,
++        {'facts':{},'unresolved':[],'choice_rules':[]},scenario,path_limit=4,grounder_type=ContractGrounder)
++    steps=trace['steps']
++    assert len(steps[1]['alternatives'])==1
++    selected=steps[1]['alternatives'][0]
++    assert selected['entry']==ids['portal.PortalGateway.approveDocument']
++    assert selected['request']['body']=={'id':'D7','revision':7,'approved':True}
++    assert selected['result']=={'id':'D7','revision':8,'approved':True}
++    assert steps[2]['alternatives'][0]['result']==[selected['result']]
++
++
++def test_stale_revision_rejects_before_write_and_remote(tmp_path):
++    project,db,ids=fixture(tmp_path);engine=Engine(project,ScenarioState(db))
++    engine.run(ids['portal.PortalGateway.approveDocument'],Request.http('portal','POST','/library/approve',
++        body={'id':'D7','revision':6,'approved':True}))
++    assert [event['operation'] for event in engine.data_operations]==['findById']
++    assert ids['audit.AuditController.accept'] not in {t for _,k,t in engine.edges if k=='executes'}
++    assert engine.state.database.tables[('docs','documents')]==[{'id':'D7','revision':7,'approved':False}]
+--- parent28/tests/test_enum_field_runtime_kind.py
++++ solution29/tests/test_enum_field_runtime_kind.py
+@@ -0,0 +1,14 @@
++from analyzer.engine import Engine
++from analyzer.state import ScenarioState
++from builders import build
++
++
++def test_source_enum_string_field_keeps_its_declared_kind_in_key_construction(tmp_path):
++    project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;
++      enum Code{REVIEW("R",1);private String label;private int code;
++        Code(String input,int value){this.label=input;this.code=value;}String label(){return label;}}
++      class Key{String value(){return Code.REVIEW.label()+"7";}}
++      class Api{String entry(){Key key=new Key();Map<String,String> items=new HashMap<>();
++        items.put(key.value(),"found");return items.get("R7");}}'''})
++    engine=Engine(project,ScenarioState(db))
++    assert engine.run(ids['Api.entry'],{})=='found' and not engine.approximate
+--- parent28/tests/test_fallback_read_effects.py
++++ solution29/tests/test_fallback_read_effects.py
+@@ -0,0 +1,20 @@
++import pytest
++from analyzer.engine import Engine
++from analyzer.state import ScenarioState
++from builders import build
++
++
++@pytest.mark.parametrize('operation,annotation,unknown', [
++    ('store.findById("p1");','',False),
++    ('store.save(new Parcel());','',True),
++    ('store.findById("p1");','@Transactional',True),
++])
++def test_fallback_preserves_proven_reads_and_invalidates_possible_writes(tmp_path,operation,annotation,unknown):
++    project,db,ids=build(tmp_path,{'Api.java':'''class Api{Store store;'''+annotation+''' void entry(){'''+operation+'''}}
++      @Entity @Table(name="parcels") class Parcel{@Id String id;}
++      interface Store extends JpaRepository<Parcel,String>{Parcel findById(String id);Parcel save(Parcel value);}'''},
++      rows={'parcels':[{'id':'p1'}]})
++    engine=Engine(project,ScenarioState(db));engine.method=ids['Api.entry']
++    engine.fallback(ids['Api.entry'])
++    assert (('service','parcels') in engine.state.database.unknown_tables) is unknown
++    assert (ids['Api.entry'],'data','res:table:service.parcels') in engine.candidate_edges
+--- parent28/tests/test_full_state_evidence.py
++++ solution29/tests/test_full_state_evidence.py
+@@ -0,0 +1,11 @@
++from analyzer.state import ScenarioState,U
++from builders import build
++
++
++def test_full_evidence_freezes_known_rows_and_marks_unknown_tables(tmp_path):
++    _,db,_=build(tmp_path,{'Api.java':'class Api{void entry(){}}'},rows={'items':[{'id':'a'}],'other':[{'id':'b'}]})
++    state=ScenarioState(db);state.database.unknown_tables.add(('service','other'))
++    snapshot=state.snapshot(full=True)
++    state.database.tables[('service','items')][0]['id']='later'
++    assert snapshot['tables']['service.items']==[{'id':'a'}]
++    assert snapshot['tables']['service.other'] is U
+--- parent28/tests/test_jjwt_authenticated_requests.py
++++ solution29/tests/test_jjwt_authenticated_requests.py
+@@ -0,0 +1,101 @@
++"""Login -> signed result -> real Authorization header -> source filter.
++
++There is no pre-supplied successful token or authenticated session.
++"""
++from datetime import datetime, timedelta
++import json
++import base64
++import pytest
++from analyzer.engine import Engine
++from analyzer.paths import run_paths
++from analyzer.request import Request, MISSING
++from analyzer.state import ScenarioState, U
++from builders import build
++from test_regression_authentication import SOURCE
++
++
++JWT_SOURCE = '''import io.jsonwebtoken.*;import java.util.*;
++ import org.springframework.http.*;import org.springframework.web.bind.annotation.*;
++ import org.springframework.security.authentication.*;import org.springframework.security.core.*;
++ import org.springframework.web.filter.OncePerRequestFilter;import javax.servlet.*;import javax.servlet.http.*;
++ class Credentials{public String name;public String password;}
++ class SessionToken{public String token;public String name;}
++ class Login {AuthenticationManager manager;
++  @PostMapping("/login") ResponseEntity<SessionToken> login(@RequestBody Credentials input){
++   try{Authentication authenticated=manager.authenticate(new UsernamePasswordAuthenticationToken(input.name,input.password));
++    Claims claims=Jwts.claims().setSubject(authenticated.getName());claims.put("roles",Arrays.asList("reader"));
++    String token=Jwts.builder().setClaims(claims).setIssuedAt(new Date()).setExpiration(new Date(new Date().getTime()+60000L))
++       .signWith(SignatureAlgorithm.HS256,"c2VjcmV0").compact();
++    SessionToken result=new SessionToken();result.token=token;result.name=authenticated.getName();return ResponseEntity.ok(result);
++   }catch(AuthenticationException failure){return new ResponseEntity<SessionToken>(null,HttpStatus.UNAUTHORIZED);}}
++  @GetMapping("/protected") String read(){return "protected-data";}
++ }
++ class Gate extends OncePerRequestFilter {
++  void doFilterInternal(HttpServletRequest req,HttpServletResponse res,FilterChain chain){
++   if(req.getRequestURI().equals("/protected")){
++    String header=req.getHeader("Authorization");if(header==null){res.setStatus(401);return;}
++    try{Claims claims=Jwts.parser().setSigningKey("c2VjcmV0").parseClaimsJws(header.substring(7)).getBody();
++     if(!claims.getSubject().equals("alice")){res.setStatus(403);return;}}
++    catch(JwtException failure){res.setStatus(401);return;}
++   }chain.doFilter(req,res);
++  }
++ }'''
++
++
++def fixture(root, version='0.8.0'):
++    root.mkdir(parents=True,exist_ok=True)
++    (root/'pom.xml').write_text('<project><dependencies><dependency><groupId>io.jsonwebtoken</groupId>'
++        '<artifactId>jjwt</artifactId><version>'+version+'</version></dependency></dependencies></project>')
++    return build(root,{'Security.java':SOURCE,'Web.java':JWT_SOURCE})
++
++
++@pytest.mark.parametrize('name,password,status',[('alice','secret',True),('alice','wrong',False),('disabled','secret',False)])
++def test_password_status_and_first_request_result(tmp_path,name,password,status):
++    project,db,ids=fixture(tmp_path)
++    state=ScenarioState(db,{'clock':datetime(2026,10,18)})
++    request=Request.http('service','POST','/login',{'Content-Type':'application/json'},{'name':name,'password':password})
++    paths=run_paths(project,state,ids['Login.login'],request,limit=1)
++    assert len(paths)==1
++    result=paths[0]['result'];engine=paths[0]['engine']
++    if status:
++        assert result['name']==name and isinstance(result['token'],str)
++        claims=json.loads(base64.urlsafe_b64decode(result['token'].split('.')[1]+'=='))
++        assert claims['sub']==name and claims['roles']==['reader']
++        assert sorted(engine.warnings)==['request filter registration is assumed from source classes; full bean registration is not modeled']
++    else:
++        assert result is None and engine.outcome=='HTTP error response'
++        assert not any('opaque call' in warning for warning in engine.warnings)
++
++
++@pytest.mark.parametrize('actor,alter,elapsed,expected', [
++    ('alice',False,0,'protected-data'),('bob',False,0,None),
++    ('alice',True,0,None),('alice',False,61,None),
++])
++def test_actual_login_token_controls_next_protected_request(tmp_path,actor,alter,elapsed,expected):
++    project,db,ids=fixture(tmp_path)
++    clock=datetime(2026,10,18);state=ScenarioState(db,{'clock':clock})
++    login=Request.http('service','POST','/login',{'Content-Type':'application/json'},{'name':actor,'password':'secret'})
++    first=Engine(project,state);result=first.run(ids['Login.login'],login)
++    assert isinstance(result,dict) and result['name']==actor
++    token=result['token']
++    if alter:token=token.rsplit('.',1)[0]+'.invalid'
++    first.state.now=clock+timedelta(seconds=elapsed)
++    protected=Request.http('service','GET','/protected',{'Authorization':'Bearer '+token},MISSING)
++    second=Engine(project,first.state)
++    observed=second.run(ids['Login.read'],protected)
++    if expected is not None:assert observed==expected
++    else:
++        assert observed is U and second.outcome=='request stopped by filter'
++        assert second.http_responses[-1]['status']==(403 if actor=='bob' else 401)
++    entered=ids['Login.read'] in {target for _,kind,target in second.edges if kind=='executes'}
++    assert entered is (expected is not None)
++    assert sorted(second.warnings)==['request filter registration is assumed from source classes; full bean registration is not modeled']
++
++
++def test_unknown_library_version_is_explicitly_unsupported(tmp_path):
++    project,db,ids=fixture(tmp_path,'0.12.0')
++    state=ScenarioState(db,{'clock':datetime(2026,10,18)})
++    request=Request.http('service','POST','/login',{'Content-Type':'application/json'},{'name':'alice','password':'secret'})
++    engine=Engine(project,state);engine.run(ids['Login.login'],request)
++    assert engine.outcome=='unsupported_semantics boundary'
++    assert any('version 0.8.0' in warning for warning in engine.warnings)
+--- parent28/tests/test_json_bean_lifecycle.py
++++ solution29/tests/test_json_bean_lifecycle.py
+@@ -19,18 +19,21 @@
+ def executed(e,ids,name):return any(k=='executes' and t==ids[name] for _,k,t in e.edges)
+ 
+ 
++def reflected(e,ids,name):return any(event['method']==ids[name] and event['role']=='getter' for event in e.semantic_callbacks)
++
++
+ def test_serialization_uses_a_computed_getter_without_a_matching_field(tmp_path):
+     result,e,ids=run(tmp_path,'return new ObjectMapper().writeValueAsString(new Item());',
+         'class Item{public String getLabel(){return "computed";}}')
+     assert isinstance(result,JsonText) and result.payload=={'label':'computed'}
+-    assert executed(e,ids,'Item.getLabel') and not called(e,ids,'Item.getLabel') and not e.approximate
++    assert reflected(e,ids,'Item.getLabel') and not executed(e,ids,'Item.getLabel') and not called(e,ids,'Item.getLabel') and not e.approximate
+ 
+ 
+ def test_serialization_getter_takes_precedence_over_the_public_field(tmp_path):
+     result,e,ids=run(tmp_path,'return new ObjectMapper().writeValueAsString(new Item());',
+         'class Item{public int count=1;public int getCount(){return count+1;}}')
+     assert isinstance(result,JsonText) and result.payload=={'count':2}
+-    assert executed(e,ids,'Item.getCount') and not called(e,ids,'Item.getCount') and not e.approximate
++    assert reflected(e,ids,'Item.getCount') and not executed(e,ids,'Item.getCount') and not called(e,ids,'Item.getCount') and not e.approximate
+ 
+ 
+ def test_private_unexposed_field_is_not_leaked_by_serialization(tmp_path):
+@@ -64,7 +67,8 @@
+ def test_getter_failure_prevents_success_continuation(tmp_path):
+     result,e,ids=run(tmp_path,'new ObjectMapper().writeValueAsString(new Item());after();return true;',
+         'class Item{public String getName(){throw new IllegalStateException();}}')
+-    assert result is U and executed(e,ids,'Item.getName') and not called(e,ids,'Api.after')
++    assert result is U and reflected(e,ids,'Item.getName') and not executed(e,ids,'Item.getName') and not called(e,ids,'Api.after')
++    assert e.semantic_callbacks[-1]['outcome']=='threw'
+     assert e.outcome=='uncaught application exception'
+ 
+ 
+@@ -91,7 +95,7 @@
+     result,e,ids=run(tmp_path,'return new ObjectMapper().writeValueAsString(new Item());',
+         'class Item{public boolean isReady(){return true;}}')
+     assert isinstance(result,JsonText) and result.payload=={'ready':True}
+-    assert executed(e,ids,'Item.isReady') and not called(e,ids,'Item.isReady') and not e.approximate
++    assert reflected(e,ids,'Item.isReady') and not executed(e,ids,'Item.isReady') and not called(e,ids,'Item.isReady') and not e.approximate
+ 
+ 
+ def test_scenario_http_body_uses_the_same_setter_contract(tmp_path):
+@@ -109,7 +113,7 @@
+       @GetMapping("/items") Item entry(){return new Item();}}
+       class Item{public String getLabel(){return "computed";}}'''})
+     e=Engine(p,ScenarioState(db));result=e.run(ids['Api.entry'],{})
+-    assert result=={'label':'computed'} and executed(e,ids,'Item.getLabel')
++    assert result=={'label':'computed'} and reflected(e,ids,'Item.getLabel') and not executed(e,ids,'Item.getLabel')
+ 
+ 
+ def test_http_response_getter_runs_exactly_once(tmp_path):
+--- parent28/tests/test_json_java_arrays.py
++++ solution29/tests/test_json_java_arrays.py
+@@ -0,0 +1,149 @@
++"""Class<T> array conversion through source methods and downstream consumers."""
++import pytest
++import json
++from analyzer.project import Project
++from analyzer.paths import run_paths
++from analyzer.engine import Engine
++from analyzer.state import ScenarioState, U
++from analyzer.native_arrays import JavaArray
++from builders import build
++
++
++def run(tmp_path, body, schema='class Parcel {public String id;String getId(){return id;}}'):
++    project, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;
++      import com.fasterxml.jackson.databind.*;''' + schema + '''class Api {
++      <T> T decode(String text,Class<T> cls){return new ObjectMapper().readValue(text,cls);}
++      Object entry(){''' + body + '''}
++      String after(){return "wrong";} String rejected(){return "rejected";}
++    }'''})
++    engine = Engine(project, ScenarioState(db))
++    value = engine.run(ids['Api.entry'], {})
++    return value, engine, ids
++
++
++def test_class_array_survives_generic_decode_and_foreach_selection(tmp_path):
++    result, engine, ids = run(tmp_path, '''Parcel[] values=decode("[{\\"id\\":\\"P7\\"},{\\"id\\":\\"P9\\"}]",Parcel[].class);
++      List<Parcel> items=Arrays.asList(values);
++      for(Parcel item:items){if(item.getId().equals("P9")){return item.getId();}}return "missing";''')
++    assert result == 'P9'
++    assert ids['Parcel.getId'] in {target for _, kind, target in engine.edges if kind == 'executes'}
++
++
++@pytest.mark.parametrize('text,expected', [('[]', []), ('[null]', [None])])
++def test_empty_and_null_elements_keep_array_shape(tmp_path, text, expected):
++    result, engine, _ = run(tmp_path, 'return decode("' + text + '",Parcel[].class);')
++    assert isinstance(result, JavaArray) and result.component == 'Parcel'
++    assert list(result) == expected and not engine.approximate
++
++
++def test_null_array_stays_null(tmp_path):
++    result, engine, _ = run(tmp_path, 'return decode("null",Parcel[].class);')
++    assert result is None and not engine.approximate
++
++
++def test_nested_arrays_keep_each_runtime_component(tmp_path):
++    result, engine, _ = run(tmp_path, 'return decode("[[null],[]]",Parcel[][].class);')
++    assert isinstance(result, JavaArray) and result.component == 'Parcel[]'
++    assert all(isinstance(item, JavaArray) and item.component == 'Parcel' for item in result)
++    assert list(result[0]) == [None] and list(result[1]) == [] and not engine.approximate
++
++
++@pytest.mark.parametrize('typ,text,expected', [('int', '[1,null,3]', [1,0,3]),
++    ('boolean', '[true,false,null]', [True,False,False]), ('long', '[2147483648]', [2147483648]),
++    ('String', '["a",null]', ['a',None])])
++def test_primitive_and_reference_elements_use_declared_conversion(tmp_path, typ, text, expected):
++    escaped = text.replace('"', '\\"')
++    result, engine, _ = run(tmp_path, 'return decode("' + escaped + '",' + typ + '[].class);')
++    assert isinstance(result, JavaArray) and list(result) == expected and not engine.approximate
++
++
++def test_wrong_object_shape_uses_owned_codec_failure_before_following_code(tmp_path):
++    result, engine, ids = run(tmp_path, '''try{decode("{}",Parcel[].class);return after();}
++      catch(JsonMappingException failure){return rejected();}''')
++    assert result == 'rejected'
++    assert ids['Api.after'] not in {target for _, kind, target in engine.edges if kind == 'executes'}
++
++
++def test_null_primitive_element_obeys_observed_policy(tmp_path):
++    result, _, _ = run(tmp_path, '''ObjectMapper mapper=new ObjectMapper();
++      mapper.enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES);
++      try{mapper.readValue("[null]",int[].class);return after();}catch(JsonMappingException failure){return rejected();}''')
++    assert result == 'rejected'
++
++
++def test_convert_scalar_dto_to_array_cannot_alias_or_erase_the_input(tmp_path):
++    result, engine, _ = run(tmp_path, '''Parcel parcel=new Parcel();parcel.id="kept";
++      try{new ObjectMapper().convertValue(parcel,Parcel[].class);return after();}
++      catch(IllegalArgumentException failure){return parcel.id;}''')
++    assert result == 'kept' and not engine.approximate
++
++
++def test_array_list_is_backed_in_both_directions_and_has_fixed_size(tmp_path):
++    result,engine,_=run(tmp_path,'''String[] values=decode("[\\"a\\",\\"b\\"]",String[].class);
++      List<String> view=Arrays.asList(values);view.set(0,"c");values[1]="d";
++      try{view.add("wrong");return after();}catch(UnsupportedOperationException failure){return values[0]+view.get(1);}''')
++    assert result=='cd' and not engine.approximate
++
++
++def test_array_view_keeps_runtime_store_check_after_erasure(tmp_path):
++    result,engine,_=run(tmp_path,'''String[] values=decode("[\\"a\\"]",String[].class);
++      List view=Arrays.asList(values);try{view.set(0,7);return after();}
++      catch(ArrayStoreException failure){return values[0];}''')
++    assert result=='a' and not engine.approximate
++
++
++def test_primitive_array_is_a_single_as_list_element(tmp_path):
++    result,engine,_=run(tmp_path,'''int[] values=decode("[1,2]",int[].class);
++      return Arrays.asList(values).size();''')
++    assert result==1 and not engine.approximate
++
++
++def test_inline_generic_array_infers_the_reference_varargs_type(tmp_path):
++    result,engine,_=run(tmp_path,'''return Arrays.asList(decode("[\\"a\\",\\"b\\"]",String[].class)).size();''')
++    assert result==2 and not engine.approximate
++
++
++def test_an_object_cast_keeps_the_array_as_one_varargs_element(tmp_path):
++    result,engine,_=run(tmp_path,'''Object values=decode("[\\"a\\",\\"b\\"]",String[].class);
++      return Arrays.asList(values).size();''')
++    assert result==1 and not engine.approximate
++
++
++def test_observed_single_value_policy_does_not_force_array_failure(tmp_path):
++    result,engine,_=run(tmp_path,'''ObjectMapper mapper=new ObjectMapper();
++      mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
++      return mapper.readValue("7",int[].class);''')
++    assert isinstance(result,JavaArray) and list(result)==[7] and not engine.approximate
++
++
++@pytest.mark.parametrize('typ',['byte','char'])
++def test_specialized_text_array_codec_is_explicitly_unresolved(tmp_path,typ):
++    result,engine,_=run(tmp_path,'return decode("\\"YQ==\\"",'+typ+'[].class);')
++    assert result is U and engine.outcome=='returned'
++    assert any('specialized codec' in warning for warning in engine.warnings)
++
++
++def test_same_dto_name_in_another_deployment_cannot_change_array_schema(tmp_path):
++    merged={'nodes':{},'edges':[]};entries={}
++    for module,field,value in [('first','code','"P7"'),('second','label','"other"')]:
++        source='''import com.fasterxml.jackson.databind.ObjectMapper;
++          class Parcel{public String '''+field+''';}class Api{Parcel[] entry(){return new ObjectMapper().readValue(
++          "[{\\"'''+field+'''\\":\\"'''+json.loads(value)+'''\\"}]",Parcel[].class);}}'''
++        project,db,ids=build(tmp_path/module,{'Api.java':source},module=module)
++        for node in project.skeleton['nodes'].values():
++            if node.get('file'):node['file']=module+'/'+node['file']
++        merged['nodes'].update(project.skeleton['nodes']);merged['edges'].extend(project.skeleton['edges'])
++        entries[module]=(ids['Api.entry'],field,json.loads(value))
++    (tmp_path/'skeleton.json').write_text(json.dumps(merged));project=Project(tmp_path/'skeleton.json',tmp_path)
++    for module,(entry,field,value) in entries.items():
++        engine=Engine(project,ScenarioState(db));result=engine.run(entry,{})
++        assert isinstance(result,JavaArray) and result[0][field]==value
++        assert result[0].source_owner=='type:'+module+':Parcel' and not engine.approximate
++
++
++def test_array_view_alias_survives_a_conservative_branch_join(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import com.fasterxml.jackson.databind.ObjectMapper;
++      class Api{String entry(boolean flag){String[] array=new ObjectMapper().readValue("[\\"a\\"]",String[].class);
++      List<String> view=Arrays.asList(array);if(flag){view.set(0,"x");}else{array[0]="x";}return view.get(0);}}'''})
++    outcomes=run_paths(p,ScenarioState(db),ids['Api.entry'],{'flag':U},limit=1)
++    assert {row['result'] for row in outcomes}=={'x'}
+--- parent28/tests/test_json_model_boundaries.py
++++ solution29/tests/test_json_model_boundaries.py
+@@ -9,7 +9,9 @@
+       class Api {@GetMapping("/item") Item item(){return new Item();}}'''})
+     engine=Engine(project,ScenarioState(db));result=engine.run(ids['Api.item'],{})
+     assert result=={'id':'formatted'} and not engine.approximate
+-    assert ('','executes',ids['Item.getId']) in engine.edges
++    assert ('','executes',ids['Item.getId']) not in engine.edges
++    assert ('','executes',ids['Item.getId']) in engine.reflection_edges
++    assert any(event['method']==ids['Item.getId'] and event['role']=='getter' for event in engine.semantic_callbacks)
+     assert not any(kind=='calls' and target==ids['Item.getId'] for _,kind,target in engine.edges)
+ 
+ 
+--- parent28/tests/test_native_observer_continuation.py
++++ solution29/tests/test_native_observer_continuation.py
+@@ -0,0 +1,16 @@
++import pytest
++from analyzer.paths import run_paths
++from analyzer.state import ScenarioState, U
++from builders import build
++
++
++@pytest.mark.parametrize('limit', [1, 4, 8])
++def test_nullable_collection_keeps_normal_and_caught_completion_at_small_budget(tmp_path, limit):
++    project, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;class Api {
++      String entry(List<String> values){try{values.size();return after();}
++       catch(NullPointerException failure){return failed();}}
++      String after(){return "after";}String failed(){return "caught";}}'''})
++    outcomes = run_paths(project, ScenarioState(db), ids['Api.entry'], {'values':U}, limit=limit)
++    assert {row['result'] for row in outcomes} == {'after','caught'}
++    assert all(row['engine'].outcome == 'returned' for row in outcomes)
++    assert all(not row['engine'].state.database.unknown_tables for row in outcomes)
+--- parent28/tests/test_nested_required_checked_exit.py
++++ solution29/tests/test_nested_required_checked_exit.py
+@@ -0,0 +1,15 @@
++from analyzer.engine import Engine
++from analyzer.state import ScenarioState
++from builders import build
++
++
++def test_checked_outer_exit_cannot_clear_an_existing_rollback_only(tmp_path):
++    project,db,ids=build(tmp_path,{'Api.java':'''import java.io.IOException;
++      class Api{Inner inner;Store store;@Transactional void entry()throws IOException{
++        Row a=new Row();a.id="a";store.save(a);try{inner.fail();}catch(RuntimeException ignored){}
++        throw new IOException();}}
++      class Inner{Store store;@Transactional void fail(){Row b=new Row();b.id="b";store.save(b);throw new IllegalStateException();}}
++      @Entity @Table(name="rows")class Row{@Id String id;}interface Store extends JpaRepository<Row,String>{Row save(Row value);}'''},rows={'rows':[]})
++    engine=Engine(project,ScenarioState(db));engine.run(ids['Api.entry'],{})
++    assert engine.state.database.tables[('service','rows')]==[]
++    assert engine.persistence_events[-1]['outcome']=='rollback'
+--- parent28/tests/test_partial_dto_footprint.py
++++ solution29/tests/test_partial_dto_footprint.py
+@@ -0,0 +1,32 @@
++"""Unknown optional properties must preserve independent explicit inputs."""
++import pytest
++from analyzer.paths import run_paths
++from analyzer.request_inputs import RequestInputs
++from analyzer.state import ScenarioState, U
++from builders import build
++
++
++@pytest.mark.parametrize('limit', [1, 4, 8])
++def test_optional_comment_keeps_revision_and_approval_through_handler(tmp_path, limit):
++    project, db, ids = build(tmp_path, {'Api.java': '''class Approval {
++      public int revision; public boolean approved; private String comment;
++      public void setComment(String value){comment=value;}}
++      class Api{@PostMapping("/approvals") String entry(@RequestBody Approval input){
++      if(input.revision==7 && input.approved){return accept();}return reject();}
++      String accept(){return "accepted";}String reject(){return "rejected";}}'''})
++    params = RequestInputs({'revision':7, 'approved':True}, flat_bodies=['input'],
++                           body_unknowns={'input':{'comment':'unobserved'}})
++    outcomes = run_paths(project, ScenarioState(db), ids['Api.entry'], params, limit=limit)
++    assert {row['result'] for row in outcomes} == {'accepted'}
++    assert all(ids['Api.reject'] not in {t for _,k,t in row['engine'].edges if k=='executes'} for row in outcomes)
++
++
++def test_setter_with_additional_writes_does_not_preserve_a_false_revision(tmp_path):
++    project, db, ids = build(tmp_path, {'Api.java': '''class Approval {
++      public int revision; private String comment;
++      public void setComment(String value){comment=value;revision=0;}}
++      class Api{@PostMapping("/approvals") int entry(@RequestBody Approval input){return input.revision;}}'''})
++    params = RequestInputs({'revision':7}, flat_bodies=['input'],
++                           body_unknowns={'input':{'comment':'unobserved'}})
++    outcomes = run_paths(project, ScenarioState(db), ids['Api.entry'], params, limit=1)
++    assert all(row['result'] is U for row in outcomes)
+--- parent28/tests/test_related_reference_scope.py
++++ solution29/tests/test_related_reference_scope.py
+@@ -0,0 +1,57 @@
++"""A related-object read rule must not strengthen an internal write helper."""
++from analyzer.contracts import ContractIndex
++from analyzer.frontend import Frontend
++from builders import build
++
++
++SOURCE = '''import org.springframework.web.bind.annotation.*;
++class Invoice {String id; String status;}
++class Payment {String id; String invoiceId;}
++class Envelope<T> {T data;}
++class BalancePaymentController {
++ @PostMapping("/payments/balance") Envelope<Payment> payFromBalance(@RequestBody Payment request) {
++  debit(request.invoiceId); return new Envelope<Payment>();
++ }
++ void debit(String invoiceId){}
++}
++class InvoiceController {
++ @PostMapping("/invoices/{invoiceId}/paid") boolean payInvoice(@PathVariable String invoiceId) {return true;}
++ @GetMapping("/invoices") List<Invoice> getInvoices(){return null;}
++}
++class PaymentController {
++ @GetMapping("/payments/{paymentId}") Envelope<Payment> getPayment(@PathVariable String paymentId){return null;}
++ @GetMapping("/payments/invoice/{invoiceId}") Envelope<Payment> findPaymentByInvoiceId(@PathVariable String invoiceId){return null;}
++}'''
++
++
++def index(tmp_path):
++    project, _, ids = build(tmp_path, {'Billing.java': SOURCE})
++    return ContractIndex(project, Frontend(project)), ids
++
++
++def test_write_qualifier_does_not_multiply_internal_reference_score(tmp_path):
++    contracts, ids = index(tmp_path)
++    action = 'Pay for the invoice from the internal account balance'
++    # The independent contract is the public payment operation, not the status
++    # endpoint. The same action's "for invoice" must never boost a path ID.
++    assert contracts.rank(action)[0][2]['entry'] == ids['BalancePaymentController.payFromBalance']
++
++
++def test_payment_read_keeps_related_reference_parameter(tmp_path):
++    contracts, ids = index(tmp_path)
++    assert contracts.rank('Find payment for the invoice')[0][2]['entry'] == ids['PaymentController.findPaymentByInvoiceId']
++
++
++def test_unqualified_invoice_collection_is_preserved(tmp_path):
++    contracts, ids = index(tmp_path)
++    assert contracts.rank('Show all invoices')[0][2]['entry'] == ids['InvoiceController.getInvoices']
++
++
++def test_related_payment_does_not_require_a_record_keyword(tmp_path):
++    contracts, ids = index(tmp_path)
++    assert contracts.rank('Read the payment of the invoice')[0][2]['entry'] == ids['PaymentController.findPaymentByInvoiceId']
++
++
++def test_list_of_keeps_collection_noun(tmp_path):
++    contracts, ids = index(tmp_path)
++    assert contracts.rank('Open the list of all invoices')[0][2]['entry'] == ids['InvoiceController.getInvoices']
+--- parent28/tests/test_repository_unknown_wrappers.py
++++ solution29/tests/test_repository_unknown_wrappers.py
+@@ -0,0 +1,43 @@
++import pytest
++from analyzer.paths import run_paths
++from analyzer.engine import Engine
++from analyzer.state import ScenarioState, U
++from builders import build
++
++
++SOURCE = '''import java.util.*;import org.springframework.data.jpa.repository.JpaRepository;
++ @Entity @Table(name="parcels") class Parcel{@Id public String id;public String label;}
++ interface Store extends JpaRepository<Parcel,String>{
++  Optional<Parcel> findById(String id);List<Parcel> findByLabel(String label);}
++ class Api{Store store;
++  String entry(String id){Optional<Parcel> value=store.findById(id);
++   try{if(value.isPresent()){value.get();if(!value.isPresent()){return wrong();}return present();}return absent();}
++   catch(NullPointerException failure){return wrong();}catch(NoSuchElementException failure){return wrong();}}
++  String list(String label){List<Parcel> values=store.findByLabel(label);
++   try{values.size();return after();}catch(NullPointerException failure){return wrong();}}
++  String wrong(){return "wrong";}String present(){return "present";}
++  String absent(){return "absent";}String after(){return "after";}}'''
++
++
++@pytest.mark.parametrize('limit', [1,4,8])
++@pytest.mark.parametrize('unknown_database', [False,True])
++def test_unknown_contents_keep_nonnull_optional_and_correlated_presence(tmp_path,limit,unknown_database):
++    project,db,ids=build(tmp_path,{'Api.java':SOURCE},rows={'parcels':[{'id':'p1','label':'one'}]})
++    if unknown_database:db.unknown_tables.add(('service','parcels'))
++    outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{'id':U},limit=limit)
++    assert {row['result'] for row in outcomes} == {'present','absent'}
++    assert all(ids['Api.wrong'] not in {t for _,k,t in row['engine'].edges if k=='executes'} for row in outcomes)
++
++
++@pytest.mark.parametrize('limit',[1,4,8])
++def test_unknown_list_is_not_a_nullable_receiver(tmp_path,limit):
++    project,db,ids=build(tmp_path,{'Api.java':SOURCE},rows={'parcels':[{'id':'p1','label':'one'}]})
++    outcomes=run_paths(project,ScenarioState(db),ids['Api.list'],{'label':U},limit=limit)
++    assert {row['result'] for row in outcomes} == {'after'}
++
++
++def test_custom_repository_default_method_can_return_null(tmp_path):
++    source=SOURCE.replace('List<Parcel> findByLabel(String label);',
++        'default List<Parcel> findByLabel(String label){return null;}')
++    project,db,ids=build(tmp_path,{'Api.java':source},rows={'parcels':[{'id':'p1','label':'one'}]})
++    assert Engine(project,ScenarioState(db)).run(ids['Api.list'],{'label':'one'}) == 'wrong'
+--- parent28/tests/test_source_bean_startup.py
++++ solution29/tests/test_source_bean_startup.py
+@@ -0,0 +1,23 @@
++from datetime import datetime
++from analyzer.engine import Engine
++from analyzer.state import ScenarioState
++from builders import build
++
++
++def test_source_postconstruct_initializes_private_key_without_startup_edges(tmp_path):
++    source='''import java.util.*;import io.jsonwebtoken.*;import javax.annotation.PostConstruct;
++      import org.springframework.stereotype.Component;
++      @Component class Signer {private String secret="secret";private long duration=60000;
++       @PostConstruct void init(){secret=Base64.getEncoder().encodeToString(secret.getBytes());}
++       String token(){return Jwts.builder().setSubject("reader").setExpiration(new Date(new Date().getTime()+duration))
++        .signWith(SignatureAlgorithm.HS256,secret).compact();}}
++      class Api{Signer signer;String entry(){return signer.token();}}'''
++    (tmp_path/'pom.xml').write_text('<project><dependencies><dependency><groupId>io.jsonwebtoken</groupId>'
++      '<artifactId>jjwt</artifactId><version>0.8.0</version></dependency></dependencies></project>')
++    project,db,ids=build(tmp_path,{'Api.java':source})
++    engine=Engine(project,ScenarioState(db,{'clock':datetime(2026,10,18)}))
++    result=engine.run(ids['Api.entry'],{})
++    assert isinstance(result,str) and len(result.split('.'))==3
++    assert ids['Signer.init'] not in {t for _,k,t in engine.edges if k=='executes'}
++    assert ids['Signer.token'] in {t for _,k,t in engine.edges if k=='executes'}
++    assert not engine.approximate
+--- parent28/tests/test_storage_consumer_diagnostic.py
++++ solution29/tests/test_storage_consumer_diagnostic.py
+@@ -0,0 +1,12 @@
++from analyzer.frontend import Frontend
++from analyzer.state import ScenarioState,U
++from builders import build
++
++
++def test_storage_keys_of_different_clients_do_not_create_a_session(tmp_path):
++    project,db,_=build(tmp_path,{'Api.java':'class Api{void entry(){}}'})
++    frontend=Frontend(project);state=ScenarioState(db)
++    state.browser['storage']['staff_token']='staff-proof'
++    assert frontend.evaluate('sessionStorage.getItem("visitor_token")',state,{}, {}) is U
++    assert state.browser['storage']=={'staff_token':'staff-proof'}
++    assert state.limitations==['Source storage consumer has no established value: visitor_token']

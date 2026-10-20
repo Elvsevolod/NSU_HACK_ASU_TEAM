@@ -1,0 +1,149 @@
+{
+  "project": "fixture",
+  "scenarios": {
+    "finance-refusal": {
+      "edges": [
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:Account#getName()"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:Account#setLastSeen(Date)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:Account#setName(String)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:Account#setSaving(Saving)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:AccountController#createNewAccount(User)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:AccountController#getAccountByName(String)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:AccountServiceImpl#create(User)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:AccountServiceImpl#findByName(String)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:Saving#setAmount(BigDecimal)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:Saving#setCapitalization(Boolean)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:Saving#setCurrency(Currency)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:Saving#setDeposit(Boolean)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:Saving#setInterest(BigDecimal)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:User#getUsername()"
+        },
+        {
+          "source": "method:account:AccountController#createNewAccount(User)",
+          "relation": "calls",
+          "target": "method:account:AccountServiceImpl#create(User)"
+        },
+        {
+          "source": "method:account:AccountController#getAccountByName(String)",
+          "relation": "calls",
+          "target": "method:account:AccountServiceImpl#findByName(String)"
+        },
+        {
+          "source": "method:account:AccountServiceImpl#create(User)",
+          "relation": "calls",
+          "target": "method:account:Account#getName()"
+        },
+        {
+          "source": "method:account:AccountServiceImpl#create(User)",
+          "relation": "calls",
+          "target": "method:account:Account#setLastSeen(Date)"
+        },
+        {
+          "source": "method:account:AccountServiceImpl#create(User)",
+          "relation": "calls",
+          "target": "method:account:Account#setName(String)"
+        },
+        {
+          "source": "method:account:AccountServiceImpl#create(User)",
+          "relation": "calls",
+          "target": "method:account:Account#setSaving(Saving)"
+        },
+        {
+          "source": "method:account:AccountServiceImpl#create(User)",
+          "relation": "calls",
+          "target": "method:account:Saving#setAmount(BigDecimal)"
+        },
+        {
+          "source": "method:account:AccountServiceImpl#create(User)",
+          "relation": "calls",
+          "target": "method:account:Saving#setCapitalization(Boolean)"
+        },
+        {
+          "source": "method:account:AccountServiceImpl#create(User)",
+          "relation": "calls",
+          "target": "method:account:Saving#setCurrency(Currency)"
+        },
+        {
+          "source": "method:account:AccountServiceImpl#create(User)",
+          "relation": "calls",
+          "target": "method:account:Saving#setDeposit(Boolean)"
+        },
+        {
+          "source": "method:account:AccountServiceImpl#create(User)",
+          "relation": "calls",
+          "target": "method:account:Saving#setInterest(BigDecimal)"
+        },
+        {
+          "source": "method:account:AccountServiceImpl#create(User)",
+          "relation": "calls",
+          "target": "method:account:User#getUsername()"
+        },
+        {
+          "source": "method:account:AccountServiceImpl#create(User)",
+          "relation": "data",
+          "target": "res:collection:account.accounts"
+        },
+        {
+          "source": "method:account:AccountServiceImpl#findByName(String)",
+          "relation": "data",
+          "target": "res:collection:account.accounts"
+        }
+      ]
+    }
+  }
+}

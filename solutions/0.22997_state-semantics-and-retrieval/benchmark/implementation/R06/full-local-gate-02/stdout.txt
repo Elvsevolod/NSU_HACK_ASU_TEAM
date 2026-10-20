@@ -1,0 +1,119 @@
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 10%]
+........................................................................ [ 14%]
+........................................................................ [ 17%]
+........................................................................ [ 21%]
+........................................................................ [ 24%]
+........................................................................ [ 28%]
+........................................................................ [ 31%]
+........................................................................ [ 35%]
+........................................................................ [ 38%]
+......................................FFF............................... [ 42%]
+........................................................................ [ 45%]
+........................................................................ [ 49%]
+........................................................................ [ 52%]
+........................................................................ [ 56%]
+........................................................................ [ 59%]
+........................................................................ [ 63%]
+........................................................................ [ 66%]
+........................................................................ [ 70%]
+........................................................................ [ 73%]
+........................................................................ [ 77%]
+........................................................................ [ 80%]
+........................................................................ [ 84%]
+........................................................................ [ 87%]
+........................................................................ [ 91%]
+........................................................................ [ 94%]
+........................................................................ [ 98%]
+.......................................                                  [100%]
+=================================== FAILURES ===================================
+_______ test_batch_unique_membership_noop_and_following_http_request[1] ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-27/test_batch_unique_membership_n0')
+limit = 1
+
+    @pytest.mark.parametrize('limit',[1,4,8])
+    def test_batch_unique_membership_noop_and_following_http_request(tmp_path,limit):
+        p,db,ids=fixture(tmp_path);state=ScenarioState(db)
+        paths=run_paths(p,state,ids['gateway.InventoryGateway.listProducts'],Request.http('gateway','GET','/inventory'),limit=limit)
+        # The category query has two legal orders. The product list is explicitly
+        # built in SKU7/8/9 order by the warehouse source and must keep that order.
+        assert len(paths)==2
+        def category_order(path):
+            engine=path['engine']
+            request=next(r for r in engine.request_events if r['entry']==ids['catalog.CategoryController.lookup'])
+            response=next(r for r in engine.http_responses if r['request']==request['id'])
+            return tuple(row['code'] for row in response['body'])
+>       assert {category_order(path) for path in paths}=={
+                ('hardware','office'),('office','hardware')}
+E       AssertionError: assert {('hardware', 'office')} == {('hardware',..., 'hardware')}
+E         
+E         Extra items in the right set:
+E         ('office', 'hardware')
+E         Use -v to get more diff
+
+code/tests/test_inventory_collection_journey.py:86: AssertionError
+_______ test_batch_unique_membership_noop_and_following_http_request[4] ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-27/test_batch_unique_membership_n1')
+limit = 4
+
+    @pytest.mark.parametrize('limit',[1,4,8])
+    def test_batch_unique_membership_noop_and_following_http_request(tmp_path,limit):
+        p,db,ids=fixture(tmp_path);state=ScenarioState(db)
+        paths=run_paths(p,state,ids['gateway.InventoryGateway.listProducts'],Request.http('gateway','GET','/inventory'),limit=limit)
+        # The category query has two legal orders. The product list is explicitly
+        # built in SKU7/8/9 order by the warehouse source and must keep that order.
+        assert len(paths)==2
+        def category_order(path):
+            engine=path['engine']
+            request=next(r for r in engine.request_events if r['entry']==ids['catalog.CategoryController.lookup'])
+            response=next(r for r in engine.http_responses if r['request']==request['id'])
+            return tuple(row['code'] for row in response['body'])
+>       assert {category_order(path) for path in paths}=={
+                ('hardware','office'),('office','hardware')}
+E       AssertionError: assert {('hardware', 'office')} == {('hardware',..., 'hardware')}
+E         
+E         Extra items in the right set:
+E         ('office', 'hardware')
+E         Use -v to get more diff
+
+code/tests/test_inventory_collection_journey.py:86: AssertionError
+_______ test_batch_unique_membership_noop_and_following_http_request[8] ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-27/test_batch_unique_membership_n2')
+limit = 8
+
+    @pytest.mark.parametrize('limit',[1,4,8])
+    def test_batch_unique_membership_noop_and_following_http_request(tmp_path,limit):
+        p,db,ids=fixture(tmp_path);state=ScenarioState(db)
+        paths=run_paths(p,state,ids['gateway.InventoryGateway.listProducts'],Request.http('gateway','GET','/inventory'),limit=limit)
+        # The category query has two legal orders. The product list is explicitly
+        # built in SKU7/8/9 order by the warehouse source and must keep that order.
+        assert len(paths)==2
+        def category_order(path):
+            engine=path['engine']
+            request=next(r for r in engine.request_events if r['entry']==ids['catalog.CategoryController.lookup'])
+            response=next(r for r in engine.http_responses if r['request']==request['id'])
+            return tuple(row['code'] for row in response['body'])
+>       assert {category_order(path) for path in paths}=={
+                ('hardware','office'),('office','hardware')}
+E       AssertionError: assert {('hardware', 'office')} == {('hardware',..., 'hardware')}
+E         
+E         Extra items in the right set:
+E         ('office', 'hardware')
+E         Use -v to get more diff
+
+code/tests/test_inventory_collection_journey.py:86: AssertionError
+=============================== warnings summary ===============================
+checks/tests/test_archive_support.py::test_duplicate_symlink_or_corruption[options0]
+  /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/zipfile.py:1566: UserWarning: Duplicate name: 'submission.json'
+    return self._open_to_write(zinfo, force_zip64=force_zip64)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED code/tests/test_inventory_collection_journey.py::test_batch_unique_membership_noop_and_following_http_request[1]
+FAILED code/tests/test_inventory_collection_journey.py::test_batch_unique_membership_noop_and_following_http_request[4]
+FAILED code/tests/test_inventory_collection_journey.py::test_batch_unique_membership_noop_and_following_http_request[8]
+3 failed, 2052 passed, 1 warning in 9.24s

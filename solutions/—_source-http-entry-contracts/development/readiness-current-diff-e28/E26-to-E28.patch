@@ -1,0 +1,364 @@
+--- E26/analyzer/java_lists.py
++++ E28/analyzer/java_lists.py
+@@ -89,6 +89,9 @@
+     if name=='clear' and not args:
+         if obj and not resizable(obj):return unresolved('List mutability is unresolved',obj)
+         obj.clear();return True,None
++    # Stream creation is lazy. Keep the native receiver/lifecycle even when
++    # membership is unknown; the terminal operation owns that boundary.
++    if name in ('stream','parallelStream') and not args:return False,U
+     if obj.opaque:return unresolved('List contents or length are unresolved')
+     if isinstance(obj,ArrayListView) and name=='set' and len(args)==2:
+         index,value=args
+--- E26/analyzer/knowledge.py
++++ E28/analyzer/knowledge.py
+@@ -30,9 +30,12 @@
+ 
+ def record(engine,phase,cause,node=None,before=U,after=U,declared_type='',runtime_kind=None,
+            affected=(),possible_writes=(),completion='unresolved'):
+-    meta=engine.p.methods.get(engine.method,{})
++    source_mid=engine.method
++    if node is None and engine.boundary_frames:
++        source_mid,node,_=engine.boundary_frames[-1]
++    meta=engine.p.methods.get(source_mid,{})
+     location={'file':meta.get('file'),'line':node.start_point.row+1 if node is not None else None,
+-        'end_line':node.end_point.row+1 if node is not None else None,'method':engine.method}
++        'end_line':node.end_point.row+1 if node is not None else None,'method':source_mid}
+     key=(phase,cause,location['file'],location['line'],declared_type,
+         tuple((g.get('condition'),str(g.get('value')),g.get('assumed')) for g in engine.guard_stack))
+     if key in engine.loss_keys:return
+@@ -40,14 +43,32 @@
+     if len(engine.loss_events)>=128:
+         engine.loss_records_omitted+=1;return
+     source=engine.p.sources.get(meta.get('file'),b'')
++    request_id=(engine.filter_frames[-1]['request_id'] if engine.filter_frames else
++        next((r['id'] for r in reversed(engine.request_events) if r['entry']==source_mid),None))
++    request_index=next((i for i,r in enumerate(engine.request_events) if r['id']==request_id),None)
++    request_event=engine.request_events[request_index] if request_index is not None else {}
++    request=request_event.get('request') or {}
++    from .resource_effects import proven_read
++    reads=[{'resource':op['resource'],'operation':op['operation'],'request_id':op.get('request_id'),
++        'data_operation_index':i} for i,op in enumerate(engine.data_operations)
++        if op.get('source_site') in engine.p.nodes and proven_read(engine.p,op['source_site'])]
++    invocation=node
++    while invocation is not None and invocation.type!='method_invocation':invocation=invocation.parent
++    callsite=engine.p.site(source_mid,invocation) if invocation is not None else None
+     event={'sequence':len(engine.loss_events)+1,'phase':phase,'cause':cause,'location':location,
++        'callsite':callsite,
+         'source_sha256':hashlib.sha256(source).hexdigest() if source else None,
+         'declared_type':declared_type or None,'runtime_kind':runtime_kind,
+         'before':abstract(before),'after':abstract(after),'completion':completion,
+         'guards':deepcopy(engine.guard_stack),'assumptions':list(engine.execution_assumptions),
+         'prefix_event_count':len(engine.events),'prefix_edges':[list(e['edge']) for e in engine.events[-12:]],
+         'actual_effect_count':len(engine.data_operations),'actual_effects':deepcopy(engine.data_operations[-4:]),
++        'read_locations':reads,'read_locations_scope':'source-proven repository reads in executed SQL prefix; all accesses remain in data_operations',
+         'possible_write_footprint':list(possible_writes),'widened_locations':list(affected),
+-        'request_id':engine.request_events[-1].get('id') if engine.request_events else None,
+-        'producer_lineage':'request bound_arguments / request provenance and state history; see full step trace'}
++        'request_id':request_id,'producer_lineage':{
++            'entry':request_event.get('entry'),
++            'request_event_reference':'requests['+str(request_index)+']' if request_index is not None else None,
++            'bound_arguments_reference':'requests['+str(request_index)+'].bound_arguments' if request_index is not None else None,
++            'provenance':deepcopy(request.get('provenance')),
++            'history_length':len(engine.state.history) if engine.state is not None else 0}}
+     engine.loss_events.append(event)
+--- E26/tests/test_list_search_contracts.py
++++ E28/tests/test_list_search_contracts.py
+@@ -25,14 +25,29 @@
+     assert ('','executes',ids['Key.equals']) in e.edges
+ 
+ 
+-def test_equality_throw_skips_suffix(tmp_path):
++@pytest.mark.parametrize('operation', ['indexOf', 'lastIndexOf'])
++def test_equality_throw_skips_suffix(tmp_path, operation):
+     p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;
+       class Key{public boolean equals(Object x){throw new IllegalStateException();}}
+-      class Api{int entry(){List<Object> values=Arrays.asList("A");values.indexOf(new Key());return after();}
+-      int after(){return 9;}}'''})
++      class Api{int entry(){List<Object> values=Arrays.asList("A");values.OPERATION(new Key());return after();}
++      int after(){return 9;}}'''.replace('OPERATION', operation)})
+     e=Engine(p,ScenarioState(db));e.run(ids['Api.entry'],{})
+     assert e.outcome=='uncaught application exception'
+     assert ('','executes',ids['Api.after']) not in e.edges
++
++
++@pytest.mark.parametrize('operation,expected_trace', [('indexOf', 'AB'), ('lastIndexOf', 'CB')])
++def test_callback_encounter_order_and_method_return_consumer(tmp_path, operation, expected_trace):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;
++      class Key{String seen="";public boolean equals(Object x){seen=seen+x;return "B".equals(x);}}
++      class Api{int find(List<Object> values,Key key){return values.OPERATION(key);}
++        Object entry(){Key key=new Key();List<Object> values=Arrays.asList("A","B","C");
++          List<Object> alias=values;int pos=find(values,key);Object first=alias.get(0);Object last=alias.get(2);
++          return Arrays.asList(pos,key.seen,first,last,alias==values);}}'''.replace('OPERATION',operation)})
++    e=Engine(p,ScenarioState(db));result=e.run(ids['Api.entry'],{})
++    assert result == [1, expected_trace, 'A', 'C', True], (result, sorted(e.warnings), e.effect_events)
++    assert result.kinds[0] == 'Integer' and not e.approximate
++    assert ('','executes',ids['Api.find']) in e.edges
+ 
+ 
+ @pytest.mark.parametrize('opaque,ordered',[(True,True),(False,False)])
+--- E26/tests/test_native_equipment_contracts33.py
++++ E28/tests/test_native_equipment_contracts33.py
+@@ -0,0 +1,191 @@
++"""Imported Spring/JPA counterpart of the R03/R05 kernel fixtures.
++
++The supplied skeleton defines deployment/SQL ownership. Component scanning,
++repository and RestTemplate beans are assumed available; no JVM is launched.
++Expected finite edges, messages and rows are derived from the source below.
++The opaque-input checks are application slices, not concrete HTTP messages.
++"""
++from copy import deepcopy
++import json
++
++import pytest
++
++from analyzer.engine import Engine
++from analyzer.native_storage import JavaList
++from analyzer.project import Project
++from analyzer.request import Request
++from analyzer.state import ScenarioState, U
++from builders import build
++
++
++INITIAL = [{'id': 'A', 'status': 'free'}, {'id': 'B', 'status': 'free'}]
++RID = 'res:table:service.equipment'
++
++
++def equipment(root, rows=None, body='String projected=item;', suffix=''):
++    sources = {
++        'warehouse/WarehouseApp.java': '''import org.springframework.boot.autoconfigure.SpringBootApplication;
++          @SpringBootApplication public class WarehouseApp {}''',
++        'warehouse/Warehouse.java': '''import java.util.Optional;
++          import org.springframework.beans.factory.annotation.Autowired;
++          import org.springframework.web.bind.annotation.*;
++          import org.springframework.http.ResponseEntity;
++          @RestController public class Warehouse {
++            @Autowired Store store;
++            @GetMapping("/equipment/{id}") public String read(@PathVariable String id) {
++              return store.findById(id).get().status;
++            }
++            @PostMapping("/reserve/{id}") public ResponseEntity<String> reserve(@PathVariable String id) {
++              Optional<Item> found=store.findById(id);
++              if(found.isEmpty()) return ResponseEntity.status(404).body("absent");
++              Item item=found.get();item.status="reserved";store.save(item);
++              return ResponseEntity.ok(item.status);
++            }
++          }''',
++        'warehouse/Item.java': '''import jakarta.persistence.*;
++          @Entity @Table(name="equipment") public class Item {
++            @Id public String id; public String status;
++            protected Item() {}
++          }''',
++        'warehouse/Store.java': '''import java.util.Optional;
++          import org.springframework.data.jpa.repository.JpaRepository;
++          public interface Store extends JpaRepository<Item,String> {
++            Optional<Item> findById(String id); Item save(Item value);
++          }''',
++        'approval/ApprovalApp.java': '''import org.springframework.boot.autoconfigure.SpringBootApplication;
++          import org.springframework.context.annotation.Bean;
++          import org.springframework.web.client.RestTemplate;
++          @SpringBootApplication public class ApprovalApp {
++            @Bean public RestTemplate restTemplate(){return new RestTemplate();}
++          }''',
++        'approval/Approval.java': '''import java.util.*;
++          import org.springframework.beans.factory.annotation.Autowired;
++          import org.springframework.web.bind.annotation.*;
++          import org.springframework.web.client.RestTemplate;
++          @RestController public class Approval {
++            @Autowired RestTemplate rest;
++            @PostMapping("/approval") public String entry() {
++              Arrays.asList("A","B").stream().forEach(id->{
++                rest.postForObject("http://warehouse/reserve/"+id,null,String.class);
++              });
++              return rest.getForObject("http://warehouse/equipment/A",String.class);
++            }
++            public String inspect(String id,List<String> unknown,boolean inspectOnly) {
++              String prefix=rest.getForObject("http://warehouse/equipment/"+id,String.class);
++              if(inspectOnly){for(String item:unknown){BODY}SUFFIX return prefix;}
++              return rest.postForObject("http://warehouse/reserve/"+id,null,String.class);
++            }
++          }'''.replace('BODY', body).replace('SUFFIX', suffix),
++    }
++    p, db, ids = build(root, sources, rows={'equipment': deepcopy(INITIAL if rows is None else rows)})
++    graph = p.skeleton
++    for unit in ('approval', 'warehouse'):
++        graph['nodes']['module:'+unit] = {'kind': 'module', 'name': unit, 'deployment_units': [unit]}
++    for node in graph['nodes'].values():
++        if node.get('file'):
++            node['module'] = node['file'].split('/')[0]
++    # Possible transport edges belong to the input skeleton, not the oracle.
++    for nid, node in list(graph['nodes'].items()):
++        if node.get('kind') == 'call_site' and node.get('file') == 'approval/Approval.java':
++            target = {'getForObject': 'Warehouse.read', 'postForObject': 'Warehouse.reserve'}.get(node.get('callee'))
++            if target:
++                graph['edges'].append({'source': nid, 'type': 'remote_call', 'target': ids[target]})
++    (root/'skeleton.json').write_text(json.dumps(graph))
++    return Project(root/'skeleton.json', root), db, ids
++
++
++def source_edges(ids, caller, targets):
++    return {('', 'executes', ids[caller])} | {
++        edge for target in targets for edge in (
++            ('', 'executes', ids[target]),
++            (ids[caller], 'remote', ids[target]),
++            (ids[target], 'data', RID),
++        )
++    }
++
++
++@pytest.mark.parametrize('enabled', [False, True])
++def test_native_finite_callback_full_http_edges_and_rows(tmp_path, enabled):
++    p, db, ids = equipment(tmp_path)
++    assert {x['status'] for x in p.handler_registration} == {'conditional_controller'}
++    e = Engine(p, ScenarioState(db, {'scoped_effect_summary': enabled}))
++    assert e.run(ids['Approval.entry'], Request.http('approval', 'POST', 'http://approval/approval')) == 'reserved'
++    assert e.outcome == 'returned' and not e.approximate
++    assert e.edges == source_edges(ids, 'Approval.entry', ['Warehouse.reserve', 'Warehouse.read'])
++    assert [x['operation'] for x in e.data_operations] == ['findById', 'save', 'findById', 'save', 'findById']
++    assert e.state.database.rows(p.nodes[RID]) == [
++        {'id': 'A', 'status': 'reserved', '__type__': 'Item'},
++        {'id': 'B', 'status': 'reserved', '__type__': 'Item'}]
++    assert [(x['request']['method'], x['request']['url']) for x in e.request_events] == [
++        ('POST', 'http://approval/approval'), ('POST', 'http://warehouse/reserve/A'),
++        ('POST', 'http://warehouse/reserve/B'), ('GET', 'http://warehouse/equipment/A')]
++    assert {x['request']: (x['status'], x['body']) for x in e.http_responses} == {
++        n: (200, 'reserved') for n in (1, 2, 3, 4)}
++    assert ScenarioState(db).database.rows(p.nodes[RID]) == INITIAL
++
++
++@pytest.mark.parametrize('enabled', [False, True])
++def test_native_callback_http404_retains_prefix_and_never_reads_suffix(tmp_path, enabled):
++    p, db, ids = equipment(tmp_path, INITIAL[:1])
++    e = Engine(p, ScenarioState(db, {'scoped_effect_summary': enabled}))
++    assert e.run(ids['Approval.entry'], Request.http('approval', 'POST', 'http://approval/approval')) is U
++    assert e.outcome == 'uncaught application exception'
++    assert e.edges == source_edges(ids, 'Approval.entry', ['Warehouse.reserve'])
++    assert [x['operation'] for x in e.data_operations] == ['findById', 'save', 'findById']
++    assert e.state.database.rows(p.nodes[RID]) == [{'id': 'A', 'status': 'reserved', '__type__': 'Item'}]
++    responses = {x['request']: x for x in e.http_responses}
++    assert (responses[2]['status'], responses[2]['body']) == (200, 'reserved')
++    assert (responses[3]['status'], responses[3]['body']) == (404, 'absent')
++    assert len(e.request_events) == 3
++
++
++def test_native_readonly_slice_is_a_boundary_with_precise_independent_rows(tmp_path):
++    p, db, ids = equipment(tmp_path)
++    engines = []
++    for enabled in (False, True):
++        unknown = JavaList(); unknown.opaque = True
++        e = Engine(p, ScenarioState(db, {'scoped_effect_summary': enabled}))
++        assert e.run(ids['Approval.inspect'], {'id': 'A', 'unknown': unknown, 'inspectOnly': True}) is U
++        assert e.outcome == 'unsupported_semantics boundary'
++        assert e.edges == source_edges(ids, 'Approval.inspect', ['Warehouse.read'])
++        assert [x['operation'] for x in e.data_operations] == ['findById']
++        assert [(x['status'], x.get('body')) for x in e.http_responses] == [(200, 'free')]
++        engines.append(e)
++    assert engines[0].state.database.rows(p.nodes[RID]) is None
++    assert engines[1].state.database.rows(p.nodes[RID]) == INITIAL
++    summary = next(x for x in engines[1].effect_events if x.get('model_version') == 'readonly-native-foreach-stop/1')
++    assert summary['write_footprint'] == [] and summary['completion'] == 'analysis boundary retained'
++    assert summary['return'] == summary['throw'] == 'not supplied'
++    assert ScenarioState(db).database.rows(p.nodes[RID]) == INITIAL
++
++
++def test_loss_records_observed_reads_and_current_request_after_remote_return(tmp_path):
++    p, db, ids = equipment(tmp_path)
++    unknown = JavaList(); unknown.opaque = True
++    e = Engine(p, ScenarioState(db, {'scoped_effect_summary': True}))
++    e.run(ids['Approval.inspect'], {'id': 'A', 'unknown': unknown, 'inspectOnly': True})
++    loss = next(x for x in e.loss_events if x['phase'] == 'unsupported')
++    assert loss['read_locations'] == [
++        {'resource': RID, 'operation': 'findById', 'request_id': 2, 'data_operation_index': 0}]
++    assert loss['request_id'] == 1
++    assert loss['producer_lineage']['request_event_reference'] == 'requests[0]'
++    assert loss['producer_lineage']['bound_arguments_reference'] == 'requests[0].bound_arguments'
++    assert loss['producer_lineage']['entry'] == ids['Approval.inspect']
++    assert loss['location']['file'] == 'approval/Approval.java' and loss['location']['line'] is not None
++    assert loss['actual_effect_count'] == 1 and not loss['widened_locations']
++
++
++@pytest.mark.parametrize('body,suffix', [
++    ('rest.postForObject("http://warehouse/reserve/"+item,null,String.class);', ''),
++    ('RestTemplate alias=rest;alias.postForObject("http://warehouse/reserve/"+item,null,String.class);', ''),
++    ('String projected=item;', 'rest.postForObject("http://warehouse/reserve/A",null,String.class);'),
++])
++def test_native_potential_remote_write_cannot_get_a_readonly_summary(tmp_path, body, suffix):
++    p, db, ids = equipment(tmp_path, body=body, suffix=suffix)
++    unknown = JavaList(); unknown.opaque = True
++    e = Engine(p, ScenarioState(db, {'scoped_effect_summary': True}))
++    assert e.run(ids['Approval.inspect'], {'id': 'A', 'unknown': unknown, 'inspectOnly': True}) is U
++    assert e.outcome == 'unsupported_semantics boundary'
++    assert not any(x.get('model_version') == 'readonly-native-foreach-stop/1' for x in e.effect_events)
++    assert not any(x.get('operation') == 'save' for x in e.data_operations)
++    assert e.state.database.rows(p.nodes[RID]) is None
+--- E26/tests/test_static_namespace_controls33.py
++++ E28/tests/test_static_namespace_controls33.py
+@@ -0,0 +1,41 @@
++"""Distinct declaring owners for same-named static types in one deployment."""
++import json
++
++from analyzer.engine import Engine
++from analyzer.project import Project
++from analyzer.state import Database, ScenarioState
++
++
++def test_static_import_and_qualified_cells_keep_both_packages_and_scenario_state(tmp_path):
++    sources = {
++        'alpha/Material.java': 'package alpha; public class Material {public static int count=2;}',
++        'beta/Material.java': 'package beta; public class Material {public static int count=20;}',
++        'app/Api.java': '''package app; import alpha.Material; import static beta.Material.count;
++          public class Api {
++            public int entry(){Material.count++;return Material.count+count;}
++            public int alpha(){return Material.count;}
++            public int beta(){return count;}
++          }''',
++    }
++    nodes = {'module:m': {'kind': 'module', 'name': 'm', 'deployment_units': ['m']}}
++    for name, file in [('alpha.Material', 'alpha/Material.java'),
++                       ('beta.Material', 'beta/Material.java'), ('app.Api', 'app/Api.java')]:
++        nodes['type:'+name] = {'kind': 'type', 'fqn': name, 'file': file, 'module': 'm'}
++    for name, line in [('entry', 3), ('alpha', 4), ('beta', 5)]:
++        nodes['method:app.Api#'+name] = {
++            'kind': 'method', 'owner': 'type:app.Api', 'name': name, 'file': 'app/Api.java',
++            'module': 'm', 'line': line, 'params_as_written': [], 'annotations': [], 'return_raw': 'int'}
++    for file, source in sources.items():
++        path = tmp_path/file; path.parent.mkdir(parents=True, exist_ok=True); path.write_text(source)
++    (tmp_path/'skeleton.json').write_text(json.dumps({'nodes': nodes, 'edges': []}))
++    (tmp_path/'initial.sql').write_text('')
++    p = Project(tmp_path/'skeleton.json', tmp_path)
++    db = Database(tmp_path/'initial.sql'); state = ScenarioState(db)
++    assert Engine(p, state).run('method:app.Api#entry', {}) == 23
++    assert Engine(p, state).run('method:app.Api#alpha', {}) == 3
++    assert Engine(p, state).run('method:app.Api#beta', {}) == 20
++    assert state.static_fields['type:alpha.Material']['count'] == 3
++    assert state.static_fields['type:beta.Material']['count'] == 20
++    assert all(state.static_fields[owner].kinds['count'] == 'Integer'
++               for owner in ('type:alpha.Material', 'type:beta.Material'))
++    assert Engine(p, ScenarioState(db)).run('method:app.Api#alpha', {}) == 2
+--- E26/tests/test_stream_completion32.py
++++ E28/tests/test_stream_completion32.py
+@@ -72,3 +72,24 @@
+     p,db,ids=build(tmp_path,{'Api.java':'class Bucket{boolean isEmpty(){return false;}}class Api{boolean entry(){return new Bucket().isEmpty();}}'})
+     e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is False
+     assert ('','executes',ids['Bucket.isEmpty']) in e.edges
++
++
++@pytest.mark.parametrize('enabled', [False, True])
++def test_unknown_filter_with_alias_write_retains_stream_boundary_before_callback(tmp_path, enabled):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import jakarta.persistence.*;
++      import org.springframework.beans.factory.annotation.Autowired;
++      import org.springframework.data.jpa.repository.JpaRepository;
++      class Api{@Autowired Store store;Object entry(List<String> input){
++        input.stream().filter(id->{Item row=store.findById(id).get();Item alias=row;
++          alias.status="held";store.save(alias);return true;}).toList();return after();}
++        int after(){return 99;}}
++      @Entity @Table(name="items")class Item{@Id public String id;public String status;}
++      interface Store extends JpaRepository<Item,String>{Optional<Item> findById(String id);Item save(Item item);}'''},
++      rows={'items':[{'id':'A','status':'free'}]})
++    values=JavaList();values.opaque=True;e=Engine(p,ScenarioState(db,{'scoped_effect_summary':enabled}))
++    assert e.run(ids['Api.entry'],{'input':values}) is U
++    assert e.outcome=='unsupported_semantics boundary'
++    assert ('','executes',ids['Api.after']) not in e.edges
++    assert not e.data_operations
++    assert not any(x.get('model_version') in ('readonly-native-foreach-stop/1','opaque-java-call/1') for x in e.effect_events)
++    assert e.state.database.rows(p.nodes['res:table:service.items']) is None

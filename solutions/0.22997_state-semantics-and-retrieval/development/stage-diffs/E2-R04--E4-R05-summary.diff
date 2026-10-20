@@ -1,0 +1,577 @@
+--- E2-R04/analyzer/__main__.py
++++ E4-R05-summary/analyzer/__main__.py
+@@ -176,6 +176,8 @@
+                                     'requests': engine.request_events,
+                                     'responses': engine.http_responses,
+                                     'call_effects': engine.effect_events,
++                                    'knowledge_losses':engine.loss_events,
++                                    'knowledge_loss_records_omitted':engine.loss_records_omitted,
+                                     'persistence': engine.persistence_events,
+                                     'static_candidates': pack(engine.candidate_edges, scenario['id']),
+                                     'state_after': following.snapshot(full=True), 'edges': pack(engine.edges, scenario['id'])})
+--- E2-R04/analyzer/call_effects.py
++++ E4-R05-summary/analyzer/call_effects.py
+@@ -26,7 +26,7 @@
+         current = pending.pop()
+         if current in seen:continue
+         seen.add(current)
+-        methods = [mid for mid, meta in project.methods.items() if meta['owner'] == current]
++        methods = [mid for mid, meta in project.methods.items() if meta['owner'] == current and not meta.get('analysis_context')]
+         if methods:
+             from .resource_effects import possible_writes
+             closure=project.ix.closure(set(methods))
+@@ -72,6 +72,8 @@
+     meta = engine.p.methods[engine.method]
+     owner = engine.p.resolve_type(declared, meta['module'], meta['file']) if declared else None
+     resources = source_resources(engine.p, owner)
++    engine.loss('unsupported','opaque call may change reachable heap/global state: '+name,
++        before={'receiver_type':declared},possible_writes=resources or (),completion='normal_or_throw')
+     roots = [receiver, *args, env.get('this', U)]
+     for value in roots:invalidate(value, engine.opaque_heap)
+     callbacks = tuple(index for index, value in enumerate(args)
+--- E2-R04/analyzer/engine.py
++++ E4-R05-summary/analyzer/engine.py
+@@ -281,6 +281,16 @@
+         self.persistence_events = []
+         self.implicit_initializer = 0
+         self.initializer_context = None
++        self.loss_events,self.loss_keys=[],set()
++        self.loss_records_omitted=0
++        self.execution_frames=[]
++        self.boundary_frames=[]
++        self.boundary_guards=[]
++        self.boundary_had_transaction=False
++
++    def loss(self,phase,cause,node=None,**facts):
++        from .knowledge import record
++        record(self,phase,cause,node,**facts)
+ 
+     def source_call_visible(self):
+         return not self.initializer_context or self.method != self.initializer_context[1] or not self.initializer_context[2]
+@@ -386,14 +396,18 @@
+             if self.outcome == 'returned' and http_entity(result) and type(result.get('status')) is int and result['status']>=400:
+                 self.outcome='HTTP error response'
+         except AnalysisBoundary as boundary:
++            self.loss('budget' if boundary.category=='completion_budget' else 'unsupported',str(boundary),completion='boundary')
+             self.outcome='analysis completion budget exhausted' if boundary.category=='completion_budget' else boundary.category+' boundary'
+             self.operation_issues[(boundary.category,'stop')]+=1
+             self.warnings.add(str(boundary))
+-            self.fallback(entry)
+-            message='unobserved continuation after completion budget: '+entry
++            from .scoped_effects import stop_summary
++            summary=stop_summary(self,boundary)
++            if summary:self.effect_events.append(summary)
++            self.fallback(entry,preserve_writes=summary is not None)
++            message='unobserved continuation after '+boundary.category+': '+entry
+             from .resource_effects import possible_writes
+             closure=self.p.ix.closure({entry})
+-            writable=possible_writes(self.p,closure[0],closure[3],bool(self.state.transactions))
++            writable=set() if summary else possible_writes(self.p,closure[0],closure[3],bool(self.state.transactions))
+             for _,relation,rid in self.candidate_edges:
+                 if relation!='data' or rid not in writable:continue
+                 rows=self.state.database.rows(self.p.nodes[rid])
+@@ -401,6 +415,7 @@
+                 self.state.resource_assumptions.setdefault(rid,[]).append(message)
+             return U
+         except JavaThrow as exc:
++            self.loss('application_exception',str(exception_type(exc.value)),completion='throw')
+             self.outcome = 'uncaught application exception'
+             self.warnings.add('uncaught Java exception: '+str(exception_type(exc.value)))
+             return U
+@@ -822,7 +837,7 @@
+             raise JavaThrow(result)
+         return result
+ 
+-    def fallback(self, mid):
++    def fallback(self, mid,preserve_writes=False):
+         if self.p.methods.get(mid,{}).get('analysis_context'):
+             raise AnalysisBoundary('unmodeled effect in static initialization: '+self.p.methods[mid]['owner'],category='unsupported_semantics')
+         self.approximate = True
+@@ -831,7 +846,8 @@
+         if mid not in cache:cache[mid]=self.p.ix.closure({mid})
+         methods, calls, remote, data = cache[mid]
+         from .resource_effects import possible_writes
+-        writable=possible_writes(self.p,methods,data,bool(self.state.transactions))
++        writable=set() if preserve_writes else possible_writes(self.p,methods,data,bool(self.state.transactions))
++        widened=[]
+         for method in methods:
+             self.candidate_edges.add(('', 'executes', method))
+         for relation, pairs in [('calls', calls), ('remote', remote), ('data', data)]:
+@@ -841,6 +857,9 @@
+                     rows = self.state.database.rows(self.p.nodes[target])
+                     if rows is not None:
+                         self.state.database.invalidate(rows)
++                        widened.append(target)
++        if widened:self.loss('fallback','entry/method writable closure widened; not an executed SQL write',
++            affected=sorted(set(widened)),possible_writes=sorted(writable),completion='boundary_or_approximation')
+ 
+     def execution_fork(self,state):
+         # Method execution never mutates completed request observations. Share
+@@ -861,7 +880,7 @@
+                     'history': before.history, 'params': self.params, 'opaque_heap': self.opaque_heap,
+                     'managed': {unit: frame['managed'] for unit, frame in before.transactions.items()}}
+         alternatives, states, results, controls = [], [], [], []
+-        diagnostic_names=('events','request_events','http_responses','effect_events','persistence_events','data_operations','semantic_callbacks')
++        diagnostic_names=('events','request_events','http_responses','effect_events','persistence_events','data_operations','semantic_callbacks','loss_events')
+         prefix={name:len(getattr(self,name)) for name in diagnostic_names}
+         segments=[]
+         try:
+@@ -1093,6 +1112,8 @@
+                 else:
+                     self.approximate=True
+                     self.warnings.add('primitive binding has an unresolved unboxing source: '+written)
++                    self.loss('binding','primitive binding has an unresolved unboxing source',node,
++                        before=value,after=U,declared_type=wanted,runtime_kind=kind)
+                     return U,None
+             if is_symbolic(value) and value.get('__type__') in (wanted,self.declared_kind(wanted),'java.lang.'+self.declared_kind(wanted)):
+                 return value,self.declared_kind(wanted)
+@@ -1345,7 +1366,19 @@
+                            for key in ('left','right'))
+         return op in ('-','*','/','%','<','>','<=','>=','&','|','^','<<','>>','>>>','&&','||')
+ 
+-    def execute(self, node, env):
++    def execute(self,node,env):
++        self.execution_frames.append((self.method,node,env))
++        try:return self.execute_statement(node,env)
++        except AnalysisBoundary as boundary:
++            if not self.boundary_frames:
++                self.boundary_frames=list(self.execution_frames)
++                self.boundary_guards=deepcopy(self.guard_stack)
++                self.boundary_had_transaction=bool(self.state.transactions)
++            self.loss('budget' if boundary.category=='completion_budget' else 'unsupported',str(boundary),node,completion='boundary')
++            raise
++        finally:self.execution_frames.pop()
++
++    def execute_statement(self, node, env):
+         if node is None:
+             return U, None
+         typ = node.type
+@@ -1625,12 +1658,19 @@
+         self.value_frames.append({})
+         self.last_reference_kind=NO_KIND
+         try:result=self.expression_value(node,env)
++        except AnalysisBoundary as boundary:
++            self.loss('budget' if boundary.category=='completion_budget' else 'unsupported',str(boundary),node,completion='boundary')
++            raise
+         finally:frame=self.value_frames.pop()
+         self.last_reference_kind=frame.get('kind','Boolean' if type(result) is bool else NO_KIND)
+         if self.last_reference_kind=='Float' and result is not U and result is not None and not (type(result) is float and result==0.0):
+             self.approximate=True
+             self.warnings.add('float scalar promotion or rounding is not modeled: '+self.method)
+             result=U
++        if result is U and node is not None and node.type in ('identifier','field_access','method_invocation','array_access'):
++            from .knowledge import type_qualifier
++            if not type_qualifier(self,node,env):self.loss('input_or_value' if node.type in ('identifier','field_access') else 'unsupported_value',
++                'unresolved '+node.type,node,declared_type=self.source_type(node),runtime_kind=self.last_reference_kind if self.last_reference_kind is not NO_KIND else None)
+         return result
+ 
+     def expression_value(self, node, env):
+@@ -1845,10 +1885,6 @@
+             load(self,obj,field,self.p.methods[self.method]['file']+':'+str(node.start_point.row+1))
+             if obj is None:
+                 declared=self.source_type(node.child_by_field_name('object'))
+-                constant=self.p.constants.get(declared.split('.')[-1]+'.'+field,U)
+-                if constant is not U:
+-                    self.remember_reference_kind(self.p.constant_kinds.get(declared.split('.')[-1]+'.'+field))
+-                    return constant
+                 owner=self.p.resolve_type(declared,self.p.methods[self.method]['module'],self.p.methods[self.method]['file'])
+                 if field in self.p.type_fields.get(owner,{}) or declared.endswith('[]') and field=='length':
+                     raise JavaThrow({'__type__':'NullPointerException'})
+@@ -2147,7 +2183,6 @@
+             return 'java.lang.Class<'+target+'>'
+         if kind=='character_literal':return 'char'
+         if kind in ('true','false'):return 'boolean'
+-        if kind=='instanceof_expression':return 'boolean'
+         if kind in ('decimal_integer_literal','decimal_floating_point_literal'):return self.numeric_type(node)
+         if kind=='this':return self.receiver_type or self.p.nodes[meta['owner']]['fqn']
+         if kind=='identifier':
+@@ -3027,7 +3062,12 @@
+             if handled:return value
+         if not targets and isinstance(obj,list) and name in ('contains','indexOf','lastIndexOf') and len(args)==1:
+             self.remember_reference_kind('Boolean' if name=='contains' else 'Integer')
+-            return self.collection_membership(obj,args[0],name,reason,argument_kinds[0])
++            value=self.collection_membership(obj,args[0],name,reason,argument_kinds[0])
++            if name!='contains':self.effect_events.append({'model_version':'native-list-search/1','operation':name,
++                'callsite':reason,'declared_return':'int','result':value,'result_kind':'Integer',
++                'membership_known':not getattr(obj,'opaque',False),'order_known':getattr(obj,'order_known',True),
++                'resource_writes':[]})
++            return value
+         if not targets and name=='getClass' and not args and isinstance(obj,dict) and (isinstance(obj,JavaRecord) or type(obj) is dict and obj.get('__type__')):
+             if isinstance(obj,JavaRecord) and not isinstance(obj,JavaObject):
+                 self.approximate=True
+--- E2-R04/analyzer/knowledge.py
++++ E4-R05-summary/analyzer/knowledge.py
+@@ -0,0 +1,53 @@
++"""Passive causal loss records, separate from observed program effects."""
++from copy import deepcopy
++import hashlib
++from .state import U
++
++
++def abstract(value):
++    if value is U:return {'knowledge':'unknown'}
++    if value is None or type(value) in (bool,int,float):return {'knowledge':'constant','value':value}
++    if type(value) is str:return {'knowledge':'constant','value':value[:160],'truncated':len(value)>160}
++    if isinstance(value,list):return {'knowledge':'collection','carrier':type(value).__name__,
++        'cardinality':None if getattr(value,'opaque',False) else len(value),
++        'order_known':getattr(value,'order_known',None),'kinds':getattr(value,'kinds',[])[:16]}
++    if isinstance(value,dict):return {'knowledge':'object','carrier':type(value).__name__,
++        'type':getattr(value,'declared_type',value.get('__type__')),'fields':sorted(map(str,value))[:24]}
++    return {'knowledge':'unrendered','carrier':type(value).__name__}
++
++
++def type_qualifier(engine,node,env):
++    from .project import text
++    current=node
++    while current.parent is not None and current.parent.type=='field_access' and current.parent.child_by_field_name('object')==current:
++        current=current.parent
++    parent=current.parent
++    if parent is None or parent.type!='method_invocation' or parent.child_by_field_name('object')!=current:return False
++    root=text(current).split('.')[0]
++    meta=engine.p.methods.get(engine.method,{})
++    return root not in env and root not in engine.variable_types and root not in engine.p.type_fields.get(meta.get('owner'),{})
++
++
++def record(engine,phase,cause,node=None,before=U,after=U,declared_type='',runtime_kind=None,
++           affected=(),possible_writes=(),completion='unresolved'):
++    meta=engine.p.methods.get(engine.method,{})
++    location={'file':meta.get('file'),'line':node.start_point.row+1 if node is not None else None,
++        'end_line':node.end_point.row+1 if node is not None else None,'method':engine.method}
++    key=(phase,cause,location['file'],location['line'],declared_type,
++        tuple((g.get('condition'),str(g.get('value')),g.get('assumed')) for g in engine.guard_stack))
++    if key in engine.loss_keys:return
++    engine.loss_keys.add(key)
++    if len(engine.loss_events)>=128:
++        engine.loss_records_omitted+=1;return
++    source=engine.p.sources.get(meta.get('file'),b'')
++    event={'sequence':len(engine.loss_events)+1,'phase':phase,'cause':cause,'location':location,
++        'source_sha256':hashlib.sha256(source).hexdigest() if source else None,
++        'declared_type':declared_type or None,'runtime_kind':runtime_kind,
++        'before':abstract(before),'after':abstract(after),'completion':completion,
++        'guards':deepcopy(engine.guard_stack),'assumptions':list(engine.execution_assumptions),
++        'prefix_event_count':len(engine.events),'prefix_edges':[list(e['edge']) for e in engine.events[-12:]],
++        'actual_effect_count':len(engine.data_operations),'actual_effects':deepcopy(engine.data_operations[-4:]),
++        'possible_write_footprint':list(possible_writes),'widened_locations':list(affected),
++        'request_id':engine.request_events[-1].get('id') if engine.request_events else None,
++        'producer_lineage':'request bound_arguments / request provenance and state history; see full step trace'}
++    engine.loss_events.append(event)
+--- E2-R04/analyzer/paths.py
++++ E4-R05-summary/analyzer/paths.py
+@@ -12,7 +12,12 @@
+         for key in set(joined.database.tables) | set(other.database.tables):
+             if joined.database.tables.raw_get(key) != other.database.tables.raw_get(key):
+                 joined.database.unknown_tables.add(key)
++                event={'phase':'join','cause':'incompatible row alternatives','widened_location':'.'.join(key),
++                    'actual_sql_write':False,'before':'alternative tables differ','after':'table knowledge unknown'}
++                if event not in joined.join_losses:joined.join_losses.append(event)
+         joined.database.unknown_tables.update(other.database.unknown_tables)
++        for event in other.join_losses:
++            if event not in joined.join_losses:joined.join_losses.append(deepcopy(event))
+         joined.browser = merge(joined.browser, other.browser)
+         joined.actor_browsers = merge(joined.actor_browsers,other.actor_browsers)
+         joined.bean_instances = merge(joined.bean_instances,other.bean_instances)
+--- E2-R04/analyzer/scoped_effects.py
++++ E4-R05-summary/analyzer/scoped_effects.py
+@@ -0,0 +1,96 @@
++"""One stop-only summary: a native unknown foreach with a read-only residual.
++
++No continuation is resumed and no return value is supplied. The proof merely
++avoids invalidating data after a stopped, local scalar projection. The domain
++is {proven_read_only, unproved}; join is unproved unless both prove read-only.
++There is no cache, fixed point, scheduler or exception/transaction shortcut.
++"""
++import hashlib
++from .project import text,walk
++from .native_storage import JavaList
++
++
++def stop_summary(engine,boundary):
++    if not engine.state.context.get('scoped_effect_summary',True):return None
++    frames=engine.boundary_frames
++    if not frames or engine.boundary_had_transaction or engine.state.transactions or engine.state.unscoped_state_assumptions:return None
++    mids={mid for mid,_,_ in frames}
++    if len(mids)!=1:return None
++    mid=next(iter(mids));meta=engine.p.methods[mid]
++    leaf=frames[-1][1];env=frames[-1][2]
++    if leaf is None or leaf.type!='enhanced_for_statement' or 'unknown collection membership' not in str(boundary):return None
++    value_node=leaf.child_by_field_name('value')
++    if value_node is None or value_node.type!='identifier':return None
++    carrier=env.get(text(value_node))
++    if not isinstance(carrier,JavaList) or carrier.flavor not in ('ArrayList','LinkedList','Arrays.ArrayList','HashSet') or not carrier.opaque:return None
++    # Start with the entire unvisited loop body. Add all later statements in
++    # active blocks, every possible catch/finally, and reject repeated loops.
++    residual=[leaf.child_by_field_name('body')]
++    normal_exit=True
++    for index in range(len(frames)-2,-1,-1):
++        _,node,_=frames[index]
++        child=frames[index+1][1]
++        if node.type in ('block','constructor_body'):
++            statements=list(node.named_children)
++            if child not in statements:return None
++            if normal_exit:
++                for statement in statements[statements.index(child)+1:]:
++                    residual.append(statement)
++                    if statement.type in ('return_statement','throw_statement'):
++                        normal_exit=False;break
++        elif node.type in ('while_statement','do_statement','for_statement','enhanced_for_statement'):return None
++        elif node.type in ('try_statement','try_with_resources_statement'):
++            if node.type=='try_with_resources_statement':return None
++            residual.extend(c for c in node.named_children if c.type in ('catch_clause','finally_clause'))
++            if any(c.type=='catch_clause' for c in node.named_children):normal_exit=True
++        elif node.type not in ('if_statement',):return None
++    locals_={name for name,_ in engine.p.parameters(mid)}
++    source=engine.p.ast.get(mid)
++    for node in walk(source):
++        if node.type=='variable_declarator':locals_.add(text(node.child_by_field_name('name')))
++        elif node.type=='enhanced_for_statement':locals_.add(text(node.child_by_field_name('name')))
++    active=set()
++    def readonly(node,owner_mid=mid,names=locals_):
++        if node is None:return True
++        kind=node.type
++        if kind in ('object_creation_expression','array_creation_expression','synchronized_statement','method_reference','lambda_expression','class_declaration','try_with_resources_statement'):return False
++        if kind in ('assignment_expression','update_expression'):
++            left=node.child_by_field_name('left') if kind=='assignment_expression' else next(iter(node.named_children),None)
++            if left is None or left.type!='identifier' or text(left) not in names:return False
++        if kind=='field_access':return False  # lazy/active class reads need another contract
++        if kind=='identifier':
++            owner=engine.p.methods[owner_mid]
++            if text(node) not in names and (text(node) in engine.p.type_fields.get(owner['owner'],{}) or
++                    engine.p.static_field_declaration(owner['owner'],text(node)) or
++                    engine.p.imported_static_field(owner['file'],owner['module'],text(node))):return False
++        if kind=='method_invocation':
++            site=engine.p.site(owner_mid,node)
++            targets=engine.p.targets(owner_mid,site) if site else engine.p.source_targets(owner_mid,node)
++            if not targets:return False
++            for target in targets:
++                body=engine.p.ast.get(target)
++                if target in active or body is None or engine.p.methods[target].get('abstract'):return False
++                from .static_storage import items
++                owner=engine.p.methods[target]['owner']
++                status=engine.state.class_initialization.get(owner,{})
++                if items(engine.p,owner) and (not isinstance(status,dict) or status.get('status')!='initialized'):return False
++                nested_names={name for name,_ in engine.p.parameters(target)}
++                nested_names.update(text(n.child_by_field_name('name')) for n in walk(body) if n.type=='variable_declarator')
++                active.add(target)
++                try:
++                    if not readonly(body,target,nested_names):return False
++                finally:active.remove(target)
++        return all(readonly(child,owner_mid,names) for child in node.named_children)
++    if not all(readonly(node) for node in residual):return None
++    roots=[{'file':meta['file'],'start_line':n.start_point.row+1,'end_line':n.end_point.row+1} for n in residual if n is not None]
++    return {'model_version':'readonly-native-foreach-stop/1','operation':'stopped scalar projection',
++        'source_sha256':hashlib.sha256(engine.p.sources[meta['file']]).hexdigest(),
++        'method':mid,'source_spans':roots,'preconditions':{
++            'single_active_source_frame':True,'native_collection':carrier.flavor,'membership':'unknown',
++            'no_transaction':True,'no_unscoped_effect':True,'residual_source_readonly':True},
++        'return':'not supplied','throw':'not supplied','completion':'analysis boundary retained',
++        'read_footprint':'source scalar locals only',
++        'write_footprint':[],'alias_assumptions':'all reachable aliases retained; no residual heap stores',
++        'guards':list(engine.boundary_guards),'prefix_effect_count':len(engine.data_operations),
++        'effects_order':'executed prefix unchanged; suffix remains unexecuted',
++        'reuse':'none; source and preconditions checked on every occurrence'}
+--- E2-R04/analyzer/state.py
++++ E4-R05-summary/analyzer/state.py
+@@ -205,6 +205,7 @@
+         self.bean_instances = {}
+         self.static_fields = {}
+         self.class_initialization = {}
++        self.join_losses = []
+         self.actor_browsers = {}
+         self.input_journal = []
+ 
+@@ -248,6 +249,7 @@
+                 'analysis_assumptions':list(self.analysis_assumptions),
+                 'limitations': list(self.limitations),
+                 'class_initialization':deepcopy(self.class_initialization),
++                'join_losses':deepcopy(self.join_losses),
+                 **({'static_fields':deepcopy(self.static_fields)} if full else {}),
+                 **({'tables':{schema+'.'+table:(U if (schema,table) in self.database.unknown_tables else deepcopy(rows))
+                               for (schema,table),rows in self.database.tables.raw_items()}} if full else {})}
+--- E2-R04/analyzer/static_storage.py
++++ E4-R05-summary/analyzer/static_storage.py
+@@ -64,7 +64,13 @@
+     for field,node,written,final in items(project,owner):
+         if field==name and final and written in ('String','java.lang.String','boolean','byte','short','char','int','long','float','double'):
+             value,kind=literal_default(node)
+-            if value is not U:return True,value,kind
++            if value is not U and value is not None:return True,value,kind
++            if node is not None and value is U and not any(n.type in
++                    ('method_invocation','object_creation_expression','array_creation_expression','null_literal') for n in walk(node)):
++                # This could be a JLS constant expression. Active class
++                # initialization would itself be a false effect. Stop until
++                # constant-expression proof covers this expression's grammar.
++                return None,U,None
+     return False,U,None
+ 
+ 
+@@ -106,8 +112,7 @@
+                 value=engine.value(node,env)
+                 kind=engine.source_reference_kind(node,engine.last_reference_kind)
+                 value,kind=engine.assignment_value(value,kind,written,node)
+-                engine.state.static_fields[owner].set_value(name,value,kind)
+-                engine.state.class_initialization[owner]['versions'][name]+=1
++                write(engine,owner,name,value,kind)
+         engine.state.class_initialization[owner]['status']='initialized'
+     except JavaThrow as failure:
+         engine.state.class_initialization[owner]['status']='failed'
+@@ -138,6 +143,9 @@
+     if not found:return False,U
+     owner,_=found;name=text(node.child_by_field_name('field')) if node.type=='field_access' else text(node)
+     is_constant,value,kind=constant(engine.p,owner,name)
++    if is_constant is None:
++        from .engine import AnalysisBoundary
++        raise AnalysisBoundary('compile-time static constant expression is outside the literal proof: '+owner+'.'+name,category='unsupported_semantics')
+     if is_constant:
+         engine.remember_reference_kind(kind);return True,value
+     owner,name,_=cell(engine,node,env)
+--- E2-R04/tests/test_scoped_effects32.py
++++ E4-R05-summary/tests/test_scoped_effects32.py
+@@ -0,0 +1,126 @@
++"""A source-reviewed equipment chain, with full tiny prefix and state oracle."""
++from copy import deepcopy
++import json
++import pytest
++from analyzer.engine import Engine
++from analyzer.native_storage import JavaList
++from analyzer.project import Project
++from analyzer.state import ScenarioState,U
++from builders import build
++
++INITIAL=[{'id':'A','status':'free'},{'id':'B','status':'free'}]
++RID='res:table:service.equipment'
++
++
++def fixture(tmp_path,body='String projected=item;',suffix='',annotation=''):
++    p,db,ids=build(tmp_path,{
++      'Warehouse.java':'''import java.util.*;import org.springframework.data.jpa.repository.JpaRepository;
++        class Warehouse{Store store;
++        @GetMapping("/equipment/{id}")String read(@PathVariable String id){return store.findById(id).get().status;}
++        @PostMapping("/reserve/{id}")String reserve(@PathVariable String id){Item item=store.findById(id).get();
++          item.status="reserved";store.save(item);return item.status;}}
++        @Entity @Table(name="equipment")class Item{@Id String id;public String status;}
++        interface Store extends JpaRepository<Item,String>{Optional<Item> findById(String id);Item save(Item value);}''',
++      'Approval.java':'''import java.util.*;import org.springframework.web.client.RestTemplate;
++        class Approval{RestTemplate rest;'''+annotation+'''String entry(String id,List<String> unknown,boolean inspectOnly){
++        String prefix=rest.getForObject("http://warehouse/equipment/"+id,String.class);
++        if(inspectOnly){for(String item:unknown){'''+body+'''}'''+suffix+'''return prefix;}
++        return rest.postForObject("http://warehouse/reserve/"+id,null,String.class);}}'''
++    },rows={'equipment':deepcopy(INITIAL)})
++    graph=p.skeleton
++    for unit in ('approval','warehouse'):graph['nodes']['module:'+unit]={'kind':'module','name':unit,'deployment_units':[unit]}
++    for node in graph['nodes'].values():
++        if node.get('file')=='Approval.java':node['module']='approval'
++        if node.get('file')=='Warehouse.java':node['module']='warehouse'
++    for nid,node in list(graph['nodes'].items()):
++        if node.get('kind')=='call_site' and node.get('file')=='Approval.java':
++            target=ids['Warehouse.read'] if node.get('callee')=='getForObject' else ids['Warehouse.reserve'] if node.get('callee')=='postForObject' else None
++            if target:graph['edges'].append({'source':nid,'type':'remote_call','target':target})
++    (tmp_path/'skeleton.json').write_text(json.dumps(graph))
++    return Project(tmp_path/'skeleton.json',tmp_path),db,ids
++
++
++def run(p,db,ids,enabled,values=None,inspect=True,id_='A'):
++    state=ScenarioState(db,{'scoped_effect_summary':enabled})
++    values=JavaList() if values is None else values
++    if not values:values.opaque=True
++    engine=Engine(p,state)
++    result=engine.run(ids['Approval.entry'],{'id':id_,'unknown':values,'inspectOnly':inspect})
++    return result,engine
++
++
++def prefix_oracle(ids):
++    return {('','executes',ids['Approval.entry']),('','executes',ids['Warehouse.read']),
++        (ids['Approval.entry'],'remote',ids['Warehouse.read']),(ids['Warehouse.read'],'data',RID)}
++
++
++def test_readonly_stop_preserves_prefix_full_edges_and_unrelated_rows(tmp_path):
++    p,db,ids=fixture(tmp_path)
++    _,off=run(p,db,ids,False);result,on=run(p,db,ids,True)
++    assert result is U and on.outcome=='unsupported_semantics boundary'
++    assert off.outcome==on.outcome and off.edges==on.edges==prefix_oracle(ids)
++    assert off.state.database.rows(p.nodes[RID]) is None
++    assert on.state.database.rows(p.nodes[RID])==INITIAL
++    assert [x['operation'] for x in on.data_operations]==['findById']
++    assert any(x['model_version']=='readonly-native-foreach-stop/1' for x in on.effect_events)
++    assert not any(x['widened_locations'] for x in on.loss_events)
++    assert ScenarioState(db).database.rows(p.nodes[RID])==INITIAL
++
++
++@pytest.mark.parametrize('enabled',[False,True])
++def test_exact_source_read_remote_save_reread_control(tmp_path,enabled):
++    p,db,ids=fixture(tmp_path);result,e=run(p,db,ids,enabled,JavaList(['one'],['String']),inspect=False)
++    assert result=='reserved'
++    expected=prefix_oracle(ids)|{('','executes',ids['Warehouse.reserve']),
++        (ids['Approval.entry'],'remote',ids['Warehouse.reserve']),(ids['Warehouse.reserve'],'data',RID)}
++    assert e.edges==expected
++    assert [x['operation'] for x in e.data_operations]==['findById','findById','save']
++    rows=e.state.database.rows(p.nodes[RID]);assert rows[0]['status']=='reserved' and rows[1]==INITIAL[1]
++    reread=Engine(p,e.state);assert reread.run(ids['Warehouse.read'],{'id':'A'})=='reserved'
++
++
++@pytest.mark.parametrize('enabled',[False,True])
++def test_remote_failure_before_write_keeps_source_state(tmp_path,enabled):
++    p,db,ids=fixture(tmp_path);result,e=run(p,db,ids,enabled,id_='missing')
++    assert result is U and e.outcome=='uncaught application exception'
++    assert e.state.database.rows(p.nodes[RID])==INITIAL
++    assert e.edges==prefix_oracle(ids)
++    assert not any(x.get('operation')=='save' for x in e.data_operations)
++
++
++@pytest.mark.parametrize('body,suffix,annotation',[
++    ('String projected=item;','rest.postForObject("http://warehouse/reserve/A",null,String.class);',''),
++    ('rest.postForObject("http://warehouse/reserve/"+item,null,String.class);','',''),
++    ('String projected=item;','','@Transactional '),
++])
++def test_potential_writes_and_transaction_do_not_get_readonly_summary(tmp_path,body,suffix,annotation):
++    p,db,ids=fixture(tmp_path,body,suffix,annotation);_,e=run(p,db,ids,True)
++    assert e.outcome=='unsupported_semantics boundary'
++    assert not any(x.get('model_version')=='readonly-native-foreach-stop/1' for x in e.effect_events)
++
++
++def test_native_qualifiers_do_not_become_first_input_loss(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'class Api{String entry(){return java.util.Base64.getEncoder().encodeToString("ab".getBytes());}}'})
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})=='YWI='
++    assert not e.loss_events
++
++
++def test_finally_write_cannot_be_hidden_by_an_inner_return(tmp_path):
++    p,db,ids=fixture(tmp_path)
++    source=tmp_path/'Approval.java'
++    value=source.read_text().replace('if(inspectOnly){for', 'if(inspectOnly){try{for').replace(
++        'return prefix;}', 'return prefix;}finally{rest.postForObject("http://warehouse/reserve/A",null,String.class);}}')
++    # Rebuild the source-backed skeleton, including both remote sites.
++    original={'Warehouse.java':(tmp_path/'Warehouse.java').read_text(),'Approval.java':value}
++    p,db,ids=build(tmp_path/'finally',original,rows={'equipment':deepcopy(INITIAL)})
++    graph=p.skeleton
++    for unit in ('approval','warehouse'):graph['nodes']['module:'+unit]={'kind':'module','name':unit,'deployment_units':[unit]}
++    for nid,node in list(graph['nodes'].items()):
++        if node.get('file')=='Approval.java':node['module']='approval'
++        if node.get('file')=='Warehouse.java':node['module']='warehouse'
++        if node.get('kind')=='call_site' and node.get('file')=='Approval.java':
++            target=ids['Warehouse.read'] if node.get('callee')=='getForObject' else ids['Warehouse.reserve'] if node.get('callee')=='postForObject' else None
++            if target:graph['edges'].append({'source':nid,'type':'remote_call','target':target})
++    (tmp_path/'finally/skeleton.json').write_text(json.dumps(graph));p=Project(tmp_path/'finally/skeleton.json',tmp_path/'finally')
++    _,e=run(p,db,ids,True)
++    assert not any(x.get('model_version')=='readonly-native-foreach-stop/1' for x in e.effect_events)
+--- E2-R04/tests/test_static_storage.py
++++ E4-R05-summary/tests/test_static_storage.py
+@@ -94,3 +94,19 @@
+     e=Engine(p,state);assert e.run(ids['Caller.entry'],{}) is U
+     assert ('','executes',ids['Receiver.read']) not in e.edges
+     assert not any(relation=='remote' and target==ids['Receiver.read'] for _,relation,target in e.edges)
++
++
++def test_null_final_string_is_not_a_compile_time_constant(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''class Material{static final String value=null;
++      static{throw new IllegalStateException();}}class Api{String entry(){return Material.value;}}'''})
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
++    assert e.outcome=='uncaught application exception'
++
++
++def test_literal_constant_does_not_initialize_but_unproved_expression_stops(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''class Material{static final int literal=3;static final int computed=1+2;
++      static{throw new IllegalStateException();}}class Api{int entry(){return Material.literal;}int other(){return Material.computed;}}'''})
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==3
++    assert not e.state.class_initialization
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.other'],{}) is U
++    assert e.outcome=='unsupported_semantics boundary' and not e.state.class_initialization

@@ -1,0 +1,548 @@
+{
+  "passed": true,
+  "mutations": [
+    {
+      "profile": "explicit",
+      "mutation": "missing-step",
+      "rejected": true,
+      "errors": [
+        "exact unique steps 1..8 required",
+        "3: state before differs",
+        "3: state after differs, including untouched rows",
+        "3: no executed alternative",
+        "3: actual root request differs",
+        "3: producer provenance missing",
+        "3: producer IDs/types differ"
+      ],
+      "mutated_trace_sha256": "39ada2fc6ebf5055f1e879847f53cade129227089b075802b1a4b840f137c1fb"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "duplicate-step",
+      "rejected": true,
+      "errors": [
+        "exact unique steps 1..8 required",
+        "2: state before differs",
+        "2: actual root request differs",
+        "2/0: root controller entry differs",
+        "2/0: missing source execute method:payment-service:PaymentController#refund(Long)",
+        "2/0: missing source execute method:order-service:OrderHttpMapper#toResponse(Order)",
+        "2/0: missing source execute method:order-service:OrderPersistenceMapper#toDomain(OrderJpaEntity)",
+        "2/0: missing source execute method:order-service:Order#total()",
+        "2/0: missing source execute method:order-service:OrderDetail#subtotal()",
+        "2/0: missing per-step required edge ['method:payment-service:PaymentController#refund(Long)', 'calls', 'method:payment-service:PaymentCommandService#refund(Long)']",
+        "2/0: missing per-step required edge ['method:payment-service:PaymentCommandService#refund(Long)', 'calls', 'method:payment-service:RefundPaymentUseCase#execute(Long)']",
+        "2/0: missing per-step required edge ['method:payment-service:RefundPaymentUseCase#execute(Long)', 'calls', 'method:payment-service:Payment#refund()']",
+        "2/0: missing per-step required edge ['method:payment-service:RefundPaymentUseCase#execute(Long)', 'calls', 'method:payment-service:PaymentPersistenceAdapter#save(Payment)']",
+        "2/0: missing per-step required edge ['method:payment-service:RefundPaymentUseCase#execute(Long)', 'calls', 'method:payment-service:OrderClientAdapter#revertToPending(Long)']",
+        "2/0: missing per-step required edge ['method:payment-service:OrderClientAdapter#revertToPending(Long)', 'remote', 'method:order-service:OrderController#revertPayment(Long)']",
+        "2/0: missing per-step required edge ['method:payment-service:PaymentPersistenceAdapter#save(Payment)', 'data', 'res:table:payment-service.payments']",
+        "2/0: missing per-step required edge ['method:order-service:OrderController#revertPayment(Long)', 'calls', 'method:order-service:OrderCommandService#revertToPending(Long)']",
+        "2/0: missing per-step required edge ['method:order-service:OrderCommandService#revertToPending(Long)', 'calls', 'method:order-service:RevertOrderToPendingUseCase#execute(Long)']",
+        "2/0: missing per-step required edge ['method:order-service:RevertOrderToPendingUseCase#execute(Long)', 'calls', 'method:order-service:Order#revertToPending()']",
+        "2/0: missing per-step required edge ['method:order-service:OrderPersistenceAdapter#save(Order)', 'data', 'res:table:order-service.orders']",
+        "2/0: refund remote missing on this step",
+        "2/0: exact one refund remote request required",
+        "2/0: required write missing payments",
+        "2/0: required write missing orders",
+        "3: state before differs",
+        "3: state after differs, including untouched rows",
+        "3: no executed alternative",
+        "3: actual root request differs",
+        "3: producer provenance missing",
+        "3: producer IDs/types differ"
+      ],
+      "mutated_trace_sha256": "e9998380e59a3005b5b69159741a4dbc809796f7ef77ca70a7b5d448218bee52"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "wrong-root-entry",
+      "rejected": true,
+      "errors": [
+        "2/0: root controller entry differs"
+      ],
+      "mutated_trace_sha256": "365ba772caa5dd89aa310ab2e116e274bf083a9d16951ceaa427e865ee23ac83"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "wrong-bound-id",
+      "rejected": true,
+      "errors": [
+        "2/0: root bound argument type/value differs"
+      ],
+      "mutated_trace_sha256": "0f8c8e66b780f91abdbf48737a10dc8aeeb12ff3c8029e83658b321cb3763906"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "wrong-bound-type",
+      "rejected": true,
+      "errors": [
+        "2/0: root bound argument type/value differs"
+      ],
+      "mutated_trace_sha256": "a1986d1d8a0c7b9db64b9c3f9a1feae142b880ac374636e8af288a75fa34beaf"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "missing-server-body",
+      "rejected": true,
+      "errors": [
+        "2/0: actual server response/body missing despite client Void"
+      ],
+      "mutated_trace_sha256": "bbff66acdf79fda1c20bdef6c7fa4d439956611405264ae63cd6f3521ce7596c"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "wrong-server-total",
+      "rejected": true,
+      "errors": [
+        "2/0: actual server response/body missing despite client Void"
+      ],
+      "mutated_trace_sha256": "4e4e52abd92e822faaf4aec6ccd242bca6e568349a6aa8f83b2145575dd162d3"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "wrong-remote-port",
+      "rejected": true,
+      "errors": [
+        "2/0: remote deployment/address differs"
+      ],
+      "mutated_trace_sha256": "6567a43aafce7170598a628a5e3f45517bfc6d5dcfae965f5cdd56fee139bbfa"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "wrong-remote-entry",
+      "rejected": true,
+      "errors": [
+        "2/0: remote controller/typed arguments differ"
+      ],
+      "mutated_trace_sha256": "b7e077121f08e3462a208fc5094c00a9a5e67fee3cf6e83c57c584abe5b70308"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "wrong-remote-argument",
+      "rejected": true,
+      "errors": [
+        "2/0: remote controller/typed arguments differ"
+      ],
+      "mutated_trace_sha256": "b1f64b49cbd0ae3f188c4754d6a2e9c832bce01e8721584de6e2e5cd4d629364"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "missing-server-mapper",
+      "rejected": true,
+      "errors": [
+        "2/0: missing source execute method:order-service:OrderHttpMapper#toResponse(Order)"
+      ],
+      "mutated_trace_sha256": "1a9304da4418dbd2aa019e4eac7e231cdd18eac68d8cf482e86970490a009246"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "missing-server-total",
+      "rejected": true,
+      "errors": [
+        "2/0: missing source execute method:order-service:Order#total()"
+      ],
+      "mutated_trace_sha256": "d967956668d1147d2dfefe6d3ffd31b33430a9b5be34b669faceb8fd3e36e9e6"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "missing-remote-edge",
+      "rejected": true,
+      "errors": [
+        "2/0: missing per-step required edge ['method:payment-service:OrderClientAdapter#revertToPending(Long)', 'remote', 'method:order-service:OrderController#revertPayment(Long)']",
+        "2/0: refund remote missing on this step"
+      ],
+      "mutated_trace_sha256": "7d872ca5b53097f3faec476a7d34ede03b04a8254d43f00f589198e443f5a5dc"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "lost-status",
+      "rejected": true,
+      "errors": [
+        "5/0: root response status/pairing differs"
+      ],
+      "mutated_trace_sha256": "f3eecb9bde736aa49a21aec2d75bc4d3b3fd4a39ce1102b5cbd4c2644cf3b291"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "swapped-response-ids",
+      "rejected": true,
+      "errors": [
+        "2/0: root body/result pairing differs",
+        "2/0: actual server response/body missing despite client Void"
+      ],
+      "mutated_trace_sha256": "ad897be5ec0bb57c8017c6fccbafd5f0491156b948fb0863892876033846e5ba"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "foreign-row",
+      "rejected": true,
+      "errors": [
+        "2/0: alternative state differs"
+      ],
+      "mutated_trace_sha256": "fdb00d921742b99d32744273c610314a5c1fd6e93f88e4acfb2ae2737a296b28"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "write-after-refusal",
+      "rejected": true,
+      "errors": [
+        "5/0: write after read/refusal"
+      ],
+      "mutated_trace_sha256": "ab0878a3f7d71464e0144b5944d6b16a3793b821ebe93a04a0c115a7912f8e14"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "ambiguous-handler",
+      "rejected": true,
+      "errors": [
+        "7: ambiguous action executed a handler"
+      ],
+      "mutated_trace_sha256": "f864f646744f6f68672047634d12693710f318466dabcc7063bc739adef84fcb"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "missing-state-before",
+      "rejected": true,
+      "errors": [
+        "4: state before differs"
+      ],
+      "mutated_trace_sha256": "51166c3417646d7890437dba8e528df674bfe3d9ed75518e51345acaf644492b"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "lost-scope",
+      "rejected": true,
+      "errors": [
+        "declared post-authentication slice missing"
+      ],
+      "mutated_trace_sha256": "cb9f175454b4dda562557ffedb3d1564866848e728d81d5836764b54e20afbd0"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "wrong-body-id",
+      "rejected": true,
+      "errors": [
+        "2/0: root body/result pairing differs",
+        "2/0: response fields/types differ"
+      ],
+      "mutated_trace_sha256": "08dcd0aa688f74f6f922ee2a9de2a5c95362da53f7a3d43e7922de1486d03e20"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "lost-producer",
+      "rejected": true,
+      "errors": [
+        "2: producer provenance missing",
+        "2: producer IDs/types differ"
+      ],
+      "mutated_trace_sha256": "102c0ee0090bc7f61f11dad823f5c1100692f03ae2de298381cc690228a52f40"
+    },
+    {
+      "profile": "explicit",
+      "mutation": "wrong-producer-id",
+      "rejected": true,
+      "errors": [
+        "2: producer IDs/types differ"
+      ],
+      "mutated_trace_sha256": "75c74dbf163701ec6a4d071c5293c39379b40e09f7ce65540cd14909658ec638"
+    },
+    {
+      "profile": "nl",
+      "mutation": "missing-step",
+      "rejected": true,
+      "errors": [
+        "exact unique steps 1..8 required",
+        "3: state before differs",
+        "3: state after differs, including untouched rows",
+        "3: no executed alternative",
+        "3: actual root request differs",
+        "3: producer provenance missing",
+        "3: producer IDs/types differ",
+        "4: producer provenance missing",
+        "4: producer IDs/types differ",
+        "5: producer provenance missing",
+        "5: producer IDs/types differ"
+      ],
+      "mutated_trace_sha256": "dcbf44a02a76f4d9d0446007116b7d9c8318460608d8cbcc3c14c245b807c3be"
+    },
+    {
+      "profile": "nl",
+      "mutation": "duplicate-step",
+      "rejected": true,
+      "errors": [
+        "exact unique steps 1..8 required",
+        "2: state before differs",
+        "2: actual root request differs",
+        "2/0: root controller entry differs",
+        "2/0: missing source execute method:payment-service:PaymentController#refund(Long)",
+        "2/0: missing source execute method:order-service:OrderHttpMapper#toResponse(Order)",
+        "2/0: missing source execute method:order-service:OrderPersistenceMapper#toDomain(OrderJpaEntity)",
+        "2/0: missing source execute method:order-service:Order#total()",
+        "2/0: missing source execute method:order-service:OrderDetail#subtotal()",
+        "2/0: missing per-step required edge ['method:payment-service:PaymentController#refund(Long)', 'calls', 'method:payment-service:PaymentCommandService#refund(Long)']",
+        "2/0: missing per-step required edge ['method:payment-service:PaymentCommandService#refund(Long)', 'calls', 'method:payment-service:RefundPaymentUseCase#execute(Long)']",
+        "2/0: missing per-step required edge ['method:payment-service:RefundPaymentUseCase#execute(Long)', 'calls', 'method:payment-service:Payment#refund()']",
+        "2/0: missing per-step required edge ['method:payment-service:RefundPaymentUseCase#execute(Long)', 'calls', 'method:payment-service:PaymentPersistenceAdapter#save(Payment)']",
+        "2/0: missing per-step required edge ['method:payment-service:RefundPaymentUseCase#execute(Long)', 'calls', 'method:payment-service:OrderClientAdapter#revertToPending(Long)']",
+        "2/0: missing per-step required edge ['method:payment-service:OrderClientAdapter#revertToPending(Long)', 'remote', 'method:order-service:OrderController#revertPayment(Long)']",
+        "2/0: missing per-step required edge ['method:payment-service:PaymentPersistenceAdapter#save(Payment)', 'data', 'res:table:payment-service.payments']",
+        "2/0: missing per-step required edge ['method:order-service:OrderController#revertPayment(Long)', 'calls', 'method:order-service:OrderCommandService#revertToPending(Long)']",
+        "2/0: missing per-step required edge ['method:order-service:OrderCommandService#revertToPending(Long)', 'calls', 'method:order-service:RevertOrderToPendingUseCase#execute(Long)']",
+        "2/0: missing per-step required edge ['method:order-service:RevertOrderToPendingUseCase#execute(Long)', 'calls', 'method:order-service:Order#revertToPending()']",
+        "2/0: missing per-step required edge ['method:order-service:OrderPersistenceAdapter#save(Order)', 'data', 'res:table:order-service.orders']",
+        "2/0: refund remote missing on this step",
+        "2/0: exact one refund remote request required",
+        "2/0: required write missing payments",
+        "2/0: required write missing orders",
+        "2/1: root controller entry differs",
+        "2/1: missing source execute method:payment-service:PaymentController#refund(Long)",
+        "2/1: missing source execute method:order-service:OrderHttpMapper#toResponse(Order)",
+        "2/1: missing source execute method:order-service:OrderPersistenceMapper#toDomain(OrderJpaEntity)",
+        "2/1: missing source execute method:order-service:Order#total()",
+        "2/1: missing source execute method:order-service:OrderDetail#subtotal()",
+        "2/1: missing per-step required edge ['method:payment-service:PaymentController#refund(Long)', 'calls', 'method:payment-service:PaymentCommandService#refund(Long)']",
+        "2/1: missing per-step required edge ['method:payment-service:PaymentCommandService#refund(Long)', 'calls', 'method:payment-service:RefundPaymentUseCase#execute(Long)']",
+        "2/1: missing per-step required edge ['method:payment-service:RefundPaymentUseCase#execute(Long)', 'calls', 'method:payment-service:Payment#refund()']",
+        "2/1: missing per-step required edge ['method:payment-service:RefundPaymentUseCase#execute(Long)', 'calls', 'method:payment-service:PaymentPersistenceAdapter#save(Payment)']",
+        "2/1: missing per-step required edge ['method:payment-service:RefundPaymentUseCase#execute(Long)', 'calls', 'method:payment-service:OrderClientAdapter#revertToPending(Long)']",
+        "2/1: missing per-step required edge ['method:payment-service:OrderClientAdapter#revertToPending(Long)', 'remote', 'method:order-service:OrderController#revertPayment(Long)']",
+        "2/1: missing per-step required edge ['method:payment-service:PaymentPersistenceAdapter#save(Payment)', 'data', 'res:table:payment-service.payments']",
+        "2/1: missing per-step required edge ['method:order-service:OrderController#revertPayment(Long)', 'calls', 'method:order-service:OrderCommandService#revertToPending(Long)']",
+        "2/1: missing per-step required edge ['method:order-service:OrderCommandService#revertToPending(Long)', 'calls', 'method:order-service:RevertOrderToPendingUseCase#execute(Long)']",
+        "2/1: missing per-step required edge ['method:order-service:RevertOrderToPendingUseCase#execute(Long)', 'calls', 'method:order-service:Order#revertToPending()']",
+        "2/1: missing per-step required edge ['method:order-service:OrderPersistenceAdapter#save(Order)', 'data', 'res:table:order-service.orders']",
+        "2/1: refund remote missing on this step",
+        "2/1: exact one refund remote request required",
+        "2/1: required write missing payments",
+        "2/1: required write missing orders",
+        "3: state before differs",
+        "3: state after differs, including untouched rows",
+        "3: no executed alternative",
+        "3: actual root request differs",
+        "3: producer provenance missing",
+        "3: producer IDs/types differ",
+        "4: producer provenance missing",
+        "4: producer IDs/types differ",
+        "5: producer provenance missing",
+        "5: producer IDs/types differ"
+      ],
+      "mutated_trace_sha256": "7ec6d03b2e4d364c8ec84ec7530957aefb535240e4ed57516cd2725242be5348"
+    },
+    {
+      "profile": "nl",
+      "mutation": "wrong-root-entry",
+      "rejected": true,
+      "errors": [
+        "2/0: root controller entry differs"
+      ],
+      "mutated_trace_sha256": "b3aef8003dfd10776085694fff8c01e744525e01cdd9acff7c51689c3ed0d4a2"
+    },
+    {
+      "profile": "nl",
+      "mutation": "wrong-bound-id",
+      "rejected": true,
+      "errors": [
+        "2/0: root bound argument type/value differs"
+      ],
+      "mutated_trace_sha256": "1505f79410a3edbff68fc3f7842916146d2cea623a0040ce14f55ea990c85f45"
+    },
+    {
+      "profile": "nl",
+      "mutation": "wrong-bound-type",
+      "rejected": true,
+      "errors": [
+        "2/0: root bound argument type/value differs"
+      ],
+      "mutated_trace_sha256": "a1bd7b30ec284fc126dad3ca8377d1ba3991c4582c5bec255af9611ba779d058"
+    },
+    {
+      "profile": "nl",
+      "mutation": "missing-server-body",
+      "rejected": true,
+      "errors": [
+        "2/0: actual server response/body missing despite client Void"
+      ],
+      "mutated_trace_sha256": "533126c34bd56746e60ecf987fbbd5c58b3ad727c9315b3aca03d5f3a929e776"
+    },
+    {
+      "profile": "nl",
+      "mutation": "wrong-server-total",
+      "rejected": true,
+      "errors": [
+        "2/0: actual server response/body missing despite client Void"
+      ],
+      "mutated_trace_sha256": "20a62976738e4010d2fbf4d026b49e877714fd43a662f9f001bb1b04c885336a"
+    },
+    {
+      "profile": "nl",
+      "mutation": "wrong-remote-port",
+      "rejected": true,
+      "errors": [
+        "2/0: remote deployment/address differs"
+      ],
+      "mutated_trace_sha256": "dabf33de278bfa9b7ee9c3e065c7472ac9c1d2f05341ca7b0df6acea8309a1c9"
+    },
+    {
+      "profile": "nl",
+      "mutation": "wrong-remote-entry",
+      "rejected": true,
+      "errors": [
+        "2/0: remote controller/typed arguments differ"
+      ],
+      "mutated_trace_sha256": "0253c151c5d8558b9cda85ca48b752f6d3c9f429fc0602d9bb4867b3d99f757e"
+    },
+    {
+      "profile": "nl",
+      "mutation": "wrong-remote-argument",
+      "rejected": true,
+      "errors": [
+        "2/0: remote controller/typed arguments differ"
+      ],
+      "mutated_trace_sha256": "77fd18bb1b297b9313cf0e6d76d504d5e2c8b20e4fb64021164353de5e34c80d"
+    },
+    {
+      "profile": "nl",
+      "mutation": "missing-server-mapper",
+      "rejected": true,
+      "errors": [
+        "2/0: missing source execute method:order-service:OrderHttpMapper#toResponse(Order)"
+      ],
+      "mutated_trace_sha256": "2914269d6354b8b734c18720569dfba34c1fe17c00654fe291611530dccc9b49"
+    },
+    {
+      "profile": "nl",
+      "mutation": "missing-server-total",
+      "rejected": true,
+      "errors": [
+        "2/0: missing source execute method:order-service:Order#total()"
+      ],
+      "mutated_trace_sha256": "d72101933c435121a21539de060f2cf8534514cb81a25804343e3f99e8056235"
+    },
+    {
+      "profile": "nl",
+      "mutation": "missing-remote-edge",
+      "rejected": true,
+      "errors": [
+        "2/0: missing per-step required edge ['method:payment-service:OrderClientAdapter#revertToPending(Long)', 'remote', 'method:order-service:OrderController#revertPayment(Long)']",
+        "2/0: refund remote missing on this step"
+      ],
+      "mutated_trace_sha256": "27f1b5a15b5787cd6ef40bcd6a6e9525a77da7d4da5b7a29c1726fa3ae9b890c"
+    },
+    {
+      "profile": "nl",
+      "mutation": "lost-status",
+      "rejected": true,
+      "errors": [
+        "5/0: root response status/pairing differs"
+      ],
+      "mutated_trace_sha256": "059ecc7ebd15df84aace8c0c4e840608df50112a168fdff6cb3ef9bbac5931da"
+    },
+    {
+      "profile": "nl",
+      "mutation": "swapped-response-ids",
+      "rejected": true,
+      "errors": [
+        "2/0: root body/result pairing differs",
+        "2/0: actual server response/body missing despite client Void"
+      ],
+      "mutated_trace_sha256": "b8ef101ac5ef91ce68027946b36ffddd83a697e328669521c910c2ee487a890c"
+    },
+    {
+      "profile": "nl",
+      "mutation": "foreign-row",
+      "rejected": true,
+      "errors": [
+        "2: state after differs, including untouched rows",
+        "2/0: alternative state differs"
+      ],
+      "mutated_trace_sha256": "8fea79ea45bd431aba0c6fb1fbdd75d85357e3aa7bd7254cb877f709316bf01a"
+    },
+    {
+      "profile": "nl",
+      "mutation": "write-after-refusal",
+      "rejected": true,
+      "errors": [
+        "5/0: write after read/refusal"
+      ],
+      "mutated_trace_sha256": "3735859a9e2199e91212a814c8c4bb72dcfe83758ca0e7c899dccf1889665e08"
+    },
+    {
+      "profile": "nl",
+      "mutation": "ambiguous-handler",
+      "rejected": true,
+      "errors": [
+        "7: state before differs",
+        "7: ambiguous action executed a handler",
+        "7: ambiguous action changed application state"
+      ],
+      "mutated_trace_sha256": "93406a83e714687d195a398e371e1e48fbbfaf85b4742ebe82d87ea2885ac68e"
+    },
+    {
+      "profile": "nl",
+      "mutation": "missing-state-before",
+      "rejected": true,
+      "errors": [
+        "4: state before differs"
+      ],
+      "mutated_trace_sha256": "c19340c61471c7e1eff2a009486faf41c78b0131799a7bfc0bf758a5a4793aaf"
+    },
+    {
+      "profile": "nl",
+      "mutation": "lost-scope",
+      "rejected": true,
+      "errors": [
+        "declared post-authentication slice missing"
+      ],
+      "mutated_trace_sha256": "7926fac544624bf686a991047d45edc701eb8ed755acdb86d55be9b0d31a8288"
+    },
+    {
+      "profile": "nl",
+      "mutation": "wrong-body-id",
+      "rejected": true,
+      "errors": [
+        "2/0: root body/result pairing differs",
+        "2/0: response fields/types differ"
+      ],
+      "mutated_trace_sha256": "39a3ce83ebaaa56610ea23af26062fc870c0e7d87d29b55a27c903007373c60d"
+    },
+    {
+      "profile": "nl",
+      "mutation": "lost-producer-binding",
+      "rejected": true,
+      "errors": [
+        "2: producer provenance missing",
+        "2: producer IDs/types differ"
+      ],
+      "mutated_trace_sha256": "145e1ea4024748588da6a73ca291ace46ed47f52262c064f0fac64a436781e9d"
+    },
+    {
+      "profile": "nl",
+      "mutation": "wrong-producer-reference",
+      "rejected": true,
+      "errors": [
+        "2: producer provenance missing",
+        "2: producer IDs/types differ"
+      ],
+      "mutated_trace_sha256": "b97113c4dcd09b359c084cefc8a52daf0bb82847e40b2581522e239dd197a4ae"
+    },
+    {
+      "profile": "nl",
+      "mutation": "unresolved-producer",
+      "rejected": true,
+      "errors": [
+        "2: producer provenance missing",
+        "2: producer IDs/types differ"
+      ],
+      "mutated_trace_sha256": "5abd7c5549e1f7c1f8ed03d70fd72b712cd52e90cb164c4caaf5e47b97cce5af"
+    }
+  ],
+  "inputs": {
+    "nl.json": "d3de814bd85b0ce863f807c8e55a7358e50cbbf5e8b062c70862dba4087d7383",
+    "explicit.json": "b309afdbf4baa47dfac8364e01688b0c88cd024a55ff8243bdf6057bda26d1c5",
+    "checks.json": "1efa8745af6ac369a1cf3df982bc4302560cf568d3d646a5647639d89abce8a8",
+    "submission.json": "ff5d8424d336549f5f37aa6c64a4d39e8a3d18f0a1ce12801ea194bbda91cdd1"
+  },
+  "targets_started": false,
+  "mutated_before_nl_normalization": true
+}

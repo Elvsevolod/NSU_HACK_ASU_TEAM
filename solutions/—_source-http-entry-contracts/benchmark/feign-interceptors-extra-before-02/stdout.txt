@@ -1,0 +1,191 @@
+.FFFFFFF                                                                 [100%]
+=================================== FAILURES ===================================
+____ test_callback_appends_to_existing_client_header_as_one_value[x-access] ____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-90/test_callback_appends_to_exist1')
+key = 'x-access'
+
+    @pytest.mark.parametrize('key',['X-Access','x-access'])
+    def test_callback_appends_to_existing_client_header_as_one_value(tmp_path,key):
+        p,db,ids=fixture(tmp_path,'@Component class Header implements RequestInterceptor{public void apply(RequestTemplate template){template.header("x-access","hook");}}',
+          'return client.read(7L,"seed");',client_header=key)
+        e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})=='ok' and not e.approximate
+>       assert headers(e)==[{'x-access':['seed','hook']}]
+E       AssertionError: assert [{'x-access':...'d', 'hook']}] == [{'x-access':...ed', 'hook']}]
+E         
+E         At index 0 diff: {'x-access': ['s', 'e', 'e', 'd', 'hook']} != {'x-access': ['seed', 'hook']}
+E         Use -v to get more diff
+
+code/tests/test_feign_interceptors33.py:159: AssertionError
+____ test_null_varargs_array_throws_in_arrays_as_list_before_header_update _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-90/test_null_varargs_array_throws0')
+
+    def test_null_varargs_array_throws_in_arrays_as_list_before_header_update(tmp_path):
+        p,db,ids=fixture(tmp_path,'@Component class Header implements RequestInterceptor{public void apply(RequestTemplate template){template.header("x-access",(String[])null);}}',
+          'try{return client.read(7L);}catch(NullPointerException expected){return "null-array";}')
+>       e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})=='null-array' and not e.approximate and not outbound(e)
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ('ok' == 'null-array'
+E         
+E         - null-array
+E         + ok)
+
+code/tests/test_feign_interceptors33.py:165: AssertionError
+_ test_null_iterable_header_values_clear_instead_of_appending_null[Iterable<String>] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-90/test_null_iterable_header_valu0')
+typ = 'Iterable<String>'
+
+    @pytest.mark.parametrize('typ',['Iterable<String>','List<String>'])
+    def test_null_iterable_header_values_clear_instead_of_appending_null(tmp_path,typ):
+        p,db,ids=fixture(tmp_path,'@Component class Header implements RequestInterceptor{public void apply(RequestTemplate template){template.header("x-access","seed");template.header("x-access",('+typ+')null);}}')
+        e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})=='ok' and not e.approximate
+>       assert headers(e)==[{}]
+E       AssertionError: assert [{'x-access': ['seed']}] == [{}]
+E         
+E         At index 0 diff: {'x-access': ['seed']} != {}
+E         Use -v to get more diff
+
+code/tests/test_feign_interceptors33.py:172: AssertionError
+_ test_null_iterable_header_values_clear_instead_of_appending_null[List<String>] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-90/test_null_iterable_header_valu1')
+typ = 'List<String>'
+
+    @pytest.mark.parametrize('typ',['Iterable<String>','List<String>'])
+    def test_null_iterable_header_values_clear_instead_of_appending_null(tmp_path,typ):
+        p,db,ids=fixture(tmp_path,'@Component class Header implements RequestInterceptor{public void apply(RequestTemplate template){template.header("x-access","seed");template.header("x-access",('+typ+')null);}}')
+        e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})=='ok' and not e.approximate
+>       assert headers(e)==[{}]
+E       AssertionError: assert [{'x-access': ['seed']}] == [{}]
+E         
+E         At index 0 diff: {'x-access': ['seed']} != {}
+E         Use -v to get more diff
+
+code/tests/test_feign_interceptors33.py:172: AssertionError
+_ test_unproved_conditional_scope_or_duplicate_bean_registration_never_dispatches[condition] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-90/test_unproved_conditional_scop0')
+policy = 'condition'
+
+    @pytest.mark.parametrize('policy',['condition','factory_scope','duplicate_name'])
+    def test_unproved_conditional_scope_or_duplicate_bean_registration_never_dispatches(tmp_path,policy):
+        annotation='@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name="unmodeled")' if policy=='condition' else ''
+        extra=('@Component ' if policy!='factory_scope' else '')+annotation+'''class Header implements RequestInterceptor{
+          public void apply(RequestTemplate template){template.header("x-access","hook");}}'''
+        if policy in ('factory_scope','duplicate_name'):
+            scope='@Scope("prototype")' if policy=='factory_scope' else ''
+            extra+='@Configuration class Wiring{@Bean '+scope+' RequestInterceptor header(){return new Header();}}'
+        p,db,ids=fixture(tmp_path,extra);e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Api.entry'],{}) is U and e.outcome=='unsupported_semantics boundary'
+E       AssertionError: assert ('ok' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'ok' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10722ee50>.run
+
+code/tests/test_feign_interceptors33.py:184: AssertionError
+_ test_unproved_conditional_scope_or_duplicate_bean_registration_never_dispatches[factory_scope] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-90/test_unproved_conditional_scop1')
+policy = 'factory_scope'
+
+    @pytest.mark.parametrize('policy',['condition','factory_scope','duplicate_name'])
+    def test_unproved_conditional_scope_or_duplicate_bean_registration_never_dispatches(tmp_path,policy):
+        annotation='@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name="unmodeled")' if policy=='condition' else ''
+        extra=('@Component ' if policy!='factory_scope' else '')+annotation+'''class Header implements RequestInterceptor{
+          public void apply(RequestTemplate template){template.header("x-access","hook");}}'''
+        if policy in ('factory_scope','duplicate_name'):
+            scope='@Scope("prototype")' if policy=='factory_scope' else ''
+            extra+='@Configuration class Wiring{@Bean '+scope+' RequestInterceptor header(){return new Header();}}'
+        p,db,ids=fixture(tmp_path,extra);e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Api.entry'],{}) is U and e.outcome=='unsupported_semantics boundary'
+E       AssertionError: assert ('ok' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'ok' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1071c4cd0>.run
+
+code/tests/test_feign_interceptors33.py:184: AssertionError
+_ test_unproved_conditional_scope_or_duplicate_bean_registration_never_dispatches[duplicate_name] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-90/test_unproved_conditional_scop2')
+policy = 'duplicate_name'
+
+    @pytest.mark.parametrize('policy',['condition','factory_scope','duplicate_name'])
+    def test_unproved_conditional_scope_or_duplicate_bean_registration_never_dispatches(tmp_path,policy):
+        annotation='@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name="unmodeled")' if policy=='condition' else ''
+        extra=('@Component ' if policy!='factory_scope' else '')+annotation+'''class Header implements RequestInterceptor{
+          public void apply(RequestTemplate template){template.header("x-access","hook");}}'''
+        if policy in ('factory_scope','duplicate_name'):
+            scope='@Scope("prototype")' if policy=='factory_scope' else ''
+            extra+='@Configuration class Wiring{@Bean '+scope+' RequestInterceptor header(){return new Header();}}'
+        p,db,ids=fixture(tmp_path,extra);e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Api.entry'],{}) is U and e.outcome=='unsupported_semantics boundary'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_feign_interceptors33.py:184: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+code/analyzer/engine.py:389: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:481: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+code/analyzer/engine.py:572: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'],on_entry=entered)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:722: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds,on_entry)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:814: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1386: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1419: in execute_statement
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1386: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1424: in execute_statement
+    value = self.value(node.named_children[0], env) if node.named_children else None
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1675: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2101: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2737: in call
+    handled,value=feign_operation(self,node,args,reason) if objnode is not None else (False,U)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/feign_client.py:112: in operation
+    headers=apply_interceptors(engine,unit,owner,interceptors,headers,reason)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/feign_interceptors.py:176: in apply
+    order=engine.choose(reason+':Feign RequestInterceptor order',list(permutations(order)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x1050bff50>
+label = 'call:method:service:Api#entry()@12:60:Feign RequestInterceptor order'
+choices = [(0, 1), (1, 0)]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:call:method:service:Api#entry()@12:60:Feign RequestInterceptor order', [(0, 1), (1, 0)])
+
+code/analyzer/engine.py:314: AlternativeRequired
+=========================== short test summary info ============================
+FAILED code/tests/test_feign_interceptors33.py::test_callback_appends_to_existing_client_header_as_one_value[x-access]
+FAILED code/tests/test_feign_interceptors33.py::test_null_varargs_array_throws_in_arrays_as_list_before_header_update
+FAILED code/tests/test_feign_interceptors33.py::test_null_iterable_header_values_clear_instead_of_appending_null[Iterable<String>]
+FAILED code/tests/test_feign_interceptors33.py::test_null_iterable_header_values_clear_instead_of_appending_null[List<String>]
+FAILED code/tests/test_feign_interceptors33.py::test_unproved_conditional_scope_or_duplicate_bean_registration_never_dispatches[condition]
+FAILED code/tests/test_feign_interceptors33.py::test_unproved_conditional_scope_or_duplicate_bean_registration_never_dispatches[factory_scope]
+FAILED code/tests/test_feign_interceptors33.py::test_unproved_conditional_scope_or_duplicate_bean_registration_never_dispatches[duplicate_name]
+7 failed, 1 passed, 22 deselected in 0.48s

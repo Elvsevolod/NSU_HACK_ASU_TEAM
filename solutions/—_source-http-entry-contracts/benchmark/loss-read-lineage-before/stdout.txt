@@ -1,0 +1,21 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_loss_records_observed_reads_and_current_request_after_remote_return ___
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-220/test_loss_records_observed_rea0')
+
+    def test_loss_records_observed_reads_and_current_request_after_remote_return(tmp_path):
+        p, db, ids = equipment(tmp_path)
+        unknown = JavaList(); unknown.opaque = True
+        e = Engine(p, ScenarioState(db, {'scoped_effect_summary': True}))
+        e.run(ids['Approval.inspect'], {'id': 'A', 'unknown': unknown, 'inspectOnly': True})
+        loss = next(x for x in e.loss_events if x['phase'] == 'unsupported')
+>       assert loss['read_locations'] == [
+               ^^^^^^^^^^^^^^^^^^^^^^
+            {'resource': RID, 'operation': 'findById', 'request_id': 2, 'data_operation_index': 0}]
+E       KeyError: 'read_locations'
+
+code/tests/test_native_equipment_contracts33.py:168: KeyError
+=========================== short test summary info ============================
+FAILED code/tests/test_native_equipment_contracts33.py::test_loss_records_observed_reads_and_current_request_after_remote_return
+1 failed, 8 deselected in 0.15s

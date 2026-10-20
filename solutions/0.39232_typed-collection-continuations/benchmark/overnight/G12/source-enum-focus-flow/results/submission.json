@@ -1,0 +1,324 @@
+{
+  "edges": [
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:order-service:ErrorResponseDTO#<init>(int,String,String,String,String)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:order-service:GetOrderUseCase#execute(Long)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:order-service:GlobalExceptionHandler#handleIllegalArgument(IllegalArgumentException,HttpServletRequest)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:order-service:GlobalExceptionHandler#handleNotFound(OrderNotFoundException,HttpServletRequest)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:order-service:OrderController#getById(Long)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:order-service:OrderNotFoundException#<init>(OrderId)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:order-service:OrderPersistenceAdapter#findById(OrderId)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:order-service:OrderQueryService#getById(Long)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:ErrorResponseDTO#<init>(int,String,String,String,String)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:GetPaymentUseCase#execute(Long)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:GlobalExceptionHandler#handleNotFound(PaymentNotFoundException,HttpServletRequest)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:Payment#<init>(Long,Long,Long,BigDecimal,PaymentMethod,PaymentStatus,LocalDateTime)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:Payment#getAmount()"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:Payment#getCreatedAt()"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:Payment#getCustomerId()"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:Payment#getId()"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:Payment#getOrderId()"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:Payment#getPaymentMethod()"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:Payment#getStatus()"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:Payment#reconstitute(Long,Long,Long,BigDecimal,PaymentMethod,PaymentStatus,LocalDateTime)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:PaymentCommandService#refund(Long)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:PaymentController#getById(Long)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:PaymentController#getByOrder(Long)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:PaymentController#refund(Long)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:PaymentHttpMapper#toResponse(Payment)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:PaymentNotFoundException#<init>(Long)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:PaymentPersistenceMapper#toDomain(PaymentJpaEntity)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:PaymentQueryService#getById(Long)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+    },
+    {
+      "source": "scenario:cart-refund",
+      "relation": "executes",
+      "target": "method:payment-service:RefundPaymentUseCase#execute(Long)"
+    },
+    {
+      "source": "method:order-service:GetOrderUseCase#execute(Long)",
+      "relation": "calls",
+      "target": "method:order-service:OrderNotFoundException#<init>(OrderId)"
+    },
+    {
+      "source": "method:order-service:GetOrderUseCase#execute(Long)",
+      "relation": "calls",
+      "target": "method:order-service:OrderPersistenceAdapter#findById(OrderId)"
+    },
+    {
+      "source": "method:order-service:GlobalExceptionHandler#handleIllegalArgument(IllegalArgumentException,HttpServletRequest)",
+      "relation": "calls",
+      "target": "method:order-service:ErrorResponseDTO#<init>(int,String,String,String,String)"
+    },
+    {
+      "source": "method:order-service:GlobalExceptionHandler#handleNotFound(OrderNotFoundException,HttpServletRequest)",
+      "relation": "calls",
+      "target": "method:order-service:ErrorResponseDTO#<init>(int,String,String,String,String)"
+    },
+    {
+      "source": "method:order-service:OrderController#getById(Long)",
+      "relation": "calls",
+      "target": "method:order-service:OrderQueryService#getById(Long)"
+    },
+    {
+      "source": "method:order-service:OrderPersistenceAdapter#findById(OrderId)",
+      "relation": "data",
+      "target": "res:table:order-service.orders"
+    },
+    {
+      "source": "method:order-service:OrderQueryService#getById(Long)",
+      "relation": "calls",
+      "target": "method:order-service:GetOrderUseCase#execute(Long)"
+    },
+    {
+      "source": "method:payment-service:GetPaymentUseCase#execute(Long)",
+      "relation": "calls",
+      "target": "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+    },
+    {
+      "source": "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+      "relation": "calls",
+      "target": "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+    },
+    {
+      "source": "method:payment-service:GlobalExceptionHandler#handleNotFound(PaymentNotFoundException,HttpServletRequest)",
+      "relation": "calls",
+      "target": "method:payment-service:ErrorResponseDTO#<init>(int,String,String,String,String)"
+    },
+    {
+      "source": "method:payment-service:Payment#reconstitute(Long,Long,Long,BigDecimal,PaymentMethod,PaymentStatus,LocalDateTime)",
+      "relation": "calls",
+      "target": "method:payment-service:Payment#<init>(Long,Long,Long,BigDecimal,PaymentMethod,PaymentStatus,LocalDateTime)"
+    },
+    {
+      "source": "method:payment-service:PaymentCommandService#refund(Long)",
+      "relation": "calls",
+      "target": "method:payment-service:RefundPaymentUseCase#execute(Long)"
+    },
+    {
+      "source": "method:payment-service:PaymentController#getById(Long)",
+      "relation": "calls",
+      "target": "method:payment-service:PaymentQueryService#getById(Long)"
+    },
+    {
+      "source": "method:payment-service:PaymentController#getByOrder(Long)",
+      "relation": "calls",
+      "target": "method:payment-service:PaymentHttpMapper#toResponse(Payment)"
+    },
+    {
+      "source": "method:payment-service:PaymentController#getByOrder(Long)",
+      "relation": "calls",
+      "target": "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+    },
+    {
+      "source": "method:payment-service:PaymentController#refund(Long)",
+      "relation": "calls",
+      "target": "method:payment-service:PaymentCommandService#refund(Long)"
+    },
+    {
+      "source": "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+      "relation": "calls",
+      "target": "method:payment-service:Payment#getAmount()"
+    },
+    {
+      "source": "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+      "relation": "calls",
+      "target": "method:payment-service:Payment#getCreatedAt()"
+    },
+    {
+      "source": "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+      "relation": "calls",
+      "target": "method:payment-service:Payment#getCustomerId()"
+    },
+    {
+      "source": "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+      "relation": "calls",
+      "target": "method:payment-service:Payment#getId()"
+    },
+    {
+      "source": "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+      "relation": "calls",
+      "target": "method:payment-service:Payment#getOrderId()"
+    },
+    {
+      "source": "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+      "relation": "calls",
+      "target": "method:payment-service:Payment#getPaymentMethod()"
+    },
+    {
+      "source": "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+      "relation": "calls",
+      "target": "method:payment-service:Payment#getStatus()"
+    },
+    {
+      "source": "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+      "relation": "calls",
+      "target": "method:payment-service:PaymentNotFoundException#<init>(Long)"
+    },
+    {
+      "source": "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+      "relation": "data",
+      "target": "res:table:payment-service.payments"
+    },
+    {
+      "source": "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+      "relation": "calls",
+      "target": "method:payment-service:PaymentPersistenceMapper#toDomain(PaymentJpaEntity)"
+    },
+    {
+      "source": "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+      "relation": "data",
+      "target": "res:table:payment-service.payments"
+    },
+    {
+      "source": "method:payment-service:PaymentPersistenceMapper#toDomain(PaymentJpaEntity)",
+      "relation": "calls",
+      "target": "method:payment-service:Payment#reconstitute(Long,Long,Long,BigDecimal,PaymentMethod,PaymentStatus,LocalDateTime)"
+    },
+    {
+      "source": "method:payment-service:PaymentQueryService#getById(Long)",
+      "relation": "calls",
+      "target": "method:payment-service:GetPaymentUseCase#execute(Long)"
+    },
+    {
+      "source": "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+      "relation": "calls",
+      "target": "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+    },
+    {
+      "source": "method:payment-service:RefundPaymentUseCase#execute(Long)",
+      "relation": "calls",
+      "target": "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+    }
+  ]
+}

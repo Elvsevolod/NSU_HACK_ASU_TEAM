@@ -1,0 +1,54 @@
+FF....F                                                                  [100%]
+=================================== FAILURES ===================================
+________ test_unknown_membership_does_not_prove_local_map_empty[False] _________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-248/test_unknown_membership_does_n0')
+opaque = False
+
+    @pytest.mark.parametrize('opaque', [False, True])
+    def test_unknown_membership_does_not_prove_local_map_empty(tmp_path, opaque):
+        p, db, ids = build(tmp_path, {'Api.java': SOURCE})
+        engine = Engine(p, ScenarioState(db))
+        assert engine.run(ids['Api.local'], {'rows': opaque_rows() if opaque else U}) is U
+>       assert engine.outcome == 'unsupported_semantics boundary'
+E       AssertionError: assert 'returned' == 'unsupported_...tics boundary'
+E         
+E         - unsupported_semantics boundary
+E         + returned
+
+code/tests/test_unknown_collection_iteration.py:29: AssertionError
+_________ test_unknown_membership_does_not_prove_local_map_empty[True] _________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-248/test_unknown_membership_does_n1')
+opaque = True
+
+    @pytest.mark.parametrize('opaque', [False, True])
+    def test_unknown_membership_does_not_prove_local_map_empty(tmp_path, opaque):
+        p, db, ids = build(tmp_path, {'Api.java': SOURCE})
+        engine = Engine(p, ScenarioState(db))
+>       assert engine.run(ids['Api.local'], {'rows': opaque_rows() if opaque else U}) is U
+E       AssertionError: assert True is <Unknown.VALUE: 'unknown'>
+E        +  where True = run('method:service:Api#local(List<Row>)', {'rows': []})
+E        +    where run = <analyzer.engine.Engine object at 0x102737e50>.run
+
+code/tests/test_unknown_collection_iteration.py:28: AssertionError
+_____________________ test_null_foreach_throws_before_body _____________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-248/test_null_foreach_throws_befor0')
+
+    def test_null_foreach_throws_before_body(tmp_path):
+        p, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;class Api{
+          String entry(){try{for(String value:(List<String>)null){return value;}}
+           catch(NullPointerException failure){return "null";}return "after";}}'''})
+>       assert Engine(p, ScenarioState(db)).run(ids['Api.entry'], {}) == 'null'
+E       AssertionError: assert 'after' == 'null'
+E         
+E         - null
+E         + after
+
+code/tests/test_unknown_collection_iteration.py:58: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_unknown_collection_iteration.py::test_unknown_membership_does_not_prove_local_map_empty[False]
+FAILED code/tests/test_unknown_collection_iteration.py::test_unknown_membership_does_not_prove_local_map_empty[True]
+FAILED code/tests/test_unknown_collection_iteration.py::test_null_foreach_throws_before_body
+3 failed, 4 passed in 0.14s

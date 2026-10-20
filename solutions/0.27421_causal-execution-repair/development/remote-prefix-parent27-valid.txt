@@ -1,0 +1,26 @@
+F..                                                                      [100%]
+=================================== FAILURES ===================================
+____ test_remote_edge_is_recorded_at_handler_entry_even_when_analysis_stops ____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-123/test_remote_edge_is_recorded_a0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x109b0ad90>
+
+    def test_remote_edge_is_recorded_at_handler_entry_even_when_analysis_stops(tmp_path,monkeypatch):
+        project,db,ids=remote_project(tmp_path)
+        original=Engine.execute
+        def stop(self,node,env):
+            if self.method==ids['Api.prefix']:raise AnalysisBoundary('fixture work limit reached inside the entered server')
+            return original(self,node,env)
+        monkeypatch.setattr(Engine,'execute',stop)
+        engine=Engine(project,ScenarioState(db))
+        engine.run(ids['Caller.entry'],{'key':'12345678-1234-1234-1234-123456789abc'})
+        assert ('','executes',ids['Api.read']) in engine.edges
+        assert ('','executes',ids['Api.prefix']) in engine.edges
+>       assert (ids['Caller.entry'],'remote',ids['Api.read']) in engine.edges
+E       AssertionError: assert ('method:service:Caller#entry(String)', 'remote', 'method:service:Api#read(UUID)') in {('', 'executes', 'method:service:Api#prefix()'), ('', 'executes', 'method:service:Api#read(UUID)'), ('', 'executes', 'method:service:Caller#entry(String)'), ('method:service:Api#read(UUID)', 'calls', 'method:service:Api#prefix()')}
+E        +  where {('', 'executes', 'method:service:Api#prefix()'), ('', 'executes', 'method:service:Api#read(UUID)'), ('', 'executes', 'method:service:Caller#entry(String)'), ('method:service:Api#read(UUID)', 'calls', 'method:service:Api#prefix()')} = <analyzer.engine.Engine object at 0x10873fe50>.edges
+
+solutions/—_causal-execution-repair/code/tests/test_regression_remote_prefix.py:36: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_remote_prefix.py::test_remote_edge_is_recorded_at_handler_entry_even_when_analysis_stops
+1 failed, 2 passed in 0.09s

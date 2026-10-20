@@ -1,0 +1,22 @@
+...F...............                                                      [100%]
+=================================== FAILURES ===================================
+_ test_built_references_share_arguments_but_not_subsequent_builder_assignments _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-130/test_built_references_share_ar0')
+
+    def test_built_references_share_arguments_but_not_subsequent_builder_assignments(tmp_path):
+        e,ids=fixture(tmp_path,fields='public java.util.List<String> names;',returned='boolean',body='''
+          java.util.List<String> names=new java.util.ArrayList<>();names.add("first");
+          var builder=Item.builder().names(names);Item first=builder.build();
+          names.add("shared");builder.names(new java.util.ArrayList<>());Item second=builder.build();
+          return first.names.size()==2 && second.names.isEmpty() && first!=second;''')
+>       assert e.run(ids['Api.entry'],{}) is True and not e.approximate
+E       AssertionError: assert (True is True and not True)
+E        +  where True = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x102d23710>.run
+E        +  and   True = <analyzer.engine.Engine object at 0x102d23710>.approximate
+
+code/tests/test_lombok_builder33.py:47: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_lombok_builder33.py::test_built_references_share_arguments_but_not_subsequent_builder_assignments
+1 failed, 18 passed in 0.18s

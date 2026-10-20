@@ -1,0 +1,124 @@
+{
+  "project": "healthcare",
+  "seconds": 0.04625829200085718,
+  "contracts": 12,
+  "canonical_handlers": 12,
+  "frontend_sites": 0,
+  "routes": [
+    {
+      "entry": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#create(Doctor)",
+      "method": "POST",
+      "path": [
+        "doctors"
+      ],
+      "unit": "doctor-service"
+    },
+    {
+      "entry": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getAll(Pageable)",
+      "method": "GET",
+      "path": [
+        "doctors"
+      ],
+      "unit": "doctor-service"
+    },
+    {
+      "entry": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getById(Long)",
+      "method": "GET",
+      "path": [
+        "doctors",
+        "{id}"
+      ],
+      "unit": "doctor-service"
+    },
+    {
+      "entry": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#update(Long,Doctor)",
+      "method": "PUT",
+      "path": [
+        "doctors",
+        "{id}"
+      ],
+      "unit": "doctor-service"
+    },
+    {
+      "entry": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#delete(Long)",
+      "method": "DELETE",
+      "path": [
+        "doctors",
+        "{id}"
+      ],
+      "unit": "doctor-service"
+    },
+    {
+      "entry": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+      "method": "GET",
+      "path": [
+        "doctors",
+        "{doctorId}",
+        "patient",
+        "{patientId}"
+      ],
+      "unit": "doctor-service"
+    },
+    {
+      "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+      "method": "POST",
+      "path": [
+        "patients"
+      ],
+      "unit": "patient-service"
+    },
+    {
+      "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#getAll(Pageable)",
+      "method": "GET",
+      "path": [
+        "patients"
+      ],
+      "unit": "patient-service"
+    },
+    {
+      "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+      "method": "GET",
+      "path": [
+        "patients",
+        "{id}"
+      ],
+      "unit": "patient-service"
+    },
+    {
+      "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+      "method": "PUT",
+      "path": [
+        "patients",
+        "{id}"
+      ],
+      "unit": "patient-service"
+    },
+    {
+      "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)",
+      "method": "DELETE",
+      "path": [
+        "patients",
+        "{id}"
+      ],
+      "unit": "patient-service"
+    },
+    {
+      "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#searchPatients(String,Integer,String)",
+      "method": "GET",
+      "path": [
+        "patients",
+        "search"
+      ],
+      "unit": "patient-service"
+    }
+  ],
+  "source_errors": [],
+  "route_warnings": [],
+  "resources": {
+    "res:table:hospital_db.doctors": "type:doctor-service:com.hospital.doctorservice.entity.Doctor",
+    "res:table:hospital_db.patients": "type:patient-service:com.hospital.patientservice.entity.Patient"
+  },
+  "source_only_preparation": true,
+  "query_inference_run": false,
+  "targets_executed": false
+}

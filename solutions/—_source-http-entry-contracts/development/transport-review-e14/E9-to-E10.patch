@@ -1,0 +1,233 @@
+--- E9-feign-bean-decoder/analyzer/engine.py
++++ E10-lombok-builder/analyzer/engine.py
+@@ -2800,17 +2800,10 @@
+                 self.approximate=True
+                 self.warnings.add('unresolved static/instance invocation on null: '+reason)
+                 return U
+-        if not targets and name == 'builder' and receiver_type in self.p.builder_types:
+-            fields = self.p.builder_types[receiver_type]
+-            return {'__builder__': receiver_type, 'fields': {n: False if t == 'boolean' else 0 if t in ('int', 'long', 'double', 'float') else None for n, t in fields}}
+-        if not targets and type(obj) is dict and '__builder__' in obj:
+-            if name == 'build':
+-                value=JavaRecord(obj['__builder__'],{'__type__': obj['__builder__'], **deepcopy(obj['fields'])},obj['fields'])
+-                value.source_owner=self.p.resolve_type(obj['__builder__'],self.p.methods[mid]['module'],self.p.methods[mid]['file'])
+-                return value
+-            if name in obj['fields'] and len(args) == 1:
+-                obj['fields'][name] = args[0]
+-                return obj
++        if not targets:
++            from .lombok_builder import operation as builder_operation
++            handled,value=builder_operation(self,node,obj,args,argument_kinds,reason)
++            if handled:return value
+         if not targets and name == 'values' and not args:
+             meta = self.p.methods[mid]
+             tid = self.p.resolve_type(text(objnode), meta['module'], meta['file'])
+--- E9-feign-bean-decoder/analyzer/lombok_builder.py
++++ E10-lombok-builder/analyzer/lombok_builder.py
+@@ -0,0 +1,92 @@
++"""Source-proven default class-level Lombok builders; no generated graph IDs."""
++from .bean_properties import annotations,declaration
++from .java_collections import JavaObject
++from .project import text,keywords
++from .source_generics import render
++from .state import U
++
++
++class JavaBuilder(dict):
++    def __init__(self,owner,fields):
++        super().__init__()
++        self.owner,self.fields=owner,fields
++        self.values={name:False if typ=='boolean' else '\0' if typ=='char' else
++                     0.0 if typ in ('float','double') else 0 if typ in ('byte','short','int','long') else None
++                     for name,typ in fields.items()}
++        self.kinds={}
++
++
++def boundary(reason,message):
++    from .engine import AnalysisBoundary
++    raise AnalysisBoundary('Lombok builder '+message+': '+reason,category='unsupported_semantics')
++
++
++def plan(engine,owner,reason):
++    p=engine.p;cache=p.__dict__.setdefault('_default_builder_plans',{})
++    if owner in cache:
++        fields,error=cache[owner]
++        if error:boundary(reason,error)
++        return fields
++    node=declaration(p,owner);meta=p.nodes[owner]
++    notes={name.rsplit('.',1)[-1]:args for name,args in annotations(node)
++           if engine.standard_type(name,'lombok.'+name.rsplit('.',1)[-1],meta)} if node is not None else {}
++    if 'Builder' not in notes:return None
++    body=node.child_by_field_name('body');members=body.named_children if body is not None else []
++    error=None
++    if node.type!='class_declaration' or node.child_by_field_name('type_parameters') is not None or p.type_parents.get(owner):
++        error='generic/inherited declaration is outside the default contract'
++    elif any(not engine.standard_type(parent,'java.lang.Object',meta) for parent in p.framework_types.get(owner,())):
++        error='external parent contract is unresolved'
++    elif any(notes.get(name,'').strip('() ') for name in ('Builder','AllArgsConstructor','NoArgsConstructor')):
++        error='annotation options are not modeled'
++    elif any(member.type in ('constructor_declaration','class_declaration','interface_declaration','block') for member in members):
++        error='source constructor, nested builder or instance initializer is not modeled'
++    elif any(name in notes for name in ('RequiredArgsConstructor','NoArgsConstructor')) and 'AllArgsConstructor' not in notes:
++        error='generated all-args constructor is not proved'
++    fields={}
++    for member in members:
++        if member.type!='field_declaration' or 'static' in keywords(member):continue
++        if any(any(engine.standard_type(name,fqn,meta) for fqn in ('lombok.Builder.Default','lombok.Singular','lombok.NonNull'))
++               for name,_ in annotations(member)):
++            error='field default, singular collection or null-check policy is not modeled'
++        for variable in member.named_children:
++            if variable.type!='variable_declarator':continue
++            if variable.child_by_field_name('value') is not None:error='instance field initializer is not modeled'
++            written=text(member.child_by_field_name('type'))
++            actual=render(p,written,meta,{},engine.standard_type)
++            if not actual:error='field type is unresolved'
++            fields[text(variable.child_by_field_name('name'))]=actual or written
++    cache[owner]=fields,error
++    if error:boundary(reason,error)
++    return fields
++
++
++def operation(engine,node,obj,args,kinds,reason):
++    name=text(node.child_by_field_name('name'));p=engine.p;meta=p.methods[engine.method]
++    if isinstance(obj,JavaBuilder):
++        if engine.opaque(obj):boundary(reason,'escaped builder contents are unresolved')
++        if name=='build' and not args:
++            fqn=p.nodes[obj.owner]['fqn']
++            value=JavaObject(fqn,{'__type__':fqn,'__http_entity__':False,**obj.values},wire_fields=obj.fields)
++            value.source_owner=obj.owner
++            value._native_field_kinds={field:obj.kinds.get(field,engine.declared_kind(typ,p.nodes[obj.owner]) if
++                typ in ('boolean','byte','short','char','int','long','float','double') else None) for field,typ in obj.fields.items()}
++            value._field_reference_types=dict(obj.fields)
++            return True,value
++        if name in obj.fields and len(args)==1:
++            argument=next(child for child in node.child_by_field_name('arguments').named_children
++                          if child.type not in ('line_comment','block_comment'))
++            value,kind=engine.assignment_value(args[0],kinds[0],obj.fields[name],argument)
++            obj.values[name]=value;obj.kinds[name]=kind
++            return True,obj
++        boundary(reason,'method or overload is outside the default contract')
++    qualifier=node.child_by_field_name('object');written=text(qualifier);root=written.split('.')[0]
++    if name!='builder' or args or qualifier is None:return False,U
++    if root in engine.variable_types or root in p.type_fields.get(meta['owner'],{}):return False,U
++    owner=p.resolve_type(written,meta['module'],meta['file'])
++    if owner is None:return False,U
++    fields=plan(engine,owner,reason)
++    if fields is None:return False,U
++    from .static_storage import ensure
++    ensure(engine,owner)
++    return True,JavaBuilder(owner,fields)
+--- E9-feign-bean-decoder/analyzer/project.py
++++ E10-lombok-builder/analyzer/project.py
+@@ -80,7 +80,6 @@
+                 qualified_types[node['fqn']].append(tid)
+         self.enum_prefixes = {tid: (tid if len(qualified_types[node['fqn']]) > 1 else node['fqn'] if len(type_names[node['fqn'].split('.')[-1]]) > 1 else node['fqn'].split('.')[-1])
+                               for tid, node in self.nodes.items() if node['kind'] == 'type'}
+-        self.builder_types = {}
+         self.all_args_types = {}
+         self.constants = {}
+         self.constant_types = {}
+@@ -125,7 +124,6 @@
+                         else:
+                             fields.append((name, text(field.child_by_field_name('type'))))
+                 modifiers = next((text(c) for c in decl.named_children if c.type == 'modifiers'), '')
+-                if '@Builder' in modifiers: self.builder_types[meta['fqn']] = fields
+                 if '@AllArgsConstructor' in modifiers: self.all_args_types[meta['fqn']] = fields
+         for file, tree in self.trees.items():
+             declarations[file] = [n for n in walk(tree.root_node) if n.type in ('method_declaration', 'constructor_declaration')]
+--- E9-feign-bean-decoder/tests/test_lombok_builder33.py
++++ E10-lombok-builder/tests/test_lombok_builder33.py
+@@ -0,0 +1,93 @@
++"""Generated builders need source ownership, native annotations and typed aliases."""
++import json
++import re
++import pytest
++from builders import build
++from analyzer.engine import Engine
++from analyzer.project import Project
++from analyzer.state import ScenarioState,U
++from analyzer.java_collections import JavaObject
++
++
++def fixture(root,*,annotation='@lombok.Builder',fields='public String name;',
++            body='Item item=Item.builder().name("ready").build();return item.name;',
++            extra='',api_extra='',imports='import records.Item;',returned='String'):
++    sources={'Item.java':'package records;'+annotation+' public class Item{'+fields+extra+'}',
++             'Api.java':'package caller;'+imports+' class Api{'+returned+' entry(){'+body+'}'+api_extra+'}'}
++    p,db,ids=build(root,sources)
++    data=json.loads((root/'skeleton.json').read_text())
++    for node in data['nodes'].values():
++        if node['kind']=='type':
++            package=re.search(r'package\s+([\w.]+)',sources[node['file']])[1]
++            node['fqn']=package+'.'+node['fqn']
++    (root/'skeleton.json').write_text(json.dumps(data))
++    return Engine(Project(root/'skeleton.json',root),ScenarioState(db)),ids
++
++
++@pytest.mark.parametrize('annotation',['@lombok.Builder','import lombok.Builder;@Builder','@lombok.Builder @lombok.NoArgsConstructor @lombok.AllArgsConstructor'])
++def test_imported_class_builder_resolves_the_source_qualified_owner(tmp_path,annotation):
++    e,ids=fixture(tmp_path,annotation=annotation)
++    assert e.run(ids['Api.entry'],{})=='ready' and not e.approximate
++    assert e.edges=={('','executes',ids['Api.entry'])}
++
++
++def test_fully_qualified_builder_ignores_untrusted_skeleton_receiver_spelling(tmp_path):
++    e,ids=fixture(tmp_path,imports='',body='records.Item item=records.Item.builder().name("ready").build();return item.name;')
++    for node in e.p.nodes.values():
++        if node['kind']=='call_site' and node.get('callee')=='builder':node['receiver_type']='unrelated.Item'
++    assert e.run(ids['Api.entry'],{})=='ready' and not e.approximate
++
++
++def test_built_references_share_arguments_but_not_subsequent_builder_assignments(tmp_path):
++    e,ids=fixture(tmp_path,fields='public java.util.List<String> names;',returned='boolean',body='''
++      java.util.List<String> names=new java.util.ArrayList<String>();names.add("first");
++      Item.ItemBuilder builder=Item.builder().names(names);Item first=builder.build();
++      names.add("shared");builder.names(new java.util.ArrayList<String>());Item second=builder.build();
++      return first.names.size()==2 && second.names.isEmpty() && first!=second;''')
++    assert e.run(ids['Api.entry'],{}) is True and not e.approximate,e.warnings
++
++
++def test_native_defaults_and_declared_numeric_kinds_are_preserved(tmp_path):
++    e,ids=fixture(tmp_path,fields='public long id;public boolean active;public char marker;public String name;',
++        returned='Item',body='return Item.builder().id(7L).build();')
++    value=e.run(ids['Api.entry'],{})
++    assert isinstance(value,JavaObject) and value.java_type=='records.Item'
++    assert {k:value[k] for k in ('id','active','marker','name')}=={'id':7,'active':False,'marker':'\0','name':None}
++    assert value._native_field_kinds['id']=='Long' and not e.approximate
++
++
++def test_builder_initializes_the_declaring_class_once(tmp_path):
++    e,ids=fixture(tmp_path,fields='public String name;public static int initialized=1;',
++                  body='Item.builder().build();Item.builder().build();return "ready";')
++    assert e.run(ids['Api.entry'],{})=='ready' and not e.approximate
++    assert e.state.static_fields['type:service:Item']['initialized']==1
++
++
++@pytest.mark.parametrize('annotation,fields,extra',[
++    ('@lombok.Builder(toBuilder=true)','public String name;',''),
++    ('@lombok.Builder','@lombok.Builder.Default public String name="initial";',''),
++    ('@lombok.Builder','@lombok.NonNull public String name;',''),
++    ('@lombok.Builder','@lombok.Singular public java.util.List<String> names;',''),
++    ('@lombok.Builder','public String name;','public Item(String name){this.name=name;}'),
++    ('@lombok.Builder','public String name;','public static class ItemBuilder{public Item build(){return null;}}'),
++    ('@lombok.Builder','public String name="initializer";',''),
++])
++def test_nondefault_builder_contracts_do_not_run_a_success_suffix(tmp_path,annotation,fields,extra):
++    e,ids=fixture(tmp_path,annotation=annotation,fields=fields,extra=extra,
++                  body='Item.builder();return after();',api_extra='String after(){return "wrong";}')
++    assert e.run(ids['Api.entry'],{}) is U and e.approximate
++    assert not any(kind=='executes' and target==ids['Api.after'] for _,kind,target in e.edges)
++
++
++def test_source_builder_method_has_priority_over_generated_construction(tmp_path):
++    e,ids=fixture(tmp_path,extra='''public Item(String value){name=value;}
++      public static Item builder(){return new Item("source");}''',body='return Item.builder().name;')
++    assert e.run(ids['Api.entry'],{})=='source' and not e.approximate
++    assert any(kind=='executes' and target==ids['Item.builder'] for _,kind,target in e.edges)
++
++
++def test_a_user_annotation_namesake_cannot_enable_generated_code(tmp_path):
++    e,ids=fixture(tmp_path,annotation='@interface Builder{} @Builder',body='return Item.builder().name;',
++        extra='public static Item builder(){Item item=new Item();item.name="source";return item;}')
++    assert e.run(ids['Api.entry'],{})=='source' and not e.approximate
++    assert any(kind=='executes' and target==ids['Item.builder'] for _,kind,target in e.edges)

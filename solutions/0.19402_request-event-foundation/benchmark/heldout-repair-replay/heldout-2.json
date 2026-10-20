@@ -1,0 +1,461 @@
+{
+  "prediction": {
+    "edges": [
+      {
+        "source": "scenario:heldout-2",
+        "relation": "executes",
+        "target": "method:account:AccountController#getAccountByName(String)"
+      },
+      {
+        "source": "scenario:heldout-2",
+        "relation": "executes",
+        "target": "method:account:AccountServiceImpl#findByName(String)"
+      },
+      {
+        "source": "method:account:AccountController#getAccountByName(String)",
+        "relation": "calls",
+        "target": "method:account:AccountServiceImpl#findByName(String)"
+      },
+      {
+        "source": "method:account:AccountServiceImpl#findByName(String)",
+        "relation": "data",
+        "target": "res:collection:account.accounts"
+      }
+    ]
+  },
+  "report": {
+    "graph_policy": "observed-union",
+    "analysis_status": "partial",
+    "certainty_scope": "relative to supplied inputs, proposed bindings and supported semantics; not a runtime trace",
+    "confirmed": [
+      {
+        "source": "scenario:heldout-2",
+        "relation": "executes",
+        "target": "method:account:AccountController#getAccountByName(String)"
+      },
+      {
+        "source": "scenario:heldout-2",
+        "relation": "executes",
+        "target": "method:account:AccountServiceImpl#findByName(String)"
+      },
+      {
+        "source": "method:account:AccountController#getAccountByName(String)",
+        "relation": "calls",
+        "target": "method:account:AccountServiceImpl#findByName(String)"
+      },
+      {
+        "source": "method:account:AccountServiceImpl#findByName(String)",
+        "relation": "data",
+        "target": "res:collection:account.accounts"
+      }
+    ],
+    "possible": [],
+    "unresolved": [
+      "System clock is unknown",
+      "framework method interception is not fully modeled: PreAuthorize at method:account:AccountController#getAccountByName(String)"
+    ],
+    "steps": [
+      {
+        "n": 1,
+        "action": "GET /absent",
+        "selection": {
+          "proposal": {
+            "hypotheses": []
+          },
+          "candidates": [
+            "method:account:AccountController#getAccountByName(String)"
+          ],
+          "unresolved": []
+        },
+        "alternatives": [
+          {
+            "entry": "method:account:AccountController#getAccountByName(String)",
+            "parameters": {
+              "name": "absent"
+            },
+            "grounding_reason": "Explicit HTTP matched against source routes",
+            "grounding_repairs": [],
+            "retrieval_candidates": [
+              "method:account:AccountController#getAccountByName(String)"
+            ],
+            "ui_site": null,
+            "bindings": {},
+            "result": null,
+            "request": {
+              "deployment": "account",
+              "method": "GET",
+              "url": "/absent",
+              "path": [
+                "absent"
+              ],
+              "query": {},
+              "query_complete": true,
+              "headers": {},
+              "body": {
+                "missing": true
+              },
+              "actor": {
+                "unknown": true
+              },
+              "session": {
+                "unknown": true
+              },
+              "body_properties": {},
+              "provenance": {
+                "source": "explicit_action",
+                "quote": "GET /absent"
+              }
+            },
+            "created_objects": [],
+            "path_conditions": [],
+            "decisions": {},
+            "pruned_paths": [],
+            "outcome": "returned",
+            "unresolved": [
+              "framework method interception is not fully modeled: PreAuthorize at method:account:AccountController#getAccountByName(String)"
+            ],
+            "operation_issues": [],
+            "data_operations": [
+              {
+                "method": "method:account:AccountServiceImpl#findByName(String)",
+                "resource": "res:collection:account.accounts",
+                "operation": "findByName",
+                "arguments": [
+                  "absent"
+                ],
+                "source_site": "call:method:account:AccountServiceImpl#findByName(String)@39:21",
+                "uncertain_write": false,
+                "sql_emitted": false,
+                "datastore_event": true,
+                "transactional": false,
+                "emitted_by": "call:method:account:AccountServiceImpl#findByName(String)@39:21"
+              }
+            ],
+            "events": [
+              {
+                "edge": {
+                  "source": "scenario:heldout-2",
+                  "relation": "executes",
+                  "target": "method:account:AccountController#getAccountByName(String)"
+                },
+                "request": 1,
+                "callsite": "scenario request",
+                "method": "method:account:AccountController#getAccountByName(String)",
+                "line": null,
+                "context": "C1",
+                "values": {
+                  "version": "value-witness/1",
+                  "arguments": [
+                    {
+                      "kind": "str",
+                      "value": "absent"
+                    }
+                  ]
+                },
+                "cause": "source_execution"
+              },
+              {
+                "edge": {
+                  "source": "scenario:heldout-2",
+                  "relation": "executes",
+                  "target": "method:account:AccountServiceImpl#findByName(String)"
+                },
+                "request": 1,
+                "callsite": "call:method:account:AccountController#getAccountByName(String)@22:25",
+                "method": "method:account:AccountServiceImpl#findByName(String)",
+                "line": 22,
+                "context": "C1",
+                "values": {
+                  "version": "value-witness/1",
+                  "arguments": [
+                    {
+                      "kind": "str",
+                      "value": "absent"
+                    }
+                  ]
+                },
+                "cause": "source_execution"
+              },
+              {
+                "edge": {
+                  "source": "method:account:AccountServiceImpl#findByName(String)",
+                  "relation": "data",
+                  "target": "res:collection:account.accounts"
+                },
+                "request": 1,
+                "callsite": "call:method:account:AccountServiceImpl#findByName(String)@39:21",
+                "method": "method:account:AccountServiceImpl#findByName(String)",
+                "line": 39,
+                "context": "C1",
+                "values": {
+                  "version": "value-witness/1",
+                  "arguments": [
+                    {
+                      "kind": "str",
+                      "value": "absent"
+                    }
+                  ]
+                },
+                "cause": "datastore"
+              },
+              {
+                "edge": {
+                  "source": "method:account:AccountController#getAccountByName(String)",
+                  "relation": "calls",
+                  "target": "method:account:AccountServiceImpl#findByName(String)"
+                },
+                "request": 1,
+                "callsite": "call:method:account:AccountController#getAccountByName(String)@22:25",
+                "method": "method:account:AccountController#getAccountByName(String)",
+                "line": 22,
+                "context": "C1",
+                "values": {
+                  "version": "value-witness/1",
+                  "arguments": [
+                    {
+                      "kind": "str",
+                      "value": "absent"
+                    }
+                  ]
+                },
+                "cause": "direct_call"
+              }
+            ],
+            "assumptions": {},
+            "event_contexts": {
+              "C1": {
+                "guards": [],
+                "assumptions": []
+              }
+            },
+            "requests": [
+              {
+                "id": 1,
+                "entry": "method:account:AccountController#getAccountByName(String)",
+                "reason": "scenario request",
+                "request": {
+                  "deployment": "account",
+                  "method": "GET",
+                  "url": "/absent",
+                  "path": [
+                    "absent"
+                  ],
+                  "query": {},
+                  "query_complete": true,
+                  "headers": {},
+                  "body": {
+                    "missing": true
+                  },
+                  "actor": {
+                    "unknown": true
+                  },
+                  "session": {
+                    "unknown": true
+                  },
+                  "body_properties": {},
+                  "provenance": {
+                    "source": "explicit_action",
+                    "quote": "GET /absent"
+                  }
+                }
+              }
+            ],
+            "responses": [
+              {
+                "request": 1,
+                "status": 200,
+                "entered": true
+              }
+            ],
+            "call_effects": [],
+            "persistence": [],
+            "static_candidates": [],
+            "state_after": {
+              "browser": {
+                "storage": {},
+                "form": {},
+                "dom": {},
+                "url": {},
+                "options": {},
+                "script": {}
+              },
+              "history": [
+                {
+                  "step": 1,
+                  "entry": "method:account:AccountController#getAccountByName(String)",
+                  "action": "GET /absent"
+                }
+              ],
+              "clock": {
+                "unknown": true
+              },
+              "database_rows": {
+                "account.accounts": 1
+              },
+              "unknown_tables": [],
+              "analysis_assumptions": [
+                "step 1: unresolved source/request/state assumptions"
+              ],
+              "limitations": []
+            },
+            "edges": [
+              {
+                "source": "scenario:heldout-2",
+                "relation": "executes",
+                "target": "method:account:AccountController#getAccountByName(String)"
+              },
+              {
+                "source": "scenario:heldout-2",
+                "relation": "executes",
+                "target": "method:account:AccountServiceImpl#findByName(String)"
+              },
+              {
+                "source": "method:account:AccountController#getAccountByName(String)",
+                "relation": "calls",
+                "target": "method:account:AccountServiceImpl#findByName(String)"
+              },
+              {
+                "source": "method:account:AccountServiceImpl#findByName(String)",
+                "relation": "data",
+                "target": "res:collection:account.accounts"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "evidence": [
+      {
+        "edge": {
+          "source": "scenario:heldout-2",
+          "relation": "executes",
+          "target": "method:account:AccountController#getAccountByName(String)"
+        },
+        "grounds": [
+          {
+            "step": 1,
+            "entry": "method:account:AccountController#getAccountByName(String)",
+            "ui_site": null,
+            "alternative": 0,
+            "source_sites": [
+              "scenario request"
+            ],
+            "approximate": true,
+            "source_locations": [
+              {
+                "file": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java",
+                "line": 19,
+                "method": "method:account:AccountController#getAccountByName(String)"
+              }
+            ],
+            "applied_rules": [
+              "Source method invocation or scenario HTTP entry"
+            ]
+          }
+        ]
+      },
+      {
+        "edge": {
+          "source": "scenario:heldout-2",
+          "relation": "executes",
+          "target": "method:account:AccountServiceImpl#findByName(String)"
+        },
+        "grounds": [
+          {
+            "step": 1,
+            "entry": "method:account:AccountController#getAccountByName(String)",
+            "ui_site": null,
+            "alternative": 0,
+            "source_sites": [
+              "call:method:account:AccountController#getAccountByName(String)@22:25"
+            ],
+            "approximate": true,
+            "source_locations": [
+              {
+                "file": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java",
+                "line": 22,
+                "call_site": "call:method:account:AccountController#getAccountByName(String)@22:25"
+              },
+              {
+                "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java",
+                "line": 36,
+                "method": "method:account:AccountServiceImpl#findByName(String)"
+              }
+            ],
+            "applied_rules": [
+              "Source method invocation or scenario HTTP entry"
+            ]
+          }
+        ]
+      },
+      {
+        "edge": {
+          "source": "method:account:AccountController#getAccountByName(String)",
+          "relation": "calls",
+          "target": "method:account:AccountServiceImpl#findByName(String)"
+        },
+        "grounds": [
+          {
+            "step": 1,
+            "entry": "method:account:AccountController#getAccountByName(String)",
+            "ui_site": null,
+            "alternative": 0,
+            "source_sites": [
+              "call:method:account:AccountController#getAccountByName(String)@22:25"
+            ],
+            "approximate": true,
+            "source_locations": [
+              {
+                "file": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java",
+                "line": 22,
+                "call_site": "call:method:account:AccountController#getAccountByName(String)@22:25"
+              },
+              {
+                "file": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java",
+                "line": 19,
+                "method": "method:account:AccountController#getAccountByName(String)"
+              }
+            ],
+            "applied_rules": [
+              "Source method invocation or scenario HTTP entry"
+            ]
+          }
+        ]
+      },
+      {
+        "edge": {
+          "source": "method:account:AccountServiceImpl#findByName(String)",
+          "relation": "data",
+          "target": "res:collection:account.accounts"
+        },
+        "grounds": [
+          {
+            "step": 1,
+            "entry": "method:account:AccountController#getAccountByName(String)",
+            "ui_site": null,
+            "alternative": 0,
+            "source_sites": [
+              "call:method:account:AccountServiceImpl#findByName(String)@39:21"
+            ],
+            "approximate": true,
+            "source_locations": [
+              {
+                "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java",
+                "line": 39,
+                "call_site": "call:method:account:AccountServiceImpl#findByName(String)@39:21"
+              },
+              {
+                "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java",
+                "line": 36,
+                "method": "method:account:AccountServiceImpl#findByName(String)"
+              }
+            ],
+            "applied_rules": [
+              "Spring Data repository operation with source entity and primary-key mapping"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

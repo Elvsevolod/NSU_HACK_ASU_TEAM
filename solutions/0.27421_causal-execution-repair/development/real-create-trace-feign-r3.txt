@@ -1,0 +1,1092 @@
+{
+  "result": {
+    "unknown": true
+  },
+  "outcome": "analysis completion budget exhausted",
+  "warnings": [
+    "Feign response status is unresolved: call:method:account-service:AccountServiceImpl#create(User)@51:14",
+    "JSON bean plan: external bean parent introspection is not modeled: UserDetails: call:method:account-service:AccountServiceImpl#create(User)@51:14",
+    "JSON bean plan: getter-only collection mutation is not modeled: authorities: call:method:account-service:AccountServiceImpl#create(User)@51:14",
+    "framework method interception is not fully modeled: PreAuthorize at method:auth-service:UserController#createUser(User)",
+    "opaque callback count/arguments are unknown; zero/may-execute alternatives retained: call:method:auth-service:UserServiceImpl#create(User)@28:12",
+    "repository predicate is not fully modeled: call:method:auth-service:UserServiceImpl#create(User)@27:40",
+    "request bean validation is not fully modeled: method:account-service:AccountController#createNewAccount(User)",
+    "request bean validation is not fully modeled: method:auth-service:UserController#createUser(User)",
+    "server exception status or custom exception resolver is not modeled: method:auth-service:UserController#createUser(User)",
+    "unsupported call: call:method:auth-service:UserServiceImpl#create(User)@28:12 ifPresent"
+  ],
+  "effects": [
+    {
+      "callsite": "call:method:auth-service:UserServiceImpl#create(User)@28:12",
+      "operation": "ifPresent",
+      "declared_receiver": "java.util.Optional<com.piggymetrics.auth.domain.User>",
+      "model_version": "opaque-java-call/1",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "global_footprint": "unresolved",
+      "callbacks": [
+        0
+      ],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    }
+  ],
+  "responses": [
+    {
+      "request": 2,
+      "status": {
+        "unknown": true
+      },
+      "entered": true
+    }
+  ],
+  "data": [
+    {
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "resource": "res:collection:account-service.accounts",
+      "operation": "findByName",
+      "arguments": [
+        "aurora"
+      ],
+      "source_site": "call:method:account-service:AccountServiceImpl#create(User)@48:33",
+      "uncertain_write": false,
+      "sql_emitted": false,
+      "datastore_event": true,
+      "transactional": false,
+      "emitted_by": "call:method:account-service:AccountServiceImpl#create(User)@48:33"
+    },
+    {
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "resource": "res:collection:auth-service.users",
+      "operation": "findById",
+      "arguments": [
+        {
+          "unknown": true
+        }
+      ],
+      "source_site": "call:method:auth-service:UserServiceImpl#create(User)@27:40",
+      "uncertain_write": false,
+      "sql_emitted": false,
+      "datastore_event": true,
+      "transactional": false,
+      "emitted_by": "call:method:auth-service:UserServiceImpl#create(User)@27:40"
+    }
+  ],
+  "request": [
+    {
+      "id": 1,
+      "entry": "method:account-service:AccountController#createNewAccount(User)",
+      "reason": "scenario request",
+      "request": {
+        "deployment": "account-service",
+        "method": "POST",
+        "url": "/accounts/",
+        "path": [
+          "accounts"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {
+          "content-type": [
+            "application/json"
+          ],
+          "accept": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "username": "aurora",
+          "password": "alpha-safe-pass"
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "bound_arguments": [
+        {
+          "name": "user",
+          "declared_type": "com.piggymetrics.account.domain.User",
+          "value": {
+            "__type__": "com.piggymetrics.account.domain.User",
+            "__http_entity__": false,
+            "username": "aurora",
+            "password": "alpha-safe-pass"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "entry": "method:auth-service:UserController#createUser(User)",
+      "reason": "call:method:account-service:AccountServiceImpl#create(User)@51:14",
+      "request": {
+        "deployment": "auth-service",
+        "method": "POST",
+        "url": "http://auth-service/uaa/users",
+        "path": [
+          "uaa",
+          "users"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {
+          "content-type": [
+            "application/json;charset=UTF-8"
+          ],
+          "authorization": [
+            "Bearer service-proof"
+          ]
+        },
+        "body": {
+          "password": "alpha-safe-pass",
+          "username": "aurora"
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "token": "service-proof",
+          "scope": [
+            "server"
+          ],
+          "principal": {
+            "name": "account-service"
+          },
+          "authenticated": true
+        },
+        "body_properties": {},
+        "provenance": {
+          "source_callsite": "call:method:account-service:AccountServiceImpl#create(User)@51:14",
+          "client_method": "method:account-service:AuthServiceClient#createUser(User)",
+          "oauth_boundary": "supplied verified context"
+        }
+      },
+      "bound_arguments": [
+        {
+          "name": "user",
+          "declared_type": "com.piggymetrics.auth.domain.User",
+          "value": {
+            "unknown": true
+          }
+        }
+      ]
+    }
+  ]
+}
+{
+  "result": {
+    "unknown": true
+  },
+  "outcome": "uncaught application exception",
+  "warnings": [
+    "JSON bean plan: external bean parent introspection is not modeled: UserDetails: call:method:account-service:AccountServiceImpl#create(User)@51:14",
+    "JSON bean plan: getter-only collection mutation is not modeled: authorities: call:method:account-service:AccountServiceImpl#create(User)@51:14",
+    "framework method interception is not fully modeled: PreAuthorize at method:auth-service:UserController#createUser(User)",
+    "implicit reference cast context or runtime kind is unresolved: it-> {throw new IllegalArgumentException(\"user already exists: \" + it.getUsername());} -> <unresolved consumer>",
+    "repository predicate is not fully modeled: call:method:auth-service:UserServiceImpl#create(User)@27:40",
+    "request bean validation is not fully modeled: method:account-service:AccountController#createNewAccount(User)",
+    "request bean validation is not fully modeled: method:auth-service:UserController#createUser(User)",
+    "uncaught Java exception: feign.FeignException",
+    "unsupported call: call:method:auth-service:UserServiceImpl#create(User)@28:12 ifPresent",
+    "unsupported call: call:method:auth-service:UserServiceImpl#create(User)@28:92 getUsername"
+  ],
+  "effects": [
+    {
+      "callsite": "call:method:auth-service:UserServiceImpl#create(User)@28:12",
+      "operation": "ifPresent",
+      "declared_receiver": "java.util.Optional<com.piggymetrics.auth.domain.User>",
+      "model_version": "opaque-java-call/1",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "global_footprint": "unresolved",
+      "callbacks": [
+        0
+      ],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "callsite": "call:method:auth-service:UserServiceImpl#create(User)@28:92",
+      "operation": "getUsername",
+      "declared_receiver": "",
+      "model_version": "opaque-java-call/1",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": null,
+      "global_footprint": "unresolved",
+      "callbacks": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    }
+  ],
+  "responses": [
+    {
+      "request": 2,
+      "status": 500,
+      "entered": true
+    },
+    {
+      "request": 1,
+      "status": 500,
+      "entered": true
+    }
+  ],
+  "data": [
+    {
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "resource": "res:collection:account-service.accounts",
+      "operation": "findByName",
+      "arguments": [
+        "aurora"
+      ],
+      "source_site": "call:method:account-service:AccountServiceImpl#create(User)@48:33",
+      "uncertain_write": false,
+      "sql_emitted": false,
+      "datastore_event": true,
+      "transactional": false,
+      "emitted_by": "call:method:account-service:AccountServiceImpl#create(User)@48:33"
+    },
+    {
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "resource": "res:collection:auth-service.users",
+      "operation": "findById",
+      "arguments": [
+        {
+          "unknown": true
+        }
+      ],
+      "source_site": "call:method:auth-service:UserServiceImpl#create(User)@27:40",
+      "uncertain_write": false,
+      "sql_emitted": false,
+      "datastore_event": true,
+      "transactional": false,
+      "emitted_by": "call:method:auth-service:UserServiceImpl#create(User)@27:40"
+    }
+  ],
+  "request": [
+    {
+      "id": 1,
+      "entry": "method:account-service:AccountController#createNewAccount(User)",
+      "reason": "scenario request",
+      "request": {
+        "deployment": "account-service",
+        "method": "POST",
+        "url": "/accounts/",
+        "path": [
+          "accounts"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {
+          "content-type": [
+            "application/json"
+          ],
+          "accept": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "username": "aurora",
+          "password": "alpha-safe-pass"
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "bound_arguments": [
+        {
+          "name": "user",
+          "declared_type": "com.piggymetrics.account.domain.User",
+          "value": {
+            "__type__": "com.piggymetrics.account.domain.User",
+            "__http_entity__": false,
+            "username": "aurora",
+            "password": "alpha-safe-pass"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "entry": "method:auth-service:UserController#createUser(User)",
+      "reason": "call:method:account-service:AccountServiceImpl#create(User)@51:14",
+      "request": {
+        "deployment": "auth-service",
+        "method": "POST",
+        "url": "http://auth-service/uaa/users",
+        "path": [
+          "uaa",
+          "users"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {
+          "content-type": [
+            "application/json;charset=UTF-8"
+          ],
+          "authorization": [
+            "Bearer service-proof"
+          ]
+        },
+        "body": {
+          "password": "alpha-safe-pass",
+          "username": "aurora"
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "token": "service-proof",
+          "scope": [
+            "server"
+          ],
+          "principal": {
+            "name": "account-service"
+          },
+          "authenticated": true
+        },
+        "body_properties": {},
+        "provenance": {
+          "source_callsite": "call:method:account-service:AccountServiceImpl#create(User)@51:14",
+          "client_method": "method:account-service:AuthServiceClient#createUser(User)",
+          "oauth_boundary": "supplied verified context"
+        }
+      },
+      "bound_arguments": [
+        {
+          "name": "user",
+          "declared_type": "com.piggymetrics.auth.domain.User",
+          "value": {
+            "unknown": true
+          }
+        }
+      ]
+    }
+  ]
+}
+{
+  "result": {
+    "unknown": true
+  },
+  "outcome": "analysis completion budget exhausted",
+  "warnings": [
+    "Feign response status is unresolved: call:method:account-service:AccountServiceImpl#create(User)@51:14",
+    "JSON bean plan: external bean parent introspection is not modeled: UserDetails: call:method:account-service:AccountServiceImpl#create(User)@51:14",
+    "JSON bean plan: getter-only collection mutation is not modeled: authorities: call:method:account-service:AccountServiceImpl#create(User)@51:14",
+    "framework method interception is not fully modeled: PreAuthorize at method:auth-service:UserController#createUser(User)",
+    "implicit reference cast context or runtime kind is unresolved: it-> {throw new IllegalArgumentException(\"user already exists: \" + it.getUsername());} -> <unresolved consumer>",
+    "repository predicate is not fully modeled: call:method:auth-service:UserServiceImpl#create(User)@27:40",
+    "request bean validation is not fully modeled: method:account-service:AccountController#createNewAccount(User)",
+    "request bean validation is not fully modeled: method:auth-service:UserController#createUser(User)",
+    "server exception status or custom exception resolver is not modeled: method:auth-service:UserController#createUser(User)",
+    "unsupported call: call:method:auth-service:UserServiceImpl#create(User)@28:12 ifPresent",
+    "unsupported call: call:method:auth-service:UserServiceImpl#create(User)@28:92 getUsername"
+  ],
+  "effects": [
+    {
+      "callsite": "call:method:auth-service:UserServiceImpl#create(User)@28:12",
+      "operation": "ifPresent",
+      "declared_receiver": "java.util.Optional<com.piggymetrics.auth.domain.User>",
+      "model_version": "opaque-java-call/1",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "global_footprint": "unresolved",
+      "callbacks": [
+        0
+      ],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "callsite": "call:method:auth-service:UserServiceImpl#create(User)@28:92",
+      "operation": "getUsername",
+      "declared_receiver": "",
+      "model_version": "opaque-java-call/1",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": null,
+      "global_footprint": "unresolved",
+      "callbacks": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    }
+  ],
+  "responses": [
+    {
+      "request": 2,
+      "status": {
+        "unknown": true
+      },
+      "entered": true
+    }
+  ],
+  "data": [
+    {
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "resource": "res:collection:account-service.accounts",
+      "operation": "findByName",
+      "arguments": [
+        "aurora"
+      ],
+      "source_site": "call:method:account-service:AccountServiceImpl#create(User)@48:33",
+      "uncertain_write": false,
+      "sql_emitted": false,
+      "datastore_event": true,
+      "transactional": false,
+      "emitted_by": "call:method:account-service:AccountServiceImpl#create(User)@48:33"
+    },
+    {
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "resource": "res:collection:auth-service.users",
+      "operation": "findById",
+      "arguments": [
+        {
+          "unknown": true
+        }
+      ],
+      "source_site": "call:method:auth-service:UserServiceImpl#create(User)@27:40",
+      "uncertain_write": false,
+      "sql_emitted": false,
+      "datastore_event": true,
+      "transactional": false,
+      "emitted_by": "call:method:auth-service:UserServiceImpl#create(User)@27:40"
+    }
+  ],
+  "request": [
+    {
+      "id": 1,
+      "entry": "method:account-service:AccountController#createNewAccount(User)",
+      "reason": "scenario request",
+      "request": {
+        "deployment": "account-service",
+        "method": "POST",
+        "url": "/accounts/",
+        "path": [
+          "accounts"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {
+          "content-type": [
+            "application/json"
+          ],
+          "accept": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "username": "aurora",
+          "password": "alpha-safe-pass"
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "bound_arguments": [
+        {
+          "name": "user",
+          "declared_type": "com.piggymetrics.account.domain.User",
+          "value": {
+            "__type__": "com.piggymetrics.account.domain.User",
+            "__http_entity__": false,
+            "username": "aurora",
+            "password": "alpha-safe-pass"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "entry": "method:auth-service:UserController#createUser(User)",
+      "reason": "call:method:account-service:AccountServiceImpl#create(User)@51:14",
+      "request": {
+        "deployment": "auth-service",
+        "method": "POST",
+        "url": "http://auth-service/uaa/users",
+        "path": [
+          "uaa",
+          "users"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {
+          "content-type": [
+            "application/json;charset=UTF-8"
+          ],
+          "authorization": [
+            "Bearer service-proof"
+          ]
+        },
+        "body": {
+          "password": "alpha-safe-pass",
+          "username": "aurora"
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "token": "service-proof",
+          "scope": [
+            "server"
+          ],
+          "principal": {
+            "name": "account-service"
+          },
+          "authenticated": true
+        },
+        "body_properties": {},
+        "provenance": {
+          "source_callsite": "call:method:account-service:AccountServiceImpl#create(User)@51:14",
+          "client_method": "method:account-service:AuthServiceClient#createUser(User)",
+          "oauth_boundary": "supplied verified context"
+        }
+      },
+      "bound_arguments": [
+        {
+          "name": "user",
+          "declared_type": "com.piggymetrics.auth.domain.User",
+          "value": {
+            "unknown": true
+          }
+        }
+      ]
+    }
+  ]
+}
+{
+  "result": {
+    "expenses": null,
+    "incomes": null,
+    "lastSeen": "2026-10-18T00:00:00",
+    "name": "aurora",
+    "note": null,
+    "saving": {
+      "amount": "0",
+      "capitalization": false,
+      "currency": {
+        "unknown": true
+      },
+      "deposit": false,
+      "interest": "0"
+    }
+  },
+  "outcome": "returned",
+  "warnings": [
+    "JSON bean plan: external bean parent introspection is not modeled: UserDetails: call:method:account-service:AccountServiceImpl#create(User)@51:14",
+    "JSON bean plan: getter-only collection mutation is not modeled: authorities: call:method:account-service:AccountServiceImpl#create(User)@51:14",
+    "SLF4J native contract: provider transport failures are not modeled; source formatting callbacks and their caught throwables are modeled",
+    "framework method interception is not fully modeled: PreAuthorize at method:auth-service:UserController#createUser(User)",
+    "opaque callback count/arguments are unknown; zero/may-execute alternatives retained: call:method:auth-service:UserServiceImpl#create(User)@28:12",
+    "repository predicate is not fully modeled: call:method:auth-service:UserServiceImpl#create(User)@27:40",
+    "repository predicate is not fully modeled: call:method:auth-service:UserServiceImpl#create(User)@33:14",
+    "request bean validation is not fully modeled: method:account-service:AccountController#createNewAccount(User)",
+    "request bean validation is not fully modeled: method:auth-service:UserController#createUser(User)",
+    "unsupported call: call:method:account-service:AccountServiceImpl#create(User)@55:31 getDefault",
+    "unsupported call: call:method:auth-service:UserServiceImpl#create(User)@28:12 ifPresent"
+  ],
+  "effects": [
+    {
+      "callsite": "call:method:auth-service:UserServiceImpl#create(User)@28:12",
+      "operation": "ifPresent",
+      "declared_receiver": "java.util.Optional<com.piggymetrics.auth.domain.User>",
+      "model_version": "opaque-java-call/1",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "global_footprint": "unresolved",
+      "callbacks": [
+        0
+      ],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "callsite": "call:method:account-service:AccountServiceImpl#create(User)@55:31",
+      "operation": "getDefault",
+      "declared_receiver": "",
+      "model_version": "opaque-java-call/1",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": null,
+      "global_footprint": "unresolved",
+      "callbacks": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    }
+  ],
+  "responses": [
+    {
+      "request": 2,
+      "status": 200,
+      "entered": true
+    },
+    {
+      "request": 1,
+      "status": 200,
+      "entered": true
+    }
+  ],
+  "data": [
+    {
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "resource": "res:collection:account-service.accounts",
+      "operation": "findByName",
+      "arguments": [
+        "aurora"
+      ],
+      "source_site": "call:method:account-service:AccountServiceImpl#create(User)@48:33",
+      "uncertain_write": false,
+      "sql_emitted": false,
+      "datastore_event": true,
+      "transactional": false,
+      "emitted_by": "call:method:account-service:AccountServiceImpl#create(User)@48:33"
+    },
+    {
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "resource": "res:collection:auth-service.users",
+      "operation": "findById",
+      "arguments": [
+        {
+          "unknown": true
+        }
+      ],
+      "source_site": "call:method:auth-service:UserServiceImpl#create(User)@27:40",
+      "uncertain_write": false,
+      "sql_emitted": false,
+      "datastore_event": true,
+      "transactional": false,
+      "emitted_by": "call:method:auth-service:UserServiceImpl#create(User)@27:40"
+    },
+    {
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "resource": "res:collection:auth-service.users",
+      "operation": "save",
+      "arguments": [
+        {
+          "unknown": true
+        }
+      ],
+      "source_site": "call:method:auth-service:UserServiceImpl#create(User)@33:14",
+      "uncertain_write": false,
+      "sql_emitted": false,
+      "datastore_event": true,
+      "transactional": false,
+      "emitted_by": "call:method:auth-service:UserServiceImpl#create(User)@33:14"
+    },
+    {
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "resource": "res:collection:account-service.accounts",
+      "operation": "save",
+      "arguments": [
+        {
+          "__type__": "com.piggymetrics.account.domain.Account",
+          "__http_entity__": false,
+          "name": "aurora",
+          "lastSeen": "2026-10-18T00:00:00",
+          "incomes": null,
+          "expenses": null,
+          "saving": {
+            "__type__": "com.piggymetrics.account.domain.Saving",
+            "__http_entity__": false,
+            "amount": "0",
+            "currency": {
+              "unknown": true
+            },
+            "interest": "0",
+            "deposit": false,
+            "capitalization": false
+          },
+          "note": null
+        }
+      ],
+      "source_site": "call:method:account-service:AccountServiceImpl#create(User)@65:14",
+      "uncertain_write": false,
+      "sql_emitted": false,
+      "datastore_event": true,
+      "transactional": false,
+      "emitted_by": "call:method:account-service:AccountServiceImpl#create(User)@65:14"
+    }
+  ],
+  "request": [
+    {
+      "id": 1,
+      "entry": "method:account-service:AccountController#createNewAccount(User)",
+      "reason": "scenario request",
+      "request": {
+        "deployment": "account-service",
+        "method": "POST",
+        "url": "/accounts/",
+        "path": [
+          "accounts"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {
+          "content-type": [
+            "application/json"
+          ],
+          "accept": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "username": "aurora",
+          "password": "alpha-safe-pass"
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "bound_arguments": [
+        {
+          "name": "user",
+          "declared_type": "com.piggymetrics.account.domain.User",
+          "value": {
+            "__type__": "com.piggymetrics.account.domain.User",
+            "__http_entity__": false,
+            "username": "aurora",
+            "password": "alpha-safe-pass"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "entry": "method:auth-service:UserController#createUser(User)",
+      "reason": "call:method:account-service:AccountServiceImpl#create(User)@51:14",
+      "request": {
+        "deployment": "auth-service",
+        "method": "POST",
+        "url": "http://auth-service/uaa/users",
+        "path": [
+          "uaa",
+          "users"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {
+          "content-type": [
+            "application/json;charset=UTF-8"
+          ],
+          "authorization": [
+            "Bearer service-proof"
+          ]
+        },
+        "body": {
+          "password": "alpha-safe-pass",
+          "username": "aurora"
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "token": "service-proof",
+          "scope": [
+            "server"
+          ],
+          "principal": {
+            "name": "account-service"
+          },
+          "authenticated": true
+        },
+        "body_properties": {},
+        "provenance": {
+          "source_callsite": "call:method:account-service:AccountServiceImpl#create(User)@51:14",
+          "client_method": "method:account-service:AuthServiceClient#createUser(User)",
+          "oauth_boundary": "supplied verified context"
+        }
+      },
+      "bound_arguments": [
+        {
+          "name": "user",
+          "declared_type": "com.piggymetrics.auth.domain.User",
+          "value": {
+            "unknown": true
+          }
+        }
+      ]
+    }
+  ]
+}
+{
+  "result": {
+    "unknown": true
+  },
+  "outcome": "uncaught application exception",
+  "warnings": [
+    "JSON bean plan: external bean parent introspection is not modeled: UserDetails: call:method:account-service:AccountServiceImpl#create(User)@51:14",
+    "JSON bean plan: getter-only collection mutation is not modeled: authorities: call:method:account-service:AccountServiceImpl#create(User)@51:14",
+    "SLF4J native contract: provider transport failures are not modeled; source formatting callbacks and their caught throwables are modeled",
+    "framework method interception is not fully modeled: PreAuthorize at method:auth-service:UserController#createUser(User)",
+    "opaque callback count/arguments are unknown; zero/may-execute alternatives retained: call:method:auth-service:UserServiceImpl#create(User)@28:12",
+    "repository predicate is not fully modeled: call:method:auth-service:UserServiceImpl#create(User)@27:40",
+    "repository predicate is not fully modeled: call:method:auth-service:UserServiceImpl#create(User)@33:14",
+    "request bean validation is not fully modeled: method:account-service:AccountController#createNewAccount(User)",
+    "request bean validation is not fully modeled: method:auth-service:UserController#createUser(User)",
+    "server exception status or custom exception resolver is not modeled: method:account-service:AccountController#createNewAccount(User)",
+    "uncaught Java exception: java.lang.Throwable",
+    "unsupported call: call:method:account-service:AccountServiceImpl#create(User)@55:31 getDefault",
+    "unsupported call: call:method:auth-service:UserServiceImpl#create(User)@28:12 ifPresent"
+  ],
+  "effects": [
+    {
+      "callsite": "call:method:auth-service:UserServiceImpl#create(User)@28:12",
+      "operation": "ifPresent",
+      "declared_receiver": "java.util.Optional<com.piggymetrics.auth.domain.User>",
+      "model_version": "opaque-java-call/1",
+      "heap_roots": [
+        0,
+        1,
+        2
+      ],
+      "resource_writes": null,
+      "global_footprint": "unresolved",
+      "callbacks": [
+        0
+      ],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    },
+    {
+      "callsite": "call:method:account-service:AccountServiceImpl#create(User)@55:31",
+      "operation": "getDefault",
+      "declared_receiver": "",
+      "model_version": "opaque-java-call/1",
+      "heap_roots": [
+        0,
+        1
+      ],
+      "resource_writes": null,
+      "global_footprint": "unresolved",
+      "callbacks": [],
+      "completions": [
+        "normal",
+        "throw"
+      ]
+    }
+  ],
+  "responses": [
+    {
+      "request": 2,
+      "status": 200,
+      "entered": true
+    },
+    {
+      "request": 1,
+      "status": {
+        "unknown": true
+      },
+      "entered": true
+    }
+  ],
+  "data": [
+    {
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "resource": "res:collection:account-service.accounts",
+      "operation": "findByName",
+      "arguments": [
+        "aurora"
+      ],
+      "source_site": "call:method:account-service:AccountServiceImpl#create(User)@48:33",
+      "uncertain_write": false,
+      "sql_emitted": false,
+      "datastore_event": true,
+      "transactional": false,
+      "emitted_by": "call:method:account-service:AccountServiceImpl#create(User)@48:33"
+    },
+    {
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "resource": "res:collection:auth-service.users",
+      "operation": "findById",
+      "arguments": [
+        {
+          "unknown": true
+        }
+      ],
+      "source_site": "call:method:auth-service:UserServiceImpl#create(User)@27:40",
+      "uncertain_write": false,
+      "sql_emitted": false,
+      "datastore_event": true,
+      "transactional": false,
+      "emitted_by": "call:method:auth-service:UserServiceImpl#create(User)@27:40"
+    },
+    {
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "resource": "res:collection:auth-service.users",
+      "operation": "save",
+      "arguments": [
+        {
+          "unknown": true
+        }
+      ],
+      "source_site": "call:method:auth-service:UserServiceImpl#create(User)@33:14",
+      "uncertain_write": false,
+      "sql_emitted": false,
+      "datastore_event": true,
+      "transactional": false,
+      "emitted_by": "call:method:auth-service:UserServiceImpl#create(User)@33:14"
+    }
+  ],
+  "request": [
+    {
+      "id": 1,
+      "entry": "method:account-service:AccountController#createNewAccount(User)",
+      "reason": "scenario request",
+      "request": {
+        "deployment": "account-service",
+        "method": "POST",
+        "url": "/accounts/",
+        "path": [
+          "accounts"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {
+          "content-type": [
+            "application/json"
+          ],
+          "accept": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "username": "aurora",
+          "password": "alpha-safe-pass"
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "bound_arguments": [
+        {
+          "name": "user",
+          "declared_type": "com.piggymetrics.account.domain.User",
+          "value": {
+            "__type__": "com.piggymetrics.account.domain.User",
+            "__http_entity__": false,
+            "username": "aurora",
+            "password": "alpha-safe-pass"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "entry": "method:auth-service:UserController#createUser(User)",
+      "reason": "call:method:account-service:AccountServiceImpl#create(User)@51:14",
+      "request": {
+        "deployment": "auth-service",
+        "method": "POST",
+        "url": "http://auth-service/uaa/users",
+        "path": [
+          "uaa",
+          "users"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {
+          "content-type": [
+            "application/json;charset=UTF-8"
+          ],
+          "authorization": [
+            "Bearer service-proof"
+          ]
+        },
+        "body": {
+          "password": "alpha-safe-pass",
+          "username": "aurora"
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "token": "service-proof",
+          "scope": [
+            "server"
+          ],
+          "principal": {
+            "name": "account-service"
+          },
+          "authenticated": true
+        },
+        "body_properties": {},
+        "provenance": {
+          "source_callsite": "call:method:account-service:AccountServiceImpl#create(User)@51:14",
+          "client_method": "method:account-service:AuthServiceClient#createUser(User)",
+          "oauth_boundary": "supplied verified context"
+        }
+      },
+      "bound_arguments": [
+        {
+          "name": "user",
+          "declared_type": "com.piggymetrics.auth.domain.User",
+          "value": {
+            "unknown": true
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+.F.F.FFFF...                                                             [100%]
+=================================== FAILURES ===================================
+_ test_default_grounding_does_not_promote_failed_or_unexplored_response_to_a_known_id[500-True-4-False] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-203/test_default_grounding_does_no1')
+status = 500, choice = True, limit = 4, eligible = False
+
+    @pytest.mark.parametrize('status,choice,limit,eligible',[
+        (200,True,4,True),(500,True,4,False),(200,U,1,False),
+    ])
+    def test_default_grounding_does_not_promote_failed_or_unexplored_response_to_a_known_id(tmp_path,status,choice,limit,eligible):
+        p,ids,g,state=fixture(tmp_path,status,choice,limit)
+        assert state.history[0]['exploration']['complete']==(choice is not U)
+        assert state.history[0]['outcome']==('returned' if status==200 else 'HTTP error response')
+        proposals,detail=g.step('Read the new parcel',state)
+        resolved=[x for x in proposals if x['bindings'].get('id',{}).get('source')=='history' and x['bindings']['id'].get('resolved')]
+>       assert bool(resolved)==eligible
+E       AssertionError: assert True == False
+E        +  where True = bool([{'actor': <Unknown.VALUE: 'unknown'>, 'bindings': {'id': {'producer_observation': {'digest': 'e83f1e514a6ebefe93def57...result.id', 'resolved': True, ...}}, 'body_omissions': {}, 'entry': 'method:service:ParcelController#read(Long)', ...}])
+
+code/tests/test_failed_history_response33.py:48: AssertionError
+_ test_a_failed_later_creation_cannot_select_the_old_successful_creation[Read the new parcel] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-203/test_a_failed_later_creation_c0')
+action = 'Read the new parcel'
+
+    @pytest.mark.parametrize('action',['Read the new parcel','Read the parcel just created'])
+    def test_a_failed_later_creation_cannot_select_the_old_successful_creation(tmp_path,action):
+        p,ids,g,state=fixture(tmp_path,500)
+        old=deepcopy(state.history[0]);old.update(step=1,outcome='returned',result=JsonObject({'id':5},'Parcel'))
+        state.history[0]['step']=2;state.history.insert(0,old)
+        proposals,detail=g.step(action,state)
+>       assert not any(x['bindings'].get('id',{}).get('resolved') for x in proposals)
+E       assert not True
+E        +  where True = any(<generator object test_a_failed_later_creation_cannot_select_the_old_successful_creation.<locals>.<genexpr> at 0x120077ae0>)
+
+code/tests/test_failed_history_response33.py:58: AssertionError
+_ test_selected_and_related_fields_from_an_unavailable_response_are_not_inputs[related-failed] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-203/test_selected_and_related_fiel0')
+case = 'failed', consumer = 'related'
+
+    @pytest.mark.parametrize('case',['failed','partial'])
+    @pytest.mark.parametrize('consumer',['related','selected','role'])
+    def test_selected_and_related_fields_from_an_unavailable_response_are_not_inputs(tmp_path,case,consumer):
+        p,ids,g,state=fixture(tmp_path,500 if case=='failed' else 200,U if case=='partial' else True,1 if case=='partial' else 4)
+        item=state.history[0]
+        item['selected_objects']=[{'entity':['parcel'],'value':7,'object':deepcopy(item['result']),
+            'qualified_type':'Parcel','producer_entry':ids['ParcelController.create'],'reference':'history[0].result.id'}]
+>       if consumer=='related':assert related_selection_value(p,ids['ParcelController.supplier'],'supplierId','Read its supplier',state.history) is None
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ('history[0].selected_objects[0].object.supplierId', 9) is None
+E        +  where ('history[0].selected_objects[0].object.supplierId', 9) = related_selection_value(<analyzer.project.Project object at 0x106086810>, 'method:service:ParcelController#supplier(Long)', 'supplierId', 'Read its supplier', [{'action': 'Create parcel', 'created_objects': [], 'entry': 'method:service:ParcelController#create(boolean,Parcel)', 'exploration': {'complete': True, 'completed': 1, 'completion_budget': 8, 'completion_splits': 0, ...}, ...}])
+E        +    where [{'action': 'Create parcel', 'created_objects': [], 'entry': 'method:service:ParcelController#create(boolean,Parcel)', 'exploration': {'complete': True, 'completed': 1, 'completion_budget': 8, 'completion_splits': 0, ...}, ...}] = <analyzer.state.ScenarioState object at 0x1066a77d0>.history
+
+code/tests/test_failed_history_response33.py:68: AssertionError
+_ test_selected_and_related_fields_from_an_unavailable_response_are_not_inputs[related-partial] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-203/test_selected_and_related_fiel1')
+case = 'partial', consumer = 'related'
+
+    @pytest.mark.parametrize('case',['failed','partial'])
+    @pytest.mark.parametrize('consumer',['related','selected','role'])
+    def test_selected_and_related_fields_from_an_unavailable_response_are_not_inputs(tmp_path,case,consumer):
+        p,ids,g,state=fixture(tmp_path,500 if case=='failed' else 200,U if case=='partial' else True,1 if case=='partial' else 4)
+        item=state.history[0]
+        item['selected_objects']=[{'entity':['parcel'],'value':7,'object':deepcopy(item['result']),
+            'qualified_type':'Parcel','producer_entry':ids['ParcelController.create'],'reference':'history[0].result.id'}]
+>       if consumer=='related':assert related_selection_value(p,ids['ParcelController.supplier'],'supplierId','Read its supplier',state.history) is None
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ('history[0].selected_objects[0].object.supplierId', 9) is None
+E        +  where ('history[0].selected_objects[0].object.supplierId', 9) = related_selection_value(<analyzer.project.Project object at 0x106633d50>, 'method:service:ParcelController#supplier(Long)', 'supplierId', 'Read its supplier', [{'action': 'Create parcel', 'created_objects': [], 'entry': 'method:service:ParcelController#create(boolean,Parcel)', 'exploration': {'complete': False, 'completed': 1, 'completion_budget': 8, 'completion_splits': 0, ...}, ...}])
+E        +    where [{'action': 'Create parcel', 'created_objects': [], 'entry': 'method:service:ParcelController#create(boolean,Parcel)', 'exploration': {'complete': False, 'completed': 1, 'completion_budget': 8, 'completion_splits': 0, ...}, ...}] = <analyzer.state.ScenarioState object at 0x10609a8d0>.history
+
+code/tests/test_failed_history_response33.py:68: AssertionError
+_ test_selected_and_related_fields_from_an_unavailable_response_are_not_inputs[selected-failed] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-203/test_selected_and_related_fiel2')
+case = 'failed', consumer = 'selected'
+
+    @pytest.mark.parametrize('case',['failed','partial'])
+    @pytest.mark.parametrize('consumer',['related','selected','role'])
+    def test_selected_and_related_fields_from_an_unavailable_response_are_not_inputs(tmp_path,case,consumer):
+        p,ids,g,state=fixture(tmp_path,500 if case=='failed' else 200,U if case=='partial' else True,1 if case=='partial' else 4)
+        item=state.history[0]
+        item['selected_objects']=[{'entity':['parcel'],'value':7,'object':deepcopy(item['result']),
+            'qualified_type':'Parcel','producer_entry':ids['ParcelController.create'],'reference':'history[0].result.id'}]
+        if consumer=='related':assert related_selection_value(p,ids['ParcelController.supplier'],'supplierId','Read its supplier',state.history) is None
+>       elif consumer=='selected':assert selected_field(p,'city',{'parcelId':7},state.history,ids['ParcelController.update']) is None
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ('history[0].selected_objects[0].object.city', 'returned-city') is None
+E        +  where ('history[0].selected_objects[0].object.city', 'returned-city') = selected_field(<analyzer.project.Project object at 0x105cf0950>, 'city', {'parcelId': 7}, [{'action': 'Create parcel', 'created_objects': [], 'entry': 'method:service:ParcelController#create(boolean,Parcel)', 'exploration': {'complete': True, 'completed': 1, 'completion_budget': 8, 'completion_splits': 0, ...}, ...}], 'method:service:ParcelController#update(Long,Parcel)')
+E        +    where [{'action': 'Create parcel', 'created_objects': [], 'entry': 'method:service:ParcelController#create(boolean,Parcel)', 'exploration': {'complete': True, 'completed': 1, 'completion_budget': 8, 'completion_splits': 0, ...}, ...}] = <analyzer.state.ScenarioState object at 0x1060976d0>.history
+
+code/tests/test_failed_history_response33.py:69: AssertionError
+_ test_selected_and_related_fields_from_an_unavailable_response_are_not_inputs[selected-partial] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-203/test_selected_and_related_fiel3')
+case = 'partial', consumer = 'selected'
+
+    @pytest.mark.parametrize('case',['failed','partial'])
+    @pytest.mark.parametrize('consumer',['related','selected','role'])
+    def test_selected_and_related_fields_from_an_unavailable_response_are_not_inputs(tmp_path,case,consumer):
+        p,ids,g,state=fixture(tmp_path,500 if case=='failed' else 200,U if case=='partial' else True,1 if case=='partial' else 4)
+        item=state.history[0]
+        item['selected_objects']=[{'entity':['parcel'],'value':7,'object':deepcopy(item['result']),
+            'qualified_type':'Parcel','producer_entry':ids['ParcelController.create'],'reference':'history[0].result.id'}]
+        if consumer=='related':assert related_selection_value(p,ids['ParcelController.supplier'],'supplierId','Read its supplier',state.history) is None
+>       elif consumer=='selected':assert selected_field(p,'city',{'parcelId':7},state.history,ids['ParcelController.update']) is None
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ('history[0].selected_objects[0].object.city', 'returned-city') is None
+E        +  where ('history[0].selected_objects[0].object.city', 'returned-city') = selected_field(<analyzer.project.Project object at 0x106605790>, 'city', {'parcelId': 7}, [{'action': 'Create parcel', 'created_objects': [], 'entry': 'method:service:ParcelController#create(boolean,Parcel)', 'exploration': {'complete': False, 'completed': 1, 'completion_budget': 8, 'completion_splits': 0, ...}, ...}], 'method:service:ParcelController#update(Long,Parcel)')
+E        +    where [{'action': 'Create parcel', 'created_objects': [], 'entry': 'method:service:ParcelController#create(boolean,Parcel)', 'exploration': {'complete': False, 'completed': 1, 'completion_budget': 8, 'completion_splits': 0, ...}, ...}] = <analyzer.state.ScenarioState object at 0x1065d1310>.history
+
+code/tests/test_failed_history_response33.py:69: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_failed_history_response33.py::test_default_grounding_does_not_promote_failed_or_unexplored_response_to_a_known_id[500-True-4-False]
+FAILED code/tests/test_failed_history_response33.py::test_a_failed_later_creation_cannot_select_the_old_successful_creation[Read the new parcel]
+FAILED code/tests/test_failed_history_response33.py::test_selected_and_related_fields_from_an_unavailable_response_are_not_inputs[related-failed]
+FAILED code/tests/test_failed_history_response33.py::test_selected_and_related_fields_from_an_unavailable_response_are_not_inputs[related-partial]
+FAILED code/tests/test_failed_history_response33.py::test_selected_and_related_fields_from_an_unavailable_response_are_not_inputs[selected-failed]
+FAILED code/tests/test_failed_history_response33.py::test_selected_and_related_fields_from_an_unavailable_response_are_not_inputs[selected-partial]
+6 failed, 6 passed in 0.31s

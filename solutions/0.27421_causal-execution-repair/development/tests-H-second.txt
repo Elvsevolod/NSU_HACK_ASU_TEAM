@@ -1,0 +1,160 @@
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 13%]
+........................................................................ [ 17%]
+........................................................................ [ 22%]
+........................................................................ [ 26%]
+........................................................................ [ 31%]
+........................................................................ [ 35%]
+........................................................................ [ 40%]
+........................................................................ [ 44%]
+...............................................FF..F..F...F.F........... [ 49%]
+..................................................F..................... [ 53%]
+........................................................................ [ 57%]
+........................................................................ [ 62%]
+........................................................................ [ 66%]
+........................................................................ [ 71%]
+........................................................................ [ 75%]
+........................................................................ [ 80%]
+................................FF...................................... [ 84%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+..............................                                           [100%]
+=================================== FAILURES ===================================
+______ test_serialization_uses_a_computed_getter_without_a_matching_field ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-149/test_serialization_uses_a_comp0')
+
+    def test_serialization_uses_a_computed_getter_without_a_matching_field(tmp_path):
+        result,e,ids=run(tmp_path,'return new ObjectMapper().writeValueAsString(new Item());',
+            'class Item{public String getLabel(){return "computed";}}')
+        assert isinstance(result,JsonText) and result.payload=={'label':'computed'}
+>       assert not executed(e,ids,'Item.getLabel') and not called(e,ids,'Item.getLabel') and not e.approximate
+E       AssertionError: assert (not True)
+E        +  where True = executed(<analyzer.engine.Engine object at 0x107219710>, {'Api.after': 'method:service:Api#after()', 'Api.entry': 'method:service:Api#entry()', 'Item.getLabel': 'method:service:Item#getLabel()'}, 'Item.getLabel')
+
+tests/test_json_bean_lifecycle.py:26: AssertionError
+_______ test_serialization_getter_takes_precedence_over_the_public_field _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-149/test_serialization_getter_take0')
+
+    def test_serialization_getter_takes_precedence_over_the_public_field(tmp_path):
+        result,e,ids=run(tmp_path,'return new ObjectMapper().writeValueAsString(new Item());',
+            'class Item{public int count=1;public int getCount(){return count+1;}}')
+        assert isinstance(result,JsonText) and result.payload=={'count':2}
+>       assert not executed(e,ids,'Item.getCount') and not called(e,ids,'Item.getCount') and not e.approximate
+E       AssertionError: assert (not True)
+E        +  where True = executed(<analyzer.engine.Engine object at 0x107252190>, {'Api.after': 'method:service:Api#after()', 'Api.entry': 'method:service:Api#entry()', 'Item.getCount': 'method:service:Item#getCount()'}, 'Item.getCount')
+
+tests/test_json_bean_lifecycle.py:33: AssertionError
+___ test_default_constructor_runs_before_a_setter_and_preserves_other_fields ___
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-149/test_default_constructor_runs_0')
+
+    def test_default_constructor_runs_before_a_setter_and_preserves_other_fields(tmp_path):
+        result,e,ids=run(tmp_path,'Item item=new ObjectMapper().readValue("{\\"name\\":\\"input\\"}",Item.class);return item.getName();',
+            'class Item{private String prefix="initial";private String name;public Item(){prefix="ctor:";}'
+            'public void setName(String value){name=prefix+value;}public String getName(){return name;}}')
+>       assert result=='ctor:input' and not executed(e,ids,'Item.<init>') and executed(e,ids,'Item.setName') and not e.approximate
+E       AssertionError: assert ('ctor:input' == 'ctor:input'
+E         
+E           ctor:input and not True)
+E        +  where True = executed(<analyzer.engine.Engine object at 0x1073003d0>, {'Api.after': 'method:service:Api#after()', 'Api.entry': 'method:service:Api#entry()', 'Item.<init>': 'method:service:Item#<init>()', 'Item.getName': 'method:service:Item#getName()', ...}, 'Item.<init>')
+
+tests/test_json_bean_lifecycle.py:52: AssertionError
+______________ test_getter_failure_prevents_success_continuation _______________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-149/test_getter_failure_prevents_s0')
+
+    def test_getter_failure_prevents_success_continuation(tmp_path):
+        result,e,ids=run(tmp_path,'new ObjectMapper().writeValueAsString(new Item());after();return true;',
+            'class Item{public String getName(){throw new IllegalStateException();}}')
+>       assert result is U and not executed(e,ids,'Item.getName') and not called(e,ids,'Api.after')
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> is <Unknown.VALUE: 'unknown'> and not True)
+E        +  where True = executed(<analyzer.engine.Engine object at 0x1065032d0>, {'Api.after': 'method:service:Api#after()', 'Api.entry': 'method:service:Api#entry()', 'Item.getName': 'method:service:Item#getName()'}, 'Item.getName')
+
+tests/test_json_bean_lifecycle.py:67: AssertionError
+_______ test_boolean_is_getter_is_discovered_without_a_same_named_field ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-149/test_boolean_is_getter_is_disc0')
+
+    def test_boolean_is_getter_is_discovered_without_a_same_named_field(tmp_path):
+        result,e,ids=run(tmp_path,'return new ObjectMapper().writeValueAsString(new Item());',
+            'class Item{public boolean isReady(){return true;}}')
+        assert isinstance(result,JsonText) and result.payload=={'ready':True}
+>       assert not executed(e,ids,'Item.isReady') and not called(e,ids,'Item.isReady') and not e.approximate
+E       AssertionError: assert (not True)
+E        +  where True = executed(<analyzer.engine.Engine object at 0x10722a150>, {'Api.after': 'method:service:Api#after()', 'Api.entry': 'method:service:Api#entry()', 'Item.isReady': 'method:service:Item#isReady()'}, 'Item.isReady')
+
+tests/test_json_bean_lifecycle.py:94: AssertionError
+_________ test_scenario_http_response_carries_computed_wire_properties _________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-149/test_scenario_http_response_ca0')
+
+    def test_scenario_http_response_carries_computed_wire_properties(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''class Api{
+          @GetMapping("/items") Item entry(){return new Item();}}
+          class Item{public String getLabel(){return "computed";}}'''})
+        e=Engine(p,ScenarioState(db));result=e.run(ids['Api.entry'],{})
+>       assert result=={'label':'computed'} and not executed(e,ids,'Item.getLabel')
+E       AssertionError: assert ({'label': 'computed'} == {'label': 'computed'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Use -v to get more diff and not True)
+E        +  where True = executed(<analyzer.engine.Engine object at 0x10721e110>, {'Api.entry': 'method:service:Api#entry()', 'Item.getLabel': 'method:service:Item#getLabel()'}, 'Item.getLabel')
+
+tests/test_json_bean_lifecycle.py:112: AssertionError
+___ test_source_getter_computes_http_json_without_exporting_reflection_edges ___
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-149/test_source_getter_computes_ht0')
+
+    def test_source_getter_computes_http_json_without_exporting_reflection_edges(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''class Item {
+            private String id="raw";public String getId(){return "formatted";}}
+          class Api {@GetMapping("/item") Item item(){return new Item();}}'''})
+        engine=Engine(project,ScenarioState(db));result=engine.run(ids['Api.item'],{})
+        assert result=={'id':'formatted'} and not engine.approximate
+>       assert ids['Item.getId'] not in {target for _,kind,target in engine.edges if kind in ('calls','executes')}
+E       AssertionError: assert 'method:service:Item#getId()' not in {'method:service:Api#item()', 'method:service:Item#getId()'}
+
+tests/test_json_model_boundaries.py:12: AssertionError
+_____________ test_json_and_orm_use_the_same_reflection_root_rule ______________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-149/test_json_and_orm_use_the_same0')
+
+    def test_json_and_orm_use_the_same_reflection_root_rule(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''class Api{@PostMapping("/items") String entry(@RequestBody Item input){return input.name;}}
+          class Item{public String name;public Item(){helper();}void helper(){nested();}void nested(){}}'''})
+        e=Engine(p,ScenarioState(db))
+        assert e.run(ids['Api.entry'],Request.http('service','POST','/items',body={'name':'wire'}))=='wire'
+>       assert ('','executes',ids['Item.<init>']) not in e.edges
+E       AssertionError: assert ('', 'executes', 'method:service:Item#<init>()') not in {('', 'executes', 'method:service:Api#entry(Item)'), ('', 'executes', 'method:service:Item#<init>()'), ('', 'executes'...', 'calls', 'method:service:Item#helper()'), ('method:service:Item#helper()', 'calls', 'method:service:Item#nested()')}
+E        +  where {('', 'executes', 'method:service:Api#entry(Item)'), ('', 'executes', 'method:service:Item#<init>()'), ('', 'executes'...', 'calls', 'method:service:Item#helper()'), ('method:service:Item#helper()', 'calls', 'method:service:Item#nested()')} = <analyzer.engine.Engine object at 0x1075487d0>.edges
+
+tests/test_review_projection.py:45: AssertionError
+________ test_json_source_constructor_initializes_fields_in_java_order _________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-149/test_json_source_constructor_i0')
+
+    def test_json_source_constructor_initializes_fields_in_java_order(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''class Api{@PostMapping("/items") int entry(@RequestBody Item input){return input.first;}}
+          class Item{public int first=readLater();public int later=9;public Item(){}int readLater(){return later;}}'''})
+        e=Engine(p,ScenarioState(db))
+        assert e.run(ids['Api.entry'],Request.http('service','POST','/items',body={}))==0
+>       assert ('','executes',ids['Item.<init>']) not in e.edges
+E       AssertionError: assert ('', 'executes', 'method:service:Item#<init>()') not in {('', 'executes', 'method:service:Api#entry(Item)'), ('', 'executes', 'method:service:Item#<init>()'), ('', 'executes', 'method:service:Item#readLater()'), ('method:service:Item#<init>()', 'calls', 'method:service:Item#readLater()')}
+E        +  where {('', 'executes', 'method:service:Api#entry(Item)'), ('', 'executes', 'method:service:Item#<init>()'), ('', 'executes', 'method:service:Item#readLater()'), ('method:service:Item#<init>()', 'calls', 'method:service:Item#readLater()')} = <analyzer.engine.Engine object at 0x1075f4490>.edges
+
+tests/test_review_projection.py:56: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_json_bean_lifecycle.py::test_serialization_uses_a_computed_getter_without_a_matching_field
+FAILED tests/test_json_bean_lifecycle.py::test_serialization_getter_takes_precedence_over_the_public_field
+FAILED tests/test_json_bean_lifecycle.py::test_default_constructor_runs_before_a_setter_and_preserves_other_fields
+FAILED tests/test_json_bean_lifecycle.py::test_getter_failure_prevents_success_continuation
+FAILED tests/test_json_bean_lifecycle.py::test_boolean_is_getter_is_discovered_without_a_same_named_field
+FAILED tests/test_json_bean_lifecycle.py::test_scenario_http_response_carries_computed_wire_properties
+FAILED tests/test_json_model_boundaries.py::test_source_getter_computes_http_json_without_exporting_reflection_edges
+FAILED tests/test_review_projection.py::test_json_and_orm_use_the_same_reflection_root_rule
+FAILED tests/test_review_projection.py::test_json_source_constructor_initializes_fields_in_java_order
+9 failed, 1605 passed in 5.43s

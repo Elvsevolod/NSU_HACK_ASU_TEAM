@@ -1,0 +1,118 @@
+F...............FF......                                                 [100%]
+=================================== FAILURES ===================================
+______________________ test_equal_keys_and_hash_collision ______________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-12/test_equal_keys_and_hash_colli0')
+
+    def test_equal_keys_and_hash_collision(tmp_path):
+        p,db,ids=model(tmp_path,'''Set<WarehouseKey> keys=new HashSet<>();
+          boolean a=keys.add(new WarehouseKey(1,"A"));boolean b=keys.add(new WarehouseKey(1,"A"));
+          boolean c=keys.add(new WarehouseKey(2,"B"));return Arrays.asList(a,b,c,keys.size());''',KEY)
+>       e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==[True,False,True,2]
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_set_source_keys32.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+code/analyzer/engine.py:376: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:463: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+code/analyzer/engine.py:552: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:702: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:788: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1363: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1554: in execute
+    value=self.value(initializer,env)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1619: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2023: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2999: in call
+    handled,value=native_list_call(self,name,obj,args,argument_kinds,arguments,node,reason)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/java_lists.py:40: in call
+    handled,result=set_call(engine,name,obj,args,kinds,reason)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/java_sets.py:57: in call
+    found,hashed=index(args[0],kinds[0])
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/java_sets.py:49: in index
+    equal=key_equal(engine,value,item,kind,values.kinds[i],reason)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/set_keys.py:111: in equal
+    result=engine.invoke(target,[item],value,'HashSet equals callback at '+reason,argument_kinds=[item_kind])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:702: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:788: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1363: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1389: in execute
+    decision = self.choose(self.method + ':' + str(node.start_point.row + 1), [True, False])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x111113710>
+label = 'method:service:WarehouseKey#equals(Object):3', choices = [True, False]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:method:service:WarehouseKey#equals(Object):3', [True, False])
+
+code/analyzer/engine.py:301: AlternativeRequired
+_______ test_user_collection_and_user_equality_are_not_native_string_set _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-12/test_user_collection_and_user_0')
+
+    def test_user_collection_and_user_equality_are_not_native_string_set(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;
+          class Product{public boolean equals(Object other){return true;}public int hashCode(){return 7;}}
+          class Api{int entry(){Set<Product> values=new HashSet<>();values.add(new Product());values.add(new Product());return values.size();}}'''})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{}) is U
+E       AssertionError: assert 1 is <Unknown.VALUE: 'unknown'>
+E        +  where 1 = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1113cb9d0>.run
+
+code/tests/test_hashset_membership.py:64: AssertionError
+_ test_unknown_source_hash_callback_does_not_get_a_fabricated_normal_continuation _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-12/test_unknown_source_hash_callb0')
+
+    def test_unknown_source_hash_callback_does_not_get_a_fabricated_normal_continuation(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Product{public int hashCode(){throw new IllegalStateException();}}
+          class Api{int entry(){Set<Product> values=new HashSet<>();values.add(new Product());return after();}int after(){return 99;}}'''})
+        e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
+>       assert e.outcome=='unsupported_semantics boundary'
+E       AssertionError: assert 'uncaught app...ion exception' == 'unsupported_...tics boundary'
+E         
+E         - unsupported_semantics boundary
+E         + uncaught application exception
+
+code/tests/test_hashset_membership.py:73: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_set_source_keys32.py::test_equal_keys_and_hash_collision
+FAILED code/tests/test_hashset_membership.py::test_user_collection_and_user_equality_are_not_native_string_set
+FAILED code/tests/test_hashset_membership.py::test_unknown_source_hash_callback_does_not_get_a_fabricated_normal_continuation
+3 failed, 21 passed in 0.57s

@@ -1,0 +1,20 @@
+documents step 1 paths 1
+documents step 2 paths 1
+documents step 3 paths 1
+Traceback (most recent call last):
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/checks/run_document_journey.py", line 102, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/checks/run_document_journey.py", line 94, in main
+    checks={mode:check(value,oracle,mode) for mode,value in [('explicit',rows),('nl',nlrows)]}
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/checks/run_document_journey.py", line 94, in <dictcomp>
+    checks={mode:check(value,oracle,mode) for mode,value in [('explicit',rows),('nl',nlrows)]}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/checks/check_document_journey.py", line 19, in check
+    actual_graph={tuple(e) if isinstance(e,list) else ('' if e['relation']=='executes' else e['source'],e['relation'],e['target']) for e in row['edges']}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_collection-value-flow/checks/check_document_journey.py", line 19, in <setcomp>
+    actual_graph={tuple(e) if isinstance(e,list) else ('' if e['relation']=='executes' else e['source'],e['relation'],e['target']) for e in row['edges']}
+                                                             ~^^^^^^^^^^^^
+TypeError: tuple indices must be integers or slices, not str

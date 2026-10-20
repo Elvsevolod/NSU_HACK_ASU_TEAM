@@ -1,0 +1,24 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_checked_outer_exit_cannot_clear_an_existing_rollback_only ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-193/test_checked_outer_exit_cannot0')
+
+    def test_checked_outer_exit_cannot_clear_an_existing_rollback_only(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.io.IOException;
+          class Api{Inner inner;Store store;@Transactional void entry()throws IOException{
+            Row a=new Row();a.id="a";store.save(a);try{inner.fail();}catch(RuntimeException ignored){}
+            throw new IOException();}}
+          class Inner{Store store;@Transactional void fail(){Row b=new Row();b.id="b";store.save(b);throw new IllegalStateException();}}
+          @Entity @Table(name="rows")class Row{@Id String id;}interface Store extends JpaRepository<Row,String>{Row save(Row value);}'''},rows={'rows':[]})
+        engine=Engine(project,ScenarioState(db));engine.run(ids['Api.entry'],{})
+>       assert engine.state.database.tables[('service','rows')]==[]
+E       AssertionError: assert [{'__type__':...e, 'id': 'b'}] == []
+E         
+E         Left contains 2 more items, first extra item: {'__type__': 'Row', '__http_entity__': False, 'id': 'a'}
+E         Use -v to get more diff
+
+solutions/—_request-array-continuity/code/tests/test_nested_required_checked_exit.py:14: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_request-array-continuity/code/tests/test_nested_required_checked_exit.py::test_checked_outer_exit_cannot_clear_an_existing_rollback_only
+1 failed in 0.11s

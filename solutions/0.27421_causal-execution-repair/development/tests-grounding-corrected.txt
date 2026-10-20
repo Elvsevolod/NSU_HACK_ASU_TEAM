@@ -1,0 +1,163 @@
+.FF........F............................F....F......................F.   [100%]
+=================================== FAILURES ===================================
+_____ test_negative_intent_needs_source_evidence_for_empty_control_branch ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-141/test_negative_intent_needs_sou0')
+
+    def test_negative_intent_needs_source_evidence_for_empty_control_branch(tmp_path):
+        project, db, _ = build(tmp_path, {'Api.java': '''class Api {
+          @PostMapping("/parcels") int add(@RequestBody Parcel input){return input.giftType;}
+        } class Parcel {int giftType;String giftLabel;}'''})
+        (tmp_path/'ui.js').write_text('''function add(){
+          var input={};
+          if(null!=$("#summary_giftType").text() && ""!=$("#summary_giftType").text()){
+            input.giftType=19;input.giftLabel=$("#gift_label").val();
+          } else {input.giftType=73;}
+          $.ajax({url:"/parcels",type:"POST",data:JSON.stringify(input)});
+        }''')
+        frontend=Frontend(project)
+        grounder=ContractGrounder(project,frontend,ContractIndex(project,frontend),None,{'facts':{}})
+        absent,_=grounder.step('Add parcel without gift',ScenarioState(db))
+        assert 'giftType' not in absent[0]['params']
+        assert any('does not prove an empty display' in issue for issue in absent[0]['unresolved'])
+        unspecified,_=grounder.step('Add parcel',ScenarioState(db))
+        assert 'giftType' not in unspecified[0]['params']
+        positive,_=grounder.step('Add parcel with gift',ScenarioState(db))
+        assert 'giftType' not in positive[0]['params']
+        (tmp_path/'page.html').write_text('<p id="summary_giftType"></p><script src="ui.js"></script>')
+        frontend=Frontend(project)
+        grounder=ContractGrounder(project,frontend,ContractIndex(project,frontend),None,{'facts':{}})
+        empty,_=grounder.step('Add parcel without gift',ScenarioState(db))
+>       assert empty[0]['params']=={'giftType':73,'giftLabel':None}
+E       AssertionError: assert {'giftType': 73} == {'giftLabel':...giftType': 73}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Right contains 1 more item:
+E         {'giftLabel': None}
+E         Use -v to get more diff
+
+tests/test_dom_choices.py:52: AssertionError
+______ test_confirmation_callback_keeps_enclosing_create_or_update_action ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-141/test_confirmation_callback_kee0')
+
+    def test_confirmation_callback_keeps_enclosing_create_or_update_action(tmp_path):
+        project, db, _ = build(tmp_path, {'Api.java': '''class Api {
+          @PostMapping("/notebooks") String save(@RequestBody Notebook input){return input.title;}
+        } class Notebook {String id;String title;}'''})
+        (tmp_path/'ui.js').write_text('''$scope.createNotebook=function(){
+          $("#dialog").modal({onConfirm:function(){
+            $http({url:"/notebooks",method:"POST",data:{title:$scope.newTitle}});
+          }});
+        };
+        $scope.updateNotebook=function(){
+          $("#dialog").modal({onConfirm:function(){
+            $http({url:"/notebooks",method:"POST",data:{id:$scope.existingId,title:$scope.editedTitle}});
+          }});
+        };''')
+        frontend=Frontend(project)
+        assert {s['action_label'] for s in frontend.sites.values()}=={'createNotebook','updateNotebook'}
+        grounder=ContractGrounder(project,frontend,ContractIndex(project,frontend),None,{'facts':{}})
+        create,_=grounder.step('Create notebook',ScenarioState(db))
+        update,_=grounder.step('Update notebook',ScenarioState(db))
+        assert create[0]['site']['action_label']=='createNotebook'
+        assert update[0]['site']['action_label']=='updateNotebook'
+>       assert create[0]['params']['id'] is None
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'id'
+
+tests/test_dom_choices.py:81: KeyError
+________ test_omitted_dto_defaults_are_not_defaults_for_unknown_inputs _________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-141/test_omitted_dto_defaults_are_0')
+
+    def test_omitted_dto_defaults_are_not_defaults_for_unknown_inputs(tmp_path):
+        source = {'Shelf.java': '''@RestController class Shelf {
+          @PostMapping("/shelves") int add(@RequestBody ShelfInput input) { return input.capacity; }
+        } class ShelfInput { int capacity; boolean locked; String label; int configured=7; }'''}
+        project, db, ids = build(tmp_path, source)
+        (tmp_path / 'ui.js').write_text('$.ajax({url:"/shelves",type:"POST",data:{capacity:unknown()}});')
+        frontend = Frontend(project)
+        site = next(iter(frontend.sites.values()))
+        site['body_complete'] = True
+        grounder = ContractGrounder(project, frontend, ContractIndex(project, frontend), None, {'facts': {}})
+        choices, _ = grounder.step('Add shelf', ScenarioState(db))
+        choice = choices[0]
+        assert 'capacity' not in choice['params']
+>       assert choice['params']['locked'] is False
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'locked'
+
+tests/test_provenance_binding.py:69: KeyError
+___ test_omitted_properties_remain_proven_when_another_value_is_conditional ____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-141/test_omitted_properties_remain0')
+
+    def test_omitted_properties_remain_proven_when_another_value_is_conditional(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java': '''@RestController class Api {
+          @PostMapping("/notes") String add(@RequestBody Note input){return input.text;}
+        } class Note { String id; String text; int amount; }'''})
+        (tmp_path/'add_note.js').write_text('''function addNote(){ var n=new Object();
+          n.text="fixed"; if (unknown()) {n.amount=2;} else {n.amount=7;}
+          $.ajax({url:"/notes",type:"POST",data:JSON.stringify(n)});
+        }''')
+        frontend=Frontend(project)
+        choices,_=ContractGrounder(project,frontend,ContractIndex(project,frontend),None,{'facts':{}}).step('Add note',ScenarioState(db))
+>       assert choices[0]['params']['id'] is None
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'id'
+
+tests/test_source_inputs.py:248: KeyError
+_____ test_checkbox_omission_and_unknown_mutation_have_different_defaults ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-141/test_checkbox_omission_and_unk0')
+
+    def test_checkbox_omission_and_unknown_mutation_have_different_defaults(tmp_path):
+        source={'Api.java': '''@RestController class Api {
+          @PostMapping("/parcels") String add(@RequestBody Parcel input){return input.id;}
+        } class Parcel {String id; String giftMessage; int wrappers;}'''}
+        project,db,ids=build(tmp_path,source)
+        (tmp_path/'add_parcel.js').write_text('''function addParcel(){var parcel=new Object();parcel.id="p1";
+          if ($('#need-gift-or-not').is(':checked')) {parcel.giftMessage=unknown();parcel.wrappers=7;}
+          $.ajax({url:"/parcels",type:"POST",data:JSON.stringify(parcel)});
+        }''')
+        frontend=Frontend(project);grounder=ContractGrounder(project,frontend,ContractIndex(project,frontend),None,{'facts':{}})
+        choices,_=grounder.step('Add parcel without gift',ScenarioState(db))
+>       assert choices[0]['params']=={'id':'p1','giftMessage':None,'wrappers':0}
+E       AssertionError: assert {'id': 'p1'} == {'giftMessage...'wrappers': 0}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Right contains 2 more items:
+E         {'giftMessage': None, 'wrappers': 0}
+E         Use -v to get more diff
+
+tests/test_source_inputs.py:329: AssertionError
+_____ test_partial_constructor_does_not_erase_independent_literal_defaults _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-141/test_partial_constructor_does_0')
+
+    def test_partial_constructor_does_not_erase_independent_literal_defaults(tmp_path):
+        project, db, _=build(tmp_path,{'Api.java':'''class Api {
+          @PostMapping("/records") String add(@RequestBody RecordInput input){return input.ownerId;}
+        } class RecordInput {String ownerId;String timestamp;
+          RecordInput(){this.ownerId="";this.timestamp=Clock.format(new Date());}}
+        class Clock {static String format(Date date){return "now";}}'''})
+        (tmp_path/'ui.js').write_text('''$.ajax({url:"/records",type:"POST",data:{}});''')
+        frontend=Frontend(project)
+        choices,_=ContractGrounder(project,frontend,ContractIndex(project,frontend),None,{'facts':{}}).step('Add record',ScenarioState(db))
+>       assert choices[0]['params']=={'ownerId':''}
+E       AssertionError: assert {} == {'ownerId': ''}
+E         
+E         Right contains 1 more item:
+E         {'ownerId': ''}
+E         Use -v to get more diff
+
+tests/test_structured_inputs.py:160: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_dom_choices.py::test_negative_intent_needs_source_evidence_for_empty_control_branch
+FAILED tests/test_dom_choices.py::test_confirmation_callback_keeps_enclosing_create_or_update_action
+FAILED tests/test_provenance_binding.py::test_omitted_dto_defaults_are_not_defaults_for_unknown_inputs
+FAILED tests/test_source_inputs.py::test_omitted_properties_remain_proven_when_another_value_is_conditional
+FAILED tests/test_source_inputs.py::test_checkbox_omission_and_unknown_mutation_have_different_defaults
+FAILED tests/test_structured_inputs.py::test_partial_constructor_does_not_erase_independent_literal_defaults
+6 failed, 64 passed in 0.49s

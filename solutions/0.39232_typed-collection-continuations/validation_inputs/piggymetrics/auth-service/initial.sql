@@ -1,0 +1,1 @@
+USE `auth-service`;

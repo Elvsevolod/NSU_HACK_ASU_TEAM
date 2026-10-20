@@ -1,0 +1,288 @@
+FFFFFFFFFFFFF.F                                                          [100%]
+=================================== FAILURES ===================================
+_ test_imported_class_builder_resolves_the_source_qualified_owner[@lombok.Builder] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_imported_class_builder_re0')
+annotation = '@lombok.Builder'
+
+    @pytest.mark.parametrize('annotation',['@lombok.Builder','@lombok.Builder @lombok.NoArgsConstructor @lombok.AllArgsConstructor'])
+    def test_imported_class_builder_resolves_the_source_qualified_owner(tmp_path,annotation):
+        e,ids=fixture(tmp_path,annotation=annotation)
+>       assert e.run(ids['Api.entry'],{})=='ready' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'ready')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1044bcad0>.run
+
+code/tests/test_lombok_builder33.py:30: AssertionError
+_ test_imported_class_builder_resolves_the_source_qualified_owner[@lombok.Builder @lombok.NoArgsConstructor @lombok.AllArgsConstructor] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_imported_class_builder_re1')
+annotation = '@lombok.Builder @lombok.NoArgsConstructor @lombok.AllArgsConstructor'
+
+    @pytest.mark.parametrize('annotation',['@lombok.Builder','@lombok.Builder @lombok.NoArgsConstructor @lombok.AllArgsConstructor'])
+    def test_imported_class_builder_resolves_the_source_qualified_owner(tmp_path,annotation):
+        e,ids=fixture(tmp_path,annotation=annotation)
+>       assert e.run(ids['Api.entry'],{})=='ready' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'ready')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1046ae4d0>.run
+
+code/tests/test_lombok_builder33.py:30: AssertionError
+__ test_fully_qualified_builder_ignores_untrusted_skeleton_receiver_spelling ___
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_fully_qualified_builder_i0')
+
+    def test_fully_qualified_builder_ignores_untrusted_skeleton_receiver_spelling(tmp_path):
+        e,ids=fixture(tmp_path,imports='',body='records.Item item=records.Item.builder().name("ready").build();return item.name;')
+        for node in e.p.nodes.values():
+            if node['kind']=='call_site' and node.get('callee')=='builder':node['receiver_type']='unrelated.Item'
+>       assert e.run(ids['Api.entry'],{})=='ready' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'ready')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1046eec50>.run
+
+code/tests/test_lombok_builder33.py:38: AssertionError
+_ test_built_references_share_arguments_but_not_subsequent_builder_assignments _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_built_references_share_ar0')
+
+    def test_built_references_share_arguments_but_not_subsequent_builder_assignments(tmp_path):
+        e,ids=fixture(tmp_path,fields='public java.util.List<String> names;',returned='boolean',body='''
+          java.util.List<String> names=new java.util.ArrayList<>();names.add("first");
+          var builder=Item.builder().names(names);Item first=builder.build();
+          names.add("shared");builder.names(new java.util.ArrayList<>());Item second=builder.build();
+          return first.names.size()==2 && second.names.isEmpty() && first!=second;''')
+>       assert e.run(ids['Api.entry'],{}) is True and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> is True)
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x104707310>.run
+
+code/tests/test_lombok_builder33.py:47: AssertionError
+________ test_native_defaults_and_declared_numeric_kinds_are_preserved _________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_native_defaults_and_decla0')
+
+    def test_native_defaults_and_declared_numeric_kinds_are_preserved(tmp_path):
+        e,ids=fixture(tmp_path,fields='public long id;public boolean active;public char marker;public String name;',
+            returned='Item',body='return Item.builder().id(7L).build();')
+        value=e.run(ids['Api.entry'],{})
+>       assert isinstance(value,JavaObject) and value.java_type=='records.Item'
+E       AssertionError: assert (False)
+E        +  where False = isinstance(<Unknown.VALUE: 'unknown'>, JavaObject)
+
+code/tests/test_lombok_builder33.py:54: AssertionError
+______________ test_builder_initializes_the_declaring_class_once _______________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_builder_initializes_the_d0')
+
+    def test_builder_initializes_the_declaring_class_once(tmp_path):
+        e,ids=fixture(tmp_path,fields='public String name;public static int initialized=1;',
+                      body='Item.builder().build();Item.builder().build();return "ready";')
+>       assert e.run(ids['Api.entry'],{})=='ready' and not e.approximate
+E       AssertionError: assert ('ready' == 'ready'
+E         
+E           ready and not True)
+E        +  where True = <analyzer.engine.Engine object at 0x104028110>.approximate
+
+code/tests/test_lombok_builder33.py:62: AssertionError
+_ test_nondefault_builder_contracts_do_not_run_a_success_suffix[@lombok.Builder(toBuilder=true)-public String name;-] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_nondefault_builder_contra0')
+annotation = '@lombok.Builder(toBuilder=true)', fields = 'public String name;'
+extra = ''
+
+    @pytest.mark.parametrize('annotation,fields,extra',[
+        ('@lombok.Builder(toBuilder=true)','public String name;',''),
+        ('@lombok.Builder','@lombok.Builder.Default public String name="initial";',''),
+        ('@lombok.Builder','@lombok.NonNull public String name;',''),
+        ('@lombok.Builder','@lombok.Singular public java.util.List<String> names;',''),
+        ('@lombok.Builder','public String name;','public Item(String name){this.name=name;}'),
+        ('@lombok.Builder','public String name;','public static class ItemBuilder{public Item build(){return null;}}'),
+        ('@lombok.Builder','public String name="initializer";',''),
+    ])
+    def test_nondefault_builder_contracts_do_not_run_a_success_suffix(tmp_path,annotation,fields,extra):
+        e,ids=fixture(tmp_path,annotation=annotation,fields=fields,extra=extra,
+                      body='Item.builder();return after();',api_extra='String after(){return "wrong";}')
+>       assert e.run(ids['Api.entry'],{}) is U and e.approximate
+E       AssertionError: assert ('wrong' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'wrong' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x104696350>.run
+
+code/tests/test_lombok_builder33.py:78: AssertionError
+_ test_nondefault_builder_contracts_do_not_run_a_success_suffix[@lombok.Builder-@lombok.Builder.Default public String name="initial";-] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_nondefault_builder_contra1')
+annotation = '@lombok.Builder'
+fields = '@lombok.Builder.Default public String name="initial";', extra = ''
+
+    @pytest.mark.parametrize('annotation,fields,extra',[
+        ('@lombok.Builder(toBuilder=true)','public String name;',''),
+        ('@lombok.Builder','@lombok.Builder.Default public String name="initial";',''),
+        ('@lombok.Builder','@lombok.NonNull public String name;',''),
+        ('@lombok.Builder','@lombok.Singular public java.util.List<String> names;',''),
+        ('@lombok.Builder','public String name;','public Item(String name){this.name=name;}'),
+        ('@lombok.Builder','public String name;','public static class ItemBuilder{public Item build(){return null;}}'),
+        ('@lombok.Builder','public String name="initializer";',''),
+    ])
+    def test_nondefault_builder_contracts_do_not_run_a_success_suffix(tmp_path,annotation,fields,extra):
+        e,ids=fixture(tmp_path,annotation=annotation,fields=fields,extra=extra,
+                      body='Item.builder();return after();',api_extra='String after(){return "wrong";}')
+>       assert e.run(ids['Api.entry'],{}) is U and e.approximate
+E       AssertionError: assert ('wrong' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'wrong' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1046ca490>.run
+
+code/tests/test_lombok_builder33.py:78: AssertionError
+_ test_nondefault_builder_contracts_do_not_run_a_success_suffix[@lombok.Builder-@lombok.NonNull public String name;-] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_nondefault_builder_contra2')
+annotation = '@lombok.Builder', fields = '@lombok.NonNull public String name;'
+extra = ''
+
+    @pytest.mark.parametrize('annotation,fields,extra',[
+        ('@lombok.Builder(toBuilder=true)','public String name;',''),
+        ('@lombok.Builder','@lombok.Builder.Default public String name="initial";',''),
+        ('@lombok.Builder','@lombok.NonNull public String name;',''),
+        ('@lombok.Builder','@lombok.Singular public java.util.List<String> names;',''),
+        ('@lombok.Builder','public String name;','public Item(String name){this.name=name;}'),
+        ('@lombok.Builder','public String name;','public static class ItemBuilder{public Item build(){return null;}}'),
+        ('@lombok.Builder','public String name="initializer";',''),
+    ])
+    def test_nondefault_builder_contracts_do_not_run_a_success_suffix(tmp_path,annotation,fields,extra):
+        e,ids=fixture(tmp_path,annotation=annotation,fields=fields,extra=extra,
+                      body='Item.builder();return after();',api_extra='String after(){return "wrong";}')
+>       assert e.run(ids['Api.entry'],{}) is U and e.approximate
+E       AssertionError: assert ('wrong' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'wrong' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1044bf250>.run
+
+code/tests/test_lombok_builder33.py:78: AssertionError
+_ test_nondefault_builder_contracts_do_not_run_a_success_suffix[@lombok.Builder-@lombok.Singular public java.util.List<String> names;-] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_nondefault_builder_contra3')
+annotation = '@lombok.Builder'
+fields = '@lombok.Singular public java.util.List<String> names;', extra = ''
+
+    @pytest.mark.parametrize('annotation,fields,extra',[
+        ('@lombok.Builder(toBuilder=true)','public String name;',''),
+        ('@lombok.Builder','@lombok.Builder.Default public String name="initial";',''),
+        ('@lombok.Builder','@lombok.NonNull public String name;',''),
+        ('@lombok.Builder','@lombok.Singular public java.util.List<String> names;',''),
+        ('@lombok.Builder','public String name;','public Item(String name){this.name=name;}'),
+        ('@lombok.Builder','public String name;','public static class ItemBuilder{public Item build(){return null;}}'),
+        ('@lombok.Builder','public String name="initializer";',''),
+    ])
+    def test_nondefault_builder_contracts_do_not_run_a_success_suffix(tmp_path,annotation,fields,extra):
+        e,ids=fixture(tmp_path,annotation=annotation,fields=fields,extra=extra,
+                      body='Item.builder();return after();',api_extra='String after(){return "wrong";}')
+>       assert e.run(ids['Api.entry'],{}) is U and e.approximate
+E       AssertionError: assert ('wrong' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'wrong' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1046edf50>.run
+
+code/tests/test_lombok_builder33.py:78: AssertionError
+_ test_nondefault_builder_contracts_do_not_run_a_success_suffix[@lombok.Builder-public String name;-public Item(String name){this.name=name;}] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_nondefault_builder_contra4')
+annotation = '@lombok.Builder', fields = 'public String name;'
+extra = 'public Item(String name){this.name=name;}'
+
+    @pytest.mark.parametrize('annotation,fields,extra',[
+        ('@lombok.Builder(toBuilder=true)','public String name;',''),
+        ('@lombok.Builder','@lombok.Builder.Default public String name="initial";',''),
+        ('@lombok.Builder','@lombok.NonNull public String name;',''),
+        ('@lombok.Builder','@lombok.Singular public java.util.List<String> names;',''),
+        ('@lombok.Builder','public String name;','public Item(String name){this.name=name;}'),
+        ('@lombok.Builder','public String name;','public static class ItemBuilder{public Item build(){return null;}}'),
+        ('@lombok.Builder','public String name="initializer";',''),
+    ])
+    def test_nondefault_builder_contracts_do_not_run_a_success_suffix(tmp_path,annotation,fields,extra):
+        e,ids=fixture(tmp_path,annotation=annotation,fields=fields,extra=extra,
+                      body='Item.builder();return after();',api_extra='String after(){return "wrong";}')
+>       assert e.run(ids['Api.entry'],{}) is U and e.approximate
+E       AssertionError: assert ('wrong' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'wrong' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1040a3750>.run
+
+code/tests/test_lombok_builder33.py:78: AssertionError
+_ test_nondefault_builder_contracts_do_not_run_a_success_suffix[@lombok.Builder-public String name;-public static class ItemBuilder{public Item build(){return null;}}] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_nondefault_builder_contra5')
+annotation = '@lombok.Builder', fields = 'public String name;'
+extra = 'public static class ItemBuilder{public Item build(){return null;}}'
+
+    @pytest.mark.parametrize('annotation,fields,extra',[
+        ('@lombok.Builder(toBuilder=true)','public String name;',''),
+        ('@lombok.Builder','@lombok.Builder.Default public String name="initial";',''),
+        ('@lombok.Builder','@lombok.NonNull public String name;',''),
+        ('@lombok.Builder','@lombok.Singular public java.util.List<String> names;',''),
+        ('@lombok.Builder','public String name;','public Item(String name){this.name=name;}'),
+        ('@lombok.Builder','public String name;','public static class ItemBuilder{public Item build(){return null;}}'),
+        ('@lombok.Builder','public String name="initializer";',''),
+    ])
+    def test_nondefault_builder_contracts_do_not_run_a_success_suffix(tmp_path,annotation,fields,extra):
+        e,ids=fixture(tmp_path,annotation=annotation,fields=fields,extra=extra,
+                      body='Item.builder();return after();',api_extra='String after(){return "wrong";}')
+>       assert e.run(ids['Api.entry'],{}) is U and e.approximate
+E       AssertionError: assert ('wrong' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'wrong' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10461c6d0>.run
+
+code/tests/test_lombok_builder33.py:78: AssertionError
+_ test_nondefault_builder_contracts_do_not_run_a_success_suffix[@lombok.Builder-public String name="initializer";-] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_nondefault_builder_contra6')
+annotation = '@lombok.Builder', fields = 'public String name="initializer";'
+extra = ''
+
+    @pytest.mark.parametrize('annotation,fields,extra',[
+        ('@lombok.Builder(toBuilder=true)','public String name;',''),
+        ('@lombok.Builder','@lombok.Builder.Default public String name="initial";',''),
+        ('@lombok.Builder','@lombok.NonNull public String name;',''),
+        ('@lombok.Builder','@lombok.Singular public java.util.List<String> names;',''),
+        ('@lombok.Builder','public String name;','public Item(String name){this.name=name;}'),
+        ('@lombok.Builder','public String name;','public static class ItemBuilder{public Item build(){return null;}}'),
+        ('@lombok.Builder','public String name="initializer";',''),
+    ])
+    def test_nondefault_builder_contracts_do_not_run_a_success_suffix(tmp_path,annotation,fields,extra):
+        e,ids=fixture(tmp_path,annotation=annotation,fields=fields,extra=extra,
+                      body='Item.builder();return after();',api_extra='String after(){return "wrong";}')
+>       assert e.run(ids['Api.entry'],{}) is U and e.approximate
+E       AssertionError: assert ('wrong' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'wrong' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1044e6310>.run
+
+code/tests/test_lombok_builder33.py:78: AssertionError
+_________ test_a_user_annotation_namesake_cannot_enable_generated_code _________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_a_user_annotation_namesak0')
+
+    def test_a_user_annotation_namesake_cannot_enable_generated_code(tmp_path):
+        e,ids=fixture(tmp_path,annotation='@Builder',extra='',body='Item.builder();return after();',
+                      api_extra='String after(){return "wrong";}')
+        path=tmp_path/'Item.java';path.write_text(path.read_text()+'@interface Builder{}')
+        # Rebuild the source facts, including the actual local annotation declaration.
+        e,ids=fixture(tmp_path,annotation='@Builder',extra='',body='Item.builder();return after();',
+                      api_extra='String after(){return "wrong";}')
+>       assert e.run(ids['Api.entry'],{}) is U and e.approximate
+E       AssertionError: assert ('wrong' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'wrong' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x103e86790>.run
+
+code/tests/test_lombok_builder33.py:96: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_lombok_builder33.py::test_imported_class_builder_resolves_the_source_qualified_owner[@lombok.Builder]
+FAILED code/tests/test_lombok_builder33.py::test_imported_class_builder_resolves_the_source_qualified_owner[@lombok.Builder @lombok.NoArgsConstructor @lombok.AllArgsConstructor]
+FAILED code/tests/test_lombok_builder33.py::test_fully_qualified_builder_ignores_untrusted_skeleton_receiver_spelling
+FAILED code/tests/test_lombok_builder33.py::test_built_references_share_arguments_but_not_subsequent_builder_assignments
+FAILED code/tests/test_lombok_builder33.py::test_native_defaults_and_declared_numeric_kinds_are_preserved
+FAILED code/tests/test_lombok_builder33.py::test_builder_initializes_the_declaring_class_once
+FAILED code/tests/test_lombok_builder33.py::test_nondefault_builder_contracts_do_not_run_a_success_suffix[@lombok.Builder(toBuilder=true)-public String name;-]
+FAILED code/tests/test_lombok_builder33.py::test_nondefault_builder_contracts_do_not_run_a_success_suffix[@lombok.Builder-@lombok.Builder.Default public String name="initial";-]
+FAILED code/tests/test_lombok_builder33.py::test_nondefault_builder_contracts_do_not_run_a_success_suffix[@lombok.Builder-@lombok.NonNull public String name;-]
+FAILED code/tests/test_lombok_builder33.py::test_nondefault_builder_contracts_do_not_run_a_success_suffix[@lombok.Builder-@lombok.Singular public java.util.List<String> names;-]
+FAILED code/tests/test_lombok_builder33.py::test_nondefault_builder_contracts_do_not_run_a_success_suffix[@lombok.Builder-public String name;-public Item(String name){this.name=name;}]
+FAILED code/tests/test_lombok_builder33.py::test_nondefault_builder_contracts_do_not_run_a_success_suffix[@lombok.Builder-public String name;-public static class ItemBuilder{public Item build(){return null;}}]
+FAILED code/tests/test_lombok_builder33.py::test_nondefault_builder_contracts_do_not_run_a_success_suffix[@lombok.Builder-public String name="initializer";-]
+FAILED code/tests/test_lombok_builder33.py::test_a_user_annotation_namesake_cannot_enable_generated_code
+14 failed, 1 passed in 0.18s

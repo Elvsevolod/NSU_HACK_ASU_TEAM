@@ -1,0 +1,460 @@
+--- E5-R06/analyzer/contracts.py
++++ E6-final/analyzer/contracts.py
+@@ -134,7 +134,11 @@
+ 
+ 
+ class ContractIndex:
++    tokenize=staticmethod(tokens)
++    query_intent=staticmethod(intent)
++
+     def __init__(self, project, frontend):
++        tokens=self.tokenize
+         self.project, self.frontend = project, frontend
+         self.contracts, docs, extra_docs = {}, {}, {}
+         for mid, verb, route in project.ix.handlers:
+@@ -189,6 +193,7 @@
+         self.extra = BM25(extra_docs)
+ 
+     def rank(self, action, active_page=None, scenario_text=''):
++        tokens=self.tokenize
+         # Weight the direct object before qualifications about related entities.
+         from .actors import actor_role, declared_roles,canonical_role
+         actor = actor_role(action)
+@@ -200,7 +205,7 @@
+         if re.match(r'^(?:open|view|show|inspect|read)\b', focus, re.I) and re.search(r'\bdetails?\b', focus, re.I):
+             focus = re.sub(r'\b(?:cheapest|quickest|newest|oldest|latest)\b', '', focus, flags=re.I)
+         query = tokens(focus)
+-        wanted = intent(action)
++        wanted = self.query_intent(action)
+         verb_words = {word for group in VERBS for word in group}
+         objects = [word for word in query if word not in verb_words]
+         object_words = set(objects) - {'all', 'detail', 'first', 'second', 'third', 'new'}
+@@ -362,6 +367,7 @@
+             {'entry': c['entry'], 'ui_site': c['site']['id'] if c['site'] else None, 'score': score}
+             for score, _, c in ranked[:6]], 'proposal': {'hypotheses': []}, 'unresolved': []}
+         detail['grounding_status'] = 'lexical_hypothesis'
++        if hasattr(self.index,'last_decision'):detail['retrieval_decision']=deepcopy(self.index.last_decision)
+         detail['certainty_note'] = 'Graph certainty is conditional on the selected source contract and validated bindings'
+         if not ranked:
+             detail['unresolved'] = ['No lexical evidence for a source request']
+--- E5-R06/analyzer/engine.py
++++ E6-final/analyzer/engine.py
+@@ -4201,7 +4201,7 @@
+             declared_owner=self.p.resolve_type(cs.get('receiver_type',''),self.p.methods[mid]['module'],self.p.methods[mid]['file'])
+             declared = [m.get('return_raw', '') for m in self.p.methods.values()
+                         if m['name'] == name and m['owner']==declared_owner]
+-            return_type = declared[0] if declared else ('Optional' if name == 'findById' else '')
++            return_type = declared[0] if declared else ('Optional' if name == 'findById' else 'java.util.List' if name in ('findAll','findAllById') else '')
+             if len(materialized)>1 and not any(t in return_type for t in ('List','Set','Collection')):
+                 raise AnalysisBoundary('repository single-result cardinality exceeds one: '+reason,category='unsupported_semantics')
+             first = materialized[0] if materialized else None
+--- E5-R06/analyzer/lexical_retrieval.py
++++ E6-final/analyzer/lexical_retrieval.py
+@@ -0,0 +1,52 @@
++"""Optional source-fact lexical retriever; ranking supplies no execution facts."""
++from baseline_closure import BM25
++from .contracts import ContractIndex,STOP,VERBS
++from .retrieval_sources import documents,unicode_tokens
++
++RU_VERBS={'показать':'get','просмотреть':'view','открыть':'open','читать':'read','найти':'find',
++    'создать':'create','добавить':'add','зарегистрировать':'register','удалить':'delete',
++    'обновить':'update','изменить':'change','войти':'login','оплатить':'pay'}
++LANGUAGE_STOP=set('и или в на по для из с со у все всех новый новую текущий текущую'.split())
++
++
++def tokens(value):
++    return [RU_VERBS.get(word,word) for word in unicode_tokens(value) if word not in STOP|LANGUAGE_STOP]
++
++
++def intent(value):
++    words=tokens(value)
++    return next((i for i,group in enumerate(VERBS) if words and words[0] in group),None)
++
++
++class LexicalContractIndex(ContractIndex):
++    tokenize=staticmethod(tokens)
++    query_intent=staticmethod(intent)
++
++    def __init__(self,project,frontend):
++        super().__init__(project,frontend)
++        self.source_documents=documents(project,self.contracts)
++        docs={key:tokens(row['fact_text']) for key,row in self.source_documents.items()}
++        extra={key:tokens(' '.join(c['text'] for c in row['chunks'])) for key,row in self.source_documents.items()}
++        self.bm25=BM25(docs);self.extra=BM25(extra)
++        self.content={key:set(words) for key,words in docs.items()}
++        self.last_decision={}
++
++    def rank(self,action,active_page=None,scenario_text=''):
++        ranked=super().rank(action,active_page,scenario_text)
++        wanted=intent(action);verbs={word for group in VERBS for word in group}
++        content=set(tokens(action))-verbs-{'id','name','current','my','by','earlier','please'}
++        # A verb alone cannot establish a request. Nor does a high noun score
++        # establish a source operation which contradicts the stated action.
++        candidates=[row for row in ranked if content & self.content[row[1]] and not
++            (wanted==2 and row[2]['verb']!='DELETE' and row[2]['intent']!=2)]
++        entries=[]
++        for row in candidates:
++            if row[2]['entry'] not in [item[2]['entry'] for item in entries]:entries.append(row)
++        reason=None
++        if not candidates:reason='no source content/operation evidence'
++        elif len(entries)>1 and entries[0][0]-entries[1][0] <= 0.08*max(entries[0][0],1e-12):
++            reason='source endpoint scores within frozen refusal margin'
++        self.last_decision={'accepted':reason is None,'reason':reason,'raw_top':[
++            {'contract_id':key,'entry':c['entry'],'score':score} for score,key,c in candidates[:6]],
++            'model_calls':0,'profile':'unicode-source-lexical/1'}
++        return [] if reason else candidates
+--- E5-R06/analyzer/offline_retrieval.py
++++ E6-final/analyzer/offline_retrieval.py
+@@ -0,0 +1,107 @@
++"""Optional, lazy offline vector ranking over existing source contracts only."""
++from importlib.metadata import version
++import hashlib,json,math,os
++from pathlib import Path
++from .contracts import ContractIndex
++from .retrieval_sources import documents
++from .actors import actor_role,canonical_role,declared_roles
++from .state import U
++
++PINS={'nomic-ai/CodeRankEmbed':'3c4b60807d71f79b43f3c4363786d9493691f8b1',
++      'Qwen/Qwen3-Embedding-0.6B':'97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3'}
++
++
++def digest(value):return hashlib.sha256(json.dumps(value,sort_keys=True,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
++
++
++def vector(value):
++    if not isinstance(value,list) or not value or any(type(x) not in (int,float) or not math.isfinite(x) for x in value):raise ValueError('invalid vector')
++    norm=math.sqrt(sum(x*x for x in value))
++    if not norm:raise ValueError('zero vector')
++    return [x/norm for x in value]
++
++
++class LocalEncoder:
++    def __init__(self,root,manifest):
++        # No remote modules are executed. CodeRank requires a separate custom
++        # code audit and is deliberately not supported by this stock loader.
++        if manifest['model_id']!='Qwen/Qwen3-Embedding-0.6B':raise ValueError('custom runtime is not audited')
++        pins=manifest.get('runtime_versions',{})
++        required={'torch','transformers','sentence-transformers','tokenizers'}
++        if set(pins)!=required or any(version(name)!=pin for name,pin in pins.items()):raise ValueError('runtime revision mismatch')
++        device=manifest.get('device')
++        if device not in ('cpu','mps') or manifest.get('dtype')!='float32':raise ValueError('unvalidated device/dtype')
++        config=json.loads((root/'config.json').read_text());modules=json.loads((root/'modules.json').read_text())
++        if config.get('auto_map') or any(not m['type'].startswith('sentence_transformers.') for m in modules):raise ValueError('unreviewed custom module')
++        os.environ['HF_HUB_OFFLINE']='1';os.environ['TRANSFORMERS_OFFLINE']='1'
++        import torch
++        from sentence_transformers import SentenceTransformer
++        if device=='mps' and not torch.backends.mps.is_available():raise ValueError('MPS unavailable in this process')
++        torch.set_num_threads(manifest['threads'])
++        self.model=SentenceTransformer(str(root),device=device,local_files_only=True,trust_remote_code=False,
++            model_kwargs={'torch_dtype':'float32'})
++        self.model.max_seq_length=manifest['max_sequence_length']
++        self.prefix=manifest['query_prefix'];self.cache={};self.model_calls=0
++
++    def __call__(self,query):
++        if query not in self.cache:
++            self.model_calls+=1
++            self.cache[query]=self.model.encode([self.prefix+query],batch_size=1,prompt='',normalize_embeddings=True,
++                show_progress_bar=False,convert_to_numpy=True)[0].tolist()
++        return self.cache[query]
++
++
++class OfflineDenseIndex(ContractIndex):
++    def __init__(self,project,frontend,snapshot=None,encoder_factory=LocalEncoder):
++        super().__init__(project,frontend)
++        self.snapshot=Path(snapshot) if snapshot else None;self.encoder_factory=encoder_factory
++        self.corpus=documents(project,self.contracts);self.corpus_digest=digest(self.corpus)
++        self.encoder=None;self.vectors=None;self.failure=None;self.last_decision={};self.model_calls=0
++
++    def load(self):
++        if self.snapshot is None:raise ValueError('model snapshot absent')
++        root=self.snapshot.resolve();manifest=json.loads((root/'manifest.json').read_text())
++        if manifest.get('revision')!=PINS.get(manifest.get('model_id')):raise ValueError('model revision mismatch')
++        if manifest.get('corpus_digest')!=self.corpus_digest:raise ValueError('source digest changed')
++        files=manifest.get('files',{})
++        if not files or not {'vectors.json','config.json','modules.json','model.safetensors','tokenizer.json'}<=files.keys():raise ValueError('snapshot files missing')
++        for name,expected in files.items():
++            path=(root/name).resolve()
++            if not path.is_relative_to(root) or not path.is_file():raise ValueError('snapshot file outside root or absent')
++            with path.open('rb') as stream:actual=hashlib.file_digest(stream,'sha256').hexdigest()
++            if actual!=expected:raise ValueError('snapshot cache corrupt')
++        raw=json.loads((root/'vectors.json').read_text())
++        if set(raw)!=set(self.contracts):raise ValueError('vector IDs differ from source contracts')
++        self.vectors={key:vector(value) for key,value in raw.items()}
++        if len({len(v) for v in self.vectors.values()})!=1:raise ValueError('vector dimension mismatch')
++        if not (0<=manifest['minimum_score']<=1 and 0<=manifest['minimum_margin']<=1):raise ValueError('calibration absent')
++        if manifest.get('candidate_policy') not in ('same_candidates','expanded'):raise ValueError('candidate policy absent')
++        self.manifest=manifest;self.encoder=self.encoder_factory(root,manifest)
++
++    def rank(self,action,active_page=None,scenario_text=''):
++        fallback=super().rank(action,active_page,scenario_text)
++        try:
++            if self.failure:raise ValueError(self.failure)
++            if self.encoder is None:self.load()
++            self.model_calls+=1;query=vector(self.encoder(action))
++            self.model_calls=getattr(self.encoder,'model_calls',self.model_calls)
++            if len(query)!=len(next(iter(self.vectors.values()))):raise ValueError('query dimension mismatch')
++            actor=actor_role(action);ranked=[]
++            allowed={key for _,key,_ in fallback} if self.manifest.get('candidate_policy')=='same_candidates' else set(self.contracts)
++            for key in allowed:
++                c=self.contracts[key];roles=declared_roles(self.project,c['entry'])
++                if actor is not U and roles and canonical_role(actor) not in {canonical_role(r) for r in roles}:continue
++                score=sum(a*b for a,b in zip(query,self.vectors[key]));ranked.append((score,key,c))
++            ranked.sort(key=lambda r:(-r[0],r[1]));distinct=[]
++            for row in ranked:
++                if row[2]['entry'] not in [x[2]['entry'] for x in distinct]:distinct.append(row)
++            accepted=bool(distinct) and distinct[0][0]>=self.manifest['minimum_score'] and (
++                len(distinct)==1 or distinct[0][0]-distinct[1][0]>=self.manifest['minimum_margin'])
++            self.last_decision={'mode':'offline_dense','accepted':accepted,'model_id':self.manifest['model_id'],
++                'revision':self.manifest['revision'],'corpus_digest':self.corpus_digest,
++                'candidates':[{'contract_id':key,'score':score,'file':self.corpus[key]['file'],
++                    'line':self.corpus[key]['line'],'source_sha256':self.corpus[key]['source_sha256']} for score,key,_ in ranked[:6]]}
++            return ranked if accepted else []
++        except (OSError,ValueError,KeyError,ImportError) as error:
++            self.failure=str(error);self.last_decision={'mode':'baseline_fallback','reason':self.failure,'model_calls':self.model_calls}
++            return fallback
+--- E5-R06/analyzer/portable.py
++++ E6-final/analyzer/portable.py
+@@ -27,13 +27,21 @@
+     parser.add_argument('--path-limit', type=int, default=4)
+     parser.add_argument('--no-constraints', action='store_true')
+     parser.add_argument('--graph-policy', choices=('observed-union', 'confirmed'), default='observed-union')
++    parser.add_argument('--retrieval',choices=('baseline','lexical','offline-dense'),default='baseline')
++    parser.add_argument('--model-snapshot',type=Path)
+     args = parser.parse_args()
+     if args.path_limit < 1:
+         parser.error('--path-limit must be positive')
+     started = time.perf_counter()
+     project = Project(args.skeleton, args.source)
+     frontend = Frontend(project)
+-    retrieval = ContractIndex(project, frontend)
++    if args.retrieval=='lexical':
++        from .lexical_retrieval import LexicalContractIndex
++        retrieval=LexicalContractIndex(project,frontend)
++    elif args.retrieval=='offline-dense':
++        from .offline_retrieval import OfflineDenseIndex
++        retrieval=OfflineDenseIndex(project,frontend,args.model_snapshot)
++    else:retrieval = ContractIndex(project, frontend)
+     context = read_static_context(project.skeleton.get('context', {}))
+     context['unresolved'].extend(frontend.unsupported)
+     context['unresolved'].extend('Unsupported source route: ' + message for message in project.route_warnings)
+@@ -62,6 +70,7 @@
+                   'packages': {name: importlib.metadata.version(name) for name in
+                                ('tree-sitter', 'tree-sitter-java', 'tree-sitter-javascript', 'html5lib', 'webencodings', 'six')}}}
+     report['constraints'] = not args.no_constraints
++    report['retrieval_profile']=args.retrieval
+     args.output.parent.mkdir(parents=True, exist_ok=True)
+     args.report.parent.mkdir(parents=True, exist_ok=True)
+     timings={'analysis_seconds':0.0,'submission_validation_seconds':0.0,
+@@ -80,6 +89,7 @@
+         report['serialization_seconds_before_current_report_write']={key:value for key,value in timings.items() if 'serialization' in key}
+         report.update(peak_rss(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss))
+         report['submission_sha256'] = sha256(args.output)
++        report['retrieval_model_calls']=getattr(retrieval,'model_calls',0)
+         phase=time.perf_counter()
+         with args.report.open('w') as stream:
+             dump_report(report,stream,ensure_ascii=True,separators=(',',':'),default=serial)
+@@ -99,7 +109,7 @@
+     save()
+     timings.update(preparation_seconds=prepared,end_to_end_seconds=time.perf_counter()-started,
+                    end_boundary='after final report write, before timing/audit sidecars',
+-                   index_constructions=1,scenario_count=len(scenarios),model_calls=0,external_llm_api_calls=0)
++                   index_constructions=1,scenario_count=len(scenarios),model_calls=getattr(retrieval,'model_calls',0),external_llm_api_calls=0)
+     timings.update(peak_rss(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss))
+     args.report.with_name(args.report.stem+'-timings.json').write_text(json.dumps(timings,indent=2)+'\n')
+     print(json.dumps({'seconds': report['elapsed_seconds'], 'preparation_seconds': prepared,
+--- E5-R06/analyzer/repository_order.py
++++ E6-final/analyzer/repository_order.py
+@@ -43,7 +43,8 @@
+         for field,_,_ in specs:
+             value=row.get(field,U)
+             if value is not None and not (type(value) in (int,float,Decimal) and
+-                    (type(value) is not float or math.isfinite(value))):
++                    (type(value) is not float or math.isfinite(value)) and
++                    (type(value) is not Decimal or value.is_finite())):
+                 values.repository_order.update(supported=False,reason='unproved numeric comparator/collation: '+field);return
+     native=[index for index,(_,_,nulls) in enumerate(specs) if nulls=='native' and any(row.get(specs[index][0]) is None for row in values)]
+     if len(native)>3:
+--- E5-R06/analyzer/retrieval_sources.py
++++ E6-final/analyzer/retrieval_sources.py
+@@ -0,0 +1,59 @@
++"""Source-only retrieval documents. No scenarios, traces or answer inputs."""
++import hashlib
++import json
++import re
++import unicodedata
++from .project import text
++from .state import U
++
++CHUNK_TOKENS=192
++MAX_CHUNKS=8
++
++
++def unicode_tokens(value):
++    value=unicodedata.normalize('NFKC',str(value))
++    pieces=[]
++    for word in re.findall(r'[^\W_]+',value):
++        start=0
++        for i in range(1,len(word)):
++            if (word[i].isupper() and (word[i-1].islower() or word[i-1].isdigit()) or
++                word[i-1].isupper() and word[i].isupper() and i+1<len(word) and word[i+1].islower()):
++                pieces.append(word[start:i].casefold());start=i
++        pieces.append(word[start:].casefold())
++    return pieces
++
++
++def source_chunks(project,mid):
++    meta=project.methods[mid];node=project.ast.get(mid)
++    if node is None:return []
++    data=project.sources[meta['file']];digest=hashlib.sha256(data).hexdigest()
++    pending=[node];result=[]
++    while pending and len(result)<MAX_CHUNKS:
++        current=pending.pop(0);content=text(current)
++        if len(unicode_tokens(content))>CHUNK_TOKENS:
++            pending[0:0]=list(current.named_children)
++            continue
++        result.append({'id':f'chunk:{mid}:{current.start_byte}:{current.end_byte}',
++            'entry':mid,'file':meta['file'],'line':current.start_point.row+1,
++            'end_line':current.end_point.row+1,'start_byte':current.start_byte,'end_byte':current.end_byte,
++            'source_sha256':digest,'sha256':hashlib.sha256(content.encode()).hexdigest(),'text':content})
++    return result
++
++
++def documents(project,contracts):
++    result={};chunks={}
++    for key,contract in sorted(contracts.items()):
++        mid=contract['entry'];meta=project.methods[mid];site=contract['site']
++        if mid not in chunks:chunks[mid]=source_chunks(project,mid)
++        facts={'entry':mid,'method':meta['name'],'owner':project.nodes[meta['owner']]['fqn'],
++            'http_method':contract['verb'],'route':contract['route'],
++            'annotations':meta.get('annotations',[]),'parameters':project.http_parameters(mid),
++            'request_fields':project.request_fields(mid),'return_type':meta.get('return_raw',''),
++            'ui':{name:site.get(name) for name in ('id','file','page','action_label','body_fields','conditions')} if site else None}
++        # Unsupported/absent source metadata remains explicitly unknown.
++        facts=json.loads(json.dumps(facts,ensure_ascii=False,default=lambda value:{'knowledge':'unknown'} if value is U else sorted(value) if isinstance(value,set) else str(value)))
++        data=project.sources.get(meta['file'],b'')
++        result[key]={'contract_id':key,'entry':mid,'facts':facts,'file':meta['file'],
++            'line':meta.get('line'),'source_sha256':hashlib.sha256(data).hexdigest(),
++            'fact_text':json.dumps(facts,ensure_ascii=False,sort_keys=True), 'chunks':chunks[mid]}
++    return result
+--- E5-R06/tests/test_repository_order32.py
++++ E6-final/tests/test_repository_order32.py
+@@ -23,6 +23,20 @@
+ def test_unsorted_repository_list_does_not_claim_dump_order(tmp_path):
+     p,db,ids=model(tmp_path);e=Engine(p,ScenarioState(db));result=e.run(ids['Api.entry'],{})
+     assert len(result)==2 and result.order_known is False
++
++
++def test_inherited_find_all_is_a_collection_not_a_single_result(tmp_path):
++    p,db,ids=model(tmp_path,'return repo.findAll();',method='')
++    e=Engine(p,ScenarioState(db));result=e.run(ids['Api.entry'],{})
++    assert len(result)==2 and result.order_known is False and e.outcome=='returned'
++
++
++def test_incomplete_permutation_budget_cannot_prove_a_first_id(tmp_path):
++    rows=[{'id':i,'priority':i,'state':'OPEN'} for i in range(4)]
++    p,db,ids=model(tmp_path,'return repo.findByState("OPEN").get(0).id;',rows=rows)
++    paths=outcomes(p,db,ids)
++    assert all(path['result'] is U and not path['exploration']['complete'] for path in paths)
++    assert all(path['exploration']['path_limit']==4 and path['exploration']['completion_budget']==8 for path in paths)
+ 
+ 
+ @pytest.mark.parametrize('reverse',[False,True])
+@@ -130,3 +144,12 @@
+         lambda message:pytest.fail(message))
+     assert decoded.order_known is False
+     assert decoded.repository_order['variants']==[[[0,1],[2]]]
++
++
++def test_nonfinite_decimal_is_an_unproved_comparator():
++    from decimal import Decimal
++    from analyzer.native_storage import JavaList
++    from analyzer.repository_order import apply
++    rows=JavaList([{'amount':Decimal('NaN')},{'amount':Decimal(1)}])
++    apply(rows,[('amount','asc','last')],'source query')
++    assert not rows.order_known and rows.repository_order['supported'] is False
+--- E5-R06/tests/test_retrieval32.py
++++ E6-final/tests/test_retrieval32.py
+@@ -0,0 +1,82 @@
++"""Retrieval protocol and failure controls; fake vectors are not model evaluation."""
++import hashlib,json,socket
++import pytest
++from analyzer.contracts import ContractIndex,ContractGrounder
++from analyzer.frontend import Frontend
++from analyzer.state import ScenarioState
++from analyzer.retrieval_sources import unicode_tokens,documents,CHUNK_TOKENS
++from analyzer.offline_retrieval import OfflineDenseIndex,PINS
++from builders import build,LIBRARY
++
++
++def setup(tmp_path):
++    p,db,ids=build(tmp_path/'source',LIBRARY);f=Frontend(p)
++    return p,db,ids,f
++
++
++def test_unicode_acronym_camel_snake_tokens():
++    assert unicode_tokens('HTTPСервер_имяJSON42 DéjàVu')==['http','сервер','имя','json42','déjà','vu']
++
++
++def test_chunks_are_exact_bounded_source_spans(tmp_path):
++    p,_,_,f=setup(tmp_path)
++    for document in documents(p,ContractIndex(p,f).contracts).values():
++        for chunk in document['chunks']:
++            raw=p.sources[chunk['file']][chunk['start_byte']:chunk['end_byte']]
++            assert raw.decode()==chunk['text']
++            assert hashlib.sha256(raw).hexdigest()==chunk['sha256']
++            assert len(unicode_tokens(chunk['text']))<=CHUNK_TOKENS
++
++
++def cache(tmp_path,p,f,**changes):
++    index=OfflineDenseIndex(p,f);root=tmp_path/'snapshot';root.mkdir()
++    values={key:[1.,0.] for key in index.contracts}
++    for name,data in {'vectors.json':json.dumps(values),'config.json':'{}','modules.json':'[]',
++                      'tokenizer.json':'{}','model.safetensors':'unit-test-placeholder-not-weights'}.items():
++        (root/name).write_text(data)
++    manifest={'model_id':'Qwen/Qwen3-Embedding-0.6B','revision':PINS['Qwen/Qwen3-Embedding-0.6B'],
++        'corpus_digest':index.corpus_digest,'files':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in root.iterdir()},
++        'minimum_score':.5,'minimum_margin':0.,'candidate_policy':'expanded',**changes}
++    (root/'manifest.json').write_text(json.dumps(manifest));return root
++
++
++def test_no_model_network_denied_keeps_baseline(tmp_path,monkeypatch):
++    p,_,_,f=setup(tmp_path)
++    def denied(*args,**kwargs):pytest.fail('retrieval attempted network')
++    monkeypatch.setattr(socket.socket,'connect',denied)
++    baseline=ContractIndex(p,f).rank('Read book');index=OfflineDenseIndex(p,f)
++    assert [(s,k) for s,k,_ in index.rank('Read book')]==[(s,k) for s,k,_ in baseline]
++    assert index.last_decision['mode']=='baseline_fallback' and index.model_calls==0
++
++
++def test_explicit_bypasses_encoder_and_snapshot_load(tmp_path):
++    p,db,ids,f=setup(tmp_path)
++    def forbidden(*args):pytest.fail('explicit HTTP loaded a model')
++    index=OfflineDenseIndex(p,f,tmp_path/'absent',forbidden)
++    proposals,_=ContractGrounder(p,f,index,None,{'facts':{}}).step('GET /books/B1',ScenarioState(db))
++    assert proposals and index.encoder is None and index.model_calls==0
++
++
++@pytest.mark.parametrize('case',['revision','source','corrupt','foreign-id','dimension'])
++def test_invalid_cache_preserves_exact_fallback(tmp_path,case):
++    p,_,_,f=setup(tmp_path);root=cache(tmp_path,p,f)
++    m=json.loads((root/'manifest.json').read_text())
++    if case=='revision':m['revision']='0'*40
++    elif case=='source':m['corpus_digest']='0'*64
++    elif case=='corrupt':(root/'config.json').write_text('corrupt')
++    elif case=='foreign-id':
++        (root/'vectors.json').write_text(json.dumps({'foreign-contract':[1.,0.]}))
++        m['files']['vectors.json']=hashlib.sha256((root/'vectors.json').read_bytes()).hexdigest()
++    (root/'manifest.json').write_text(json.dumps(m))
++    index=OfflineDenseIndex(p,f,root,lambda *args:lambda query:[1.,0.,0.])
++    baseline=ContractIndex(p,f).rank('Read book')
++    assert [(s,k) for s,k,_ in index.rank('Read book')]==[(s,k) for s,k,_ in baseline]
++    assert index.last_decision['mode']=='baseline_fallback'
++
++
++def test_fake_encoder_returns_existing_ids_and_evidence_only(tmp_path):
++    p,_,_,f=setup(tmp_path);root=cache(tmp_path,p,f)
++    index=OfflineDenseIndex(p,f,root,lambda *args:lambda query:[1.,0.]);ranked=index.rank('Read book')
++    assert ranked and all(key in index.contracts and contract is index.contracts[key] for _,key,contract in ranked)
++    assert index.model_calls==1 and index.last_decision['mode']=='offline_dense'
++    assert all(row['source_sha256'] and row['file'] for row in index.last_decision['candidates'])

@@ -1,0 +1,190 @@
+{"step": 1, "outcome": "returned", "candidates": 1, "events": 49, "warnings": ["SLF4J native contract: provider transport failures are not modeled; source formatting callbacks and their caught throwables are modeled", "framework method interception is not fully modeled: PreAuthorize at method:auth-service:UserController#createUser(User)", "request bean validation is not fully modeled: method:account-service:AccountController#createNewAccount(User)"]}
+{"step": 2, "outcome": "returned", "candidates": 1, "events": 4, "warnings": ["framework method interception is not fully modeled: PreAuthorize at method:account-service:AccountController#getAccountByName(String)"]}
+Traceback (most recent call last):
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/checks/run_real_journey.py", line 57, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/checks/run_real_journey.py", line 44, in main
+    result=engine.run(candidates[0],request) if len(candidates)==1 else U
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 362, in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 435, in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 511, in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 650, in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 730, in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1228, in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1404, in execute
+    return self.value(node, env), None
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1458, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1866, in expression_value
+    return self.value(node.named_children[0], env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1458, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1854, in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 2582, in call
+    value,_=invoke_alternative(target,env,[args,obj])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 2572, in invoke_alternative
+    try:value=self.invoke(target,actual_args,actual_obj,reason,contexts[target],argument_kinds)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 650, in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 730, in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1228, in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1404, in execute
+    return self.value(node, env), None
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1458, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1866, in expression_value
+    return self.value(node.named_children[0], env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1458, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1854, in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 2400, in call
+    handled,value=feign_operation(self,node,args,reason) if objnode is not None else (False,U)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/feign_client.py", line 62, in operation
+    try:response,_=engine.http_invoke(target,lambda:engine.bind_request(target,request,reason),reason,request,entered)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 435, in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 511, in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 650, in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 730, in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1228, in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1404, in execute
+    return self.value(node, env), None
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1458, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1866, in expression_value
+    return self.value(node.named_children[0], env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1458, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1854, in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 2582, in call
+    value,_=invoke_alternative(target,env,[args,obj])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 2572, in invoke_alternative
+    try:value=self.invoke(target,actual_args,actual_obj,reason,contexts[target],argument_kinds)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 650, in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 730, in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1228, in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1393, in execute
+    value=self.value(initializer,env)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1458, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1854, in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 2582, in call
+    value,_=invoke_alternative(target,env,[args,obj])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 2572, in invoke_alternative
+    try:value=self.invoke(target,actual_args,actual_obj,reason,contexts[target],argument_kinds)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 650, in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 730, in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1228, in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1393, in execute
+    value=self.value(initializer,env)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1458, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1854, in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 2582, in call
+    value,_=invoke_alternative(target,env,[args,obj])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 2572, in invoke_alternative
+    try:value=self.invoke(target,actual_args,actual_obj,reason,contexts[target],argument_kinds)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 650, in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 730, in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1228, in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1404, in execute
+    return self.value(node, env), None
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1458, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1866, in expression_value
+    return self.value(node.named_children[0], env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1458, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 1854, in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 2430, in call
+    accepted=self.choose(label,[True,False])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_causal-execution-repair/code/analyzer/engine.py", line 289, in choose
+    raise AlternativeRequired(key, choices)
+analyzer.engine.AlternativeRequired: ('1:call:method:statistics-service:ExchangeRatesServiceImpl#convert(Currency,Currency,BigDecimal)@52:10:assertion', [True, False])

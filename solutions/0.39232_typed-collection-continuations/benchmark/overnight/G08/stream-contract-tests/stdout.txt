@@ -1,0 +1,392 @@
+FFFFFFFF..FFF.FFFFF...FFFFFF                                             [100%]
+=================================== FAILURES ===================================
+________________ test_materializes_null_aliases_and_new_storage ________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_materializes_null_aliases0')
+
+    def test_materializes_null_aliases_and_new_storage(tmp_path):
+        p,db,ids=make(tmp_path,'''Object a=new Object();List<Object> xs=new ArrayList<>();xs.add(a);xs.add(null);xs.add(a);
+            List<Object> result=xs.stream().toList();xs.clear();return result;''')
+        e=Engine(p,ScenarioState(db));result=e.run(ids['Api.entry'],{})
+>       assert isinstance(result,ReadOnlyList) and len(result)==3
+E       AssertionError: assert (False)
+E        +  where False = isinstance(<Unknown.VALUE: 'unknown'>, ReadOnlyList)
+
+code/tests/test_stream_materialization.py:20: AssertionError
+_____________ test_unmodifiable_including_empty_operations[add(7)] _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_unmodifiable_including_em0')
+mutation = 'add(7)'
+
+    @pytest.mark.parametrize('mutation',['add(7)','set(0,7)','remove(0)','clear()','addAll(Arrays.asList(7))','removeAll(Arrays.asList(1))','iterator().remove()'])
+    def test_unmodifiable_including_empty_operations(tmp_path,mutation):
+        p,db,ids=make(tmp_path,'List<Integer> xs=new ArrayList<>();List<Integer> out=xs.stream().toList();out.'+mutation+';return 9;')
+        e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
+>       assert any('UnsupportedOperationException' in w for w in e.warnings),e.warnings
+E       AssertionError: {'unsupported value operation in method:service:Api#entry(): TypeError'}
+E       assert False
+E        +  where False = any(<generator object test_unmodifiable_including_empty_operations.<locals>.<genexpr> at 0x10756cc70>)
+
+code/tests/test_stream_materialization.py:32: AssertionError
+____________ test_unmodifiable_including_empty_operations[set(0,7)] ____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_unmodifiable_including_em1')
+mutation = 'set(0,7)'
+
+    @pytest.mark.parametrize('mutation',['add(7)','set(0,7)','remove(0)','clear()','addAll(Arrays.asList(7))','removeAll(Arrays.asList(1))','iterator().remove()'])
+    def test_unmodifiable_including_empty_operations(tmp_path,mutation):
+        p,db,ids=make(tmp_path,'List<Integer> xs=new ArrayList<>();List<Integer> out=xs.stream().toList();out.'+mutation+';return 9;')
+        e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
+>       assert any('UnsupportedOperationException' in w for w in e.warnings),e.warnings
+E       AssertionError: {'unsupported value operation in method:service:Api#entry(): TypeError'}
+E       assert False
+E        +  where False = any(<generator object test_unmodifiable_including_empty_operations.<locals>.<genexpr> at 0x10756dff0>)
+
+code/tests/test_stream_materialization.py:32: AssertionError
+___________ test_unmodifiable_including_empty_operations[remove(0)] ____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_unmodifiable_including_em2')
+mutation = 'remove(0)'
+
+    @pytest.mark.parametrize('mutation',['add(7)','set(0,7)','remove(0)','clear()','addAll(Arrays.asList(7))','removeAll(Arrays.asList(1))','iterator().remove()'])
+    def test_unmodifiable_including_empty_operations(tmp_path,mutation):
+        p,db,ids=make(tmp_path,'List<Integer> xs=new ArrayList<>();List<Integer> out=xs.stream().toList();out.'+mutation+';return 9;')
+        e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
+>       assert any('UnsupportedOperationException' in w for w in e.warnings),e.warnings
+E       AssertionError: {'unsupported value operation in method:service:Api#entry(): TypeError'}
+E       assert False
+E        +  where False = any(<generator object test_unmodifiable_including_empty_operations.<locals>.<genexpr> at 0x10756ecf0>)
+
+code/tests/test_stream_materialization.py:32: AssertionError
+____________ test_unmodifiable_including_empty_operations[clear()] _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_unmodifiable_including_em3')
+mutation = 'clear()'
+
+    @pytest.mark.parametrize('mutation',['add(7)','set(0,7)','remove(0)','clear()','addAll(Arrays.asList(7))','removeAll(Arrays.asList(1))','iterator().remove()'])
+    def test_unmodifiable_including_empty_operations(tmp_path,mutation):
+        p,db,ids=make(tmp_path,'List<Integer> xs=new ArrayList<>();List<Integer> out=xs.stream().toList();out.'+mutation+';return 9;')
+        e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
+>       assert any('UnsupportedOperationException' in w for w in e.warnings),e.warnings
+E       AssertionError: {'unsupported value operation in method:service:Api#entry(): TypeError'}
+E       assert False
+E        +  where False = any(<generator object test_unmodifiable_including_empty_operations.<locals>.<genexpr> at 0x10756da40>)
+
+code/tests/test_stream_materialization.py:32: AssertionError
+____ test_unmodifiable_including_empty_operations[addAll(Arrays.asList(7))] ____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_unmodifiable_including_em4')
+mutation = 'addAll(Arrays.asList(7))'
+
+    @pytest.mark.parametrize('mutation',['add(7)','set(0,7)','remove(0)','clear()','addAll(Arrays.asList(7))','removeAll(Arrays.asList(1))','iterator().remove()'])
+    def test_unmodifiable_including_empty_operations(tmp_path,mutation):
+        p,db,ids=make(tmp_path,'List<Integer> xs=new ArrayList<>();List<Integer> out=xs.stream().toList();out.'+mutation+';return 9;')
+        e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
+>       assert any('UnsupportedOperationException' in w for w in e.warnings),e.warnings
+E       AssertionError: {'unsupported value operation in method:service:Api#entry(): TypeError'}
+E       assert False
+E        +  where False = any(<generator object test_unmodifiable_including_empty_operations.<locals>.<genexpr> at 0x107528790>)
+
+code/tests/test_stream_materialization.py:32: AssertionError
+__ test_unmodifiable_including_empty_operations[removeAll(Arrays.asList(1))] ___
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_unmodifiable_including_em5')
+mutation = 'removeAll(Arrays.asList(1))'
+
+    @pytest.mark.parametrize('mutation',['add(7)','set(0,7)','remove(0)','clear()','addAll(Arrays.asList(7))','removeAll(Arrays.asList(1))','iterator().remove()'])
+    def test_unmodifiable_including_empty_operations(tmp_path,mutation):
+        p,db,ids=make(tmp_path,'List<Integer> xs=new ArrayList<>();List<Integer> out=xs.stream().toList();out.'+mutation+';return 9;')
+        e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
+>       assert any('UnsupportedOperationException' in w for w in e.warnings),e.warnings
+E       AssertionError: {'unsupported value operation in method:service:Api#entry(): TypeError'}
+E       assert False
+E        +  where False = any(<generator object test_unmodifiable_including_empty_operations.<locals>.<genexpr> at 0x10752a0c0>)
+
+code/tests/test_stream_materialization.py:32: AssertionError
+______ test_unmodifiable_including_empty_operations[iterator().remove()] _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_unmodifiable_including_em6')
+mutation = 'iterator().remove()'
+
+    @pytest.mark.parametrize('mutation',['add(7)','set(0,7)','remove(0)','clear()','addAll(Arrays.asList(7))','removeAll(Arrays.asList(1))','iterator().remove()'])
+    def test_unmodifiable_including_empty_operations(tmp_path,mutation):
+        p,db,ids=make(tmp_path,'List<Integer> xs=new ArrayList<>();List<Integer> out=xs.stream().toList();out.'+mutation+';return 9;')
+        e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
+>       assert any('UnsupportedOperationException' in w for w in e.warnings),e.warnings
+E       AssertionError: {'unsupported value operation in method:service:Api#entry(): TypeError'}
+E       assert False
+E        +  where False = any(<generator object test_unmodifiable_including_empty_operations.<locals>.<genexpr> at 0x102d69700>)
+
+code/tests/test_stream_materialization.py:32: AssertionError
+____________________ test_source_callbacks_and_known_filter ____________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_source_callbacks_and_know0')
+
+    def test_source_callbacks_and_known_filter(tmp_path):
+        p,db,ids=make(tmp_path,'return Arrays.asList(1,2,3).stream().filter(x->x>1).map(x->visit(x)).toList();')
+>       e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==[6,9]
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == [6, 9]
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x107508110>.run
+
+code/tests/test_stream_materialization.py:45: AssertionError
+____ test_unordered_callbacks_enumerated_without_inventing_encounter_order _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_unordered_callbacks_enume0')
+
+    def test_unordered_callbacks_enumerated_without_inventing_encounter_order(tmp_path):
+        p,db,ids=make(tmp_path,'return new HashSet<Integer>(Arrays.asList(1,2)).stream().map(x->visit(x)).toList();')
+        outcomes=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=4)
+>       assert {tuple(o['result']) for o in outcomes}=={(3,6),(6,3)}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_stream_materialization.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x1073f6e60>
+
+>   assert {tuple(o['result']) for o in outcomes}=={(3,6),(6,3)}
+            ^^^^^^^^^^^^^^^^^^
+E   TypeError: 'Unknown' object is not iterable
+
+code/tests/test_stream_materialization.py:52: TypeError
+________________ test_boxed_types_and_no_wire_mutability_marker ________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_boxed_types_and_no_wire_m0')
+
+    def test_boxed_types_and_no_wire_mutability_marker(tmp_path):
+        p,db,ids=make(tmp_path,'return Arrays.asList(true,1,1L,null).stream().toList();')
+        e=Engine(p,ScenarioState(db));result=e.run(ids['Api.entry'],{})
+>       assert list(result)==[True,1,1,None] and result.kinds[:3]==['java.lang.Boolean','java.lang.Integer','java.lang.Long']
+               ^^^^^^^^^^^^
+E       TypeError: 'Unknown' object is not iterable
+
+code/tests/test_stream_materialization.py:59: TypeError
+_ test_null_interference_and_throw_do_not_return_list[List<Integer> xs=new ArrayList<>();xs.add(1);return xs.stream().map(x->{xs.add(2);return x;}).toList();] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_null_interference_and_thr1')
+body = 'List<Integer> xs=new ArrayList<>();xs.add(1);return xs.stream().map(x->{xs.add(2);return x;}).toList();'
+
+    @pytest.mark.parametrize('body',[
+     'return Arrays.asList(1).stream().map(null).toList();',
+     'List<Integer> xs=new ArrayList<>();xs.add(1);return xs.stream().map(x->{xs.add(2);return x;}).toList();',
+     'return Arrays.asList(1,2).stream().map(x->{if(x==2)throw new IllegalStateException();return x;}).toList();'])
+    def test_null_interference_and_throw_do_not_return_list(tmp_path,body):
+        p,db,ids=make(tmp_path,body);e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Api.entry'],{}) is U and e.outcome!='returned'
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> is <Unknown.VALUE: 'unknown'> and 'returned' != 'returned')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106689290>.run
+E        +  and   'returned' = <analyzer.engine.Engine object at 0x106689290>.outcome
+
+code/tests/test_stream_materialization.py:70: AssertionError
+_ test_null_interference_and_throw_do_not_return_list[return Arrays.asList(1,2).stream().map(x->{if(x==2)throw new IllegalStateException();return x;}).toList();] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_null_interference_and_thr2')
+body = 'return Arrays.asList(1,2).stream().map(x->{if(x==2)throw new IllegalStateException();return x;}).toList();'
+
+    @pytest.mark.parametrize('body',[
+     'return Arrays.asList(1).stream().map(null).toList();',
+     'List<Integer> xs=new ArrayList<>();xs.add(1);return xs.stream().map(x->{xs.add(2);return x;}).toList();',
+     'return Arrays.asList(1,2).stream().map(x->{if(x==2)throw new IllegalStateException();return x;}).toList();'])
+    def test_null_interference_and_throw_do_not_return_list(tmp_path,body):
+        p,db,ids=make(tmp_path,body);e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Api.entry'],{}) is U and e.outcome!='returned'
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> is <Unknown.VALUE: 'unknown'> and 'returned' != 'returned')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10702c250>.run
+E        +  and   'returned' = <analyzer.engine.Engine object at 0x10702c250>.outcome
+
+code/tests/test_stream_materialization.py:70: AssertionError
+______ test_filter_and_map_preserve_full_encounter_order_and_source_calls ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_filter_and_map_preserve_f0')
+
+    def test_filter_and_map_preserve_full_encounter_order_and_source_calls(tmp_path):
+        project, db, ids = build(tmp_path, source('''return rows.stream()
+          .filter(number -> number >= lower).map(number -> mark(number))
+          .collect(Collectors.toList());'''))
+        engine = Engine(project, ScenarioState(db))
+>       assert engine.run(ids['Api.run'], {'rows': list(range(66)), 'lower': 1}) == list(range(2, 132, 2))
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == [2, 4, 6, 8, 10, 12, ...]
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#run(List<Integer>,int)', {'lower': 1, 'rows': [0, 1, 2, 3, 4, 5, ...]})
+E        +    where run = <analyzer.engine.Engine object at 0x107289e50>.run
+E        +  and   [2, 4, 6, 8, 10, 12, ...] = list(range(2, 132, 2))
+E        +    where range(2, 132, 2) = range(2, 132, 2)
+
+code/tests/test_java_streams.py:20: AssertionError
+_____ test_intermediate_stream_filter_is_lazy_and_captures_original_scalar _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_intermediate_stream_filte0')
+
+    def test_intermediate_stream_filter_is_lazy_and_captures_original_scalar(tmp_path):
+        project, db, ids = build(tmp_path, source('''List<Integer> seen=new ArrayList<>();
+          Object pending=rows.stream().filter(number -> {seen.add(number);return true;});
+          return seen.size();'''))
+        engine = Engine(project, ScenarioState(db))
+        assert engine.run(ids['Api.run'], {'rows': [4, 2], 'lower': 1}) == 0
+        project, db, ids = build(tmp_path/'capture', source('''int threshold=lower;
+          Object pending=rows.stream().filter(number -> number >= threshold);
+          return pending.collect(Collectors.toList());'''))
+>       assert Engine(project, ScenarioState(db)).run(ids['Api.run'], {'rows': [4, 2], 'lower': 3}) == [4]
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == [4]
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#run(List<Integer>,int)', {'lower': 3, 'rows': [4, 2]})
+E        +    where run = <analyzer.engine.Engine object at 0x107040850>.run
+E        +      where <analyzer.engine.Engine object at 0x107040850> = Engine(<analyzer.project.Project object at 0x10755b310>, <analyzer.state.ScenarioState object at 0x103f68b50>)
+E        +        where <analyzer.state.ScenarioState object at 0x103f68b50> = ScenarioState(<analyzer.state.Database object at 0x10753f9d0>)
+
+code/tests/test_java_streams.py:34: AssertionError
+_ test_unknown_filter_membership_retains_alternatives_and_never_claims_exact_size _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_unknown_filter_membership0')
+
+    def test_unknown_filter_membership_retains_alternatives_and_never_claims_exact_size(tmp_path):
+        project, db, ids = build(tmp_path, source('''return rows.stream()
+          .filter(number -> number >= lower).collect(Collectors.toList());'''))
+        outcomes = run_paths(project, ScenarioState(db), ids['Api.run'], {'rows': [4], 'lower': U})
+>       assert {repr(outcome['result']) for outcome in outcomes} == {'[]', '[4]'}
+E       assert {"<Unknown.VALUE: 'unknown'>"} == {'[4]', '[]'}
+E         
+E         Extra items in the left set:
+E         "<Unknown.VALUE: 'unknown'>"
+E         Extra items in the right set:
+E         '[4]'
+E         '[]'
+E         Use -v to get more diff
+
+code/tests/test_java_streams.py:41: AssertionError
+_ test_stream_element_contract_types_an_implicit_lambda_parameter[List<String> keys=Arrays.asList("known");-keys.stream()] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_stream_element_contract_t0')
+setup = 'List<String> keys=Arrays.asList("known");', stream = 'keys.stream()'
+
+    @pytest.mark.parametrize('setup,stream',[
+     ('List<String> keys=Arrays.asList("known");','keys.stream()'),
+     ('','Arrays.asList("known").stream()'),
+     ('','Arrays.asList("known").stream().map(key->key.substring(0,5))'),
+    ])
+    def test_stream_element_contract_types_an_implicit_lambda_parameter(tmp_path,setup,stream):
+        source='''import java.util.*;import java.util.stream.Collectors;class Api {Object entry(){Map map=new HashMap();'''+setup+stream+'''.map(key->{map.put(key,"found");return key;}).collect(Collectors.toList());return map.get("known");}}'''
+        project,db,ids=build(tmp_path,{'Api.java':source})
+>       assert Engine(project,ScenarioState(db)).run(ids['Api.entry'],{})=='found'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'found'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x107268b10>.run
+E        +      where <analyzer.engine.Engine object at 0x107268b10> = Engine(<analyzer.project.Project object at 0x1072b9610>, <analyzer.state.ScenarioState object at 0x107268d10>)
+E        +        where <analyzer.state.ScenarioState object at 0x107268d10> = ScenarioState(<analyzer.state.Database object at 0x107241c50>)
+
+code/tests/test_stream_parameter_types.py:15: AssertionError
+_ test_stream_element_contract_types_an_implicit_lambda_parameter[-Arrays.asList("known").stream()] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_stream_element_contract_t1')
+setup = '', stream = 'Arrays.asList("known").stream()'
+
+    @pytest.mark.parametrize('setup,stream',[
+     ('List<String> keys=Arrays.asList("known");','keys.stream()'),
+     ('','Arrays.asList("known").stream()'),
+     ('','Arrays.asList("known").stream().map(key->key.substring(0,5))'),
+    ])
+    def test_stream_element_contract_types_an_implicit_lambda_parameter(tmp_path,setup,stream):
+        source='''import java.util.*;import java.util.stream.Collectors;class Api {Object entry(){Map map=new HashMap();'''+setup+stream+'''.map(key->{map.put(key,"found");return key;}).collect(Collectors.toList());return map.get("known");}}'''
+        project,db,ids=build(tmp_path,{'Api.java':source})
+>       assert Engine(project,ScenarioState(db)).run(ids['Api.entry'],{})=='found'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'found'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x110922650>.run
+E        +      where <analyzer.engine.Engine object at 0x110922650> = Engine(<analyzer.project.Project object at 0x110921f10>, <analyzer.state.ScenarioState object at 0x110923050>)
+E        +        where <analyzer.state.ScenarioState object at 0x110923050> = ScenarioState(<analyzer.state.Database object at 0x1070bae50>)
+
+code/tests/test_stream_parameter_types.py:15: AssertionError
+_ test_stream_element_contract_types_an_implicit_lambda_parameter[-Arrays.asList("known").stream().map(key->key.substring(0,5))] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_stream_element_contract_t2')
+setup = ''
+stream = 'Arrays.asList("known").stream().map(key->key.substring(0,5))'
+
+    @pytest.mark.parametrize('setup,stream',[
+     ('List<String> keys=Arrays.asList("known");','keys.stream()'),
+     ('','Arrays.asList("known").stream()'),
+     ('','Arrays.asList("known").stream().map(key->key.substring(0,5))'),
+    ])
+    def test_stream_element_contract_types_an_implicit_lambda_parameter(tmp_path,setup,stream):
+        source='''import java.util.*;import java.util.stream.Collectors;class Api {Object entry(){Map map=new HashMap();'''+setup+stream+'''.map(key->{map.put(key,"found");return key;}).collect(Collectors.toList());return map.get("known");}}'''
+        project,db,ids=build(tmp_path,{'Api.java':source})
+>       assert Engine(project,ScenarioState(db)).run(ids['Api.entry'],{})=='found'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'found'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10725a1d0>.run
+E        +      where <analyzer.engine.Engine object at 0x10725a1d0> = Engine(<analyzer.project.Project object at 0x1070b9910>, <analyzer.state.ScenarioState object at 0x1070bb910>)
+E        +        where <analyzer.state.ScenarioState object at 0x1070bb910> = ScenarioState(<analyzer.state.Database object at 0x107508950>)
+
+code/tests/test_stream_parameter_types.py:15: AssertionError
+_______ test_implicit_source_receiver_parameter_keeps_getter_return_type _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_implicit_source_receiver_0')
+
+    def test_implicit_source_receiver_parameter_keeps_getter_return_type(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import java.util.stream.Collectors;
+          class Item {String getKey(){return "known";}}class Api {Object entry(){Map map=new HashMap();
+          List<Item> items=Arrays.asList(new Item());items.stream().map(item->{map.put(item.getKey(),"found");return item;})
+          .collect(Collectors.toList());return map.get("known");}}'''})
+>       assert Engine(project,ScenarioState(db)).run(ids['Api.entry'],{})=='found'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'found'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1072d6e90>.run
+E        +      where <analyzer.engine.Engine object at 0x1072d6e90> = Engine(<analyzer.project.Project object at 0x107302090>, <analyzer.state.ScenarioState object at 0x107208610>)
+E        +        where <analyzer.state.ScenarioState object at 0x107208610> = ScenarioState(<analyzer.state.Database object at 0x106115b10>)
+
+code/tests/test_stream_parameter_types.py:23: AssertionError
+____ test_raw_or_object_element_contract_does_not_guess_boxed_numeric_type _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_raw_or_object_element_con0')
+
+    def test_raw_or_object_element_contract_does_not_guess_boxed_numeric_type(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import java.util.stream.Collectors;
+          class Api {Object entry(List<Object> input){Map map=new HashMap();input.stream().map(key->{
+          map.put(key,"found");return key;}).collect(Collectors.toList());return map.get(1L);}}'''})
+        engine=Engine(project,ScenarioState(db))
+        assert engine.run(ids['Api.entry'],{'input':[1]}) is U
+>       assert engine.operation_issues[('unsupported_map_key','put')]
+E       assert 0
+
+code/tests/test_stream_parameter_types.py:32: AssertionError
+____ test_different_boxed_return_types_do_not_become_a_fabricated_long_key _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-270/test_different_boxed_return_ty0')
+
+    def test_different_boxed_return_types_do_not_become_a_fabricated_long_key(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import java.util.stream.Collectors;
+          class Api {Object entry(){Map map=new HashMap();Arrays.asList("seed").stream()
+          .map(key->{if(true){return 1;}return 2L;}).map(key->{map.put(key,"found");return key;})
+          .collect(Collectors.toList());return map.get(1L);}}'''})
+        engine=Engine(project,ScenarioState(db))
+        assert engine.run(ids['Api.entry'],{}) is U
+>       assert engine.operation_issues[('unsupported_map_key','put')]
+E       assert 0
+
+code/tests/test_stream_parameter_types.py:42: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_stream_materialization.py::test_materializes_null_aliases_and_new_storage
+FAILED code/tests/test_stream_materialization.py::test_unmodifiable_including_empty_operations[add(7)]
+FAILED code/tests/test_stream_materialization.py::test_unmodifiable_including_empty_operations[set(0,7)]
+FAILED code/tests/test_stream_materialization.py::test_unmodifiable_including_empty_operations[remove(0)]
+FAILED code/tests/test_stream_materialization.py::test_unmodifiable_including_empty_operations[clear()]
+FAILED code/tests/test_stream_materialization.py::test_unmodifiable_including_empty_operations[addAll(Arrays.asList(7))]
+FAILED code/tests/test_stream_materialization.py::test_unmodifiable_including_empty_operations[removeAll(Arrays.asList(1))]
+FAILED code/tests/test_stream_materialization.py::test_unmodifiable_including_empty_operations[iterator().remove()]
+FAILED code/tests/test_stream_materialization.py::test_source_callbacks_and_known_filter
+FAILED code/tests/test_stream_materialization.py::test_unordered_callbacks_enumerated_without_inventing_encounter_order
+FAILED code/tests/test_stream_materialization.py::test_boxed_types_and_no_wire_mutability_marker
+FAILED code/tests/test_stream_materialization.py::test_null_interference_and_throw_do_not_return_list[List<Integer> xs=new ArrayList<>();xs.add(1);return xs.stream().map(x->{xs.add(2);return x;}).toList();]
+FAILED code/tests/test_stream_materialization.py::test_null_interference_and_throw_do_not_return_list[return Arrays.asList(1,2).stream().map(x->{if(x==2)throw new IllegalStateException();return x;}).toList();]
+FAILED code/tests/test_java_streams.py::test_filter_and_map_preserve_full_encounter_order_and_source_calls
+FAILED code/tests/test_java_streams.py::test_intermediate_stream_filter_is_lazy_and_captures_original_scalar
+FAILED code/tests/test_java_streams.py::test_unknown_filter_membership_retains_alternatives_and_never_claims_exact_size
+FAILED code/tests/test_stream_parameter_types.py::test_stream_element_contract_types_an_implicit_lambda_parameter[List<String> keys=Arrays.asList("known");-keys.stream()]
+FAILED code/tests/test_stream_parameter_types.py::test_stream_element_contract_types_an_implicit_lambda_parameter[-Arrays.asList("known").stream()]
+FAILED code/tests/test_stream_parameter_types.py::test_stream_element_contract_types_an_implicit_lambda_parameter[-Arrays.asList("known").stream().map(key->key.substring(0,5))]
+FAILED code/tests/test_stream_parameter_types.py::test_implicit_source_receiver_parameter_keeps_getter_return_type
+FAILED code/tests/test_stream_parameter_types.py::test_raw_or_object_element_contract_does_not_guess_boxed_numeric_type
+FAILED code/tests/test_stream_parameter_types.py::test_different_boxed_return_types_do_not_become_a_fabricated_long_key
+22 failed, 6 passed in 0.25s

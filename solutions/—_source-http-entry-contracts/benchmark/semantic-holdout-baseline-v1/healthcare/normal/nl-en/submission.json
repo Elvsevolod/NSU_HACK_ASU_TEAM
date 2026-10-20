@@ -1,0 +1,190 @@
+{
+  "project": "holdout-healthcare-v1",
+  "scenarios": {
+    "healthcare-ambiguous-en": {
+      "edges": [
+        {
+          "source": "scenario:healthcare-ambiguous-en",
+          "relation": "executes",
+          "target": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#delete(Long)"
+        },
+        {
+          "source": "scenario:healthcare-ambiguous-en",
+          "relation": "executes",
+          "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#deleteDoctor(Long)"
+        },
+        {
+          "source": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#delete(Long)",
+          "relation": "calls",
+          "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#deleteDoctor(Long)"
+        },
+        {
+          "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#deleteDoctor(Long)",
+          "relation": "data",
+          "target": "res:table:hospital_db.doctors"
+        }
+      ]
+    },
+    "healthcare-fresh-state-nl-en": {
+      "edges": [
+        {
+          "source": "scenario:healthcare-fresh-state-nl-en",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+        },
+        {
+          "source": "scenario:healthcare-fresh-state-nl-en",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "relation": "calls",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "relation": "data",
+          "target": "res:table:hospital_db.patients"
+        }
+      ]
+    },
+    "healthcare-no-handler-en": {
+      "edges": []
+    },
+    "healthcare-state-chain-nl-en": {
+      "edges": [
+        {
+          "source": "scenario:healthcare-state-chain-nl-en",
+          "relation": "executes",
+          "target": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getById(Long)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-en",
+          "relation": "executes",
+          "target": "method:doctor-service:com.hospital.doctorservice.exception.DoctorNotFoundException#<init>(String)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-en",
+          "relation": "executes",
+          "target": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleDoctorNotFoundException(DoctorNotFoundException)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-en",
+          "relation": "executes",
+          "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-en",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-en",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-en",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-en",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-en",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-en",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-en",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-en",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-en",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-en",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+        },
+        {
+          "source": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getById(Long)",
+          "relation": "calls",
+          "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+        },
+        {
+          "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+          "relation": "calls",
+          "target": "method:doctor-service:com.hospital.doctorservice.exception.DoctorNotFoundException#<init>(String)"
+        },
+        {
+          "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+          "relation": "data",
+          "target": "res:table:hospital_db.doctors"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "relation": "calls",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)",
+          "relation": "calls",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "relation": "calls",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+          "relation": "calls",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)",
+          "relation": "data",
+          "target": "res:table:hospital_db.patients"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)",
+          "relation": "data",
+          "target": "res:table:hospital_db.patients"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "relation": "calls",
+          "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "relation": "data",
+          "target": "res:table:hospital_db.patients"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+          "relation": "calls",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+        }
+      ]
+    }
+  }
+}

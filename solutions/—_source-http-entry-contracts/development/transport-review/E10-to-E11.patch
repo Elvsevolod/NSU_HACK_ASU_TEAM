@@ -1,0 +1,168 @@
+--- E10-lombok-builder/analyzer/engine.py
++++ E11-http-error-values/analyzer/engine.py
+@@ -15,7 +15,7 @@
+ 
+ from .project import text,walk,declaration_matches,keywords
+ from .state import U
+-from .models import construct, library, known, unwrap, wire, key_equal, http_entity, optional_value, status_code, header_values
++from .models import construct, library, known, unwrap, wire, key_equal, http_entity, optional_value, status_code, header_values, NativeHttpStatus
+ from .constraints import assume, compare
+ from .java_exceptions import JavaThrow, assignable, native_type, NATIVE_TYPES
+ from .symbolic_text import concat_text
+@@ -1875,8 +1875,14 @@
+             if raw in constants and text(qualifier) not in self.variable_types and self.standard_type(text(qualifier),'java.lang.'+text(qualifier)):
+                 self.remember_reference_kind(text(qualifier))
+                 return constants[raw]
+-            if raw.startswith(('HttpMethod.', 'HttpStatus.', 'Calendar.')):
++            if raw.startswith(('HttpMethod.', 'Calendar.')):
+                 return raw.split('.')[-1]
++            root=text(qualifier).split('.')[0]
++            if (root not in env and root not in self.variable_types and root not in self.p.type_fields.get(self.p.methods[self.method]['owner'],{})
++                    and self.standard_type(text(qualifier),'org.springframework.http.HttpStatus')):
++                name=text(node.child_by_field_name('field'))
++                if status_code(name) is not U:return NativeHttpStatus(name)
++                raise AnalysisBoundary('Spring HttpStatus constant is outside the supported status table: '+raw,category='unsupported_semantics')
+             enum = self.p.enum_reference(raw, self.method)
+             if enum:
+                 return deepcopy(self.p.enum_objects[enum])
+@@ -1975,15 +1981,23 @@
+                     self.approximate=True
+                     self.warnings.add('unresolved Java reference identity: '+raw)
+                 return equal if equal is U or op=='==' else not equal
+-            if op=='+' and any(type(v) is dict and v.get('__type__') in ('String','java.lang.String')
+-                               and '__symbol__' in v for v in (a,b)):
+-                def string_part(value):
++            if op=='+' and (any(type(v) is dict and v.get('__type__') in ('String','java.lang.String')
++                               and '__symbol__' in v for v in (a,b)) or
++                    any(is_symbolic(v) for v in (a,b)) and any(self.standard_type(self.source_type(node.child_by_field_name(side)),
++                        'java.lang.String') for side in ('left','right'))):
++                def string_part(value,side):
+                     if value is None:return 'null'
+                     if type(value) is bool:return str(value).lower()
+                     if type(value) in (str,int):return str(value)
+                     if isinstance(value,datetime):return java_date_text(value)
++                    from .http_integral_text import integral_text,WIDTHS
++                    written=self.source_type(node.child_by_field_name(side))
++                    if written in ('byte','short','int','long') or any(self.standard_type(written,'java.lang.'+kind)
++                            for kind in WIDTHS if kind[0].isupper()):
++                        decimal=integral_text(value)
++                        if decimal is not None:return decimal
+                     return value
+-                return concat_text(string_part(a),string_part(b))
++                return concat_text(string_part(a,'left'),string_part(b,'right'))
+             if any(is_symbolic(v) for v in (a, b)):
+                 if op in ('==','!='):
+                     equal=key_equal(a,b)
+@@ -2724,6 +2738,14 @@
+         if not targets and not args and name=='getMessage' and isinstance(obj,JavaObject) and assignable(obj.java_type,'java.lang.Throwable',self.p) is True:
+             self.remember_reference_kind('String')
+             return obj.get('message',U)
++        if not targets and isinstance(obj,NativeHttpStatus):
++            if not args and name=='value':
++                self.remember_reference_kind('Integer')
++                return status_code(obj)
++            if len(args)==1 and name=='equals':return isinstance(args[0],NativeHttpStatus) and str(obj)==str(args[0])
++            if not args and name=='name':
++                self.remember_reference_kind('String');return str(obj)
++            raise AnalysisBoundary('Spring HttpStatus method is outside the supported enum contract: '+reason,category='unsupported_semantics')
+         if not targets and name=='getLogger' and len(args)==1 and text(objnode) not in env and self.standard_type(text(objnode),'org.slf4j.LoggerFactory'):
+             if args[0] is None:raise JavaThrow({'__type__':'NullPointerException'})
+             if not isinstance(args[0],(str,JavaTypeToken)):
+--- E10-lombok-builder/analyzer/models.py
++++ E11-http-error-values/analyzer/models.py
+@@ -40,6 +40,10 @@
+             'FORBIDDEN':403,'NOT_FOUND':404,'METHOD_NOT_ALLOWED':405,'NOT_ACCEPTABLE':406,'CONFLICT':409,'UNSUPPORTED_MEDIA_TYPE':415,
+             'UNPROCESSABLE_ENTITY':422,'TOO_MANY_REQUESTS':429,'INTERNAL_SERVER_ERROR':500,
+             'NOT_IMPLEMENTED':501,'BAD_GATEWAY':502,'SERVICE_UNAVAILABLE':503}.get(value,U) if isinstance(value,str) else U
++
++
++class NativeHttpStatus(str):
++    """A proven native Spring enum constant; ordinary text cannot forge it."""
+ 
+ 
+ def known(value, active=None):
+--- E10-lombok-builder/tests/test_http_error_values33.py
++++ E11-http-error-values/tests/test_http_error_values33.py
+@@ -0,0 +1,82 @@
++"""Native status values and source exception messages retain integral origins."""
++import pytest
++from builders import build
++from analyzer.engine import Engine
++from analyzer.state import ScenarioState,U
++from analyzer.http_integral_text import integral_text
++from analyzer.symbolic_text import concat_text
++
++
++def run(root,source,parameters=None,state_factory=None):
++    p,db,ids=build(root,{'Api.java':source})
++    state=ScenarioState(db)
++    if state_factory:parameters=state_factory(state)
++    e=Engine(p,state);return e.run(ids['Api.entry'],parameters or {}),e,ids
++
++
++@pytest.mark.parametrize('name,expected',[('OK',200),('CREATED',201),('BAD_REQUEST',400),('NOT_FOUND',404),('INTERNAL_SERVER_ERROR',500)])
++@pytest.mark.parametrize('qualified',[False,True])
++def test_native_status_value_is_an_integer(tmp_path,name,expected,qualified):
++    owner='org.springframework.http.HttpStatus' if qualified else 'HttpStatus'
++    value,e,_=run(tmp_path,'import org.springframework.http.HttpStatus;class Api{int entry(){return '+owner+'.'+name+'.value();}}')
++    assert type(value) is int and value==expected and not e.approximate
++
++
++def test_native_status_alias_preserves_its_value(tmp_path):
++    value,e,_=run(tmp_path,'''import org.springframework.http.HttpStatus;
++      class Api{int entry(){HttpStatus status=HttpStatus.NOT_FOUND;return status.value();}}''')
++    assert value==404 and not e.approximate
++
++
++def test_source_http_status_namesake_uses_its_source_method(tmp_path):
++    value,e,ids=run(tmp_path,'''enum HttpStatus{NOT_FOUND;int value(){return 73;}}
++      class Api{int entry(){return HttpStatus.NOT_FOUND.value();}}''')
++    assert value==73 and not e.approximate
++    assert any(kind=='executes' and target==ids['HttpStatus.value'] for _,kind,target in e.edges)
++
++
++def test_an_ordinary_string_does_not_become_a_status_object(tmp_path):
++    value,e,_=run(tmp_path,'''class Code{int value(){return 73;}}
++      class Api{int entry(){Code HttpStatus=new Code();return HttpStatus.value();}}''')
++    assert value==73 and not e.approximate
++
++
++def test_status_identity_does_not_equal_its_ordinary_string_spelling(tmp_path):
++    value,e,_=run(tmp_path,'''import org.springframework.http.HttpStatus;
++      class Api{boolean entry(){return HttpStatus.NOT_FOUND.equals("NOT_FOUND");}}''')
++    assert value is False and not e.approximate
++
++
++@pytest.mark.parametrize('typ',['byte','short','int','long','Byte','Short','Integer','Long'])
++@pytest.mark.parametrize('expression',[ '"item="+id', 'id+"/tail"', '"item="+id+"/tail"'])
++def test_typed_symbolic_integral_string_concatenation_retains_decimal_identity(tmp_path,typ,expression):
++    original=[]
++    def parameters(state):
++        original.append(state.generated_value(typ,'independent native identity'));return {'id':original[0]}
++    value,e,_=run(tmp_path,'class Api{String entry('+typ+' id){return '+expression+';}}',state_factory=parameters)
++    text=integral_text(original[0])
++    expected=concat_text('item=',text) if expression.startswith('"item=') else text
++    if expression.endswith('"/tail"'):expected=concat_text(expected,'/tail')
++    assert value==expected and value is not U and not e.approximate
++
++
++def test_source_exception_get_message_preserves_the_original_string_expression(tmp_path):
++    original=[]
++    def parameters(state):
++        original.append(state.generated_value('Long','independent identity'));return {'id':original[0]}
++    value,e,_=run(tmp_path,'''class Missing extends RuntimeException{Missing(String message){super(message);}}
++      class Api{String entry(Long id){try{throw new Missing("Missing item "+id);}
++        catch(Missing failure){return failure.getMessage();}}}''',state_factory=parameters)
++    assert value==concat_text('Missing item ',integral_text(original[0])) and value is not U and not e.approximate
++
++
++def test_numeric_addition_is_not_converted_to_string_text(tmp_path):
++    value,e,_=run(tmp_path,'class Api{long entry(long id){return id+1L;}}',
++                  state_factory=lambda state:{'id':state.generated_value('long','arithmetic input')})
++    assert value is U or not isinstance(value,dict) or value.get('__type__') not in ('String','java.lang.String')
++
++
++def test_nullable_boxed_identity_does_not_prove_a_nonnull_decimal(tmp_path):
++    value,e,_=run(tmp_path,'class Api{String entry(Long id){return "item="+id;}}',
++                  {'id':{'__symbol__':'nullable','__type__':'Long'}})
++    assert value is U

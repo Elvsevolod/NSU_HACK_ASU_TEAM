@@ -1,0 +1,126 @@
+{
+  "fixed_before_prediction": true,
+  "steps": [
+    {
+      "n": 1,
+      "endpoint": "method:account:AccountController#getAccountByName(String)",
+      "status": 200,
+      "result": {
+        "name": "demo",
+        "note": "seed"
+      },
+      "result_subset": true,
+      "ignore_result": false,
+      "rows": {
+        "account.accounts": 1
+      },
+      "arguments": {
+        "name": "demo"
+      }
+    },
+    {
+      "n": 2,
+      "endpoint": "method:account:AccountController#createNewAccount(User)",
+      "status": 400,
+      "result": {
+        "name": "demo",
+        "note": "seed"
+      },
+      "result_subset": true,
+      "ignore_result": true,
+      "rows": {
+        "account.accounts": 1
+      },
+      "arguments": {}
+    },
+    {
+      "n": 3,
+      "endpoint": "method:account:AccountController#getAccountByName(String)",
+      "status": 200,
+      "result": {
+        "name": "demo",
+        "note": "seed"
+      },
+      "result_subset": true,
+      "ignore_result": false,
+      "rows": {
+        "account.accounts": 1
+      },
+      "arguments": {
+        "name": "demo"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "scenario:finance-refusal",
+      "relation": "executes",
+      "target": "method:account:AccountController#getAccountByName(String)"
+    },
+    {
+      "source": "scenario:finance-refusal",
+      "relation": "executes",
+      "target": "method:account:AccountController#createNewAccount(User)"
+    },
+    {
+      "source": "scenario:finance-refusal",
+      "relation": "executes",
+      "target": "method:account:AccountServiceImpl#findByName(String)"
+    },
+    {
+      "source": "scenario:finance-refusal",
+      "relation": "executes",
+      "target": "method:account:AccountServiceImpl#create(User)"
+    },
+    {
+      "source": "scenario:finance-refusal",
+      "relation": "executes",
+      "target": "method:account:User#setUsername(String)"
+    },
+    {
+      "source": "scenario:finance-refusal",
+      "relation": "executes",
+      "target": "method:account:User#setPassword(String)"
+    },
+    {
+      "source": "scenario:finance-refusal",
+      "relation": "executes",
+      "target": "method:account:User#getUsername()"
+    },
+    {
+      "source": "scenario:finance-refusal",
+      "relation": "executes",
+      "target": "method:account:ErrorHandler#processValidationError(IllegalArgumentException)"
+    },
+    {
+      "source": "method:account:AccountController#getAccountByName(String)",
+      "relation": "calls",
+      "target": "method:account:AccountServiceImpl#findByName(String)"
+    },
+    {
+      "source": "method:account:AccountController#createNewAccount(User)",
+      "relation": "calls",
+      "target": "method:account:AccountServiceImpl#create(User)"
+    },
+    {
+      "source": "method:account:AccountServiceImpl#create(User)",
+      "relation": "calls",
+      "target": "method:account:User#getUsername()"
+    },
+    {
+      "source": "method:account:AccountServiceImpl#findByName(String)",
+      "relation": "data",
+      "target": "res:collection:account.accounts"
+    },
+    {
+      "source": "method:account:AccountServiceImpl#create(User)",
+      "relation": "data",
+      "target": "res:collection:account.accounts"
+    }
+  ],
+  "limits": [
+    "PiggyMetrics was already used in development; this is not a blind holdout",
+    "Authorized account HTTP profile and normalized supplied Mongo seed; Mongo event is not labeled SQL",
+    "Duplicate creation fails before auth-service; success creation/statistics Feign chain is outside this measured profile"
+  ]
+}

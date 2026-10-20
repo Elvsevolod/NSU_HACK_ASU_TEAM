@@ -1,0 +1,200 @@
+--- E23-repeat-operation-intent/analyzer/history_agreement.py
++++ E24-response-history-eligibility/analyzer/history_agreement.py
+@@ -47,3 +47,12 @@
+ 
+ def observation(item):
+     return digest({name:item.get(name) for name in ('result','selected_objects')})
++
++
++def response_available(item):
++    """Engine coverage is authoritative; bare legacy rows are supplied observations."""
++    if 'outcome' in item and item['outcome']!='returned':return False
++    if 'exploration' in item:
++        coverage=item['exploration']
++        if not isinstance(coverage,dict) or coverage.get('complete') is not True:return False
++    return True
+--- E23-repeat-operation-intent/analyzer/provenance.py
++++ E24-response-history-eligibility/analyzer/provenance.py
+@@ -6,6 +6,7 @@
+ from .project import text
+ from .models import date_value
+ from .java_collections import JavaMap,JavaRecord,JavaEnumValue,JsonObject,JsonText,schema_type,semantic_view
++from .history_agreement import response_available
+ 
+ 
+ def source_string(project, value):
+@@ -193,6 +194,7 @@
+     expected=dict(project.parameters(mid)).get(field)
+     for index in range(len(history)-1,-1,-1):
+         if ui_scope and history[index].get('ui_scope') and history[index]['ui_scope']!=ui_scope:continue
++        if not response_available(history[index]):continue
+         candidates=[]
+         for position,item in enumerate(history[index].get('selected_objects',[])):
+             obj=item.get('object',{});tid=project.resolve_type(schema_type(obj),project.methods[mid]['module'])
+@@ -224,9 +226,19 @@
+                         route_entities.add(tuple(sorted(entity_words(previous))))
+         requested = set(next(iter(route_entities))) if len(route_entities) == 1 else entity_words(project.nodes[project.methods[mid]['owner']]['fqn'])
+     candidates, by_step, creations, confirmed_creations, observations, first_seen = {}, {}, {}, {}, {}, {}
+-    collections = []
++    collections = [];unavailable_creation=-1
+     for index, item in enumerate(history):
+         if ui_scope and item.get('ui_scope') and item['ui_scope']!=ui_scope:continue
++        if not response_available(item):
++            from .contracts import intent
++            from .result_contracts import result_shape
++            entry=item.get('entry');meta=project.methods.get(entry,{})
++            if meta and (intent(item.get('action',''))==1 or intent(meta['name'])==1) and any(
++                m==entry and verb=='POST' for m,verb,_ in project.ix.handlers):
++                shapes=result_shape(project,entry)[0]
++                bodies=[parameter['type'] for parameter in project.http_parameters(entry) if parameter['kind']=='RequestBody']
++                if any(entity_words(typ)==requested for typ in [*shapes,*bodies]):unavailable_creation=index
++            item={**item,'result':U,'created_objects':[],'selected_objects':[]}
+         from .history_refs import references,compatible_scope,object_scope
+         saved_refs = item.get('response_refs')
+         response_refs = saved_refs if isinstance(saved_refs,dict) and isinstance(saved_refs.get('collections'),list) else references(project, item, index)
+@@ -319,6 +331,8 @@
+     if described:identities=filtered
+     ordinal = ordinal_for(action, requested)
+     wants_new = new_for(action, requested)
++    if (wants_new or re.search(r'\b(?:just|newly|recently|previously)\s+(?:created|added|registered|saved)\b',action,re.I)) and unavailable_creation>max(creations.values(),default=-1):
++        return None
+     cheapest = cheapest_reference(action, history, by_step, observations) if not ordinal and not wants_new else None
+     if cheapest:
+         return cheapest
+@@ -328,6 +342,7 @@
+         latest_creation = max(confirmed_creations.values(), default=-1) if definite else -1
+         for index in range(len(history) - 1, -1, -1):
+             if ui_scope and history[index].get('ui_scope') and history[index]['ui_scope']!=ui_scope:continue
++            if not response_available(history[index]):continue
+             if index < latest_creation:
+                 break
+             selected = history[index].get('selected_objects', [])
+@@ -379,6 +394,7 @@
+                 owners.add(tuple(sorted(entity_words(project.nodes[tid]['fqn']))))
+     for index in range(len(history) - 1, -1, -1):
+         if ui_scope and history[index].get('ui_scope') and history[index]['ui_scope']!=ui_scope:continue
++        if not response_available(history[index]):continue
+         selected = history[index].get('selected_objects', [])
+         for position, item in enumerate(selected if isinstance(selected, list) else []):
+             obj = item.get('object', {})
+@@ -417,6 +433,7 @@
+                       and (field.lower() != 'date' or date_value(value) is not U)]
+             if len({repr(value) for _, value in values}) == 1:
+                 return 'history[' + str(index) + '].parameters.' + values[0][0], values[0][1]
++        if not response_available(history[index]):continue
+         matches = []
+         for path, obj in objects(history[index].get('result', U), 'history[' + str(index) + '].result'):
+             tid = project.resolve_type(schema_type(obj), '')
+--- E23-repeat-operation-intent/tests/test_failed_history_response33.py
++++ E24-response-history-eligibility/tests/test_failed_history_response33.py
+@@ -0,0 +1,77 @@
++"""Default grounding must use the same response eligibility as explicit recipes."""
++from copy import deepcopy
++import pytest
++from builders import build
++from analyzer.paths import run_paths
++from analyzer.state import ScenarioState,U
++from analyzer.frontend import Frontend
++from analyzer.contracts import ContractIndex,ContractGrounder
++from analyzer.request import grounded_request,BoundParameters
++from analyzer.java_collections import JsonObject
++from analyzer.provenance import related_selection_value,selected_field,history_role_value
++
++
++def fixture(root,status=200,choice=True,limit=4):
++    source='''import org.springframework.web.bind.annotation.*;import org.springframework.http.ResponseEntity;
++      import org.springframework.boot.autoconfigure.SpringBootApplication;
++      @SpringBootApplication class App{}
++      class Parcel{public Long id;public Long supplierId=9L;public String city="returned-city";public String origin="returned-origin";}
++      class Supplier{public Long id;}
++      @RestController class ParcelController{
++      @PostMapping("/parcels/{choice}") ResponseEntity<Parcel> create(@PathVariable boolean choice,@RequestBody Parcel input){
++        Parcel p=new Parcel();if(choice)p.id=7L;else p.id=9L;
++        return ResponseEntity.status('''+str(status)+''').body(p);}
++      @GetMapping("/parcels/{id}") Parcel read(@PathVariable Long id){return null;}
++      @PutMapping("/parcels/{parcelId}") Parcel update(@PathVariable Long parcelId,@RequestBody Parcel input){return input;}
++      @GetMapping("/suppliers/{supplierId}") Supplier supplier(@PathVariable Long supplierId){return null;}}
++      '''
++    p,db,ids=build(root,{'Api.java':source});params={'choice':choice,'input':{}}
++    request=grounded_request(p,ids['ParcelController.create'],params,{})
++    paths=run_paths(p,ScenarioState(db),ids['ParcelController.create'],BoundParameters(params,request),limit=limit)
++    out=paths[0];state=out['state'];engine=out['engine']
++    state.history.append({'step':1,'action':'Create parcel','entry':ids['ParcelController.create'],
++        'parameters':params,'result':out['result'],'selected_objects':[],'created_objects':[],
++        'outcome':engine.outcome,'exploration':out['exploration']})
++    f=Frontend(p);g=ContractGrounder(p,f,ContractIndex(p,f),None,{'facts':{},'unresolved':[]})
++    return p,ids,g,state
++
++
++@pytest.mark.parametrize('status,choice,limit,eligible',[
++    (200,True,4,True),(500,True,4,False),(200,U,1,False),
++])
++def test_default_grounding_does_not_promote_failed_or_unexplored_response_to_a_known_id(tmp_path,status,choice,limit,eligible):
++    p,ids,g,state=fixture(tmp_path,status,choice,limit)
++    assert state.history[0]['exploration']['complete']==(choice is not U)
++    assert state.history[0]['outcome']==('returned' if status==200 else 'HTTP error response')
++    proposals,detail=g.step('Read the new parcel',state)
++    resolved=[x for x in proposals if x['bindings'].get('id',{}).get('source')=='history' and x['bindings']['id'].get('resolved')]
++    assert bool(resolved)==eligible
++    if eligible:assert resolved[0]['params']['id']==7
++
++
++@pytest.mark.parametrize('action',['Read the new parcel','Read the parcel just created'])
++def test_a_failed_later_creation_cannot_select_the_old_successful_creation(tmp_path,action):
++    p,ids,g,state=fixture(tmp_path,500)
++    old=deepcopy(state.history[0]);old.update(step=1,outcome='returned',result=JsonObject({'id':5},'Parcel'))
++    state.history[0]['step']=2;state.history.insert(0,old)
++    proposals,detail=g.step(action,state)
++    assert not any(x['bindings'].get('id',{}).get('resolved') for x in proposals)
++
++
++@pytest.mark.parametrize('case',['failed','partial'])
++@pytest.mark.parametrize('consumer',['related','selected','role'])
++def test_selected_and_related_fields_from_an_unavailable_response_are_not_inputs(tmp_path,case,consumer):
++    p,ids,g,state=fixture(tmp_path,500 if case=='failed' else 200,U if case=='partial' else True,1 if case=='partial' else 4)
++    item=state.history[0]
++    item['selected_objects']=[{'entity':['parcel'],'value':7,'object':deepcopy(item['result']),
++        'qualified_type':'Parcel','producer_entry':ids['ParcelController.create'],'reference':'history[0].result.id'}]
++    if consumer=='related':assert related_selection_value(p,ids['ParcelController.supplier'],'supplierId','Read its supplier',state.history) is None
++    elif consumer=='selected':assert selected_field(p,'city',{'parcelId':7},state.history,ids['ParcelController.update']) is None
++    else:assert history_role_value(p,'origin',{'parcelId':7},state.history) is None
++
++
++def test_explicit_literal_is_independent_of_an_earlier_failed_response(tmp_path):
++    p,ids,g,state=fixture(tmp_path,500)
++    proposals,detail=g.step('Read parcel with id=11',state)
++    assert len(proposals)==1 and proposals[0]['params']['id']==11
++    assert proposals[0]['bindings']['id']['source']=='literal'
+--- E23-repeat-operation-intent/tests/test_history_request_choice33.py
++++ E24-response-history-eligibility/tests/test_history_request_choice33.py
+@@ -101,11 +101,11 @@
+     assert not proposals and detail['unresolved']
+ 
+ 
+-@pytest.mark.parametrize('value,outcome,complete,accepted',[
+-    (7,'returned',True,True),(8,'returned',True,False),
+-    (7,'HTTP error response',True,False),(7,'returned',False,False),
++@pytest.mark.parametrize('value,outcome,complete,accepted,producer_index',[
++    (7,'returned',True,True,1),(8,'returned',True,False,None),
++    (7,'HTTP error response',True,True,0),(7,'returned',False,True,0),
+ ])
+-def test_a_later_response_must_prove_the_same_created_identity(tmp_path,value,outcome,complete,accepted):
++def test_only_available_responses_can_replace_the_original_identity_producer(tmp_path,value,outcome,complete,accepted,producer_index):
+     p,ids,g,state=fixture(tmp_path);later=deepcopy(state.history[0])
+     later.update(step=2,entry=ids['ParcelController.getById'],action='Read the parcel',outcome=outcome)
+     later['result']['id']=value;later['exploration']['complete']=complete
+@@ -113,11 +113,11 @@
+     proposals,detail=g.step('Read the parcel just created again',state)
+     assert bool(proposals)==accepted
+     if accepted:
+-        assert proposals[0]['bindings']['id']['reference']=='history[1].result.id'
++        assert proposals[0]['bindings']['id']['reference']=='history['+str(producer_index)+'].result.id'
+         proof=detail['source_history_constraint']
+-        assert proof['creation']['step']==1 and proof['value_producer']['step']==2
++        assert proof['creation']['step']==1 and proof['value_producer']['step']==producer_index+1
+         assert proof['creation']['digest']==observation(state.history[0])
+-        assert proof['value_producer']['digest']==observation(state.history[1])
++        assert proof['value_producer']['digest']==observation(state.history[producer_index])
+ 
+ 
+ def test_agreeing_value_does_not_replace_the_identity_of_its_source_producer(tmp_path):

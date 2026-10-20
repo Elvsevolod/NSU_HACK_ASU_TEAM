@@ -1,0 +1,141 @@
+FFFFFFF............................                                      [100%]
+=================================== FAILURES ===================================
+_______ test_known_live_filter_keeps_source_callbacks_and_membership[1] ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-260/test_known_live_filter_keeps_s0')
+limit = 1
+
+    @pytest.mark.parametrize('limit',[1,4])
+    def test_known_live_filter_keeps_source_callbacks_and_membership(tmp_path,limit):
+        p,db,ids=build(tmp_path,{'Api.java':SOURCE})
+        paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=limit)
+        assert len(paths)==1
+        row=paths[0];engine=row['engine']
+>       assert list(row['result'])==['A'] and not row['result'].order_known
+E       AssertionError: assert ([<Unknown.VAL...E: 'unknown'>] == ['A']
+E         
+E         At index 0 diff: <Unknown.VALUE: 'unknown'> != 'A'
+E         Left contains 2 more items, first extra item: <Unknown.VALUE: 'unknown'>
+E         Use -v to get more diff)
+
+code/tests/test_commuting_map_filter.py:45: AssertionError
+_______ test_known_live_filter_keeps_source_callbacks_and_membership[4] ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-260/test_known_live_filter_keeps_s1')
+limit = 4
+
+    @pytest.mark.parametrize('limit',[1,4])
+    def test_known_live_filter_keeps_source_callbacks_and_membership(tmp_path,limit):
+        p,db,ids=build(tmp_path,{'Api.java':SOURCE})
+        paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=limit)
+>       assert len(paths)==1
+E       AssertionError: assert 4 == 1
+E        +  where 4 = len([{'approximate': True, 'decisions': {'1:method:service:Api#entry():15:unordered-map-next': 0}, 'engine': <analyzer.eng...entry():15:unordered-map-next': 1}, 'engine': <analyzer.engine.Engine object at 0x104e77190>, 'pruned_paths': [], ...}])
+
+code/tests/test_commuting_map_filter.py:43: AssertionError
+____________ test_representative_matches_all_small_reference_orders ____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-260/test_representative_matches_al0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x104cd2250>
+
+    def test_representative_matches_all_small_reference_orders(tmp_path,monkeypatch):
+        import analyzer.map_filter_proof as proof
+        p,db,ids=build(tmp_path,{'Api.java':SOURCE})
+        fast=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=1)
+        monkeypatch.setattr(proof,'certify',lambda *args:False)
+        slow=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=64)
+>       assert len(fast)==1 and len(slow)==6
+E       AssertionError: assert (1 == 1 and 4 == 6)
+E        +  where 1 = len([{'approximate': True, 'decisions': {}, 'engine': <analyzer.engine.Engine object at 0x104e86250>, 'pruned_paths': [], ...}])
+E        +  and   4 = len([{'approximate': True, 'decisions': {'1:method:service:Api#entry():15:unordered-map-next': 0}, 'engine': <analyzer.eng...entry():15:unordered-map-next': 1}, 'engine': <analyzer.engine.Engine object at 0x104d35f90>, 'pruned_paths': [], ...}])
+
+code/tests/test_commuting_map_filter.py:59: AssertionError
+_________________ test_all_present_valid_members_are_retained __________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-260/test_all_present_valid_members0')
+
+    def test_all_present_valid_members_are_retained(tmp_path):
+        source=SOURCE.replace('plans.put("G2",shared);','plans.put("G2",shared);plans.put("G3",shared);').replace(
+            'new Item("North","West")','new Item("North","South")')
+        p,db,ids=build(tmp_path,{'Api.java':source})
+        paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=1)
+>       assert len(paths)==1 and sorted(paths[0]['result'])==['A','B','C']
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: '<' not supported between instances of 'Unknown' and 'Unknown'
+
+code/tests/test_commuting_map_filter.py:74: TypeError
+____________ test_private_trial_cannot_leak_mutating_getter_effects ____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-260/test_private_trial_cannot_leak0')
+
+    def test_private_trial_cannot_leak_mutating_getter_effects(tmp_path):
+        source=SOURCE.replace('List<String> stops(){return stations;}',
+                              'List<String> stops(){visits++;return stations;}').replace('return allowed;','return shared.visits;')
+        p,db,ids=build(tmp_path,{'Api.java':source})
+        paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=64)
+>       assert paths and all(row['result']==6 for row in paths)
+E       AssertionError: assert ([{'approximate': True, 'decisions': {'1:method:service:Api#entry():15:unordered-map-next': 0}, 'engine': <analyzer.eng...entry():15:unordered-map-next': 1}, 'engine': <analyzer.engine.Engine object at 0x104ff4c90>, 'pruned_paths': [], ...}] and False)
+E        +  where False = all(<generator object test_private_trial_cannot_leak_mutating_getter_effects.<locals>.<genexpr> at 0x105035be0>)
+
+code/tests/test_commuting_map_filter.py:83: AssertionError
+_ test_alias_to_target_declines_commutativity_certificate[Set<String> alias=allowed;] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-260/test_alias_to_target_declines_0')
+body = 'Set<String> alias=allowed;'
+
+    @pytest.mark.parametrize('body',[
+        'Set<String> alias=allowed;',
+        'Map<String,Set<String>> aliases=new HashMap<>();aliases.put("saved",allowed);',
+    ])
+    def test_alias_to_target_declines_commutativity_certificate(tmp_path,body):
+        source=SOURCE.replace('for(Map.Entry<String,List<String>> entry:',body+'for(Map.Entry<String,List<String>> entry:')
+        p,db,ids=build(tmp_path,{'Api.java':source})
+        paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=64)
+>       assert paths and all(sorted(row['result'])==['A'] for row in paths)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_commuting_map_filter.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x104b48220>
+
+>   assert paths and all(sorted(row['result'])==['A'] for row in paths)
+                         ^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: 'Unknown' object is not iterable
+
+code/tests/test_commuting_map_filter.py:95: TypeError
+_ test_alias_to_target_declines_commutativity_certificate[Map<String,Set<String>> aliases=new HashMap<>();aliases.put("saved",allowed);] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-260/test_alias_to_target_declines_1')
+body = 'Map<String,Set<String>> aliases=new HashMap<>();aliases.put("saved",allowed);'
+
+    @pytest.mark.parametrize('body',[
+        'Set<String> alias=allowed;',
+        'Map<String,Set<String>> aliases=new HashMap<>();aliases.put("saved",allowed);',
+    ])
+    def test_alias_to_target_declines_commutativity_certificate(tmp_path,body):
+        source=SOURCE.replace('for(Map.Entry<String,List<String>> entry:',body+'for(Map.Entry<String,List<String>> entry:')
+        p,db,ids=build(tmp_path,{'Api.java':source})
+        paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=64)
+>       assert paths and all(sorted(row['result'])==['A'] for row in paths)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_commuting_map_filter.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x104b40d30>
+
+>   assert paths and all(sorted(row['result'])==['A'] for row in paths)
+                         ^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: 'Unknown' object is not iterable
+
+code/tests/test_commuting_map_filter.py:95: TypeError
+=========================== short test summary info ============================
+FAILED code/tests/test_commuting_map_filter.py::test_known_live_filter_keeps_source_callbacks_and_membership[1]
+FAILED code/tests/test_commuting_map_filter.py::test_known_live_filter_keeps_source_callbacks_and_membership[4]
+FAILED code/tests/test_commuting_map_filter.py::test_representative_matches_all_small_reference_orders
+FAILED code/tests/test_commuting_map_filter.py::test_all_present_valid_members_are_retained
+FAILED code/tests/test_commuting_map_filter.py::test_private_trial_cannot_leak_mutating_getter_effects
+FAILED code/tests/test_commuting_map_filter.py::test_alias_to_target_declines_commutativity_certificate[Set<String> alias=allowed;]
+FAILED code/tests/test_commuting_map_filter.py::test_alias_to_target_declines_commutativity_certificate[Map<String,Set<String>> aliases=new HashMap<>();aliases.put("saved",allowed);]
+7 failed, 28 passed in 0.98s

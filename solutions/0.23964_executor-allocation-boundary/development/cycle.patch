@@ -1,0 +1,138 @@
+--- parent/analyzer/engine.py
++++ candidate/analyzer/engine.py
+@@ -2730,6 +2730,9 @@
+         targets = self.p.targets(mid, site) if site else self.p.source_targets(mid, node)
+         if not targets and not wiring.get('data_access'):
+             targets=self.p.source_targets(mid,node)
++        from .executor_allocation import operation as executor_allocation
++        handled,value=executor_allocation(self,node,name,obj,args,env,targets,reason)
++        if handled:return value
+         if not targets and name=='valueOf' and len(args)==1 and text(objnode) not in env and self.standard_type(text(objnode),'java.math.BigDecimal'):
+             if type(args[0]) is int and -(2**63)<=args[0]<2**63:return Decimal(args[0])
+             raise AnalysisBoundary('BigDecimal.valueOf overload/value is outside the long contract: '+reason,category='unsupported_semantics')
+--- parent/analyzer/executor_allocation.py
++++ candidate/analyzer/executor_allocation.py
+@@ -0,0 +1,48 @@
++"""Allocation only. No executor, thread, or callback is run by this contract."""
++from .java_collections import JavaObject
++from .java_exceptions import JavaThrow
++from .state import U
++from .project import text
++
++POOL='java.util.concurrent.ThreadPoolExecutor'
++FACTORY='org.springframework.scheduling.concurrent.CustomizableThreadFactory'
++
++
++def source_factory(engine,value):
++    if not isinstance(value,JavaObject):return False
++    if value.java_type==FACTORY and not getattr(value,'source_owner',None):return True
++    pending=[getattr(value,'source_owner',None)];seen=set()
++    while pending:
++        owner=pending.pop()
++        if owner is None or owner in seen:continue
++        seen.add(owner)
++        if any(engine.standard_type(parent,'java.util.concurrent.ThreadFactory',engine.p.nodes[owner])
++               for parent in engine.p.framework_types.get(owner,())):return True
++        pending.extend(engine.p.type_parents.get(owner,()))
++    return False
++
++
++def operation(engine,node,name,obj,args,env,targets,reason):
++    from .engine import AnalysisBoundary
++    if targets:return False,U
++    owner=text(node.child_by_field_name('object'))
++    constructor=text(node.child_by_field_name('type'))
++    if name=='<init>' and engine.standard_type(constructor,FACTORY):
++        if len(args)>1 or args and args[0] is not U and args[0] is not None and not isinstance(args[0],str):
++            raise AnalysisBoundary('ThreadFactory constructor overload is unresolved: '+reason,category='unsupported_semantics')
++        return True,JavaObject(FACTORY,{'threadNamePrefix':args[0] if args else U})
++    if name=='newFixedThreadPool' and owner not in env and engine.standard_type(owner,'java.util.concurrent.Executors'):
++        if len(args) not in (1,2) or type(args[0]) is not int or not -(2**31)<=args[0]<2**31:
++            raise AnalysisBoundary('fixed thread pool size/overload is unresolved: '+reason,category='unsupported_semantics')
++        if args[0]<=0:raise JavaThrow({'__type__':'IllegalArgumentException'})
++        if len(args)==2:
++            if args[1] is None:raise JavaThrow({'__type__':'NullPointerException'})
++            if not source_factory(engine,args[1]):
++                raise AnalysisBoundary('fixed thread pool factory allocation is unresolved: '+reason,category='unsupported_semantics')
++        engine.effect_events.append({'model_version':'executor-allocation/1','operation':name,'callsite':reason,
++            'resource_writes':[],'heap_roots':[],'callbacks':[],'completions':['normal'],
++            'scope':'allocation only; JVM resource/security failures outside model; no task/ThreadFactory callback'})
++        return True,JavaObject(POOL,{'threadFactory':args[1] if len(args)==2 else U})
++    if isinstance(obj,JavaObject) and obj.java_type==POOL and not getattr(obj,'source_owner',None):
++        raise AnalysisBoundary('executor operation requires unsupported task/lifecycle semantics: '+reason,category='unsupported_semantics')
++    return False,U
+--- parent/tests/test_executor_allocation35.py
++++ candidate/tests/test_executor_allocation35.py
+@@ -0,0 +1,72 @@
++"""C02 source expectations; allocation must not execute a thread/task callback."""
++import pytest
++from analyzer.paths import run_paths
++from analyzer.state import ScenarioState, U
++from builders import build
++
++
++def run(tmp_path, source, params=None):
++    p,db,ids=build(tmp_path,{'Api.java':source})
++    return run_paths(p,ScenarioState(db),ids['Api.entry'],params or {},limit=4),ids
++
++
++@pytest.mark.parametrize('expression',[
++    'Executors.newFixedThreadPool(2)',
++    'Executors.newFixedThreadPool(2,new CustomizableThreadFactory("workers-"))',
++    'java.util.concurrent.Executors.newFixedThreadPool(2,new CustomizableThreadFactory())',
++])
++def test_unused_pool_allocation_preserves_the_source_suffix(tmp_path,expression):
++    rows,ids=run(tmp_path,'''import java.util.concurrent.*;
++      import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
++      class Api{static final ExecutorService pool=EXPR;
++        int entry(){return after();}int after(){return 19;}}'''.replace('EXPR',expression))
++    assert rows and all(r['result']==19 and r['engine'].outcome=='returned' for r in rows)
++    assert all(('','executes',ids['Api.after']) in r['engine'].edges for r in rows)
++    assert not any(e.get('operation') in ('newFixedThreadPool','<init>') and e.get('unscoped')
++                   for r in rows for e in r['engine'].effect_events)
++
++
++def test_allocation_keeps_argument_constructor_effect_but_never_calls_factory(tmp_path):
++    rows,ids=run(tmp_path,'''import java.util.concurrent.*;
++      class Factory implements ThreadFactory{
++        Factory(){Api.count++;}public Thread newThread(Runnable task){Api.count+=100;throw new IllegalStateException();}}
++      class Api{static int count=0;int entry(){ExecutorService pool=Executors.newFixedThreadPool(2,new Factory());return count;}}''')
++    assert rows and all(r['result']==1 and r['engine'].outcome=='returned' for r in rows)
++    assert all(('','executes',ids['Factory.<init>']) in r['engine'].edges for r in rows)
++    assert not any(('','executes',ids['Factory.newThread']) in r['engine'].edges for r in rows)
++
++
++@pytest.mark.parametrize('expression,exception',[
++    ('Executors.newFixedThreadPool(0)','IllegalArgumentException'),
++    ('Executors.newFixedThreadPool(-2,null)','IllegalArgumentException'),
++    ('Executors.newFixedThreadPool(2,null)','NullPointerException'),
++])
++def test_invalid_pool_keeps_java_throw_and_does_not_execute_suffix(tmp_path,expression,exception):
++    rows,ids=run(tmp_path,'''import java.util.concurrent.*;class Api{
++      int entry(){try{EXPR;return after();}catch(EXCEPTION ex){return 7;}}int after(){return 99;}}'''
++      .replace('EXPR',expression).replace('EXCEPTION',exception))
++    assert rows and all(r['result']==7 and r['engine'].outcome=='returned' for r in rows)
++    assert not any(('','executes',ids['Api.after']) in r['engine'].edges for r in rows)
++
++
++def test_unknown_pool_size_is_not_assumed_positive(tmp_path):
++    rows,ids=run(tmp_path,'''import java.util.concurrent.*;class Api{
++      int entry(int count){Executors.newFixedThreadPool(count);return after();}int after(){return 99;}}''',{'count':U})
++    assert rows and all(r['engine'].outcome=='unsupported_semantics boundary' for r in rows)
++    assert not any(('','executes',ids['Api.after']) in r['engine'].edges for r in rows)
++
++
++def test_submission_is_an_explicit_boundary_not_a_completed_task(tmp_path):
++    rows,ids=run(tmp_path,'''import java.util.concurrent.*;class Api{
++      int entry(){ExecutorService pool=Executors.newFixedThreadPool(1);pool.submit(()->task());return after();}
++      int task(){return 51;}int after(){return 99;}}''')
++    assert rows and all(r['engine'].outcome=='unsupported_semantics boundary' for r in rows)
++    assert not any(('','executes',ids['Api.task']) in r['engine'].edges or ('','executes',ids['Api.after']) in r['engine'].edges for r in rows)
++
++
++def test_source_namesake_factory_keeps_its_source_calls(tmp_path):
++    rows,ids=run(tmp_path,'''import java.util.concurrent.*;
++      class Executors{static int newFixedThreadPool(int n){return 37;}}
++      class Api{int entry(){return Executors.newFixedThreadPool(2);}}''')
++    assert rows and all(r['result']==37 for r in rows)
++    assert all(('','executes',ids['Executors.newFixedThreadPool']) in r['engine'].edges for r in rows)

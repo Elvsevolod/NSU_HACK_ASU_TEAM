@@ -1,0 +1,404 @@
+--- E2/analyzer/bean_properties.py
++++ E3/analyzer/bean_properties.py
+@@ -2,6 +2,7 @@
+ from collections import defaultdict
+ from .project import text,walk,keywords,declaration_matches
+ from .generic_types import type_parts
++from .json_property import annotation as property_annotation,member as json_member,clean as clean_property
+ 
+ 
+ def annotations(node):
+@@ -66,13 +67,14 @@
+                 issue('external bean parent introspection is not modeled: '+base)
+         pending.extend((parent,depth+1) for parent in sorted(project.type_parents.get(current,())))
+     def external(name,fqn,context):return standard_type(name,fqn,context)
+-    def jackson_notes(node,context):
++    def jackson_notes(node,context,property_member=False):
+         for name,args in annotations(node):
+             leaf=name.rsplit('.',1)[-1]
+             if not external(name,'com.fasterxml.jackson.annotation.'+leaf,context) and not external(name,'com.fasterxml.jackson.databind.annotation.'+leaf,context):continue
+             if leaf=='JsonIgnoreProperties' and args.replace(' ','')=='(ignoreUnknown=true)':continue
+             if leaf=='JsonIgnore' and args.replace(' ','') in ('','()','(true)','(value=true)','(false)','(value=false)'):continue
+             if direction=='serialize' and leaf=='JsonCreator':continue
++            if property_member and leaf=='JsonProperty' and external(name,'com.fasterxml.jackson.annotation.JsonProperty',context):continue
+             issue('Jackson annotation is not modeled in bean plan: '+name)
+     def ignore(node,context):
+         values=[args.replace(' ','') for name,args in annotations(node)
+@@ -112,7 +114,8 @@
+                     for mid in methods.get(current,()) if project.methods[mid]['name']=='<init>'):
+                 issue('implicit JSON instance initializer needs a source construction context')
+             if field.type!='field_declaration' or 'static' in keywords(field):continue
+-            jackson_notes(field,meta);flags=keywords(field);field_lombok=lombok(field,meta)
++            jackson_notes(field,meta,True);flags=keywords(field);field_lombok=lombok(field,meta)
++            field_policy=property_annotation(annotations(field),project,meta,standard_type,issue)
+             if 'Value' in generated:
+                 if 'NonFinal' not in field_lombok:flags.add('final')
+             lombok_seen|=bool(field_lombok)
+@@ -121,7 +124,8 @@
+                 name=text(var.child_by_field_name('name'));typ=text(field.child_by_field_name('type'))
+                 ignore_property(name,ignore(field,meta))
+                 info={'name':name,'type':typ,'owner':current,'depth':depth,'flags':flags,'initialized':var.child_by_field_name('value') is not None,
+-                      'lombok':field_lombok,'non_null':'NonNull' in field_lombok}
++                      'lombok':field_lombok,'non_null':'NonNull' in field_lombok,
++                      'json_property':field_policy,'ignored':ignore(field,meta) is True}
+                 own_fields[name]=info;all_fields[name].append(info)
+                 if name not in fields or depth<fields[name]['depth']:fields[name]=info
+                 elif depth==fields[name]['depth'] and current!=fields[name]['owner']:issue('inherited field conflict is not modeled: '+name)
+@@ -137,7 +141,8 @@
+                 if m['name'].startswith(('get','is','set')):missing_methods.append((mid,m))
+                 continue
+             own_methods.append((mid,m,source))
+-            jackson_notes(source,m)
++            jackson_notes(source,m,m['name']!='<init>')
++            method_policy=property_annotation(annotations(source),project,m,standard_type,issue)
+             for par in (source.child_by_field_name('parameters').named_children if source.child_by_field_name('parameters') else []):
+                 jackson_notes(par,m)
+                 if any(external(a,'lombok.NonNull',m) for a,_ in annotations(par)):
+@@ -155,22 +160,25 @@
+                 continue
+             if source.child_by_field_name('body') is None and name.startswith(('get','is','set')):
+                 issue('bean accessor implementation is unavailable: '+name)
+-            if len(pars)==1 and name.startswith('set'):
+-                wire=legacy_name(name[3:],issue)
++            if len(pars)==1 and (name.startswith('set') or method_policy['explicit']):
++                wire=legacy_name(name[3:],issue) if name.startswith('set') else name
+                 if wire:
+                     ignore_property(wire,ignore(source,m))
+-                    setters[wire].append((depth,0,prop('method',mid,current,pars[0][1])))
+-            if not pars and 'public' in flags and ret!='void' and not external(ret,'java.lang.Void',m):
++                    setters[wire].append((depth,0,json_member(prop('method',mid,current,pars[0][1]),method_policy,
++                        ignored=ignore(source,m) is True)))
++            if not pars and ret!='void' and not external(ret,'java.lang.Void',m):
+                 prefix='get' if name.startswith('get') else 'is' if name.startswith('is') else None
+                 if prefix=='is' and not (ret=='boolean' or external(ret,'java.lang.Boolean',m)):
+                     if ret in project.type_variables.get(current,{}) or '<' in text(source.child_by_field_name('type_parameters')):
+                         issue('is-getter type-variable erasure is not modeled: '+name)
+                     continue
+-                if prefix:
+-                    wire=legacy_name(name[len(prefix):],issue)
++                if prefix or method_policy['explicit']:
++                    wire=legacy_name(name[len(prefix):],issue) if prefix else name
+                     if wire:
+                         ignore_property(wire,ignore(source,m))
+-                        getters[wire].append((depth,0 if prefix=='get' else 1,prop('method',mid,current,ret)))
++                        getters[wire].append((depth,0 if prefix in (None,'get') else 1,
++                            json_member(prop('method',mid,current,ret),method_policy,
++                                'public' in flags or method_policy['explicit'],ignore(source,m) is True)))
+         for name,info in own_fields.items():
+             opts=info['lombok'];has_get='Getter' in opts or 'Getter' in generated or 'Data' in generated or 'Value' in generated
+             has_set='Setter' in opts or 'Setter' in generated or 'Data' in generated
+@@ -229,23 +237,59 @@
+         if p['kind']=='method' and project.methods[p['member']].get('abstract'):
+             issue('abstract bean accessor requires a concrete implementation');return None
+         return p
+-    selected_getters={name:select(items,'getter '+name) for name,items in getters.items()}
+-    selected_setters={name:select(items,'setter '+name) for name,items in setters.items()}
+     for name,flags in ignore_flags.items():
+         if len(flags)>1:issue('conflicting inherited JsonIgnore overrides are not modeled: '+name)
+-    ignored={name for name,flags in ignore_flags.items() if True in flags}
++    ignored=set();groups={}
++    implicit={'explicit':False,'name':None,'access':'AUTO'}
++    for name in sorted(set(fields)|set(getters)|set(setters)):
++        f=fields.get(name)
++        members={'getter':list(getters.get(name,())),'setter':list(setters.get(name,())),'field':[]}
++        if f:
++            policy=f['json_property'];visible=('public' in f['flags'] and 'transient' not in f['flags']) or policy['explicit']
++            members['field']=[(f['depth'],0,json_member(prop('field',name,f['owner'],f['type']),policy,visible,f['ignored']))]
++        def note(p):return p.get('_json_property',implicit)
++        all_members=[p for items in members.values() for _,_,p in items]
++        any_ignore=any(p.get('_ignored') for p in all_members) or True in ignore_flags.get(name,set())
++        if any_ignore:
++            if not any(note(p)['explicit'] for p in all_members):ignored.add(name);continue
++            members={role:[row for row in items if not row[2].get('_ignored')] for role,items in members.items()}
++        roles=('getter','field','setter') if direction=='serialize' else ('setter','field','getter')
++        mode='AUTO'
++        for role in roles:
++            selected=select(members[role],role+' annotation '+name)
++            if selected and note(selected)['access']!='AUTO':mode=note(selected)['access'];break
++        if direction=='deserialize' and mode=='READ_ONLY':
++            if any(note(p)['name'] for items in members.values() for _,_,p in items):
++                issue('JsonProperty READ_ONLY rename ignorals need a declared Jackson version contract')
++            ignored.add(name);continue
++        if direction=='serialize' and mode=='WRITE_ONLY':continue
++        getter_visible=any(p.get('_visible',True) for _,_,p in members['getter'])
++        if mode=='AUTO':
++            members['getter']=[row for row in members['getter'] if row[2].get('_visible',True)]
++            members['field']=[row for row in members['field'] if row[2].get('_visible') or direction=='deserialize' and getter_visible]
++        # Read/write policies retain otherwise invisible members, as Jackson does.
++        if mode=='READ_ONLY':members['setter']=[]
++        if mode=='WRITE_ONLY':members['getter']=[]
++        active=[p for items in members.values() for _,_,p in items]
++        if not active:continue
++        names={note(p)['name'] for p in active if note(p)['name']}
++        if len(names)>1 and any(not note(p)['name'] and p.get('_visible',True) for p in active):
++            issue('conflicting explicit JsonProperty names include an implicit visible member: '+name);continue
++        for wire in sorted(names or {name}):
++            target=groups.setdefault(wire,{'getter':[],'setter':[],'field':[]})
++            for role,items in members.items():
++                target[role].extend(row for row in items if len(names)<=1 or note(row[2])['name']==wire)
+     result={};getter_only={}
+-    for name in sorted(set(fields)|set(getters)|set(setters)):
+-        if name in ignored:continue
+-        f=fields.get(name);getter=selected_getters.get(name);setter=selected_setters.get(name)
+-        field=prop('field',name,f['owner'],f['type']) if f and 'transient' not in f['flags'] and ('public' in f['flags'] or direction=='deserialize' and getter is not None) else None
++    for name,members in sorted(groups.items()):
++        getter=select(members['getter'],'getter '+name);setter=select(members['setter'],'setter '+name)
++        field=select(members['field'],'field '+name)
+         if direction=='serialize':chosen=getter or field
+         else:
+             chosen=setter or field
+             if chosen is None and getter is not None and any(standard_type(type_parts(getter['type'])[0],
+                     'java.util.'+native,project.nodes[getter['owner']]) for native in ('Map','List','Set','Collection')):
+-                getter_only[name]=getter
+-        if chosen is not None:result[name]=chosen
++                getter_only[name]=clean_property(getter)
++        if chosen is not None:result[name]=clean_property(chosen)
+     construction={'kind':'implicit','member':None,'owner':owner}
+     if direction=='deserialize':
+         if owner in project.json_construction_limits:
+--- E2/analyzer/json_property.py
++++ E3/analyzer/json_property.py
+@@ -0,0 +1,50 @@
++"""Literal Jackson JsonProperty facts; namesakes cannot supply native policy."""
++import json,re
++from baseline_closure import _split_args
++from .project import text
++
++FQN='com.fasterxml.jackson.annotation.JsonProperty'
++
++
++def annotation(entries,project,context,standard,issue):
++    found=[args for name,args in entries if standard(name,FQN,context)]
++    result={'explicit':bool(found),'name':None,'access':'AUTO'}
++    if not found:return result
++    if len(found)!=1:issue('duplicate JsonProperty annotations are not modeled');return result
++    seen=set()
++    for part in _split_args(found[0]):
++        pair=re.fullmatch(r'([\w]+)\s*=\s*(.*)',part,re.S)
++        key,value=(pair[1],pair[2]) if pair else ('value',part)
++        if key in seen:issue('duplicate JsonProperty argument: '+key);continue
++        seen.add(key)
++        if key in ('value','defaultValue','required'):
++            try:literal=json.loads(value)
++            except ValueError:literal=None
++            if key=='required':
++                if type(literal) is not bool:issue('JsonProperty required metadata is not a boolean literal')
++            elif not isinstance(literal,str):issue('JsonProperty '+key+' is not a supported literal')
++            elif key=='value':result['name']=literal or None
++            # required/defaultValue are metadata, not field validation/defaulting.
++        elif key=='access':
++            qualifier,_,leaf=value.strip().rpartition('.')
++            if not qualifier:
++                leaf=value.strip();tree=project.trees.get(context['file'])
++                imports=[text(n).replace(' ','').replace('\n','') for n in tree.root_node.named_children
++                    if n.type=='import_declaration'] if tree else []
++                proved=any(s in imports for s in ('importstatic'+FQN+'.Access.'+leaf+';',
++                    'importstatic'+FQN+'.Access.*;'))
++            else:
++                proved=standard(qualifier,FQN+'.Access',context) or (
++                    qualifier.endswith('.Access') and standard(qualifier[:-7],FQN,context))
++            if proved and leaf in ('AUTO','READ_ONLY','WRITE_ONLY','READ_WRITE'):result['access']=leaf
++            else:issue('JsonProperty access enum identity or value is unresolved')
++        else:issue('JsonProperty argument is outside the supported policy: '+key)
++    return result
++
++
++def member(prop,policy,visible=True,ignored=False):
++    return {**prop,'_json_property':policy,'_visible':visible,'_ignored':ignored}
++
++
++def clean(prop):
++    return {key:value for key,value in prop.items() if key not in ('_json_property','_visible','_ignored')}
+--- E2/tests/test_json_property33.py
++++ E3/tests/test_json_property33.py
+@@ -0,0 +1,190 @@
++"""Expected JSON/access effects from Jackson's source, not analyzer predictions.
++
++No JVM is compiled or launched. Creator, complex annotation and version-sensitive
++READ_ONLY rename cases must stay explicit boundaries, rather than be guessed.
++"""
++import json
++import pytest
++from analyzer.bean_properties import default_bean_plan
++from analyzer.engine import Engine
++from analyzer.java_collections import JsonText
++from analyzer.state import ScenarioState,U
++from builders import build
++
++IMPORTS='''import com.fasterxml.jackson.annotation.JsonProperty;
++import com.fasterxml.jackson.annotation.JsonProperty.Access;
++import com.fasterxml.jackson.annotation.JsonIgnore;
++import com.fasterxml.jackson.databind.ObjectMapper;import java.util.*;'''
++
++
++def fixture(root,bean,body='return new ObjectMapper().writeValueAsString(new Item());'):
++    p,db,ids=build(root,{'Api.java':IMPORTS+bean+'class Api{Object entry(){'+body+'}void after(){}}'})
++    return p,Engine(p,ScenarioState(db)),ids
++
++
++def input_json(value):return json.dumps(json.dumps(value,ensure_ascii=False))
++
++
++def plan(p,e,direction):return default_bean_plan(p,'type:service:Item',direction,e.standard_type)
++
++
++@pytest.mark.parametrize('annotation',[
++    '@JsonProperty("wire_name")','@JsonProperty(value="wire_name")',
++    '@com.fasterxml.jackson.annotation.JsonProperty("wire_name")'])
++def test_renamed_private_field_uses_wire_name_but_keeps_declaring_storage(tmp_path,annotation):
++    p,e,ids=fixture(tmp_path, 'class Item{'+annotation+' private Long local=3L;Long raw(){return local;}}',
++        'Item item=new ObjectMapper().readValue('+input_json({'wire_name':9})+',Item.class);return item;')
++    value=e.run(ids['Api.entry'],{})
++    assert value['local']==9 and 'wire_name' not in value and value._native_field_kinds['local']=='Long'
++    read=plan(p,e,'serialize');write=plan(p,e,'deserialize')
++    assert read['complete'] and write['complete']
++    assert set(read['properties'])==set(write['properties'])=={'wire_name'}
++    assert read['properties']['wire_name']['member']==write['properties']['wire_name']['member']=='local'
++
++
++@pytest.mark.parametrize('annotation',['@JsonProperty','@JsonProperty()','@JsonProperty("")','@JsonProperty(value="")'])
++def test_default_annotation_explicitly_exposes_private_field(tmp_path,annotation):
++    p,e,ids=fixture(tmp_path,'class Item{'+annotation+' private String name="shown";}')
++    value=e.run(ids['Api.entry'],{})
++    assert isinstance(value,JsonText) and value.payload=={'name':'shown'} and not e.approximate
++
++
++@pytest.mark.parametrize('qualifier',['Access','JsonProperty.Access','com.fasterxml.jackson.annotation.JsonProperty.Access'])
++def test_read_only_field_is_not_overwritten_or_treated_as_unknown_input(tmp_path,qualifier):
++    bean='class Item{@JsonProperty(access='+qualifier+'.READ_ONLY) private int value=7;int raw(){return value;}}'
++    p,e,ids=fixture(tmp_path,bean,'Item item=new ObjectMapper().readValue('+input_json({'value':99})+',Item.class);return item.raw();')
++    assert e.run(ids['Api.entry'],{})==7 and not e.approximate
++    assert 'value' in plan(p,e,'deserialize')['ignored_properties']
++    assert plan(p,e,'serialize')['properties']['value']['member']=='value'
++
++
++def test_read_only_source_setter_is_not_invoked(tmp_path):
++    p,e,ids=fixture(tmp_path,'''class Item{private int value=7;public int getValue(){return value;}
++      @JsonProperty(access=Access.READ_ONLY)public void setValue(int input){throw new IllegalStateException();}}''',
++        'return new ObjectMapper().readValue('+input_json({'value':99})+',Item.class).getValue();')
++    assert e.run(ids['Api.entry'],{})==7 and not e.approximate
++    assert not any(k=='executes' and target==ids['Item.setValue'] for _,k,target in e.edges)
++
++
++def test_observed_fail_on_ignored_policy_still_throws_for_read_only_input(tmp_path):
++    p,e,ids=fixture(tmp_path,'class Item{@JsonProperty(access=Access.READ_ONLY)public String value;}',
++        'ObjectMapper m=new ObjectMapper();m.enable(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES);'
++        'm.readValue('+input_json({'value':'incoming'})+',Item.class);after();return true;')
++    assert e.run(ids['Api.entry'],{}) is U and e.outcome=='uncaught application exception'
++    assert not any(k=='executes' and target==ids['Api.after'] for _,k,target in e.edges)
++
++
++def test_write_only_does_not_call_a_throwing_getter_or_emit_the_value(tmp_path):
++    p,e,ids=fixture(tmp_path,'''class Item{public String marker="shown";
++      @JsonProperty(access=Access.WRITE_ONLY)private String secret="hidden";
++      public String getSecret(){throw new IllegalStateException();}}''')
++    value=e.run(ids['Api.entry'],{})
++    assert isinstance(value,JsonText) and value.payload=={'marker':'shown'} and not e.approximate
++    assert not any(c['method']==ids['Item.getSecret'] for c in e.semantic_callbacks)
++
++
++def test_write_only_renamed_field_accepts_input_into_java_member(tmp_path):
++    p,e,ids=fixture(tmp_path,'''class Item{@JsonProperty(value="incoming",access=Access.WRITE_ONLY)
++      private String secret="seed";String raw(){return secret;}}''',
++        'return new ObjectMapper().readValue('+input_json({'incoming':'assigned'})+',Item.class).raw();')
++    assert e.run(ids['Api.entry'],{})=='assigned' and not e.approximate
++
++
++@pytest.mark.parametrize('access,expected',[('AUTO',3),('READ_WRITE',4),('READ_ONLY',4)])
++def test_access_policy_controls_private_getter_visibility(tmp_path,access,expected):
++    p,e,ids=fixture(tmp_path,'class Item{@JsonProperty(access=Access.'+access+')private int value=3;'
++        'private int getValue(){return value+1;}}')
++    value=e.run(ids['Api.entry'],{})
++    assert isinstance(value,JsonText) and value.payload=={'value':expected} and not e.approximate
++
++
++@pytest.mark.parametrize('direction',['serialize','deserialize'])
++def test_getter_rename_is_shared_by_the_unannotated_setter(tmp_path,direction):
++    bean='''class Item{private String value="seed";@JsonProperty("external") public String getValue(){return value;}
++      public void setValue(String input){value=input+"!";}}'''
++    body=('return new ObjectMapper().writeValueAsString(new Item());' if direction=='serialize' else
++          'return new ObjectMapper().readValue('+input_json({'external':'new'})+',Item.class).getValue();')
++    p,e,ids=fixture(tmp_path,bean,body);value=e.run(ids['Api.entry'],{})
++    assert not e.approximate
++    if direction=='serialize':assert isinstance(value,JsonText) and value.payload=={'external':'seed'}
++    else:
++        assert value=='new!'
++        assert any(k=='executes' and target==ids['Item.setValue'] for _,k,target in e.edges)
++
++
++def test_annotated_nonbean_methods_merge_by_explicit_wire_name(tmp_path):
++    bean='''class Item{private String stored="seed";
++      @JsonProperty("wire")private String expose(){return stored;}
++      @JsonProperty("wire")private void accept(String value){stored=value+"!";}}'''
++    p,e,ids=fixture(tmp_path,bean,'return new ObjectMapper().writeValueAsString('
++        'new ObjectMapper().readValue('+input_json({'wire':'new'})+',Item.class));')
++    value=e.run(ids['Api.entry'],{})
++    assert isinstance(value,JsonText) and value.payload=={'wire':'new!'} and not e.approximate
++    assert any(k=='executes' and target==ids['Item.accept'] for _,k,target in e.edges)
++
++
++def test_split_ignore_getter_and_explicit_setter_is_write_only(tmp_path):
++    bean='''class Item{public String marker="shown";private String name="seed";
++      @JsonIgnore public String getName(){throw new IllegalStateException();}
++      @JsonProperty public void setName(String value){name=value+"!";}String raw(){return name;}}'''
++    p,e,ids=fixture(tmp_path,bean,'return new ObjectMapper().readValue('+input_json({'name':'new'})+',Item.class).raw();')
++    assert e.run(ids['Api.entry'],{})=='new!' and not e.approximate
++    p,e,ids=fixture(tmp_path/'serialize',bean);value=e.run(ids['Api.entry'],{})
++    assert isinstance(value,JsonText) and value.payload=={'marker':'shown'} and not e.approximate
++
++
++def test_lombok_read_only_does_not_disable_the_java_generated_setter(tmp_path):
++    bean='''import lombok.Data;import lombok.NoArgsConstructor;
++      @Data @NoArgsConstructor class Item{@JsonProperty(access=Access.READ_ONLY)private int value=7;}'''
++    p,e,ids=fixture(tmp_path,bean,'Item item=new ObjectMapper().readValue('+input_json({'value':99})+',Item.class);'
++        'item.setValue(8);return new ObjectMapper().writeValueAsString(item);')
++    value=e.run(ids['Api.entry'],{})
++    assert isinstance(value,JsonText) and value.payload=={'value':8} and not e.approximate
++    assert ('setValue',1) in plan(p,e,'serialize')['generated_accessors']
++
++
++def test_access_annotation_priority_depends_on_direction(tmp_path):
++    bean='''class Base{@JsonProperty(access=Access.READ_ONLY)protected int value=3;}
++      class Item extends Base{@JsonProperty(access=Access.READ_WRITE)public int getValue(){return value+1;}}'''
++    p,e,ids=fixture(tmp_path,bean,'return new ObjectMapper().writeValueAsString('
++        'new ObjectMapper().readValue('+input_json({'value':99})+',Item.class));')
++    value=e.run(ids['Api.entry'],{})
++    assert isinstance(value,JsonText) and value.payload=={'value':4} and not e.approximate
++
++
++def test_read_only_collection_does_not_invoke_getter_only_mutation(tmp_path):
++    bean='''class Item{private List<String> tags;public Item(){tags=new ArrayList<>();}
++      @JsonProperty(access=Access.READ_ONLY)public List<String> getTags(){return tags;}int size(){return tags.size();}}'''
++    p,e,ids=fixture(tmp_path,bean,'return new ObjectMapper().readValue('+input_json({'tags':['incoming']})+',Item.class).size();')
++    assert e.run(ids['Api.entry'],{})==0 and not e.approximate
++    assert not any(c['method']==ids['Item.getTags'] for c in e.semantic_callbacks)
++
++
++@pytest.mark.parametrize('field',[
++    '@JsonProperty("внешнее") private String local="shown";',
++    '@JsonProperty("external") private transient String local="shown";'])
++def test_literal_wire_names_and_explicit_transient_inclusion(tmp_path,field):
++    p,e,ids=fixture(tmp_path,'class Item{'+field+'}');value=e.run(ids['Api.entry'],{})
++    expected='внешнее' if 'внешнее' in field else 'external'
++    assert isinstance(value,JsonText) and value.payload=={expected:'shown'} and not e.approximate
++
++
++def test_source_annotation_namesake_cannot_expose_private_field(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import com.fasterxml.jackson.databind.ObjectMapper;
++      @interface JsonProperty{String value()default "";}
++      class Item{@JsonProperty("external")private String local="hidden";public String marker="shown";}
++      class Api{Object entry(){return new ObjectMapper().writeValueAsString(new Item());}}'''})
++    e=Engine(p,ScenarioState(db));value=e.run(ids['Api.entry'],{})
++    assert isinstance(value,JsonText) and value.payload=={'marker':'shown'} and not e.approximate
++
++
++@pytest.mark.parametrize('bean',[
++    'class Item{static final String NAME="wire";@JsonProperty(NAME)public String value;}',
++    'class Item{@JsonProperty(index=2)public String value;}',
++    'class Item{@JsonProperty(value="wire",access=Access.READ_ONLY)public String value;}',
++    'class Item{public String marker;@com.fasterxml.jackson.annotation.JsonCreator Item(@JsonProperty("value")String value){}}',
++])
++def test_unmodeled_property_policies_do_not_silently_become_default_fields(tmp_path,bean):
++    p,e,ids=fixture(tmp_path,bean)
++    result=plan(p,e,'deserialize')
++    assert not result['complete'] and result['issues']

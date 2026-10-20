@@ -1,0 +1,184 @@
+--- E16-json-wire-ownership/analyzer/contracts.py
++++ E17-source-history-choice/analyzer/contracts.py
+@@ -363,12 +363,15 @@
+         if explicit is not None:
+             return explicit
+         ranked = self.index.rank(action, state.browser.get('active_page'), scenario_text)
++        constrained = self.source_history_choice(action,state) if not ranked else []
++        if constrained:ranked=constrained
+         candidates = [c['entry'] for _, _, c in ranked[:6]]
+         detail = {'candidates': candidates, 'ranking': [
+             {'entry': c['entry'], 'ui_site': c['site']['id'] if c['site'] else None, 'score': score}
+             for score, _, c in ranked[:6]], 'proposal': {'hypotheses': []}, 'unresolved': []}
+         detail['grounding_status'] = 'lexical_hypothesis'
+         if hasattr(self.index,'last_decision'):detail['retrieval_decision']=deepcopy(self.index.last_decision)
++        if constrained:detail['grounding_status']='source_history_constraint'
+         detail['certainty_note'] = 'Graph certainty is conditional on the selected source contract and validated bindings'
+         if not ranked:
+             detail['unresolved'] = ['No lexical evidence for a source request']
+@@ -451,6 +454,61 @@
+             detail['unresolved'].append('Selected source request blocked by known UI guard: '+blocked['site'])
+         detail['unresolved'].append('No request with a satisfiable source UI guard')
+         return [], detail
++
++    def source_history_choice(self,action,state):
++        """Resolve only a frozen lexical tie using a singular, typed prior result."""
++        decision=getattr(self.index,'last_decision',{})
++        if (decision.get('profile')!='unicode-source-lexical/1' or
++            decision.get('reason')!='source endpoint scores within frozen refusal margin' or
++            self.index.query_intent(action)!=0 or
++            not re.search(r'\b(?:just|newly|recently|previously)\s+(?:created|added|registered|saved)\b',action,re.I) or
++            re.search(r'\b(?:all|every|each|both|list|collection)\b',action,re.I)):
++            return []
++        from .result_contracts import result_shape
++        from .history_refs import object_scope
++        from .boxed_values import value_kind
++        choices=[];raw=decision.get('raw_top',[])
++        for row in raw:
++            contract=self.index.contracts[row['contract_id']];mid=contract['entry']
++            types,collection=result_shape(self.project,mid)
++            pars=self.project.http_parameters(mid)
++            if (contract['site'] or contract['verb']!='GET' or collection or len(types)!=1 or len(pars)!=1 or
++                pars[0]['kind']!='PathVariable' or not pars[0]['required']):continue
++            producers=[]
++            for number,item in enumerate(state.history):
++                previous=item.get('entry')
++                if previous not in self.project.methods:continue
++                shape=result_shape(self.project,previous)
++                if shape!=(types,False) or not any(m==previous and verb=='POST' for m,verb,_ in self.project.ix.handlers):continue
++                meta=self.project.methods[previous]
++                bodies=[self.project.resolve_type(p['type'],meta['module'],meta['file'])
++                    for p in self.project.http_parameters(previous) if p['kind']=='RequestBody']
++                if any(self.project.nodes.get(tid,{}).get('fqn') in types for tid in bodies):producers.append(number)
++            if not producers:continue
++            number=producers[-1];item=state.history[number];obj=item.get('result')
++            if (item.get('outcome')!='returned' or item.get('exploration',{}).get('complete') is not True or
++                not isinstance(obj,dict)):continue
++            _,fqn,tid=object_scope(self.project,item,obj)
++            if fqn not in types:continue
++            proposal=self._bind(action,state,contract,row['score'])
++            name=pars[0]['name'];proof=proposal['bindings'].get(name,{})
++            match=re.fullmatch(r'history\[(\d+)\]\.(?:result|created_objects\[\d+\])\.([\w$]+)',proof.get('reference',''))
++            if (proposal['unresolved'] or proof.get('source')!='history' or not match or int(match[1])!=number or
++                not proof.get('producer_observation',{}).get('digest')):continue
++            field=match[2];layout=self.project.type_fields.get(tid,{}).get(field,{})
++            engine=Engine(self.project,proposal['state'])
++            kind=engine.declared_kind(pars[0]['type'],self.project.methods[mid])
++            origin=engine.declared_kind(layout.get('type',''),self.project.nodes.get(layout.get('declaring_type'),{}))
++            value=obj.get(field,U)
++            if kind!=origin or kind not in ('String','Long','Integer','Short','Byte'):continue
++            if type(value) is dict:
++                valid=bool(value.get('__symbol__')) and value_kind(None,value.get('__type__'))==kind and 'non_null' in value.get('__constraints__',[])
++            elif kind=='String':valid=type(value) is str
++            else:
++                bits={'Long':64,'Integer':32,'Short':16,'Byte':8}[kind]
++                valid=type(value) is int and -(2**(bits-1))<=value<2**(bits-1)
++            if valid and proposal['params'].get(name)==value:choices.append((row['score'],row['contract_id'],contract))
++        return choices if len(choices)==1 and raw[0]['score']-choices[0][0]<=0.08*max(raw[0]['score'],1e-12) else []
+ 
+     def identity_ambiguity(self,action,state,ranked):
+         """Two source identity contracts need a qualifier, even with unequal scores."""
+--- E16-json-wire-ownership/tests/test_history_request_choice33.py
++++ E17-source-history-choice/tests/test_history_request_choice33.py
+@@ -0,0 +1,101 @@
++"""Source/result constraints may resolve a lexical tie, never replace a producer."""
++from copy import deepcopy
++import pytest
++from builders import build
++from analyzer.contracts import ContractGrounder
++from analyzer.frontend import Frontend
++from analyzer.history_agreement import observation
++from analyzer.java_collections import JsonObject
++from analyzer.lexical_retrieval import LexicalContractIndex
++from analyzer.paths import join_states
++from analyzer.state import ScenarioState,U
++
++
++def fixture(root,extra=''):
++    p,db,ids=build(root,{'Api.java':'''import org.springframework.web.bind.annotation.*;
++      import java.util.List;
++      class Parcel{public Long id;public String name;}
++      @RestController class ParcelController{
++      @PostMapping("/parcels") Parcel create(@RequestBody Parcel parcel){return parcel;}
++      @GetMapping("/parcels/{id}") Parcel getById(@PathVariable Long id){return null;}
++      @GetMapping("/parcels") List<Parcel> getAll(){return null;}
++      @GetMapping("/parcels/search") List<Parcel> searchParcels(@RequestParam String name){return null;}
++      '''+extra+'''}'''})
++    frontend=Frontend(p);index=LexicalContractIndex(p,frontend)
++    g=ContractGrounder(p,frontend,index,None,{'facts':{},'unresolved':[]})
++    state=ScenarioState(db)
++    state.history=[{'step':1,'action':'Create a parcel','entry':ids['ParcelController.create'],
++        'parameters':{},'result':JsonObject({'id':7,'name':'package'},'Parcel'),
++        'created_objects':[],'selected_objects':[],'outcome':'returned','exploration':{'complete':True}}]
++    return p,ids,g,state
++
++
++@pytest.mark.parametrize('value',[7,{'__symbol__':'created-id','__type__':'Long','__constraints__':['non_null']}])
++def test_source_single_record_and_complete_previous_result_resolve_a_read_tie(tmp_path,value):
++    p,ids,g,state=fixture(tmp_path);state.history[0]['result']['id']=value
++    before=deepcopy(state.history)
++    proposals,detail=g.step('Read the parcel just created',state)
++    assert len(proposals)==1 and proposals[0]['entry']==ids['ParcelController.getById']
++    proposal=proposals[0]
++    assert proposal['params']=={'id':value} and not proposal['unresolved']
++    proof=proposal['bindings']['id']
++    assert proof['source']=='history' and proof['reference']=='history[0].result.id'
++    assert proof['producer_observation']['digest']==observation(state.history[0])
++    assert detail['retrieval_decision']['accepted'] is False
++    assert detail['grounding_status']=='source_history_constraint'
++    assert state.history==before
++
++
++@pytest.mark.parametrize('mutation',[
++    'missing','partial','failed','unknown','wrong-kind','foreign-type','not-created','collection',
++])
++def test_missing_partial_failed_wrong_typed_or_noncreation_result_does_not_resolve_tie(tmp_path,mutation):
++    p,ids,g,state=fixture(tmp_path);item=state.history[0]
++    if mutation=='missing':state.history=[]
++    elif mutation=='partial':item['exploration']['complete']=False
++    elif mutation=='failed':item['outcome']='HTTP error response'
++    elif mutation=='unknown':item['result']['id']=U
++    elif mutation=='wrong-kind':item['result']['id']='7'
++    elif mutation=='foreign-type':item['result'].origin_type='Unrelated'
++    elif mutation=='not-created':item['entry']=ids['ParcelController.getById']
++    elif mutation=='collection':item['result']=[item['result']]
++    proposals,detail=g.step('Read the parcel just created',state)
++    assert not proposals and detail['unresolved']
++
++
++@pytest.mark.parametrize('action',['Read parcel','Read all parcels just created'])
++def test_history_cannot_silently_qualify_an_action_without_a_single_prior_reference(tmp_path,action):
++    p,ids,g,state=fixture(tmp_path)
++    proposals,detail=g.step(action,state)
++    assert not proposals and detail['unresolved']
++
++
++def test_explicit_identity_keeps_its_literal_producer(tmp_path):
++    p,ids,g,state=fixture(tmp_path)
++    proposals,detail=g.step('Read the parcel with id=9',state)
++    assert len(proposals)==1 and proposals[0]['params']=={'id':9}
++    assert proposals[0]['bindings']['id']['source']=='literal'
++
++
++def test_two_singular_source_endpoints_remain_ambiguous(tmp_path):
++    p,ids,g,state=fixture(tmp_path,'''@GetMapping("/mirror/parcels/{id}")
++      Parcel getMirrorById(@PathVariable Long id){return null;}''')
++    proposals,detail=g.step('Read the parcel just created',state)
++    assert not proposals and detail['unresolved']
++
++
++@pytest.mark.parametrize('other_value',[7,8])
++def test_every_joined_producer_alternative_must_agree_before_request_selection(tmp_path,other_value):
++    p,ids,g,state=fixture(tmp_path);other=deepcopy(state)
++    other.history[0]['result']['id']=other_value
++    joined=join_states([state,other])
++    proposals,detail=g.step('Read the parcel just created',joined)
++    assert bool(proposals)==(other_value==7)
++
++
++def test_an_incomplete_later_creation_cannot_fall_back_to_an_older_success(tmp_path):
++    p,ids,g,state=fixture(tmp_path);later=deepcopy(state.history[0]);later['step']=2
++    later['result']['id']=8;later['exploration']['complete']=False
++    state.history.append(later)
++    proposals,detail=g.step('Read the parcel just created',state)
++    assert not proposals and detail['unresolved']

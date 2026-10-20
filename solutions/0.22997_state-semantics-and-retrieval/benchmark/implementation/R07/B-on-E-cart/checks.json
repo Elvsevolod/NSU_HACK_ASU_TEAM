@@ -1,0 +1,196 @@
+{
+  "schema": "cart-profile/4",
+  "passed": false,
+  "frozen_v1_inputs_unchanged": true,
+  "profiles": {
+    "explicit": {
+      "schema": "cart-evaluation/4",
+      "passed": true,
+      "errors": [],
+      "required_edge_subset": {
+        "executes": {
+          "required": 0,
+          "observed": 0,
+          "precision": null,
+          "iou": null
+        },
+        "calls": {
+          "required": 13,
+          "observed": 13,
+          "precision": null,
+          "iou": null
+        },
+        "remote": {
+          "required": 1,
+          "observed": 1,
+          "precision": null,
+          "iou": null
+        },
+        "data": {
+          "required": 4,
+          "observed": 4,
+          "precision": null,
+          "iou": null
+        }
+      },
+      "scope": "post-authentication controller/application/persistence HTTP profile; JWT filter, validation and server startup are outside this oracle",
+      "new_holdout_success": false,
+      "targets_started": false,
+      "legal_orders": [
+        {
+          "step": 1,
+          "legal": [
+            [
+              21,
+              23
+            ],
+            [
+              23,
+              21
+            ]
+          ],
+          "observed": [
+            [
+              21,
+              23
+            ],
+            [
+              23,
+              21
+            ]
+          ],
+          "reason": "PaymentJpaRepository.findByOrderId has no ORDER BY/Sort; two matching rows"
+        },
+        {
+          "step": 8,
+          "legal": [
+            [
+              21,
+              23
+            ],
+            [
+              23,
+              21
+            ]
+          ],
+          "observed": [
+            [
+              21,
+              23
+            ],
+            [
+              23,
+              21
+            ]
+          ],
+          "reason": "PaymentJpaRepository.findByOrderId has no ORDER BY/Sort; two matching rows"
+        }
+      ],
+      "inherited_obligations": "all v3 required edges, executes, native arguments, state/refusal and server-body checks",
+      "metadata_delta": "transport equality ignores only diagnostic provenance; per-branch producer certificates remain required by NL normalization"
+    },
+    "nl": {
+      "schema": "cart-evaluation/4",
+      "passed": false,
+      "errors": [
+        "3: no executed alternative",
+        "3: actual root request differs",
+        "3: producer provenance missing",
+        "3: producer IDs/types differ",
+        "4: no executed alternative",
+        "4: actual root request differs",
+        "4: producer provenance missing",
+        "4: producer IDs/types differ"
+      ],
+      "required_edge_subset": {
+        "executes": {
+          "required": 0,
+          "observed": 0,
+          "precision": null,
+          "iou": null
+        },
+        "calls": {
+          "required": 13,
+          "observed": 13,
+          "precision": null,
+          "iou": null
+        },
+        "remote": {
+          "required": 1,
+          "observed": 1,
+          "precision": null,
+          "iou": null
+        },
+        "data": {
+          "required": 4,
+          "observed": 4,
+          "precision": null,
+          "iou": null
+        }
+      },
+      "scope": "post-authentication controller/application/persistence HTTP profile; JWT filter, validation and server startup are outside this oracle",
+      "new_holdout_success": false,
+      "targets_started": false,
+      "legal_orders": [
+        {
+          "step": 1,
+          "legal": [
+            [
+              21,
+              23
+            ],
+            [
+              23,
+              21
+            ]
+          ],
+          "observed": [
+            [
+              21,
+              23
+            ],
+            [
+              23,
+              21
+            ]
+          ],
+          "reason": "PaymentJpaRepository.findByOrderId has no ORDER BY/Sort; two matching rows"
+        },
+        {
+          "step": 8,
+          "legal": [
+            [
+              21,
+              23
+            ],
+            [
+              23,
+              21
+            ]
+          ],
+          "observed": [
+            [
+              21,
+              23
+            ],
+            [
+              23,
+              21
+            ]
+          ],
+          "reason": "PaymentJpaRepository.findByOrderId has no ORDER BY/Sort; two matching rows"
+        }
+      ],
+      "inherited_obligations": "all v3 required edges, executes, native arguments, state/refusal and server-body checks",
+      "metadata_delta": "transport equality ignores only diagnostic provenance; per-branch producer certificates remain required by NL normalization"
+    }
+  },
+  "new_holdout_success": false,
+  "targets_started": false,
+  "oracle_sha256": "0612d43076d5e00fe1223c35889c095c503e6999ab899fc73b6428ecc764c2b8",
+  "limits": [
+    "Required source-edge subset, not complete graph precision/IoU.",
+    "Cart is a tuned regression profile, not fresh holdout.",
+    "JWT/security/bootstrap are outside the explicit application boundary."
+  ]
+}

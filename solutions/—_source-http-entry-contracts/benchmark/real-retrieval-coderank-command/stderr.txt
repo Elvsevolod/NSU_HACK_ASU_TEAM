@@ -1,0 +1,26 @@
+Traceback (most recent call last):
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/checks/code_model_worker.py", line 119, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/checks/code_model_worker.py", line 53, in main
+    started=time.perf_counter();encoder=Encoder(args.model,args.storage,args.qwen,args.device)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/checks/code_model_encoders.py", line 81, in __init__
+    self.model.to(device=device,dtype=torch.float32)
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/.model-pilot32/venv/lib/python3.11/site-packages/transformers/modeling_utils.py", line 4343, in to
+    return super().to(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/.model-pilot32/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1371, in to
+    return self._apply(convert)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/.model-pilot32/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/.model-pilot32/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/.model-pilot32/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 957, in _apply
+    param_applied = fn(param)
+                    ^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/.model-pilot32/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1357, in convert
+    return t.to(
+           ^^^^^
+RuntimeError: The MPS backend is supported on MacOS 14.0+. Current OS version can be queried using `sw_vers`

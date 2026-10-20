@@ -1,0 +1,106 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_authentication_uses_loaded_principal_and_actual_password_status[alice-secret-True] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_authentication_uses_loade0')
+name = 'alice', password = 'secret', expected = True
+
+    @pytest.mark.parametrize('name,password,expected',[('alice','secret',True),('alice','wrong',False),('disabled','secret',False)])
+    def test_authentication_uses_loaded_principal_and_actual_password_status(tmp_path,name,password,expected):
+        project,db,ids=build(tmp_path,{'Api.java':SOURCE})
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{'name':name,'password':password},limit=1)
+>       assert {row['result'] for row in outcomes}=={expected}
+E       AssertionError: assert {<Unknown.VALUE: 'unknown'>} == {True}
+E         
+E         Extra items in the left set:
+E         <Unknown.VALUE: 'unknown'>
+E         Extra items in the right set:
+E         True
+E         Use -v to get more diff
+
+solutions/—_causal-execution-repair/code/tests/test_regression_authentication.py:41: AssertionError
+_ test_authentication_uses_loaded_principal_and_actual_password_status[alice-wrong-False] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_authentication_uses_loade1')
+name = 'alice', password = 'wrong', expected = False
+
+    @pytest.mark.parametrize('name,password,expected',[('alice','secret',True),('alice','wrong',False),('disabled','secret',False)])
+    def test_authentication_uses_loaded_principal_and_actual_password_status(tmp_path,name,password,expected):
+        project,db,ids=build(tmp_path,{'Api.java':SOURCE})
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{'name':name,'password':password},limit=1)
+>       assert {row['result'] for row in outcomes}=={expected}
+E       AssertionError: assert {<Unknown.VALUE: 'unknown'>} == {False}
+E         
+E         Extra items in the left set:
+E         <Unknown.VALUE: 'unknown'>
+E         Extra items in the right set:
+E         False
+E         Use -v to get more diff
+
+solutions/—_causal-execution-repair/code/tests/test_regression_authentication.py:41: AssertionError
+_ test_authentication_uses_loaded_principal_and_actual_password_status[disabled-secret-False] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_authentication_uses_loade2')
+name = 'disabled', password = 'secret', expected = False
+
+    @pytest.mark.parametrize('name,password,expected',[('alice','secret',True),('alice','wrong',False),('disabled','secret',False)])
+    def test_authentication_uses_loaded_principal_and_actual_password_status(tmp_path,name,password,expected):
+        project,db,ids=build(tmp_path,{'Api.java':SOURCE})
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{'name':name,'password':password},limit=1)
+>       assert {row['result'] for row in outcomes}=={expected}
+E       AssertionError: assert {<Unknown.VALUE: 'unknown'>} == {False}
+E         
+E         Extra items in the left set:
+E         <Unknown.VALUE: 'unknown'>
+E         Extra items in the right set:
+E         False
+E         Use -v to get more diff
+
+solutions/—_causal-execution-repair/code/tests/test_regression_authentication.py:41: AssertionError
+_______ test_password_and_authority_callbacks_share_the_loaded_receiver ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_password_and_authority_ca0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1060ccf10>
+
+    def test_password_and_authority_callbacks_share_the_loaded_receiver(tmp_path,monkeypatch):
+        project,db,ids=build(tmp_path,{'Api.java':SOURCE})
+        invoke=Engine.invoke;loaded=[];receivers=[]
+        def observe(self,mid,args,receiver=None,*extra,**kwargs):
+            if mid.startswith('method:service:Profile#') and not '#<init>' in mid:receivers.append(receiver)
+            result=invoke(self,mid,args,receiver,*extra,**kwargs)
+            if mid==ids['Provider.loadUserByUsername']:loaded.append(result)
+            return result
+        monkeypatch.setattr(Engine,'invoke',observe)
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{'name':'alice','password':'secret'}) is True
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> is True
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry(String,String)', {'name': 'alice', 'password': 'secret'})
+E        +    where run = <analyzer.engine.Engine object at 0x104cc7450>.run
+
+solutions/—_causal-execution-repair/code/tests/test_regression_authentication.py:60: AssertionError
+_____________ test_constructor_reference_is_a_lazy_stream_callback _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-129/test_constructor_reference_is_0')
+
+    def test_constructor_reference_is_a_lazy_stream_callback(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import java.util.stream.Collectors;
+          class Value {String text;Value(String input){text=input;}}
+          class Api {String entry(){return Arrays.asList("first","second").stream().map(Value::new).collect(Collectors.toList()).get(1).text;}}'''})
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{},limit=1)
+>       assert {row['result'] for row in outcomes}=={'second'}
+E       AssertionError: assert {<Unknown.VALUE: 'unknown'>} == {'second'}
+E         
+E         Extra items in the left set:
+E         <Unknown.VALUE: 'unknown'>
+E         Extra items in the right set:
+E         'second'
+E         Use -v to get more diff
+
+solutions/—_causal-execution-repair/code/tests/test_regression_authentication.py:69: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_authentication.py::test_authentication_uses_loaded_principal_and_actual_password_status[alice-secret-True]
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_authentication.py::test_authentication_uses_loaded_principal_and_actual_password_status[alice-wrong-False]
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_authentication.py::test_authentication_uses_loaded_principal_and_actual_password_status[disabled-secret-False]
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_authentication.py::test_password_and_authority_callbacks_share_the_loaded_receiver
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_authentication.py::test_constructor_reference_is_a_lazy_stream_callback
+5 failed in 0.21s

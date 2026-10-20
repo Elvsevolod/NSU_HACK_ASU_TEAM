@@ -1,0 +1,262 @@
+{
+  "source": "analyzer_review_full_answer.docx",
+  "variant": 27,
+  "completion_rule": "Each review item has implementation/experiment evidence and explicit scope; no claim of universal Java/Spring or zero error. R18 closes only after exact archive replay.",
+  "requirements": [
+    {
+      "id": "R01",
+      "priority": "P0",
+      "section": "§7",
+      "requirement": "Frozen independent corpus and equal controls 5/12/23/26",
+      "status": "verified_bounded",
+      "evidence": [
+        "checks/prepare_review_corpus.py",
+        "checks/prepare_public_corpus.py",
+        "benchmark/final-synthetic-candidate/comparison.json",
+        "benchmark/final-public-controls/comparison.json"
+      ],
+      "limits": "Small inspected corpus. v2 oracle correction retained separately; not blind validation."
+    },
+    {
+      "id": "R02",
+      "priority": "P0",
+      "section": "§3.1",
+      "requirement": "Semantic identity, actors and endpoint ambiguity",
+      "status": "verified_bounded",
+      "evidence": [
+        "code/tests/test_review_request.py",
+        "code/tests/test_review_history.py",
+        "code/analyzer/actors.py"
+      ],
+      "limits": "Arbitrary NL semantic matching is heuristic; source-proven actor constraints are bounded."
+    },
+    {
+      "id": "R03",
+      "priority": "P0",
+      "section": "§3.2",
+      "requirement": "Immutable Request and shared initial/remote binding",
+      "status": "verified_bounded",
+      "evidence": [
+        "code/analyzer/request.py",
+        "code/analyzer/http_binding.py",
+        "code/tests/test_review_request.py"
+      ],
+      "limits": "Bounded Java/Spring request profile; not all registration/security/converters."
+    },
+    {
+      "id": "R04",
+      "priority": "P0",
+      "section": "§3.3",
+      "requirement": "CollectionRef/ObjectRef, singleton/empty, deployment/FQN",
+      "status": "verified_bounded",
+      "evidence": [
+        "code/analyzer/history_refs.py",
+        "code/tests/test_review_history.py"
+      ],
+      "limits": "Supported HTML/JS/Vue scope extraction only; no arbitrary frontend support."
+    },
+    {
+      "id": "R05",
+      "priority": "P0",
+      "section": "§3.6",
+      "requirement": "do/while, isBlank, split, receiver context and initializers",
+      "status": "verified_bounded",
+      "evidence": [
+        "code/tests/test_review_java_control.py",
+        "code/analyzer/java_strings.py",
+        "code/analyzer/context_key.py"
+      ],
+      "limits": "Explicit Java regex/API subset, not full JVM semantics."
+    },
+    {
+      "id": "R06",
+      "priority": "P0",
+      "section": "§3.5",
+      "requirement": "Joint isolated local/remote alternatives and scoped uncertainty",
+      "status": "verified_bounded",
+      "evidence": [
+        "code/tests/test_review_alternatives.py",
+        "code/tests/test_review_snapshot.py",
+        "code/analyzer/paths.py"
+      ],
+      "limits": "Completion budget preserves executed prefix, diagnoses halt and keeps future edges as candidates."
+    },
+    {
+      "id": "R07",
+      "priority": "P0/P1",
+      "section": "§3.4",
+      "requirement": "Versioned opaque effects, reachable heap, callbacks, normal/throw",
+      "status": "verified_bounded",
+      "evidence": [
+        "code/analyzer/call_effects.py",
+        "code/tests/test_review_effects.py"
+      ],
+      "limits": "Unknown global footprint remains a named assumption; callbacks modeled zero/may, not a fabricated count."
+    },
+    {
+      "id": "R08",
+      "priority": "P1",
+      "section": "§3.8",
+      "requirement": "Event-local causality, candidates separate, export policy comparison",
+      "status": "verified_bounded",
+      "evidence": [
+        "code/analyzer/event_values.py",
+        "code/verify_run.py",
+        "code/tests/test_review_events.py",
+        "benchmark/final/witness-check.json",
+        "benchmark/export-policy-comparison.json"
+      ],
+      "limits": "Conditional supported event union selected by ablation; static candidates excluded."
+    },
+    {
+      "id": "R09",
+      "priority": "P1",
+      "section": "§3.7,§5",
+      "requirement": "Consistent direct/reflected/framework projection",
+      "status": "verified_bounded",
+      "evidence": [
+        "code/tests/test_review_projection.py",
+        "code/analyzer/bean_lifecycle.py",
+        "code/analyzer/persistence.py"
+      ],
+      "limits": "Reflection-root policy is consistent but lowers S0; target-specific constructor fitting rejected."
+    },
+    {
+      "id": "R10",
+      "priority": "P1",
+      "section": "§3.7",
+      "requirement": "Persistence context, lazy reference, SQL vs commit, flush and rollback",
+      "status": "verified_bounded",
+      "evidence": [
+        "code/analyzer/persistence.py",
+        "code/tests/test_review_persistence.py",
+        "code/tests/test_review_public_mechanisms.py"
+      ],
+      "limits": "Default REQUIRED and bounded mapping; IDENTITY conditional on Hibernate-compatible profile. Other propagation/mappings diagnosed."
+    },
+    {
+      "id": "R11",
+      "priority": "P1",
+      "section": "§6",
+      "requirement": "Coherent staged validation of 24–26 and Store/IR interfaces",
+      "status": "verified_bounded",
+      "evidence": [
+        "development/merges/24/manifest.json",
+        "development/merges/25/manifest.json",
+        "development/merges/26/manifest.json",
+        "development/tests-final-resource-filter.txt",
+        "code/tests/test_review_table_store.py"
+      ],
+      "limits": "Coherent Python donor changes accepted; Store/IR principles adapted, polygraph engine not ported wholesale."
+    },
+    {
+      "id": "R12",
+      "priority": "P1",
+      "section": "§7",
+      "requirement": "Two independent external application domains and held-out scenarios",
+      "status": "verified_bounded",
+      "evidence": [
+        "benchmark/final-public-candidate/comparison.json",
+        "benchmark/heldout-first/reference.json",
+        "benchmark/heldout-repair-replay/results.json"
+      ],
+      "limits": "Two real bounded profiles. No real remote. PiggyMetrics reused. First heldout exposed a repaired JSON bug; rerun is regression, not clean blind success."
+    },
+    {
+      "id": "R13",
+      "priority": "P1",
+      "section": "§7",
+      "requirement": "Endpoint/arguments/outcome/state and precision/recall/IoU, nonempty gold",
+      "status": "verified_bounded",
+      "evidence": [
+        "benchmark/final-public-candidate/comparison.json",
+        "benchmark/final-synthetic-candidate/comparison.json",
+        "benchmark/final/evaluation.json"
+      ],
+      "limits": "Public checks validate specified argument/result fields; some ignored response payloads are not measured. Gold-empty remote is unmeasured."
+    },
+    {
+      "id": "R14",
+      "priority": "P2",
+      "section": "§5,§7",
+      "requirement": "Extractor comparator experiment",
+      "status": "experiment_completed_not_adopted",
+      "evidence": [
+        "checks/ExtractorProbe.java",
+        "checks/compare_extractor.py",
+        "benchmark/optional-extractor-v2/comparison.json"
+      ],
+      "limits": "JavaParser syntax only, no Symbol Solver/classpath. No demonstrated final error reduction; production unchanged."
+    },
+    {
+      "id": "R15",
+      "priority": "P2",
+      "section": "§6,§7",
+      "requirement": "Versioned alias/read-state summaries and SMT ablation",
+      "status": "verified_bounded",
+      "evidence": [
+        "code/analyzer/getter_effects.py",
+        "code/tests/test_review_summaries.py",
+        "checks/optional_analysis_experiments.py",
+        "benchmark/optional-summary-smt/experiments.json"
+      ],
+      "limits": "Source getter effect summaries accepted; no return-value cache. Z3 six pure int32 pilot only, not production."
+    },
+    {
+      "id": "R16",
+      "priority": "P2",
+      "section": "§4,§7",
+      "requirement": "Optional typed-contract local reranker ablation",
+      "status": "experiment_completed_not_adopted",
+      "evidence": [
+        "checks/local_reranker.py",
+        "benchmark/optional-local-reranker-metal/experiment.json"
+      ],
+      "limits": "Nine local Qwen calls, no quality gain over already-correct baseline. Not a mandatory dependency."
+    },
+    {
+      "id": "R17",
+      "priority": "P1",
+      "section": "§2,§7",
+      "requirement": "Preparation/repeated analysis/RSS/model costs",
+      "status": "verified_bounded",
+      "evidence": [
+        "benchmark/final/metadata.json",
+        "benchmark/repeated-analysis-final.json",
+        "benchmark/optional-local-reranker-metal/experiment.json"
+      ],
+      "limits": "RSS and measured model timing reported; GPU memory not separately measured; historic parent timing not paired."
+    },
+    {
+      "id": "R18",
+      "priority": "P1",
+      "section": "§6,§8",
+      "requirement": "Reproducible offline archive, immutable inputs and diagnostics",
+      "status": "verified_bounded",
+      "evidence": [
+        "checks/package_final.py",
+        "checks/replay_archive.py",
+        "checks/check_integrity.py",
+        "benchmark/final/analysis-report-offline-audit.json",
+        "benchmark/archive-check.json",
+        "benchmark/archive-replay.json",
+        "benchmark/protected-integrity.json",
+        "benchmark/site-score.json",
+        "benchmark/site-best-restored.json"
+      ],
+      "limits": "Exact ZIP reproduced offline; package docs/ledger are pre-upload snapshots. Site metadata is appended outside the evaluated immutable archive. Finder .DS_Store change reported separately; old payloads unchanged."
+    }
+  ],
+  "last_regression_run": "development/tests-final-resource-filter.txt",
+  "source_sha256": "bd33b2cd6e164f5b978f8292434df53a21033105dd82cd961392d7308e80698f",
+  "regression_tests_passed": 1574,
+  "final_submission_sha256": "a24479ddc63892a75a1f0f6e4e9c740d0ef987c8799ac7a0d30b69d26af8995c",
+  "deepseek_calls": 0,
+  "production_model_calls": 0,
+  "external_llm_api_calls": 0,
+  "site_upload_authorized": true,
+  "site_upload_status": "accepted",
+  "site_submission_id": 1665138,
+  "site_score": 0.19402,
+  "decision": "Not promoted; negative hidden-quality experiment; best5 restored as1665145"
+}

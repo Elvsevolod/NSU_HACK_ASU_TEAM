@@ -1,0 +1,128 @@
+FFFFFFF..                                                                [100%]
+=================================== FAILURES ===================================
+_____ test_unobserved_default_charset_is_a_static_initialization_boundary ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-59/test_unobserved_default_charse0')
+
+    def test_unobserved_default_charset_is_a_static_initialization_boundary(tmp_path):
+        p,db,ids=fixture(tmp_path);e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Material.entry'],{}) is U
+E       AssertionError: assert 'YWI=' is <Unknown.VALUE: 'unknown'>
+E        +  where 'YWI=' = run('method:service:Material#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105fea510>.run
+
+code/tests/test_computed_base64_charset33.py:17: AssertionError
+_ test_computed_static_uses_observed_charset_or_typed_bytes["ab".getBytes("UTF-8")-YWI=] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-59/test_computed_static_uses_obse0')
+expression = '"ab".getBytes("UTF-8")', expected = 'YWI='
+
+    @pytest.mark.parametrize('expression,expected',[
+        ('"ab".getBytes("UTF-8")','YWI='),
+        ('"ab".getBytes(StandardCharsets.UTF_8)','YWI='),
+        ('"ab".getBytes(StandardCharsets.UTF_16BE)','AGEAYg=='),
+        ('"я".getBytes(StandardCharsets.UTF_8)','0Y8='),
+    ])
+    def test_computed_static_uses_observed_charset_or_typed_bytes(tmp_path,expression,expected):
+        p,db,ids=fixture(tmp_path,expression);e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Material.entry'],{})==expected
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'YWI='
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Material#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105f1aad0>.run
+
+code/tests/test_computed_base64_charset33.py:31: AssertionError
+_ test_computed_static_uses_observed_charset_or_typed_bytes["ab".getBytes(StandardCharsets.UTF_8)-YWI=] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-59/test_computed_static_uses_obse1')
+expression = '"ab".getBytes(StandardCharsets.UTF_8)', expected = 'YWI='
+
+    @pytest.mark.parametrize('expression,expected',[
+        ('"ab".getBytes("UTF-8")','YWI='),
+        ('"ab".getBytes(StandardCharsets.UTF_8)','YWI='),
+        ('"ab".getBytes(StandardCharsets.UTF_16BE)','AGEAYg=='),
+        ('"я".getBytes(StandardCharsets.UTF_8)','0Y8='),
+    ])
+    def test_computed_static_uses_observed_charset_or_typed_bytes(tmp_path,expression,expected):
+        p,db,ids=fixture(tmp_path,expression);e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Material.entry'],{})==expected
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'YWI='
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Material#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106616d10>.run
+
+code/tests/test_computed_base64_charset33.py:31: AssertionError
+_ test_computed_static_uses_observed_charset_or_typed_bytes["ab".getBytes(StandardCharsets.UTF_16BE)-AGEAYg==] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-59/test_computed_static_uses_obse2')
+expression = '"ab".getBytes(StandardCharsets.UTF_16BE)', expected = 'AGEAYg=='
+
+    @pytest.mark.parametrize('expression,expected',[
+        ('"ab".getBytes("UTF-8")','YWI='),
+        ('"ab".getBytes(StandardCharsets.UTF_8)','YWI='),
+        ('"ab".getBytes(StandardCharsets.UTF_16BE)','AGEAYg=='),
+        ('"я".getBytes(StandardCharsets.UTF_8)','0Y8='),
+    ])
+    def test_computed_static_uses_observed_charset_or_typed_bytes(tmp_path,expression,expected):
+        p,db,ids=fixture(tmp_path,expression);e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Material.entry'],{})==expected
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'AGEAYg=='
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Material#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10619c510>.run
+
+code/tests/test_computed_base64_charset33.py:31: AssertionError
+_ test_computed_static_uses_observed_charset_or_typed_bytes["\u044f".getBytes(StandardCharsets.UTF_8)-0Y8=] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-59/test_computed_static_uses_obse3')
+expression = '"я".getBytes(StandardCharsets.UTF_8)', expected = '0Y8='
+
+    @pytest.mark.parametrize('expression,expected',[
+        ('"ab".getBytes("UTF-8")','YWI='),
+        ('"ab".getBytes(StandardCharsets.UTF_8)','YWI='),
+        ('"ab".getBytes(StandardCharsets.UTF_16BE)','AGEAYg=='),
+        ('"я".getBytes(StandardCharsets.UTF_8)','0Y8='),
+    ])
+    def test_computed_static_uses_observed_charset_or_typed_bytes(tmp_path,expression,expected):
+        p,db,ids=fixture(tmp_path,expression);e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Material.entry'],{})==expected
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == '0Y8='
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Material#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105ceb550>.run
+
+code/tests/test_computed_base64_charset33.py:31: AssertionError
+_ test_supplied_default_charset_controls_the_same_source_without_rewriting_it __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-59/test_supplied_default_charset_0')
+
+    def test_supplied_default_charset_controls_the_same_source_without_rewriting_it(tmp_path):
+        p,db,ids=fixture(tmp_path)
+        assert Engine(p,ScenarioState(db,{'java_default_charset':'UTF-8'})).run(ids['Material.entry'],{})=='YWI='
+>       assert Engine(p,ScenarioState(db,{'java_default_charset':'UTF-16BE'})).run(ids['Material.entry'],{})=='AGEAYg=='
+E       AssertionError: assert 'YWI=' == 'AGEAYg=='
+E         
+E         - AGEAYg==
+E         + YWI=
+
+code/tests/test_computed_base64_charset33.py:39: AssertionError
+_____________ test_unknown_byte_element_stops_before_normal_suffix _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-59/test_unknown_byte_element_stop0')
+
+    def test_unknown_byte_element_stops_before_normal_suffix(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''import java.util.Base64;
+          class Api{String entry(byte[] values){Base64.getEncoder().encodeToString(values);return "after";}}'''})
+        e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{'values':JavaArray([U],'byte',['Byte'])}) is U
+>       assert e.outcome=='unsupported_semantics boundary'
+E       AssertionError: assert 'returned' == 'unsupported_...tics boundary'
+E         
+E         - unsupported_semantics boundary
+E         + returned
+
+code/tests/test_computed_base64_charset33.py:46: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_computed_base64_charset33.py::test_unobserved_default_charset_is_a_static_initialization_boundary
+FAILED code/tests/test_computed_base64_charset33.py::test_computed_static_uses_observed_charset_or_typed_bytes["ab".getBytes("UTF-8")-YWI=]
+FAILED code/tests/test_computed_base64_charset33.py::test_computed_static_uses_observed_charset_or_typed_bytes["ab".getBytes(StandardCharsets.UTF_8)-YWI=]
+FAILED code/tests/test_computed_base64_charset33.py::test_computed_static_uses_observed_charset_or_typed_bytes["ab".getBytes(StandardCharsets.UTF_16BE)-AGEAYg==]
+FAILED code/tests/test_computed_base64_charset33.py::test_computed_static_uses_observed_charset_or_typed_bytes["\u044f".getBytes(StandardCharsets.UTF_8)-0Y8=]
+FAILED code/tests/test_computed_base64_charset33.py::test_supplied_default_charset_controls_the_same_source_without_rewriting_it
+FAILED code/tests/test_computed_base64_charset33.py::test_unknown_byte_element_stops_before_normal_suffix
+7 failed, 2 passed in 0.13s

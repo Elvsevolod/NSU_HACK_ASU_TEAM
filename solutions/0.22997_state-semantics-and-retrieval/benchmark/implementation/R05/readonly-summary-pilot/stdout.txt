@@ -1,0 +1,22 @@
+F.................                                                       [100%]
+=================================== FAILURES ===================================
+______ test_readonly_stop_preserves_prefix_full_edges_and_unrelated_rows _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-16/test_readonly_stop_preserves_p0')
+
+    def test_readonly_stop_preserves_prefix_full_edges_and_unrelated_rows(tmp_path):
+        p,db,ids=fixture(tmp_path)
+        _,off=run(p,db,ids,False);result,on=run(p,db,ids,True)
+        assert result is U and on.outcome=='unsupported_semantics boundary'
+        assert off.outcome==on.outcome and off.edges==on.edges==prefix_oracle(ids)
+>       assert off.state.database.rows(p.nodes[RID]) is None
+E       AssertionError: assert [{'id': 'A', 'status': 'free'}, {'id': 'B', 'status': 'free'}] is None
+E        +  where [{'id': 'A', 'status': 'free'}, {'id': 'B', 'status': 'free'}] = rows({'kind': 'data_resource', 'name': 'equipment', 'origin': [{'file': 'Warehouse.java'}], 'resource_kind': 'table', ...})
+E        +    where rows = <analyzer.state.Database object at 0x1021ffc90>.rows
+E        +      where <analyzer.state.Database object at 0x1021ffc90> = <analyzer.state.ScenarioState object at 0x101709b10>.database
+E        +        where <analyzer.state.ScenarioState object at 0x101709b10> = <analyzer.engine.Engine object at 0x1023b01d0>.state
+
+code/tests/test_scoped_effects32.py:58: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_scoped_effects32.py::test_readonly_stop_preserves_prefix_full_edges_and_unrelated_rows
+1 failed, 17 passed in 0.18s

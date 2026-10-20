@@ -1,0 +1,437 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFF.....                                          [100%]
+=================================== FAILURES ===================================
+_ test_renamed_private_field_uses_wire_name_but_keeps_declaring_storage[@JsonProperty("wire_name")] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_renamed_private_field_use0')
+annotation = '@JsonProperty("wire_name")'
+
+    @pytest.mark.parametrize('annotation',[
+        '@JsonProperty("wire_name")','@JsonProperty(value="wire_name")',
+        '@com.fasterxml.jackson.annotation.JsonProperty("wire_name")'])
+    def test_renamed_private_field_uses_wire_name_but_keeps_declaring_storage(tmp_path,annotation):
+        p,e,ids=fixture(tmp_path, 'class Item{'+annotation+' private Long local=3L;Long raw(){return local;}}',
+            'Item item=new ObjectMapper().readValue('+input_json({'wire_name':9})+',Item.class);return item;')
+        value=e.run(ids['Api.entry'],{})
+>       assert value['local']==9 and 'wire_name' not in value and value._native_field_kinds['local']=='Long'
+               ^^^^^^^^^^^^^^
+E       TypeError: 'Unknown' object is not subscriptable
+
+code/tests/test_json_property33.py:38: TypeError
+_ test_renamed_private_field_uses_wire_name_but_keeps_declaring_storage[@JsonProperty(value="wire_name")] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_renamed_private_field_use1')
+annotation = '@JsonProperty(value="wire_name")'
+
+    @pytest.mark.parametrize('annotation',[
+        '@JsonProperty("wire_name")','@JsonProperty(value="wire_name")',
+        '@com.fasterxml.jackson.annotation.JsonProperty("wire_name")'])
+    def test_renamed_private_field_uses_wire_name_but_keeps_declaring_storage(tmp_path,annotation):
+        p,e,ids=fixture(tmp_path, 'class Item{'+annotation+' private Long local=3L;Long raw(){return local;}}',
+            'Item item=new ObjectMapper().readValue('+input_json({'wire_name':9})+',Item.class);return item;')
+        value=e.run(ids['Api.entry'],{})
+>       assert value['local']==9 and 'wire_name' not in value and value._native_field_kinds['local']=='Long'
+               ^^^^^^^^^^^^^^
+E       TypeError: 'Unknown' object is not subscriptable
+
+code/tests/test_json_property33.py:38: TypeError
+_ test_renamed_private_field_uses_wire_name_but_keeps_declaring_storage[@com.fasterxml.jackson.annotation.JsonProperty("wire_name")] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_renamed_private_field_use2')
+annotation = '@com.fasterxml.jackson.annotation.JsonProperty("wire_name")'
+
+    @pytest.mark.parametrize('annotation',[
+        '@JsonProperty("wire_name")','@JsonProperty(value="wire_name")',
+        '@com.fasterxml.jackson.annotation.JsonProperty("wire_name")'])
+    def test_renamed_private_field_uses_wire_name_but_keeps_declaring_storage(tmp_path,annotation):
+        p,e,ids=fixture(tmp_path, 'class Item{'+annotation+' private Long local=3L;Long raw(){return local;}}',
+            'Item item=new ObjectMapper().readValue('+input_json({'wire_name':9})+',Item.class);return item;')
+        value=e.run(ids['Api.entry'],{})
+>       assert value['local']==9 and 'wire_name' not in value and value._native_field_kinds['local']=='Long'
+               ^^^^^^^^^^^^^^
+E       TypeError: 'Unknown' object is not subscriptable
+
+code/tests/test_json_property33.py:38: TypeError
+___ test_default_annotation_explicitly_exposes_private_field[@JsonProperty] ____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_default_annotation_explic0')
+annotation = '@JsonProperty'
+
+    @pytest.mark.parametrize('annotation',['@JsonProperty','@JsonProperty()','@JsonProperty("")','@JsonProperty(value="")'])
+    def test_default_annotation_explicitly_exposes_private_field(tmp_path,annotation):
+        p,e,ids=fixture(tmp_path,'class Item{'+annotation+' private String name="shown";}')
+        value=e.run(ids['Api.entry'],{})
+>       assert isinstance(value,JsonText) and value.payload=={'name':'shown'} and not e.approximate
+E       AssertionError: assert (True and <Unknown.VALUE: 'unknown'> == {'name': 'shown'})
+E        +  where True = isinstance({'__json__': <Unknown.VALUE: 'unknown'>}, JsonText)
+E        +  and   <Unknown.VALUE: 'unknown'> = {'__json__': <Unknown.VALUE: 'unknown'>}.payload
+
+code/tests/test_json_property33.py:49: AssertionError
+__ test_default_annotation_explicitly_exposes_private_field[@JsonProperty()] ___
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_default_annotation_explic1')
+annotation = '@JsonProperty()'
+
+    @pytest.mark.parametrize('annotation',['@JsonProperty','@JsonProperty()','@JsonProperty("")','@JsonProperty(value="")'])
+    def test_default_annotation_explicitly_exposes_private_field(tmp_path,annotation):
+        p,e,ids=fixture(tmp_path,'class Item{'+annotation+' private String name="shown";}')
+        value=e.run(ids['Api.entry'],{})
+>       assert isinstance(value,JsonText) and value.payload=={'name':'shown'} and not e.approximate
+E       AssertionError: assert (True and <Unknown.VALUE: 'unknown'> == {'name': 'shown'})
+E        +  where True = isinstance({'__json__': <Unknown.VALUE: 'unknown'>}, JsonText)
+E        +  and   <Unknown.VALUE: 'unknown'> = {'__json__': <Unknown.VALUE: 'unknown'>}.payload
+
+code/tests/test_json_property33.py:49: AssertionError
+_ test_default_annotation_explicitly_exposes_private_field[@JsonProperty("")] __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_default_annotation_explic2')
+annotation = '@JsonProperty("")'
+
+    @pytest.mark.parametrize('annotation',['@JsonProperty','@JsonProperty()','@JsonProperty("")','@JsonProperty(value="")'])
+    def test_default_annotation_explicitly_exposes_private_field(tmp_path,annotation):
+        p,e,ids=fixture(tmp_path,'class Item{'+annotation+' private String name="shown";}')
+        value=e.run(ids['Api.entry'],{})
+>       assert isinstance(value,JsonText) and value.payload=={'name':'shown'} and not e.approximate
+E       AssertionError: assert (True and <Unknown.VALUE: 'unknown'> == {'name': 'shown'})
+E        +  where True = isinstance({'__json__': <Unknown.VALUE: 'unknown'>}, JsonText)
+E        +  and   <Unknown.VALUE: 'unknown'> = {'__json__': <Unknown.VALUE: 'unknown'>}.payload
+
+code/tests/test_json_property33.py:49: AssertionError
+_ test_default_annotation_explicitly_exposes_private_field[@JsonProperty(value="")] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_default_annotation_explic3')
+annotation = '@JsonProperty(value="")'
+
+    @pytest.mark.parametrize('annotation',['@JsonProperty','@JsonProperty()','@JsonProperty("")','@JsonProperty(value="")'])
+    def test_default_annotation_explicitly_exposes_private_field(tmp_path,annotation):
+        p,e,ids=fixture(tmp_path,'class Item{'+annotation+' private String name="shown";}')
+        value=e.run(ids['Api.entry'],{})
+>       assert isinstance(value,JsonText) and value.payload=={'name':'shown'} and not e.approximate
+E       AssertionError: assert (True and <Unknown.VALUE: 'unknown'> == {'name': 'shown'})
+E        +  where True = isinstance({'__json__': <Unknown.VALUE: 'unknown'>}, JsonText)
+E        +  and   <Unknown.VALUE: 'unknown'> = {'__json__': <Unknown.VALUE: 'unknown'>}.payload
+
+code/tests/test_json_property33.py:49: AssertionError
+_ test_read_only_field_is_not_overwritten_or_treated_as_unknown_input[Access] __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_read_only_field_is_not_ov0')
+qualifier = 'Access'
+
+    @pytest.mark.parametrize('qualifier',['Access','JsonProperty.Access','com.fasterxml.jackson.annotation.JsonProperty.Access'])
+    def test_read_only_field_is_not_overwritten_or_treated_as_unknown_input(tmp_path,qualifier):
+        bean='class Item{@JsonProperty(access='+qualifier+'.READ_ONLY) private int value=7;int raw(){return value;}}'
+        p,e,ids=fixture(tmp_path,bean,'Item item=new ObjectMapper().readValue('+input_json({'value':99})+',Item.class);return item.raw();')
+>       assert e.run(ids['Api.entry'],{})==7 and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 7)
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x107192990>.run
+
+code/tests/test_json_property33.py:56: AssertionError
+_ test_read_only_field_is_not_overwritten_or_treated_as_unknown_input[JsonProperty.Access] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_read_only_field_is_not_ov1')
+qualifier = 'JsonProperty.Access'
+
+    @pytest.mark.parametrize('qualifier',['Access','JsonProperty.Access','com.fasterxml.jackson.annotation.JsonProperty.Access'])
+    def test_read_only_field_is_not_overwritten_or_treated_as_unknown_input(tmp_path,qualifier):
+        bean='class Item{@JsonProperty(access='+qualifier+'.READ_ONLY) private int value=7;int raw(){return value;}}'
+        p,e,ids=fixture(tmp_path,bean,'Item item=new ObjectMapper().readValue('+input_json({'value':99})+',Item.class);return item.raw();')
+>       assert e.run(ids['Api.entry'],{})==7 and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 7)
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x107142750>.run
+
+code/tests/test_json_property33.py:56: AssertionError
+_ test_read_only_field_is_not_overwritten_or_treated_as_unknown_input[com.fasterxml.jackson.annotation.JsonProperty.Access] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_read_only_field_is_not_ov2')
+qualifier = 'com.fasterxml.jackson.annotation.JsonProperty.Access'
+
+    @pytest.mark.parametrize('qualifier',['Access','JsonProperty.Access','com.fasterxml.jackson.annotation.JsonProperty.Access'])
+    def test_read_only_field_is_not_overwritten_or_treated_as_unknown_input(tmp_path,qualifier):
+        bean='class Item{@JsonProperty(access='+qualifier+'.READ_ONLY) private int value=7;int raw(){return value;}}'
+        p,e,ids=fixture(tmp_path,bean,'Item item=new ObjectMapper().readValue('+input_json({'value':99})+',Item.class);return item.raw();')
+>       assert e.run(ids['Api.entry'],{})==7 and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 7)
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1070b5690>.run
+
+code/tests/test_json_property33.py:56: AssertionError
+_________________ test_read_only_source_setter_is_not_invoked __________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_read_only_source_setter_i0')
+
+    def test_read_only_source_setter_is_not_invoked(tmp_path):
+        p,e,ids=fixture(tmp_path,'''class Item{private int value=7;public int getValue(){return value;}
+          @JsonProperty(access=Access.READ_ONLY)public void setValue(int input){throw new IllegalStateException();}}''',
+            'return new ObjectMapper().readValue('+input_json({'value':99})+',Item.class).getValue();')
+>       assert e.run(ids['Api.entry'],{})==7 and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 7)
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x107128a10>.run
+
+code/tests/test_json_property33.py:65: AssertionError
+____ test_observed_fail_on_ignored_policy_still_throws_for_read_only_input _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_observed_fail_on_ignored_0')
+
+    def test_observed_fail_on_ignored_policy_still_throws_for_read_only_input(tmp_path):
+        p,e,ids=fixture(tmp_path,'class Item{@JsonProperty(access=Access.READ_ONLY)public String value;}',
+            'ObjectMapper m=new ObjectMapper();m.enable(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES);'
+            'm.readValue('+input_json({'value':'incoming'})+',Item.class);after();return true;')
+>       assert e.run(ids['Api.entry'],{}) is U and e.outcome=='uncaught application exception'
+E       AssertionError: assert (True is <Unknown.VALUE: 'unknown'>)
+E        +  where True = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10661bf50>.run
+
+code/tests/test_json_property33.py:73: AssertionError
+______ test_write_only_does_not_call_a_throwing_getter_or_emit_the_value _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_write_only_does_not_call_0')
+
+    def test_write_only_does_not_call_a_throwing_getter_or_emit_the_value(tmp_path):
+        p,e,ids=fixture(tmp_path,'''class Item{public String marker="shown";
+          @JsonProperty(access=Access.WRITE_ONLY)private String secret="hidden";
+          public String getSecret(){throw new IllegalStateException();}}''')
+        value=e.run(ids['Api.entry'],{})
+>       assert isinstance(value,JsonText) and value.payload=={'marker':'shown'} and not e.approximate
+E       AssertionError: assert (True and <Unknown.VALUE: 'unknown'> == {'marker': 'shown'})
+E        +  where True = isinstance({'__json__': <Unknown.VALUE: 'unknown'>}, JsonText)
+E        +  and   <Unknown.VALUE: 'unknown'> = {'__json__': <Unknown.VALUE: 'unknown'>}.payload
+
+code/tests/test_json_property33.py:82: AssertionError
+_________ test_write_only_renamed_field_accepts_input_into_java_member _________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_write_only_renamed_field_0')
+
+    def test_write_only_renamed_field_accepts_input_into_java_member(tmp_path):
+        p,e,ids=fixture(tmp_path,'''class Item{@JsonProperty(value="incoming",access=Access.WRITE_ONLY)
+          private String secret="seed";String raw(){return secret;}}''',
+            'return new ObjectMapper().readValue('+input_json({'incoming':'assigned'})+',Item.class).raw();')
+>       assert e.run(ids['Api.entry'],{})=='assigned' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'assigned')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x107056910>.run
+
+code/tests/test_json_property33.py:90: AssertionError
+________ test_access_policy_controls_private_getter_visibility[AUTO-3] _________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_access_policy_controls_pr0')
+access = 'AUTO', expected = 3
+
+    @pytest.mark.parametrize('access,expected',[('AUTO',3),('READ_WRITE',4),('READ_ONLY',4)])
+    def test_access_policy_controls_private_getter_visibility(tmp_path,access,expected):
+        p,e,ids=fixture(tmp_path,'class Item{@JsonProperty(access=Access.'+access+')private int value=3;'
+            'private int getValue(){return value+1;}}')
+        value=e.run(ids['Api.entry'],{})
+>       assert isinstance(value,JsonText) and value.payload=={'value':expected} and not e.approximate
+E       AssertionError: assert (True and <Unknown.VALUE: 'unknown'> == {'value': 3})
+E        +  where True = isinstance({'__json__': <Unknown.VALUE: 'unknown'>}, JsonText)
+E        +  and   <Unknown.VALUE: 'unknown'> = {'__json__': <Unknown.VALUE: 'unknown'>}.payload
+
+code/tests/test_json_property33.py:98: AssertionError
+_____ test_access_policy_controls_private_getter_visibility[READ_WRITE-4] ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_access_policy_controls_pr1')
+access = 'READ_WRITE', expected = 4
+
+    @pytest.mark.parametrize('access,expected',[('AUTO',3),('READ_WRITE',4),('READ_ONLY',4)])
+    def test_access_policy_controls_private_getter_visibility(tmp_path,access,expected):
+        p,e,ids=fixture(tmp_path,'class Item{@JsonProperty(access=Access.'+access+')private int value=3;'
+            'private int getValue(){return value+1;}}')
+        value=e.run(ids['Api.entry'],{})
+>       assert isinstance(value,JsonText) and value.payload=={'value':expected} and not e.approximate
+E       AssertionError: assert (True and <Unknown.VALUE: 'unknown'> == {'value': 4})
+E        +  where True = isinstance({'__json__': <Unknown.VALUE: 'unknown'>}, JsonText)
+E        +  and   <Unknown.VALUE: 'unknown'> = {'__json__': <Unknown.VALUE: 'unknown'>}.payload
+
+code/tests/test_json_property33.py:98: AssertionError
+______ test_access_policy_controls_private_getter_visibility[READ_ONLY-4] ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_access_policy_controls_pr2')
+access = 'READ_ONLY', expected = 4
+
+    @pytest.mark.parametrize('access,expected',[('AUTO',3),('READ_WRITE',4),('READ_ONLY',4)])
+    def test_access_policy_controls_private_getter_visibility(tmp_path,access,expected):
+        p,e,ids=fixture(tmp_path,'class Item{@JsonProperty(access=Access.'+access+')private int value=3;'
+            'private int getValue(){return value+1;}}')
+        value=e.run(ids['Api.entry'],{})
+>       assert isinstance(value,JsonText) and value.payload=={'value':expected} and not e.approximate
+E       AssertionError: assert (True and <Unknown.VALUE: 'unknown'> == {'value': 4})
+E        +  where True = isinstance({'__json__': <Unknown.VALUE: 'unknown'>}, JsonText)
+E        +  and   <Unknown.VALUE: 'unknown'> = {'__json__': <Unknown.VALUE: 'unknown'>}.payload
+
+code/tests/test_json_property33.py:98: AssertionError
+______ test_getter_rename_is_shared_by_the_unannotated_setter[serialize] _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_getter_rename_is_shared_b0')
+direction = 'serialize'
+
+    @pytest.mark.parametrize('direction',['serialize','deserialize'])
+    def test_getter_rename_is_shared_by_the_unannotated_setter(tmp_path,direction):
+        bean='''class Item{private String value="seed";@JsonProperty("external") public String getValue(){return value;}
+          public void setValue(String input){value=input+"!";}}'''
+        body=('return new ObjectMapper().writeValueAsString(new Item());' if direction=='serialize' else
+              'return new ObjectMapper().readValue('+input_json({'external':'new'})+',Item.class).getValue();')
+        p,e,ids=fixture(tmp_path,bean,body);value=e.run(ids['Api.entry'],{})
+>       assert not e.approximate
+E       assert not True
+E        +  where True = <analyzer.engine.Engine object at 0x1066d6050>.approximate
+
+code/tests/test_json_property33.py:108: AssertionError
+_____ test_getter_rename_is_shared_by_the_unannotated_setter[deserialize] ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_getter_rename_is_shared_b1')
+direction = 'deserialize'
+
+    @pytest.mark.parametrize('direction',['serialize','deserialize'])
+    def test_getter_rename_is_shared_by_the_unannotated_setter(tmp_path,direction):
+        bean='''class Item{private String value="seed";@JsonProperty("external") public String getValue(){return value;}
+          public void setValue(String input){value=input+"!";}}'''
+        body=('return new ObjectMapper().writeValueAsString(new Item());' if direction=='serialize' else
+              'return new ObjectMapper().readValue('+input_json({'external':'new'})+',Item.class).getValue();')
+        p,e,ids=fixture(tmp_path,bean,body);value=e.run(ids['Api.entry'],{})
+>       assert not e.approximate
+E       assert not True
+E        +  where True = <analyzer.engine.Engine object at 0x1071ca210>.approximate
+
+code/tests/test_json_property33.py:108: AssertionError
+__________ test_annotated_nonbean_methods_merge_by_explicit_wire_name __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_annotated_nonbean_methods0')
+
+    def test_annotated_nonbean_methods_merge_by_explicit_wire_name(tmp_path):
+        bean='''class Item{private String stored="seed";
+          @JsonProperty("wire")private String expose(){return stored;}
+          @JsonProperty("wire")private void accept(String value){stored=value+"!";}}'''
+        p,e,ids=fixture(tmp_path,bean,'return new ObjectMapper().writeValueAsString('
+            'new ObjectMapper().readValue('+input_json({'wire':'new'})+',Item.class));')
+        value=e.run(ids['Api.entry'],{})
+>       assert isinstance(value,JsonText) and value.payload=={'wire':'new!'} and not e.approximate
+E       AssertionError: assert (True and <Unknown.VALUE: 'unknown'> == {'wire': 'new!'})
+E        +  where True = isinstance({'__json__': <Unknown.VALUE: 'unknown'>}, JsonText)
+E        +  and   <Unknown.VALUE: 'unknown'> = {'__json__': <Unknown.VALUE: 'unknown'>}.payload
+
+code/tests/test_json_property33.py:122: AssertionError
+__________ test_split_ignore_getter_and_explicit_setter_is_write_only __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_split_ignore_getter_and_e0')
+
+    def test_split_ignore_getter_and_explicit_setter_is_write_only(tmp_path):
+        bean='''class Item{public String marker="shown";private String name="seed";
+          @JsonIgnore public String getName(){throw new IllegalStateException();}
+          @JsonProperty public void setName(String value){name=value+"!";}String raw(){return name;}}'''
+        p,e,ids=fixture(tmp_path,bean,'return new ObjectMapper().readValue('+input_json({'name':'new'})+',Item.class).raw();')
+>       assert e.run(ids['Api.entry'],{})=='new!' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'new!')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1065a3610>.run
+
+code/tests/test_json_property33.py:131: AssertionError
+_______ test_lombok_read_only_does_not_disable_the_java_generated_setter _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_lombok_read_only_does_not0')
+
+    def test_lombok_read_only_does_not_disable_the_java_generated_setter(tmp_path):
+        bean='''import lombok.Data;import lombok.NoArgsConstructor;
+          @Data @NoArgsConstructor class Item{@JsonProperty(access=Access.READ_ONLY)private int value=7;}'''
+        p,e,ids=fixture(tmp_path,bean,'Item item=new ObjectMapper().readValue('+input_json({'value':99})+',Item.class);'
+            'item.setValue(8);return new ObjectMapper().writeValueAsString(item);')
+        value=e.run(ids['Api.entry'],{})
+>       assert isinstance(value,JsonText) and value.payload=={'value':8} and not e.approximate
+E       AssertionError: assert (True and <Unknown.VALUE: 'unknown'> == {'value': 8})
+E        +  where True = isinstance({'__json__': <Unknown.VALUE: 'unknown'>}, JsonText)
+E        +  and   <Unknown.VALUE: 'unknown'> = {'__json__': <Unknown.VALUE: 'unknown'>}.payload
+
+code/tests/test_json_property33.py:142: AssertionError
+_____________ test_access_annotation_priority_depends_on_direction _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_access_annotation_priorit0')
+
+    def test_access_annotation_priority_depends_on_direction(tmp_path):
+        bean='''class Base{@JsonProperty(access=Access.READ_ONLY)protected int value=3;}
+          class Item extends Base{@JsonProperty(access=Access.READ_WRITE)public int getValue(){return value+1;}}'''
+        p,e,ids=fixture(tmp_path,bean,'return new ObjectMapper().writeValueAsString('
+            'new ObjectMapper().readValue('+input_json({'value':99})+',Item.class));')
+        value=e.run(ids['Api.entry'],{})
+>       assert isinstance(value,JsonText) and value.payload=={'value':4} and not e.approximate
+E       AssertionError: assert (True and <Unknown.VALUE: 'unknown'> == {'value': 4})
+E        +  where True = isinstance({'__json__': <Unknown.VALUE: 'unknown'>}, JsonText)
+E        +  and   <Unknown.VALUE: 'unknown'> = {'__json__': <Unknown.VALUE: 'unknown'>}.payload
+
+code/tests/test_json_property33.py:152: AssertionError
+________ test_read_only_collection_does_not_invoke_getter_only_mutation ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_read_only_collection_does0')
+
+    def test_read_only_collection_does_not_invoke_getter_only_mutation(tmp_path):
+        bean='''class Item{private List<String> tags;public Item(){tags=new ArrayList<>();}
+          @JsonProperty(access=Access.READ_ONLY)public List<String> getTags(){return tags;}int size(){return tags.size();}}'''
+        p,e,ids=fixture(tmp_path,bean,'return new ObjectMapper().readValue('+input_json({'tags':['incoming']})+',Item.class).size();')
+>       assert e.run(ids['Api.entry'],{})==0 and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 0)
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1065d2c50>.run
+
+code/tests/test_json_property33.py:159: AssertionError
+_ test_literal_wire_names_and_explicit_transient_inclusion[@JsonProperty("\u0432\u043d\u0435\u0448\u043d\u0435\u0435") private String local="shown";] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_literal_wire_names_and_ex0')
+field = '@JsonProperty("внешнее") private String local="shown";'
+
+    @pytest.mark.parametrize('field',[
+        '@JsonProperty("внешнее") private String local="shown";',
+        '@JsonProperty("external") private transient String local="shown";'])
+    def test_literal_wire_names_and_explicit_transient_inclusion(tmp_path,field):
+        p,e,ids=fixture(tmp_path,'class Item{'+field+'}');value=e.run(ids['Api.entry'],{})
+        expected='внешнее' if 'внешнее' in field else 'external'
+>       assert isinstance(value,JsonText) and value.payload=={expected:'shown'} and not e.approximate
+E       AssertionError: assert (True and <Unknown.VALUE: 'unknown'> == {'внешнее': 'shown'})
+E        +  where True = isinstance({'__json__': <Unknown.VALUE: 'unknown'>}, JsonText)
+E        +  and   <Unknown.VALUE: 'unknown'> = {'__json__': <Unknown.VALUE: 'unknown'>}.payload
+
+code/tests/test_json_property33.py:169: AssertionError
+_ test_literal_wire_names_and_explicit_transient_inclusion[@JsonProperty("external") private transient String local="shown";] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-68/test_literal_wire_names_and_ex1')
+field = '@JsonProperty("external") private transient String local="shown";'
+
+    @pytest.mark.parametrize('field',[
+        '@JsonProperty("внешнее") private String local="shown";',
+        '@JsonProperty("external") private transient String local="shown";'])
+    def test_literal_wire_names_and_explicit_transient_inclusion(tmp_path,field):
+        p,e,ids=fixture(tmp_path,'class Item{'+field+'}');value=e.run(ids['Api.entry'],{})
+        expected='внешнее' if 'внешнее' in field else 'external'
+>       assert isinstance(value,JsonText) and value.payload=={expected:'shown'} and not e.approximate
+E       AssertionError: assert (True and <Unknown.VALUE: 'unknown'> == {'external': 'shown'})
+E        +  where True = isinstance({'__json__': <Unknown.VALUE: 'unknown'>}, JsonText)
+E        +  and   <Unknown.VALUE: 'unknown'> = {'__json__': <Unknown.VALUE: 'unknown'>}.payload
+
+code/tests/test_json_property33.py:169: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_json_property33.py::test_renamed_private_field_uses_wire_name_but_keeps_declaring_storage[@JsonProperty("wire_name")]
+FAILED code/tests/test_json_property33.py::test_renamed_private_field_uses_wire_name_but_keeps_declaring_storage[@JsonProperty(value="wire_name")]
+FAILED code/tests/test_json_property33.py::test_renamed_private_field_uses_wire_name_but_keeps_declaring_storage[@com.fasterxml.jackson.annotation.JsonProperty("wire_name")]
+FAILED code/tests/test_json_property33.py::test_default_annotation_explicitly_exposes_private_field[@JsonProperty]
+FAILED code/tests/test_json_property33.py::test_default_annotation_explicitly_exposes_private_field[@JsonProperty()]
+FAILED code/tests/test_json_property33.py::test_default_annotation_explicitly_exposes_private_field[@JsonProperty("")]
+FAILED code/tests/test_json_property33.py::test_default_annotation_explicitly_exposes_private_field[@JsonProperty(value="")]
+FAILED code/tests/test_json_property33.py::test_read_only_field_is_not_overwritten_or_treated_as_unknown_input[Access]
+FAILED code/tests/test_json_property33.py::test_read_only_field_is_not_overwritten_or_treated_as_unknown_input[JsonProperty.Access]
+FAILED code/tests/test_json_property33.py::test_read_only_field_is_not_overwritten_or_treated_as_unknown_input[com.fasterxml.jackson.annotation.JsonProperty.Access]
+FAILED code/tests/test_json_property33.py::test_read_only_source_setter_is_not_invoked
+FAILED code/tests/test_json_property33.py::test_observed_fail_on_ignored_policy_still_throws_for_read_only_input
+FAILED code/tests/test_json_property33.py::test_write_only_does_not_call_a_throwing_getter_or_emit_the_value
+FAILED code/tests/test_json_property33.py::test_write_only_renamed_field_accepts_input_into_java_member
+FAILED code/tests/test_json_property33.py::test_access_policy_controls_private_getter_visibility[AUTO-3]
+FAILED code/tests/test_json_property33.py::test_access_policy_controls_private_getter_visibility[READ_WRITE-4]
+FAILED code/tests/test_json_property33.py::test_access_policy_controls_private_getter_visibility[READ_ONLY-4]
+FAILED code/tests/test_json_property33.py::test_getter_rename_is_shared_by_the_unannotated_setter[serialize]
+FAILED code/tests/test_json_property33.py::test_getter_rename_is_shared_by_the_unannotated_setter[deserialize]
+FAILED code/tests/test_json_property33.py::test_annotated_nonbean_methods_merge_by_explicit_wire_name
+FAILED code/tests/test_json_property33.py::test_split_ignore_getter_and_explicit_setter_is_write_only
+FAILED code/tests/test_json_property33.py::test_lombok_read_only_does_not_disable_the_java_generated_setter
+FAILED code/tests/test_json_property33.py::test_access_annotation_priority_depends_on_direction
+FAILED code/tests/test_json_property33.py::test_read_only_collection_does_not_invoke_getter_only_mutation
+FAILED code/tests/test_json_property33.py::test_literal_wire_names_and_explicit_transient_inclusion[@JsonProperty("\u0432\u043d\u0435\u0448\u043d\u0435\u0435") private String local="shown";]
+FAILED code/tests/test_json_property33.py::test_literal_wire_names_and_explicit_transient_inclusion[@JsonProperty("external") private transient String local="shown";]
+26 failed, 5 passed in 0.24s

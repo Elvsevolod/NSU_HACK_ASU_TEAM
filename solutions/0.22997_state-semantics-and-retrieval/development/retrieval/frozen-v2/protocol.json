@@ -1,0 +1,46 @@
+{
+  "schema": "source-retrieval-protocol/1",
+  "split_policy": "All available applications/families are development/regression. train/test empty; real transfer not_run.",
+  "labels": "Manual engineering reading of named source methods, annotations, parameters and DTOs; no analyzer predictions used as labels.",
+  "oracle_scope": "Full acceptable handler set for labelled queries; partial downstream required-edge oracles remain partial.",
+  "k": [
+    1,
+    3,
+    6
+  ],
+  "metrics": [
+    "top1",
+    "recall@1/3/6",
+    "MRR",
+    "coverage",
+    "false_accept",
+    "false_reject"
+  ],
+  "chunks": {
+    "tokens": 192,
+    "max_per_handler": 8,
+    "neighbors": 0,
+    "splitting": "whole AST nodes; oversized leaves omitted"
+  },
+  "bm25": {
+    "k1": 1.2,
+    "b": 0.75,
+    "extra_weight": 0.15
+  },
+  "refusal": {
+    "min_content_terms": 1,
+    "relative_margin": 0.08,
+    "same_handler_ui_ties": "not endpoint ambiguity"
+  },
+  "budgets": {
+    "path_limit": 4,
+    "completion_policy": "unchanged"
+  },
+  "A": "Exact B00-parent31 ContractIndex; historical clipping retained",
+  "B": "Unicode/camel/snake source facts + bounded AST chunks on identical semantic engine",
+  "C_D": "conditional; not_run without permitted pinned offline runtime and resource profile",
+  "transfer_inputs_needed": [
+    "real Java/Spring domain A source/config/skeleton/context/explicit+NL chains and independently checked oracle",
+    "real Java/Spring domain B same complete package; application/family held out before tuning"
+  ]
+}

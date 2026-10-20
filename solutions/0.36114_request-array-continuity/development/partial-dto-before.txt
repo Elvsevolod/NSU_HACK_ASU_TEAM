@@ -1,0 +1,29 @@
+F...                                                                     [100%]
+=================================== FAILURES ===================================
+_____ test_optional_comment_keeps_revision_and_approval_through_handler[1] _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-174/test_optional_comment_keeps_re0')
+limit = 1
+
+    @pytest.mark.parametrize('limit', [1, 4, 8])
+    def test_optional_comment_keeps_revision_and_approval_through_handler(tmp_path, limit):
+        project, db, ids = build(tmp_path, {'Api.java': '''class Approval {
+          public int revision; public boolean approved; private String comment;
+          public void setComment(String value){comment=value;}}
+          class Api{@PostMapping("/approvals") String entry(@RequestBody Approval input){
+          if(input.revision==7 && input.approved){return accept();}return reject();}
+          String accept(){return "accepted";}String reject(){return "rejected";}}'''})
+        params = RequestInputs({'revision':7, 'approved':True}, flat_bodies=['input'],
+                               body_unknowns={'input':{'comment':'unobserved'}})
+        outcomes = run_paths(project, ScenarioState(db), ids['Api.entry'], params, limit=limit)
+>       assert {row['result'] for row in outcomes} == {'accepted'}
+E       AssertionError: assert {'accepted', 'rejected'} == {'accepted'}
+E         
+E         Extra items in the left set:
+E         'rejected'
+E         Use -v to get more diff
+
+solutions/—_request-array-continuity/code/tests/test_partial_dto_footprint.py:20: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_request-array-continuity/code/tests/test_partial_dto_footprint.py::test_optional_comment_keeps_revision_and_approval_through_handler[1]
+1 failed, 3 passed in 0.11s

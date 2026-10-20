@@ -1,0 +1,22 @@
+.............F...........                                                [100%]
+=================================== FAILURES ===================================
+_______________________ test_equality_throw_skips_suffix _______________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-2/test_equality_throw_skips_suff0')
+
+    def test_equality_throw_skips_suffix(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;
+          class Key{public boolean equals(Object x){throw new IllegalStateException();}}
+          class Api{int entry(){List<Object> values=Arrays.asList("A");values.indexOf(new Key());return after();}
+          int after(){return 9;}}'''})
+        e=Engine(p,ScenarioState(db));e.run(ids['Api.entry'],{})
+>       assert e.outcome=='threw'
+E       AssertionError: assert 'uncaught app...ion exception' == 'threw'
+E         
+E         - threw
+E         + uncaught application exception
+
+code/tests/test_list_search_contracts.py:34: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_list_search_contracts.py::test_equality_throw_skips_suffix
+1 failed, 24 passed, 10 deselected in 0.16s

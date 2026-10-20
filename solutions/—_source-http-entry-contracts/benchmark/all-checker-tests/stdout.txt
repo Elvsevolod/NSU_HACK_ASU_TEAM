@@ -1,0 +1,22 @@
+F....................................................................... [ 94%]
+....                                                                     [100%]
+=================================== FAILURES ===================================
+________ test_artifact_directory_is_not_mistaken_for_active_controller _________
+
+    def test_artifact_directory_is_not_mistaken_for_active_controller():
+        path=V/'benchmark/overnight/G02/causal-ledger-v2/causal-ledger.json'
+>       assert path.exists() and not (path.parent/'run.json').exists()
+E       AssertionError: assert (False)
+E        +  where False = exists()
+E        +    where exists = PosixPath('/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/benchmark/overnight/G02/causal-ledger-v2/causal-ledger.json').exists
+
+checks/tests/test_analysis_links.py:7: AssertionError
+=============================== warnings summary ===============================
+checks/tests/test_archive_support.py::test_duplicate_symlink_or_corruption[options0]
+  /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/zipfile.py:1566: UserWarning: Duplicate name: 'submission.json'
+    return self._open_to_write(zinfo, force_zip64=force_zip64)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED checks/tests/test_analysis_links.py::test_artifact_directory_is_not_mistaken_for_active_controller
+1 failed, 75 passed, 1 warning in 0.43s

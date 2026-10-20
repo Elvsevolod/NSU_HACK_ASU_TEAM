@@ -1,0 +1,581 @@
+FFFFFFFFF...........FFFFFFFFFFFFFFFF..FF                                 [100%]
+=================================== FAILURES ===================================
+_ test_explicit_url_is_used_instead_of_the_logical_client_name[http://service:8080-http://service:8080/items/7] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_explicit_url_is_used_inst0')
+url = 'http://service:8080', expected = 'http://service:8080/items/7'
+
+    @pytest.mark.parametrize('url,expected',[
+        ('http://service:8080','http://service:8080/items/7'),
+        ('https://service:8443','https://service:8443/items/7'),
+        ('service:8080','http://service:8080/items/7'),
+        ('http://service:8080/','http://service:8080/items/7'),
+    ])
+    def test_explicit_url_is_used_instead_of_the_logical_client_name(tmp_path,url,expected):
+        e,ids=path_fixture(tmp_path,url)
+>       assert e.run(ids['Api.entry'],{})=='item-7' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'item-7')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x103b354d0>.run
+
+code/tests/test_feign_wire33.py:39: AssertionError
+_ test_explicit_url_is_used_instead_of_the_logical_client_name[https://service:8443-https://service:8443/items/7] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_explicit_url_is_used_inst1')
+url = 'https://service:8443', expected = 'https://service:8443/items/7'
+
+    @pytest.mark.parametrize('url,expected',[
+        ('http://service:8080','http://service:8080/items/7'),
+        ('https://service:8443','https://service:8443/items/7'),
+        ('service:8080','http://service:8080/items/7'),
+        ('http://service:8080/','http://service:8080/items/7'),
+    ])
+    def test_explicit_url_is_used_instead_of_the_logical_client_name(tmp_path,url,expected):
+        e,ids=path_fixture(tmp_path,url)
+>       assert e.run(ids['Api.entry'],{})=='item-7' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'item-7')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10510fc90>.run
+
+code/tests/test_feign_wire33.py:39: AssertionError
+_ test_explicit_url_is_used_instead_of_the_logical_client_name[service:8080-http://service:8080/items/7] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_explicit_url_is_used_inst2')
+url = 'service:8080', expected = 'http://service:8080/items/7'
+
+    @pytest.mark.parametrize('url,expected',[
+        ('http://service:8080','http://service:8080/items/7'),
+        ('https://service:8443','https://service:8443/items/7'),
+        ('service:8080','http://service:8080/items/7'),
+        ('http://service:8080/','http://service:8080/items/7'),
+    ])
+    def test_explicit_url_is_used_instead_of_the_logical_client_name(tmp_path,url,expected):
+        e,ids=path_fixture(tmp_path,url)
+>       assert e.run(ids['Api.entry'],{})=='item-7' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'item-7')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1050fc1d0>.run
+
+code/tests/test_feign_wire33.py:39: AssertionError
+_ test_explicit_url_is_used_instead_of_the_logical_client_name[http://service:8080/-http://service:8080/items/7] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_explicit_url_is_used_inst3')
+url = 'http://service:8080/', expected = 'http://service:8080/items/7'
+
+    @pytest.mark.parametrize('url,expected',[
+        ('http://service:8080','http://service:8080/items/7'),
+        ('https://service:8443','https://service:8443/items/7'),
+        ('service:8080','http://service:8080/items/7'),
+        ('http://service:8080/','http://service:8080/items/7'),
+    ])
+    def test_explicit_url_is_used_instead_of_the_logical_client_name(tmp_path,url,expected):
+        e,ids=path_fixture(tmp_path,url)
+>       assert e.run(ids['Api.entry'],{})=='item-7' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'item-7')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105090590>.run
+
+code/tests/test_feign_wire33.py:39: AssertionError
+______________ test_url_path_and_annotation_path_are_both_applied ______________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_url_path_and_annotation_p0')
+
+    def test_url_path_and_annotation_path_are_both_applied(tmp_path):
+        e,ids=path_fixture(tmp_path,'http://service:8080/root',path='/version/',prefix='/root/version')
+>       assert e.run(ids['Api.entry'],{})=='item-7' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'item-7')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10510fd10>.run
+
+code/tests/test_feign_wire33.py:49: AssertionError
+_ test_url_placeholders_use_the_supplied_calling_deployment[${client.url}-properties0] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_url_placeholders_use_the_0')
+literal = '${client.url}'
+properties = {'client.url': 'http://service:8080/root'}
+
+    @pytest.mark.parametrize('literal,properties',[
+        ('${client.url}',{'client.url':'http://service:8080/root'}),
+        ('http://${client.host}:${client.port}/root',{'client.host':'service','client.port':8080}),
+        ('${client.url:http://service:8080/root}',{}),
+        ('${client.url}',{'client.url':'http://${client.host}:8080/root','client.host':'service'}),
+    ])
+    def test_url_placeholders_use_the_supplied_calling_deployment(tmp_path,literal,properties):
+        context={'configuration':{'service':{'propertySources':[{'name':'provided','source':properties}]}}}
+        e,ids=path_fixture(tmp_path,literal,path='/version',prefix='/root/version',context=context)
+>       assert e.run(ids['Api.entry'],{})=='item-7' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'item-7')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1035f9d10>.run
+
+code/tests/test_feign_wire33.py:62: AssertionError
+_ test_url_placeholders_use_the_supplied_calling_deployment[http://${client.host}:${client.port}/root-properties1] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_url_placeholders_use_the_1')
+literal = 'http://${client.host}:${client.port}/root'
+properties = {'client.host': 'service', 'client.port': 8080}
+
+    @pytest.mark.parametrize('literal,properties',[
+        ('${client.url}',{'client.url':'http://service:8080/root'}),
+        ('http://${client.host}:${client.port}/root',{'client.host':'service','client.port':8080}),
+        ('${client.url:http://service:8080/root}',{}),
+        ('${client.url}',{'client.url':'http://${client.host}:8080/root','client.host':'service'}),
+    ])
+    def test_url_placeholders_use_the_supplied_calling_deployment(tmp_path,literal,properties):
+        context={'configuration':{'service':{'propertySources':[{'name':'provided','source':properties}]}}}
+        e,ids=path_fixture(tmp_path,literal,path='/version',prefix='/root/version',context=context)
+>       assert e.run(ids['Api.entry'],{})=='item-7' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'item-7')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x104580310>.run
+
+code/tests/test_feign_wire33.py:62: AssertionError
+_ test_url_placeholders_use_the_supplied_calling_deployment[${client.url:http://service:8080/root}-properties2] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_url_placeholders_use_the_2')
+literal = '${client.url:http://service:8080/root}', properties = {}
+
+    @pytest.mark.parametrize('literal,properties',[
+        ('${client.url}',{'client.url':'http://service:8080/root'}),
+        ('http://${client.host}:${client.port}/root',{'client.host':'service','client.port':8080}),
+        ('${client.url:http://service:8080/root}',{}),
+        ('${client.url}',{'client.url':'http://${client.host}:8080/root','client.host':'service'}),
+    ])
+    def test_url_placeholders_use_the_supplied_calling_deployment(tmp_path,literal,properties):
+        context={'configuration':{'service':{'propertySources':[{'name':'provided','source':properties}]}}}
+        e,ids=path_fixture(tmp_path,literal,path='/version',prefix='/root/version',context=context)
+>       assert e.run(ids['Api.entry'],{})=='item-7' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'item-7')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105030f90>.run
+
+code/tests/test_feign_wire33.py:62: AssertionError
+_ test_url_placeholders_use_the_supplied_calling_deployment[${client.url}-properties3] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_url_placeholders_use_the_3')
+literal = '${client.url}'
+properties = {'client.host': 'service', 'client.url': 'http://${client.host}:8080/root'}
+
+    @pytest.mark.parametrize('literal,properties',[
+        ('${client.url}',{'client.url':'http://service:8080/root'}),
+        ('http://${client.host}:${client.port}/root',{'client.host':'service','client.port':8080}),
+        ('${client.url:http://service:8080/root}',{}),
+        ('${client.url}',{'client.url':'http://${client.host}:8080/root','client.host':'service'}),
+    ])
+    def test_url_placeholders_use_the_supplied_calling_deployment(tmp_path,literal,properties):
+        context={'configuration':{'service':{'propertySources':[{'name':'provided','source':properties}]}}}
+        e,ids=path_fixture(tmp_path,literal,path='/version',prefix='/root/version',context=context)
+>       assert e.run(ids['Api.entry'],{})=='item-7' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'item-7')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1045c0b50>.run
+
+code/tests/test_feign_wire33.py:62: AssertionError
+_ test_scalar_query_has_actual_encoding_and_normal_server_binding["plain"-String-plain-http://service:8080/query?q=plain] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_scalar_query_has_actual_e0')
+expression = '"plain"', typ = 'String', expected = 'plain'
+url = 'http://service:8080/query?q=plain'
+
+    @pytest.mark.parametrize('expression,typ,expected,url',[
+        ('"plain"','String','plain','http://service:8080/query?q=plain'),
+        ('7L','Long','7','http://service:8080/query?q=7'),
+        ('true','Boolean','true','http://service:8080/query?q=true'),
+        ('"а б&c=1+%"','String','а б&c=1+%','http://service:8080/query?q=%D0%B0%20%D0%B1%26c%3D1%2B%25'),
+        ('"10%20off"','String','10 off','http://service:8080/query?q=10%20off'),
+        ('"10%20 off"','String','10%20 off','http://service:8080/query?q=10%2520%20off'),
+        ('""','String','server-default','http://service:8080/query?q='),
+        ('null','String','server-default','http://service:8080/query'),
+    ])
+    def test_scalar_query_has_actual_encoding_and_normal_server_binding(tmp_path,expression,typ,expected,url):
+        e,ids=query_fixture(tmp_path,expression,typ=typ)
+>       assert e.run(ids['Api.entry'],{})==expected and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'plain')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1035f9bd0>.run
+
+code/tests/test_feign_wire33.py:106: AssertionError
+_ test_scalar_query_has_actual_encoding_and_normal_server_binding[7L-Long-7-http://service:8080/query?q=7] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_scalar_query_has_actual_e1')
+expression = '7L', typ = 'Long', expected = '7'
+url = 'http://service:8080/query?q=7'
+
+    @pytest.mark.parametrize('expression,typ,expected,url',[
+        ('"plain"','String','plain','http://service:8080/query?q=plain'),
+        ('7L','Long','7','http://service:8080/query?q=7'),
+        ('true','Boolean','true','http://service:8080/query?q=true'),
+        ('"а б&c=1+%"','String','а б&c=1+%','http://service:8080/query?q=%D0%B0%20%D0%B1%26c%3D1%2B%25'),
+        ('"10%20off"','String','10 off','http://service:8080/query?q=10%20off'),
+        ('"10%20 off"','String','10%20 off','http://service:8080/query?q=10%2520%20off'),
+        ('""','String','server-default','http://service:8080/query?q='),
+        ('null','String','server-default','http://service:8080/query'),
+    ])
+    def test_scalar_query_has_actual_encoding_and_normal_server_binding(tmp_path,expression,typ,expected,url):
+        e,ids=query_fixture(tmp_path,expression,typ=typ)
+>       assert e.run(ids['Api.entry'],{})==expected and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == '7')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105651750>.run
+
+code/tests/test_feign_wire33.py:106: AssertionError
+_ test_scalar_query_has_actual_encoding_and_normal_server_binding[true-Boolean-true-http://service:8080/query?q=true] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_scalar_query_has_actual_e2')
+expression = 'true', typ = 'Boolean', expected = 'true'
+url = 'http://service:8080/query?q=true'
+
+    @pytest.mark.parametrize('expression,typ,expected,url',[
+        ('"plain"','String','plain','http://service:8080/query?q=plain'),
+        ('7L','Long','7','http://service:8080/query?q=7'),
+        ('true','Boolean','true','http://service:8080/query?q=true'),
+        ('"а б&c=1+%"','String','а б&c=1+%','http://service:8080/query?q=%D0%B0%20%D0%B1%26c%3D1%2B%25'),
+        ('"10%20off"','String','10 off','http://service:8080/query?q=10%20off'),
+        ('"10%20 off"','String','10%20 off','http://service:8080/query?q=10%2520%20off'),
+        ('""','String','server-default','http://service:8080/query?q='),
+        ('null','String','server-default','http://service:8080/query'),
+    ])
+    def test_scalar_query_has_actual_encoding_and_normal_server_binding(tmp_path,expression,typ,expected,url):
+        e,ids=query_fixture(tmp_path,expression,typ=typ)
+>       assert e.run(ids['Api.entry'],{})==expected and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'true')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1045c24d0>.run
+
+code/tests/test_feign_wire33.py:106: AssertionError
+_ test_scalar_query_has_actual_encoding_and_normal_server_binding["\u0430 \u0431&c=1+%"-String-\u0430 \u0431&c=1+%-http://service:8080/query?q=%D0%B0%20%D0%B1%26c%3D1%2B%25] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_scalar_query_has_actual_e3')
+expression = '"а б&c=1+%"', typ = 'String', expected = 'а б&c=1+%'
+url = 'http://service:8080/query?q=%D0%B0%20%D0%B1%26c%3D1%2B%25'
+
+    @pytest.mark.parametrize('expression,typ,expected,url',[
+        ('"plain"','String','plain','http://service:8080/query?q=plain'),
+        ('7L','Long','7','http://service:8080/query?q=7'),
+        ('true','Boolean','true','http://service:8080/query?q=true'),
+        ('"а б&c=1+%"','String','а б&c=1+%','http://service:8080/query?q=%D0%B0%20%D0%B1%26c%3D1%2B%25'),
+        ('"10%20off"','String','10 off','http://service:8080/query?q=10%20off'),
+        ('"10%20 off"','String','10%20 off','http://service:8080/query?q=10%2520%20off'),
+        ('""','String','server-default','http://service:8080/query?q='),
+        ('null','String','server-default','http://service:8080/query'),
+    ])
+    def test_scalar_query_has_actual_encoding_and_normal_server_binding(tmp_path,expression,typ,expected,url):
+        e,ids=query_fixture(tmp_path,expression,typ=typ)
+>       assert e.run(ids['Api.entry'],{})==expected and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'а б&c=1+%')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10464d8d0>.run
+
+code/tests/test_feign_wire33.py:106: AssertionError
+_ test_scalar_query_has_actual_encoding_and_normal_server_binding["10%20off"-String-10 off-http://service:8080/query?q=10%20off] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_scalar_query_has_actual_e4')
+expression = '"10%20off"', typ = 'String', expected = '10 off'
+url = 'http://service:8080/query?q=10%20off'
+
+    @pytest.mark.parametrize('expression,typ,expected,url',[
+        ('"plain"','String','plain','http://service:8080/query?q=plain'),
+        ('7L','Long','7','http://service:8080/query?q=7'),
+        ('true','Boolean','true','http://service:8080/query?q=true'),
+        ('"а б&c=1+%"','String','а б&c=1+%','http://service:8080/query?q=%D0%B0%20%D0%B1%26c%3D1%2B%25'),
+        ('"10%20off"','String','10 off','http://service:8080/query?q=10%20off'),
+        ('"10%20 off"','String','10%20 off','http://service:8080/query?q=10%2520%20off'),
+        ('""','String','server-default','http://service:8080/query?q='),
+        ('null','String','server-default','http://service:8080/query'),
+    ])
+    def test_scalar_query_has_actual_encoding_and_normal_server_binding(tmp_path,expression,typ,expected,url):
+        e,ids=query_fixture(tmp_path,expression,typ=typ)
+>       assert e.run(ids['Api.entry'],{})==expected and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == '10 off')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105063710>.run
+
+code/tests/test_feign_wire33.py:106: AssertionError
+_ test_scalar_query_has_actual_encoding_and_normal_server_binding["10%20 off"-String-10%20 off-http://service:8080/query?q=10%2520%20off] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_scalar_query_has_actual_e5')
+expression = '"10%20 off"', typ = 'String', expected = '10%20 off'
+url = 'http://service:8080/query?q=10%2520%20off'
+
+    @pytest.mark.parametrize('expression,typ,expected,url',[
+        ('"plain"','String','plain','http://service:8080/query?q=plain'),
+        ('7L','Long','7','http://service:8080/query?q=7'),
+        ('true','Boolean','true','http://service:8080/query?q=true'),
+        ('"а б&c=1+%"','String','а б&c=1+%','http://service:8080/query?q=%D0%B0%20%D0%B1%26c%3D1%2B%25'),
+        ('"10%20off"','String','10 off','http://service:8080/query?q=10%20off'),
+        ('"10%20 off"','String','10%20 off','http://service:8080/query?q=10%2520%20off'),
+        ('""','String','server-default','http://service:8080/query?q='),
+        ('null','String','server-default','http://service:8080/query'),
+    ])
+    def test_scalar_query_has_actual_encoding_and_normal_server_binding(tmp_path,expression,typ,expected,url):
+        e,ids=query_fixture(tmp_path,expression,typ=typ)
+>       assert e.run(ids['Api.entry'],{})==expected and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == '10%20 off')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105197490>.run
+
+code/tests/test_feign_wire33.py:106: AssertionError
+_ test_scalar_query_has_actual_encoding_and_normal_server_binding[""-String-server-default-http://service:8080/query?q=] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_scalar_query_has_actual_e6')
+expression = '""', typ = 'String', expected = 'server-default'
+url = 'http://service:8080/query?q='
+
+    @pytest.mark.parametrize('expression,typ,expected,url',[
+        ('"plain"','String','plain','http://service:8080/query?q=plain'),
+        ('7L','Long','7','http://service:8080/query?q=7'),
+        ('true','Boolean','true','http://service:8080/query?q=true'),
+        ('"а б&c=1+%"','String','а б&c=1+%','http://service:8080/query?q=%D0%B0%20%D0%B1%26c%3D1%2B%25'),
+        ('"10%20off"','String','10 off','http://service:8080/query?q=10%20off'),
+        ('"10%20 off"','String','10%20 off','http://service:8080/query?q=10%2520%20off'),
+        ('""','String','server-default','http://service:8080/query?q='),
+        ('null','String','server-default','http://service:8080/query'),
+    ])
+    def test_scalar_query_has_actual_encoding_and_normal_server_binding(tmp_path,expression,typ,expected,url):
+        e,ids=query_fixture(tmp_path,expression,typ=typ)
+>       assert e.run(ids['Api.entry'],{})==expected and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'server-default')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105194890>.run
+
+code/tests/test_feign_wire33.py:106: AssertionError
+_ test_scalar_query_has_actual_encoding_and_normal_server_binding[null-String-server-default-http://service:8080/query] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_scalar_query_has_actual_e7')
+expression = 'null', typ = 'String', expected = 'server-default'
+url = 'http://service:8080/query'
+
+    @pytest.mark.parametrize('expression,typ,expected,url',[
+        ('"plain"','String','plain','http://service:8080/query?q=plain'),
+        ('7L','Long','7','http://service:8080/query?q=7'),
+        ('true','Boolean','true','http://service:8080/query?q=true'),
+        ('"а б&c=1+%"','String','а б&c=1+%','http://service:8080/query?q=%D0%B0%20%D0%B1%26c%3D1%2B%25'),
+        ('"10%20off"','String','10 off','http://service:8080/query?q=10%20off'),
+        ('"10%20 off"','String','10%20 off','http://service:8080/query?q=10%2520%20off'),
+        ('""','String','server-default','http://service:8080/query?q='),
+        ('null','String','server-default','http://service:8080/query'),
+    ])
+    def test_scalar_query_has_actual_encoding_and_normal_server_binding(tmp_path,expression,typ,expected,url):
+        e,ids=query_fixture(tmp_path,expression,typ=typ)
+>       assert e.run(ids['Api.entry'],{})==expected and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'server-default')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10451b9d0>.run
+
+code/tests/test_feign_wire33.py:106: AssertionError
+_ test_client_default_value_does_not_invent_an_argument_or_override_the_server_default _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_client_default_value_does0')
+
+    def test_client_default_value_does_not_invent_an_argument_or_override_the_server_default(tmp_path):
+        e,ids=query_fixture(tmp_path,'null',client_options='value="q",required=false,defaultValue="client-default"')
+>       assert e.run(ids['Api.entry'],{})=='server-default' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'server-default')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1045af9d0>.run
+
+code/tests/test_feign_wire33.py:114: AssertionError
+_ test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules[Arrays.asList("a","a","b")-3-http://service:8080/query?q=a&q=a&q=b-query0] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_default_exploded_query_pr0')
+expression = 'Arrays.asList("a","a","b")', size = 3
+url = 'http://service:8080/query?q=a&q=a&q=b', query = {'q': ['a', 'a', 'b']}
+
+    @pytest.mark.parametrize('expression,size,url,query',[
+        ('Arrays.asList("a","a","b")',3,'http://service:8080/query?q=a&q=a&q=b',{'q':['a','a','b']}),
+        ('Arrays.asList("a",null,"b")',2,'http://service:8080/query?q=a&q=b',{'q':['a','b']}),
+        ('new ArrayList<String>()',0,'http://service:8080/query?q=',{'q':['']}),
+        ('Arrays.asList("a","")',1,'http://service:8080/query?q=a',{'q':['a']}),
+        ('Arrays.asList("","b")',2,'http://service:8080/query?q=&q=b',{'q':['','b']}),
+        ('Arrays.asList("a,b","c")',2,'http://service:8080/query?q=a%2Cb&q=c',{'q':['a,b','c']}),
+    ])
+    def test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules(tmp_path,expression,size,url,query):
+        e,ids=query_fixture(tmp_path,expression,typ='List<String>',target_options='"q"',target_type='List<String>',returns='q.size()',result_type='Integer')
+>       assert e.run(ids['Api.entry'],{})==size and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 3)
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10518ab10>.run
+
+code/tests/test_feign_wire33.py:128: AssertionError
+_ test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules[Arrays.asList("a",null,"b")-2-http://service:8080/query?q=a&q=b-query1] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_default_exploded_query_pr1')
+expression = 'Arrays.asList("a",null,"b")', size = 2
+url = 'http://service:8080/query?q=a&q=b', query = {'q': ['a', 'b']}
+
+    @pytest.mark.parametrize('expression,size,url,query',[
+        ('Arrays.asList("a","a","b")',3,'http://service:8080/query?q=a&q=a&q=b',{'q':['a','a','b']}),
+        ('Arrays.asList("a",null,"b")',2,'http://service:8080/query?q=a&q=b',{'q':['a','b']}),
+        ('new ArrayList<String>()',0,'http://service:8080/query?q=',{'q':['']}),
+        ('Arrays.asList("a","")',1,'http://service:8080/query?q=a',{'q':['a']}),
+        ('Arrays.asList("","b")',2,'http://service:8080/query?q=&q=b',{'q':['','b']}),
+        ('Arrays.asList("a,b","c")',2,'http://service:8080/query?q=a%2Cb&q=c',{'q':['a,b','c']}),
+    ])
+    def test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules(tmp_path,expression,size,url,query):
+        e,ids=query_fixture(tmp_path,expression,typ='List<String>',target_options='"q"',target_type='List<String>',returns='q.size()',result_type='Integer')
+>       assert e.run(ids['Api.entry'],{})==size and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 2)
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10513d650>.run
+
+code/tests/test_feign_wire33.py:128: AssertionError
+_ test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules[new ArrayList<String>()-0-http://service:8080/query?q=-query2] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_default_exploded_query_pr2')
+expression = 'new ArrayList<String>()', size = 0
+url = 'http://service:8080/query?q=', query = {'q': ['']}
+
+    @pytest.mark.parametrize('expression,size,url,query',[
+        ('Arrays.asList("a","a","b")',3,'http://service:8080/query?q=a&q=a&q=b',{'q':['a','a','b']}),
+        ('Arrays.asList("a",null,"b")',2,'http://service:8080/query?q=a&q=b',{'q':['a','b']}),
+        ('new ArrayList<String>()',0,'http://service:8080/query?q=',{'q':['']}),
+        ('Arrays.asList("a","")',1,'http://service:8080/query?q=a',{'q':['a']}),
+        ('Arrays.asList("","b")',2,'http://service:8080/query?q=&q=b',{'q':['','b']}),
+        ('Arrays.asList("a,b","c")',2,'http://service:8080/query?q=a%2Cb&q=c',{'q':['a,b','c']}),
+    ])
+    def test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules(tmp_path,expression,size,url,query):
+        e,ids=query_fixture(tmp_path,expression,typ='List<String>',target_options='"q"',target_type='List<String>',returns='q.size()',result_type='Integer')
+>       assert e.run(ids['Api.entry'],{})==size and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 0)
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1046859d0>.run
+
+code/tests/test_feign_wire33.py:128: AssertionError
+_ test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules[Arrays.asList("a","")-1-http://service:8080/query?q=a-query3] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_default_exploded_query_pr3')
+expression = 'Arrays.asList("a","")', size = 1
+url = 'http://service:8080/query?q=a', query = {'q': ['a']}
+
+    @pytest.mark.parametrize('expression,size,url,query',[
+        ('Arrays.asList("a","a","b")',3,'http://service:8080/query?q=a&q=a&q=b',{'q':['a','a','b']}),
+        ('Arrays.asList("a",null,"b")',2,'http://service:8080/query?q=a&q=b',{'q':['a','b']}),
+        ('new ArrayList<String>()',0,'http://service:8080/query?q=',{'q':['']}),
+        ('Arrays.asList("a","")',1,'http://service:8080/query?q=a',{'q':['a']}),
+        ('Arrays.asList("","b")',2,'http://service:8080/query?q=&q=b',{'q':['','b']}),
+        ('Arrays.asList("a,b","c")',2,'http://service:8080/query?q=a%2Cb&q=c',{'q':['a,b','c']}),
+    ])
+    def test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules(tmp_path,expression,size,url,query):
+        e,ids=query_fixture(tmp_path,expression,typ='List<String>',target_options='"q"',target_type='List<String>',returns='q.size()',result_type='Integer')
+>       assert e.run(ids['Api.entry'],{})==size and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 1)
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10516d350>.run
+
+code/tests/test_feign_wire33.py:128: AssertionError
+_ test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules[Arrays.asList("","b")-2-http://service:8080/query?q=&q=b-query4] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_default_exploded_query_pr4')
+expression = 'Arrays.asList("","b")', size = 2
+url = 'http://service:8080/query?q=&q=b', query = {'q': ['', 'b']}
+
+    @pytest.mark.parametrize('expression,size,url,query',[
+        ('Arrays.asList("a","a","b")',3,'http://service:8080/query?q=a&q=a&q=b',{'q':['a','a','b']}),
+        ('Arrays.asList("a",null,"b")',2,'http://service:8080/query?q=a&q=b',{'q':['a','b']}),
+        ('new ArrayList<String>()',0,'http://service:8080/query?q=',{'q':['']}),
+        ('Arrays.asList("a","")',1,'http://service:8080/query?q=a',{'q':['a']}),
+        ('Arrays.asList("","b")',2,'http://service:8080/query?q=&q=b',{'q':['','b']}),
+        ('Arrays.asList("a,b","c")',2,'http://service:8080/query?q=a%2Cb&q=c',{'q':['a,b','c']}),
+    ])
+    def test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules(tmp_path,expression,size,url,query):
+        e,ids=query_fixture(tmp_path,expression,typ='List<String>',target_options='"q"',target_type='List<String>',returns='q.size()',result_type='Integer')
+>       assert e.run(ids['Api.entry'],{})==size and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 2)
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105087450>.run
+
+code/tests/test_feign_wire33.py:128: AssertionError
+_ test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules[Arrays.asList("a,b","c")-2-http://service:8080/query?q=a%2Cb&q=c-query5] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_default_exploded_query_pr5')
+expression = 'Arrays.asList("a,b","c")', size = 2
+url = 'http://service:8080/query?q=a%2Cb&q=c', query = {'q': ['a,b', 'c']}
+
+    @pytest.mark.parametrize('expression,size,url,query',[
+        ('Arrays.asList("a","a","b")',3,'http://service:8080/query?q=a&q=a&q=b',{'q':['a','a','b']}),
+        ('Arrays.asList("a",null,"b")',2,'http://service:8080/query?q=a&q=b',{'q':['a','b']}),
+        ('new ArrayList<String>()',0,'http://service:8080/query?q=',{'q':['']}),
+        ('Arrays.asList("a","")',1,'http://service:8080/query?q=a',{'q':['a']}),
+        ('Arrays.asList("","b")',2,'http://service:8080/query?q=&q=b',{'q':['','b']}),
+        ('Arrays.asList("a,b","c")',2,'http://service:8080/query?q=a%2Cb&q=c',{'q':['a,b','c']}),
+    ])
+    def test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules(tmp_path,expression,size,url,query):
+        e,ids=query_fixture(tmp_path,expression,typ='List<String>',target_options='"q"',target_type='List<String>',returns='q.size()',result_type='Integer')
+>       assert e.run(ids['Api.entry'],{})==size and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 2)
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1045db810>.run
+
+code/tests/test_feign_wire33.py:128: AssertionError
+____ test_a_single_comma_value_is_split_by_the_server_collection_converter _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_a_single_comma_value_is_s0')
+
+    def test_a_single_comma_value_is_split_by_the_server_collection_converter(tmp_path):
+        e,ids=query_fixture(tmp_path,'Arrays.asList("a,b")',typ='List<String>',target_options='"q"',
+                            target_type='List<String>',returns='q.size()',result_type='Integer')
+>       assert e.run(ids['Api.entry'],{})==2 and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 2)
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105087090>.run
+
+code/tests/test_feign_wire33.py:136: AssertionError
+__________ test_symbolic_integral_path_retains_the_producer_identity ___________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_symbolic_integral_path_re0')
+
+    def test_symbolic_integral_path_retains_the_producer_identity(tmp_path):
+        e,ids=path_fixture(tmp_path,'http://service:8080',argument='id',parameters='Long id')
+        value=e.state.generated_value('Long','independent source identity')
+        e.run(ids['Api.entry'],{'id':value})
+>       sent=outbound(e);assert len(sent)==1
+                         ^^^^^^^^^^^^^^^^^^^
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+code/tests/test_feign_wire33.py:153: AssertionError
+_ test_source_interceptor_prefix_runs_even_when_destination_handler_is_unknown _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-109/test_source_interceptor_prefix0')
+
+    def test_source_interceptor_prefix_runs_even_when_destination_handler_is_unknown(tmp_path):
+        extra='''import org.springframework.boot.autoconfigure.SpringBootApplication;
+          import org.springframework.stereotype.Component;import feign.RequestInterceptor;import feign.RequestTemplate;
+          @SpringBootApplication @EnableFeignClients class App{}
+          @Component class Header implements RequestInterceptor{public void apply(RequestTemplate template){template.header("x-proof","source");}}'''
+        e,ids=path_fixture(tmp_path,'http://unmapped.example',extra=extra)
+        assert e.run(ids['Api.entry'],{}) is U and not outbound(e)
+>       assert any(k=='executes' and t==ids['Header.apply'] for _,k,t in e.edges)
+E       assert False
+E        +  where False = any(<generator object test_source_interceptor_prefix_runs_even_when_destination_handler_is_unknown.<locals>.<genexpr> at 0x1051662f0>)
+
+code/tests/test_feign_wire33.py:166: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_feign_wire33.py::test_explicit_url_is_used_instead_of_the_logical_client_name[http://service:8080-http://service:8080/items/7]
+FAILED code/tests/test_feign_wire33.py::test_explicit_url_is_used_instead_of_the_logical_client_name[https://service:8443-https://service:8443/items/7]
+FAILED code/tests/test_feign_wire33.py::test_explicit_url_is_used_instead_of_the_logical_client_name[service:8080-http://service:8080/items/7]
+FAILED code/tests/test_feign_wire33.py::test_explicit_url_is_used_instead_of_the_logical_client_name[http://service:8080/-http://service:8080/items/7]
+FAILED code/tests/test_feign_wire33.py::test_url_path_and_annotation_path_are_both_applied
+FAILED code/tests/test_feign_wire33.py::test_url_placeholders_use_the_supplied_calling_deployment[${client.url}-properties0]
+FAILED code/tests/test_feign_wire33.py::test_url_placeholders_use_the_supplied_calling_deployment[http://${client.host}:${client.port}/root-properties1]
+FAILED code/tests/test_feign_wire33.py::test_url_placeholders_use_the_supplied_calling_deployment[${client.url:http://service:8080/root}-properties2]
+FAILED code/tests/test_feign_wire33.py::test_url_placeholders_use_the_supplied_calling_deployment[${client.url}-properties3]
+FAILED code/tests/test_feign_wire33.py::test_scalar_query_has_actual_encoding_and_normal_server_binding["plain"-String-plain-http://service:8080/query?q=plain]
+FAILED code/tests/test_feign_wire33.py::test_scalar_query_has_actual_encoding_and_normal_server_binding[7L-Long-7-http://service:8080/query?q=7]
+FAILED code/tests/test_feign_wire33.py::test_scalar_query_has_actual_encoding_and_normal_server_binding[true-Boolean-true-http://service:8080/query?q=true]
+FAILED code/tests/test_feign_wire33.py::test_scalar_query_has_actual_encoding_and_normal_server_binding["\u0430 \u0431&c=1+%"-String-\u0430 \u0431&c=1+%-http://service:8080/query?q=%D0%B0%20%D0%B1%26c%3D1%2B%25]
+FAILED code/tests/test_feign_wire33.py::test_scalar_query_has_actual_encoding_and_normal_server_binding["10%20off"-String-10 off-http://service:8080/query?q=10%20off]
+FAILED code/tests/test_feign_wire33.py::test_scalar_query_has_actual_encoding_and_normal_server_binding["10%20 off"-String-10%20 off-http://service:8080/query?q=10%2520%20off]
+FAILED code/tests/test_feign_wire33.py::test_scalar_query_has_actual_encoding_and_normal_server_binding[""-String-server-default-http://service:8080/query?q=]
+FAILED code/tests/test_feign_wire33.py::test_scalar_query_has_actual_encoding_and_normal_server_binding[null-String-server-default-http://service:8080/query]
+FAILED code/tests/test_feign_wire33.py::test_client_default_value_does_not_invent_an_argument_or_override_the_server_default
+FAILED code/tests/test_feign_wire33.py::test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules[Arrays.asList("a","a","b")-3-http://service:8080/query?q=a&q=a&q=b-query0]
+FAILED code/tests/test_feign_wire33.py::test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules[Arrays.asList("a",null,"b")-2-http://service:8080/query?q=a&q=b-query1]
+FAILED code/tests/test_feign_wire33.py::test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules[new ArrayList<String>()-0-http://service:8080/query?q=-query2]
+FAILED code/tests/test_feign_wire33.py::test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules[Arrays.asList("a","")-1-http://service:8080/query?q=a-query3]
+FAILED code/tests/test_feign_wire33.py::test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules[Arrays.asList("","b")-2-http://service:8080/query?q=&q=b-query4]
+FAILED code/tests/test_feign_wire33.py::test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules[Arrays.asList("a,b","c")-2-http://service:8080/query?q=a%2Cb&q=c-query5]
+FAILED code/tests/test_feign_wire33.py::test_a_single_comma_value_is_split_by_the_server_collection_converter
+FAILED code/tests/test_feign_wire33.py::test_symbolic_integral_path_retains_the_producer_identity
+FAILED code/tests/test_feign_wire33.py::test_source_interceptor_prefix_runs_even_when_destination_handler_is_unknown
+27 failed, 13 passed in 0.27s

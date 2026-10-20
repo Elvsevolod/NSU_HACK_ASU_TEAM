@@ -1,0 +1,404 @@
+--- E1c-R01-R03/analyzer/engine.py
++++ E2-R04/analyzer/engine.py
+@@ -188,6 +188,10 @@
+             result.fixed_size=a.fixed_size if a.fixed_size==b.fixed_size else None
+             result.flavor=a.flavor if a.flavor==b.flavor else None
+             result.order_known=a.order_known and b.order_known
++            if result.flavor=='HashSet':
++                left,right=getattr(a,'set_hashes',None),getattr(b,'set_hashes',None)
++                if left is not None and left==right:result.set_hashes=list(left)
++                elif a or b:result.opaque=True
+             return result
+         if isinstance(a,JavaListIterator) or isinstance(b,JavaListIterator):
+             if not isinstance(a,JavaListIterator) or not isinstance(b,JavaListIterator):return U
+@@ -1686,6 +1690,22 @@
+             value=self.value(next(c for c in node.named_children if c.type not in ('line_comment','block_comment')), env)
+             self.remember_reference_kind(self.last_reference_kind)
+             return value
++        if typ=='instanceof_expression':
++            if node.child_by_field_name('name') is not None:
++                raise AnalysisBoundary('instanceof pattern binding is outside the supported contract: '+raw,category='unsupported_semantics')
++            value=self.value(node.child_by_field_name('left'),env)
++            if value is None:return False
++            wanted=text(node.child_by_field_name('right'))
++            if isinstance(value,JavaRecord):
++                if self.record_proves_type(value,wanted):return True
++                if isinstance(value,JavaObject):
++                    meta=self.p.methods[self.method]
++                    if self.p.resolve_type(wanted,meta['module'],meta['file']):return False
++            kind=self.last_reference_kind
++            if kind and self.standard_type(wanted,'java.lang.'+kind):return True
++            if kind and self.p.resolve_type(wanted,self.p.methods[self.method]['module'],self.p.methods[self.method]['file']):return False
++            self.approximate=True;self.warnings.add('instanceof runtime type is unresolved: '+raw)
++            return U
+         if typ == 'cast_expression':
+             value = self.value(node.named_children[-1], env)
+             actual_kind=self.source_reference_kind(node.named_children[-1],self.last_reference_kind)
+@@ -2062,6 +2082,7 @@
+         if kind=='decimal_floating_point_literal':return 'float' if raw.lower().endswith('f') else 'double'
+         if kind=='character_literal':return 'char'
+         if kind in ('true','false'):return 'boolean'
++        if kind=='instanceof_expression':return 'boolean'
+         if kind=='identifier':
+             typ=self.native_scalar_type(self.source_type(node))
+             return aliases.get(typ,typ)
+@@ -2114,6 +2135,7 @@
+         """Declared expression types, including bean fields and collection elements."""
+         if node is None:return ''
+         kind,raw=node.type,text(node)
++        if kind=='instanceof_expression':return 'boolean'
+         meta=self.p.methods[self.method]
+         if kind=='string_literal':return 'java.lang.String'
+         if kind=='class_literal':
+@@ -2125,6 +2147,7 @@
+             return 'java.lang.Class<'+target+'>'
+         if kind=='character_literal':return 'char'
+         if kind in ('true','false'):return 'boolean'
++        if kind=='instanceof_expression':return 'boolean'
+         if kind in ('decimal_integer_literal','decimal_floating_point_literal'):return self.numeric_type(node)
+         if kind=='this':return self.receiver_type or self.p.nodes[meta['owner']]['fqn']
+         if kind=='identifier':
+--- E1c-R01-R03/analyzer/java_sets.py
++++ E2-R04/analyzer/java_sets.py
+@@ -2,6 +2,7 @@
+ from .native_storage import JavaList
+ from .boxed_values import boxed_equal
+ from .state import U
++from .set_keys import hash_value,equal as key_equal,stop
+ 
+ 
+ def shapes(value,path='body',seen=None):
+@@ -35,35 +36,45 @@
+         if write:values.opaque=True
+         return True,U
+     def index(value,kind):
+-        if value is not None and kind not in ('String','Integer','Long','Short','Byte','Character','Boolean'):
+-            from .engine import AnalysisBoundary
+-            raise AnalysisBoundary('Java Set element equality/hash callbacks are outside the scalar contract: '+reason,category='unsupported_semantics')
+-        if value is not None and (kind not in ('String','Integer','Long','Short','Byte','Character','Boolean') or
+-            type(value) not in (str,int,bool)):return U
++        hashed=hash_value(engine,value,kind,reason)
++        if hashed is U:return U,U
++        hashed=(hashed & 0xffffffff)^((hashed & 0xffffffff)>>16)
++        stored=getattr(values,'set_hashes',None)
++        if stored is None:
++            if values:stop('stored key placement metadata is unavailable: '+reason)
++            values.set_hashes=stored=[]
++        if len(stored)!=len(values):stop('stored key placement metadata is unresolved: '+reason)
+         for i,item in enumerate(values):
+-            equal=boxed_equal(value,item,kind,values.kinds[i],lambda a,b:a==b)
+-            if equal is True:return i
+-            if equal is U:return U
+-        return -1
+-    if name=='clear' and not args:values.clear();return True,None
++            if stored[i]!=hashed:continue
++            equal=key_equal(engine,value,item,kind,values.kinds[i],reason)
++            if equal is True:return i,hashed
++            if equal is U:return U,hashed
++        return -1,hashed
++    if name=='clear' and not args:values.clear();values.set_hashes=[];return True,None
+     if values.opaque:return boundary('membership is unresolved',name in ('add','addAll','remove','removeAll','retainAll'))
+     if name in ('size','isEmpty') and not args:return True,len(values) if name=='size' else not values
+     if name in ('add','contains','remove') and len(args)==1:
+-        found=index(args[0],kinds[0])
++        found,hashed=index(args[0],kinds[0])
+         if found is U:return boundary('element equality or hash contract is unresolved',name!='contains')
+         if name=='contains':return True,found!=-1
+         if name=='add':
+             if found!=-1:return True,False
+-            values.append(args[0],kinds[0]);return True,True
++            # Linked-bin OpenJDK HashMap scope; treeified bins require another
++            # comparison order contract. Keep this limit independent of paths.
++            capacity=16
++            while len(values)+1>capacity*3//4:capacity*=2
++            if sum((h & (capacity-1))==(hashed & (capacity-1)) for h in values.set_hashes)>=7:
++                stop('treeification/collision-bin scope exceeded: '+reason)
++            values.append(args[0],kinds[0]);values.set_hashes.append(hashed);return True,True
+         if found==-1:return True,False
+-        values.pop(found);return True,True
++        values.pop(found);values.set_hashes.pop(found);return True,True
+     if name in ('addAll','removeAll','retainAll') and len(args)==1:
+         other=args[0]
+         if other is None:
+             from .java_exceptions import JavaThrow
+             raise JavaThrow({'__type__':'NullPointerException'})
+         if not isinstance(other,JavaList) or other.opaque:return boundary('bulk membership is unresolved',True)
+-        if any(value is not None and kind not in ('String','Integer','Long','Short','Byte','Character','Boolean') for value,kind in zip(other,other.kinds)):
++        if name!='addAll' and any(value is not None and kind not in ('String','Integer','Long','Short','Byte','Character','Boolean') for value,kind in zip(other,other.kinds)):
+             from .engine import AnalysisBoundary
+             raise AnalysisBoundary('Java Set bulk equality/hash callbacks are outside the scalar contract: '+reason,category='unsupported_semantics')
+         if name=='addAll':
+@@ -73,14 +84,15 @@
+                 if result is U:return True,U
+                 changed|=result
+             return True,changed
+-        kept=[];kept_kinds=[]
+-        for value,kind in zip(values,values.kinds):
++        kept=[];kept_kinds=[];kept_hashes=[]
++        for position,(value,kind) in enumerate(zip(values,values.kinds)):
+             comparisons=[boxed_equal(value,item,kind,other.kinds[i],lambda a,b:a==b) for i,item in enumerate(other)]
+             present=True if True in comparisons else U if U in comparisons else False
+             if present is U:return boundary('bulk element equality is unresolved',True)
+-            if present==(name=='retainAll'):kept.append(value);kept_kinds.append(kind)
++            if present==(name=='retainAll'):
++                kept.append(value);kept_kinds.append(kind);kept_hashes.append(values.set_hashes[position])
+         changed=len(kept)!=len(values)
+-        if changed:values[:]=kept;values.kinds[:]=kept_kinds
++        if changed:values[:]=kept;values.kinds[:]=kept_kinds;values.set_hashes=kept_hashes
+         return True,changed
+     if name=='iterator' and not args:return False,U
+     if name=='equals' and len(args)==1:
+@@ -88,6 +100,6 @@
+         if not isinstance(other,JavaList) or other.flavor!='HashSet':return True,False
+         if other.opaque:return boundary('equality contents are unresolved')
+         if len(values)!=len(other):return True,False
+-        found=[index(value,kind) for value,kind in zip(other,other.kinds)]
++        found=[index(value,kind)[0] for value,kind in zip(other,other.kinds)]
+         return boundary('equality is unresolved') if U in found else (True,all(i!=-1 for i in found))
+     return boundary('operation is outside the supported scalar contract: '+name)
+--- E1c-R01-R03/analyzer/set_keys.py
++++ E2-R04/analyzer/set_keys.py
+@@ -0,0 +1,121 @@
++"""HashSet key callbacks and a deliberately small default Lombok leaf model."""
++from .state import U
++from .java_collections import JavaRecord,reference_equal
++from .boxed_values import boxed_equal
++from .bean_properties import declaration,annotations
++from .project import text,keywords
++
++SCALARS=('String','Integer','Long','Short','Byte','Character','Boolean')
++
++
++def stop(reason):
++    from .engine import AnalysisBoundary
++    raise AnalysisBoundary('Java Set '+reason,category='unsupported_semantics')
++
++
++def signed(value):return (value+2**31)%2**32-2**31
++
++
++def scalar_hash(value,kind):
++    if value is None:return 0
++    if value is U:return U
++    if kind=='String' and type(value) is str:
++        raw=value.encode('utf-16-be',errors='surrogatepass');result=0
++        for index in range(0,len(raw),2):result=signed(31*result+int.from_bytes(raw[index:index+2],'big'))
++        return result
++    if kind in ('Integer','Short','Byte') and type(value) is int:return signed(value)
++    if kind=='Long' and type(value) is int:return signed((value&((1<<64)-1)) ^ ((value&((1<<64)-1))>>32))
++    if kind=='Character' and type(value) is str and len(value)==1 and ord(value)<=65535:return ord(value)
++    if kind=='Boolean' and type(value) is bool:return 1231 if value else 1237
++    return U
++
++
++def owner(engine,value):
++    if not isinstance(value,JavaRecord):return None
++    meta=engine.p.methods[engine.method]
++    return getattr(value,'source_owner',None) or engine.p.resolve_type(value.declared_type,meta['module'],meta['file'])
++
++
++def source_method(engine,tid,name):
++    methods=[mid for mid in engine.p.by_name.get(name,()) if engine.p.methods[mid]['owner']==tid
++        and engine.p.ast.get(mid) is not None and not engine.p.methods[mid].get('abstract')
++        and engine.p.methods[mid].get('params_as_written') in (([],) if name=='hashCode' else (['Object'],['java.lang.Object']))]
++    return methods[0] if len(methods)==1 else None
++
++
++def generated_plan(engine,tid):
++    cache=engine.p.__dict__.setdefault('_set_generated_leaf_plans',{})
++    if tid in cache:return cache[tid]
++    meta=engine.p.nodes.get(tid,{});decl=declaration(engine.p,tid) if tid else None
++    result=None
++    if decl is not None and not engine.p.type_parents.get(tid) and not engine.p.framework_types.get(tid):
++        attrs=annotations(decl)
++        standard=[(name,args) for name,args in attrs if any(engine.standard_type(name,'lombok.'+leaf,meta)
++            for leaf in ('Data','Value','EqualsAndHashCode'))]
++        options=all(args in ('','()') for _,args in standard)
++        config=engine.p.__dict__.get('_set_lombok_config_present')
++        if config is None:
++            config=any(engine.p.root.rglob('lombok.config'));engine.p._set_lombok_config_present=config
++        fields=[];valid=bool(standard) and options and not config
++        body=decl.child_by_field_name('body')
++        if any('EqualsAndHashCode.' in name for child in body.named_children for name,_ in annotations(child)):valid=False
++        for child in body.named_children:
++            if child.type!='field_declaration' or keywords(child)&{'static','transient'}:continue
++            written=text(child.child_by_field_name('type'));kind=engine.declared_kind(written,meta)
++            if kind not in SCALARS:valid=False
++            for var in child.named_children:
++                if var.type!='variable_declarator':continue
++                name=text(var.child_by_field_name('name'))
++                if name.startswith('$'):continue
++                getters=['get'+name[:1].upper()+name[1:],'is'+name[:1].upper()+name[1:]]
++                if any(engine.p.methods_of(tid,getter) for getter in getters):valid=False
++                fields.append((name,written,kind))
++        if valid:result=fields
++    cache[tid]=result
++    return result
++
++
++def hash_value(engine,value,kind,reason):
++    if value is None or kind in SCALARS:return scalar_hash(value,kind)
++    tid=owner(engine,value)
++    if not tid or engine.p.type_parents.get(tid):stop('element equality/hash owner or inheritance is outside the leaf contract: '+reason)
++    target=source_method(engine,tid,'hashCode')
++    if target:
++        value=engine.invoke(target,[],value,'HashSet hashCode callback at '+reason)
++        if type(value) is not int or engine.last_invoke_kind!='Integer':stop('source hashCode result/kind is unresolved: '+reason)
++        return signed(value)
++    if source_method(engine,tid,'equals'):stop('source equals has no supported source hashCode: '+reason)
++    plan=generated_plan(engine,tid)
++    if plan is None:stop('element equality/hash callbacks are outside the supported source/generated contract: '+reason)
++    result=1
++    for field,written,actual in plan:
++        item=value.get(field,U);observed=getattr(value,'_native_field_kinds',{}).get(field)
++        if item is not None and observed!=actual:stop('generated key field kind is unresolved: '+reason+' '+field)
++        part=(79 if item else 97) if written=='boolean' and type(item) is bool else scalar_hash(item,actual)
++        if item is None:part=43
++        if part is U:stop('generated key field value is unresolved: '+reason+' '+field)
++        result=signed(result*59+part)
++    engine.effect_events.append({'model_version':'lombok-default-scalar-key/1','operation':'hashCode',
++        'owner':tid,'fields':[f for f,_,_ in plan],'callsite':reason,'resource_writes':[],
++        'generated_method_id':None,'origin':'source annotation and scalar declarations'})
++    return result
++
++
++def equal(engine,value,item,kind,item_kind,reason):
++    if value is None:return item is None if item is not U else U
++    if kind in SCALARS:return boxed_equal(value,item,kind,item_kind,lambda a,b:a==b)
++    identity=reference_equal(value,item)
++    if identity is True:return True
++    tid=owner(engine,value);target=source_method(engine,tid,'equals') if tid else None
++    if target:
++        result=engine.invoke(target,[item],value,'HashSet equals callback at '+reason,argument_kinds=[item_kind])
++        if type(result) is not bool:stop('source equals result is unresolved: '+reason)
++        return result
++    plan=generated_plan(engine,tid) if tid else None
++    if plan is None:return False if identity is False else U
++    if owner(engine,item)!=tid:return False
++    for field,_,actual in plan:
++        result=boxed_equal(value.get(field,U),item.get(field,U),
++            getattr(value,'_native_field_kinds',{}).get(field),getattr(item,'_native_field_kinds',{}).get(field),lambda a,b:a==b)
++        if result is not True:return result
++    return True
+--- E1c-R01-R03/tests/test_hashset_membership.py
++++ E2-R04/tests/test_hashset_membership.py
+@@ -56,21 +56,22 @@
+     assert any('Set' in warning for warning in engine.warnings)
+ 
+ 
+-def test_user_collection_and_user_equality_are_not_native_string_set(tmp_path):
++def test_source_leaf_hash_and_equals_execute_their_own_bodies(tmp_path):
+     project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;
+       class Product{public boolean equals(Object other){return true;}public int hashCode(){return 7;}}
+       class Api{int entry(){Set<Product> values=new HashSet<>();values.add(new Product());values.add(new Product());return values.size();}}'''})
+     engine=Engine(project,ScenarioState(db))
+-    assert engine.run(ids['Api.entry'],{}) is U
+-    assert any('Set' in warning for warning in engine.warnings)
+-    assert engine.outcome=='unsupported_semantics boundary'
++    assert engine.run(ids['Api.entry'],{})==1
++    assert ('','executes',ids['Product.equals']) in engine.edges
++    assert ('','executes',ids['Product.hashCode']) in engine.edges
++    assert not engine.approximate
+ 
+ 
+ def test_unknown_source_hash_callback_does_not_get_a_fabricated_normal_continuation(tmp_path):
+     p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Product{public int hashCode(){throw new IllegalStateException();}}
+       class Api{int entry(){Set<Product> values=new HashSet<>();values.add(new Product());return after();}int after(){return 99;}}'''})
+     e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
+-    assert e.outcome=='unsupported_semantics boundary'
++    assert e.outcome=='uncaught application exception'
+     assert ('','executes',ids['Api.after']) not in e.edges
+ 
+ 
+--- E1c-R01-R03/tests/test_set_source_keys32.py
++++ E2-R04/tests/test_set_source_keys32.py
+@@ -0,0 +1,89 @@
++"""R04 expected source contracts, written before the Set implementation."""
++import pytest
++from analyzer.engine import Engine
++from analyzer.state import ScenarioState,U
++from builders import build
++
++
++def model(tmp_path,body,key=''):
++    return build(tmp_path,{'Api.java':'import java.util.*;'+key+'''class Api{Object entry(){'''+body+'''}int after(){return 99;}}'''})
++
++
++KEY='''class WarehouseKey{int aisle;String bin;WarehouseKey(int a,String b){aisle=a;bin=b;}
++  public int hashCode(){return 7;}
++  public boolean equals(Object other){if(!(other instanceof WarehouseKey))return false;
++    WarehouseKey key=(WarehouseKey)other;return aisle==key.aisle && bin.equals(key.bin);}}'''
++
++
++def test_equal_keys_and_hash_collision(tmp_path):
++    p,db,ids=model(tmp_path,'''Set<WarehouseKey> keys=new HashSet<>();
++      boolean a=keys.add(new WarehouseKey(1,"A"));boolean b=keys.add(new WarehouseKey(1,"A"));
++      boolean c=keys.add(new WarehouseKey(2,"B"));return Arrays.asList(a,b,c,keys.size());''',KEY)
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==[True,False,True,2]
++    assert ('','executes',ids['WarehouseKey.hashCode']) in e.edges
++    assert ('','executes',ids['WarehouseKey.equals']) in e.edges
++    assert not e.approximate
++
++
++def test_hash_runs_on_first_add_identity_shortcut_skips_equals(tmp_path):
++    key='''class Key{int hashes;int comparisons;public int hashCode(){hashes++;return 1;}
++      public boolean equals(Object other){comparisons++;return true;}}'''
++    p,db,ids=model(tmp_path,'''Key key=new Key();Set<Key> keys=new HashSet<>();
++      keys.add(key);keys.add(key);keys.add(new Key());keys.add(null);keys.add(null);
++      return Arrays.asList(key.hashes,key.comparisons,keys.size());''',key)
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==[2,0,2]
++
++
++def test_hash_throw_keeps_alias_effect_before_catch(tmp_path):
++    key='''class Counter{int value;}class Key{Counter counter;Key(Counter c){counter=c;}
++      public int hashCode(){counter.value++;throw new IllegalStateException();}}
++    '''
++    p,db,ids=model(tmp_path,'''Counter c=new Counter();Key key=new Key(c);Set<Key> keys=new HashSet<>();
++      try{keys.add(key);return after();}catch(IllegalStateException ex){return Arrays.asList(c.value,keys.size());}''',key)
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==[1,0]
++    assert ('','executes',ids['Api.after']) not in e.edges
++
++
++def test_mutation_does_not_rehash_stored_key(tmp_path):
++    key='class Key{int code;public int hashCode(){return code;}public boolean equals(Object other){return this==other;}}'
++    p,db,ids=model(tmp_path,'''Key key=new Key();key.code=1;Set<Key> keys=new HashSet<>();keys.add(key);
++      key.code=2;return Arrays.asList(keys.contains(key),keys.size());''',key)
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==[False,1]
++
++
++def test_equals_throw_preserves_incoming_alias_write_and_existing_element(tmp_path):
++    key='''class Counter{int count;}class Key{Counter counter;Key(Counter c){counter=c;}
++      public int hashCode(){return 1;}public boolean equals(Object other){counter.count++;throw new IllegalStateException();}}'''
++    p,db,ids=model(tmp_path,'''Counter first=new Counter();Counter second=new Counter();Set<Key> keys=new HashSet<>();
++      keys.add(new Key(first));try{keys.add(new Key(second));return after();}
++      catch(IllegalStateException ex){return Arrays.asList(first.count,second.count,keys.size());}''',key)
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==[0,1,1]
++    assert ('','executes',ids['Api.after']) not in e.edges
++
++
++def test_different_hash_skips_equals_and_null_has_no_callback(tmp_path):
++    key='''class Key{int code;int checks;Key(int x){code=x;}public int hashCode(){return code;}
++      public boolean equals(Object other){checks++;return true;}}'''
++    p,db,ids=model(tmp_path,'''Key a=new Key(1);Key b=new Key(2);Set<Key> keys=new HashSet<>();
++      keys.add(null);keys.add(a);keys.add(b);return Arrays.asList(a.checks,b.checks,keys.size());''',key)
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==[0,0,3]
++
++
++def test_default_lombok_leaf_membership(tmp_path):
++    key='import lombok.Data;@Data class WarehouseKey{int aisle;String bin;WarehouseKey(int a,String b){aisle=a;bin=b;}}'
++    p,db,ids=model(tmp_path,'Set<WarehouseKey> keys=new HashSet<>();keys.add(new WarehouseKey(1,"A"));keys.add(new WarehouseKey(1,"A"));return keys.size();',key)
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==1 and not e.approximate
++    assert all(not part.startswith('generated:') for edge in e.edges for part in edge)
++
++
++@pytest.mark.parametrize('key',[
++ 'class Data{} @Data class Key{int aisle;}',
++ 'import lombok.Data;class Base{int hidden;}@Data class Key extends Base{int aisle;}',
++ 'import lombok.EqualsAndHashCode;@EqualsAndHashCode(exclude="aisle")class Key{int aisle;}',
++ 'import lombok.Data;@Data class Key{int[] aisles;}',
++ 'import lombok.Data;@Data class Key{int aisle;int getAisle(){return 9;}}'])
++def test_generated_outside_scope_stops_before_normal_sentinel(tmp_path,key):
++    p,db,ids=model(tmp_path,'Set<Key> keys=new HashSet<>();keys.add(new Key());return after();',key)
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
++    assert e.outcome=='unsupported_semantics boundary'
++    assert ('','executes',ids['Api.after']) not in e.edges

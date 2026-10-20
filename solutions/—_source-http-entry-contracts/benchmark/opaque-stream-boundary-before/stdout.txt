@@ -1,0 +1,250 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_unknown_filter_with_alias_write_retains_stream_boundary_before_callback[False] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-224/test_unknown_filter_with_alias0')
+enabled = False
+
+    @pytest.mark.parametrize('enabled', [False, True])
+    def test_unknown_filter_with_alias_write_retains_stream_boundary_before_callback(tmp_path, enabled):
+        p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import jakarta.persistence.*;
+          import org.springframework.beans.factory.annotation.Autowired;
+          import org.springframework.data.jpa.repository.JpaRepository;
+          class Api{@Autowired Store store;Object entry(List<String> input){
+            input.stream().filter(id->{Item row=store.findById(id).get();Item alias=row;
+              alias.status="held";store.save(alias);return true;}).toList();return after();}
+            int after(){return 99;}}
+          @Entity @Table(name="items")class Item{@Id public String id;public String status;}
+          interface Store extends JpaRepository<Item,String>{Optional<Item> findById(String id);Item save(Item item);}'''},
+          rows={'items':[{'id':'A','status':'free'}]})
+        values=JavaList();values.opaque=True;e=Engine(p,ScenarioState(db,{'scoped_effect_summary':enabled}))
+>       assert e.run(ids['Api.entry'],{'input':values}) is U
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_stream_completion32.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:389: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:481: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:573: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'],on_entry=entered)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:723: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds,on_entry)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:815: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1387: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1420: in execute_statement
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1387: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1622: in execute_statement
+    return self.value(node, env), None
+           ^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1676: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:2133: in expression_value
+    return self.value(node.named_children[0], env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1676: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:2116: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:2688: in call
+    obj = self.value(objnode, env) if objnode else env.get('this', U)
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1676: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:2116: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:3479: in call
+    return apply_unknown(self,name,obj,args,env,declared,reason)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/call_effects.py:111: in apply_unknown
+    value,control=engine.fork_join([False,True],env,[callback],invoke_callback)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:905: in fork_join
+    value, control = operation(choice, owned['env'], owned['values'])
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/call_effects.py:107: in invoke_callback
+    if selected:engine.callback_value(values[0],[U]*count)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:3826: in callback_value
+    value, control = self.execute(body, local)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1387: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1420: in execute_statement
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1387: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1611: in execute_statement
+    value=self.value(initializer,env)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1676: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:2116: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:3363: in call
+    empty = self.choose(reason+':optional-empty',[True,False])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x104200750>
+label = 'call:method:service:Api#entry(List<String>)@5:64:optional-empty'
+choices = [True, False]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:call:method:service:Api#entry(List<String>)@5:64:optional-empty', [True, False])
+
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:314: AlternativeRequired
+_ test_unknown_filter_with_alias_write_retains_stream_boundary_before_callback[True] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-224/test_unknown_filter_with_alias1')
+enabled = True
+
+    @pytest.mark.parametrize('enabled', [False, True])
+    def test_unknown_filter_with_alias_write_retains_stream_boundary_before_callback(tmp_path, enabled):
+        p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import jakarta.persistence.*;
+          import org.springframework.beans.factory.annotation.Autowired;
+          import org.springframework.data.jpa.repository.JpaRepository;
+          class Api{@Autowired Store store;Object entry(List<String> input){
+            input.stream().filter(id->{Item row=store.findById(id).get();Item alias=row;
+              alias.status="held";store.save(alias);return true;}).toList();return after();}
+            int after(){return 99;}}
+          @Entity @Table(name="items")class Item{@Id public String id;public String status;}
+          interface Store extends JpaRepository<Item,String>{Optional<Item> findById(String id);Item save(Item item);}'''},
+          rows={'items':[{'id':'A','status':'free'}]})
+        values=JavaList();values.opaque=True;e=Engine(p,ScenarioState(db,{'scoped_effect_summary':enabled}))
+>       assert e.run(ids['Api.entry'],{'input':values}) is U
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_stream_completion32.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:389: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:481: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:573: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'],on_entry=entered)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:723: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds,on_entry)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:815: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1387: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1420: in execute_statement
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1387: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1622: in execute_statement
+    return self.value(node, env), None
+           ^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1676: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:2133: in expression_value
+    return self.value(node.named_children[0], env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1676: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:2116: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:2688: in call
+    obj = self.value(objnode, env) if objnode else env.get('this', U)
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1676: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:2116: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:3479: in call
+    return apply_unknown(self,name,obj,args,env,declared,reason)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/call_effects.py:111: in apply_unknown
+    value,control=engine.fork_join([False,True],env,[callback],invoke_callback)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:905: in fork_join
+    value, control = operation(choice, owned['env'], owned['values'])
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/call_effects.py:107: in invoke_callback
+    if selected:engine.callback_value(values[0],[U]*count)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:3826: in callback_value
+    value, control = self.execute(body, local)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1387: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1420: in execute_statement
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1387: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1611: in execute_statement
+    value=self.value(initializer,env)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:1676: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:2116: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:3363: in call
+    empty = self.choose(reason+':optional-empty',[True,False])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x103646510>
+label = 'call:method:service:Api#entry(List<String>)@5:64:optional-empty'
+choices = [True, False]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:call:method:service:Api#entry(List<String>)@5:64:optional-empty', [True, False])
+
+development/stages/E27-readiness-witnesses/code/analyzer/engine.py:314: AlternativeRequired
+=========================== short test summary info ============================
+FAILED code/tests/test_stream_completion32.py::test_unknown_filter_with_alias_write_retains_stream_boundary_before_callback[False]
+FAILED code/tests/test_stream_completion32.py::test_unknown_filter_with_alias_write_retains_stream_boundary_before_callback[True]
+2 failed, 14 deselected in 1.49s

@@ -1,0 +1,656 @@
+--- E7-integral-http-identity/analyzer/feign_client.py
++++ E8-feign-wire/analyzer/feign_client.py
+@@ -1,9 +1,6 @@
+ """Spring Cloud OpenFeign source contract, with explicit HTTP boundaries."""
+-import json
+ import re
+ from copy import deepcopy
+-from urllib.parse import quote
+-from baseline_closure import _split_args
+ 
+ from .project import text
+ from .state import U
+@@ -56,40 +53,9 @@
+     name=text(node.child_by_field_name('name'))
+     methods=[method for method in p.by_name.get(name,[]) if p.methods[method]['owner']==owner and len(p.parameters(method))==len(args)]
+     if len(methods)!=1:raise AnalysisBoundary('Feign method signature is ambiguous: '+reason,category='unknown_target')
+-    method=methods[0];routes=[(verb,route) for mid,verb,route in p.client_routes if mid==method]
+-    if len(routes)!=1:raise AnalysisBoundary('Feign HTTP mapping is ambiguous: '+reason,category='unknown_target')
+-    destination={}
+-    for part in _split_args(annotation.get('args','')):
+-        pair=re.fullmatch(r'([\w]+)\s*=\s*(.*)',part,re.S)
+-        key,value=(pair[1],pair[2]) if pair else ('value',part)
+-        if key not in ('name','value','path','url'):continue
+-        try:literal=json.loads(value)
+-        except ValueError:literal=None
+-        if key in destination or not isinstance(literal,str) or '${' in literal or '#{' in literal:
+-            raise AnalysisBoundary('Feign destination needs unique literal name/path/url: '+reason,category='unsupported_semantics')
+-        destination[key]=literal
+-    aliases={destination[key] for key in ('name','value') if destination.get(key)}
+-    if len(aliases)!=1 or destination.get('url'):
+-        raise AnalysisBoundary('Feign destination alias or explicit URL policy is not modeled: '+reason,category='unsupported_semantics')
+-    host=next(iter(aliases));literal_prefix=destination.get('path','').strip();prefix=literal_prefix.strip('/')
+-    if not re.fullmatch(r'[\w.-]+',host,re.ASCII) or any(c in prefix for c in '?#{}%\\') or '//' in literal_prefix:
+-        raise AnalysisBoundary('Feign destination syntax is outside the supported literal scope: '+reason,category='unsupported_semantics')
+-    verb,route=routes[0];parameters={parameter['name']:parameter for parameter in p.http_parameters(method)}
+-    path={};headers={};body=MISSING
+-    for (key,_),value in zip(p.parameters(method),args):
+-        parameter=parameters.get(key,{})
+-        kind=parameter.get('kind');wire_name=parameter.get('wire_name',key)
+-        if kind=='PathVariable':path[wire_name]=value
+-        elif kind=='RequestHeader':headers[wire_name]=value
+-        elif kind=='RequestParam':raise AnalysisBoundary('Feign query parameter contract is not yet modeled: '+reason,category='unsupported_semantics')
+-        elif body is MISSING:body=value
+-        else:raise AnalysisBoundary('Feign has multiple unannotated request bodies: '+reason,category='unsupported_semantics')
+-    segments=prefix.split('/') if prefix else []
+-    for segment in route:
+-        value=path.get(segment[1:-1].split(':',1)[0],U) if segment.startswith('{') else segment
+-        if not isinstance(value,(str,int)):raise AnalysisBoundary('Feign path value is unknown: '+reason,category='unknown_value')
+-        segments.append(quote(str(value),safe=''))
+-    url='http://'+host+'/'+('/'.join(segments))
++    method=methods[0]
++    from .feign_wire import request_parts
++    verb,url,address,headers,body,wire_provenance=request_parts(engine,owner,method,args,annotation,reason)
+     mapping=' '.join(a.get('args','') for a in p.methods[method].get('annotations',[]))
+     if 'APPLICATION_JSON_UTF8_VALUE' in mapping:headers['content-type']=['application/json;charset=UTF-8']
+     elif 'APPLICATION_JSON_VALUE' in mapping:headers['content-type']=['application/json']
+@@ -102,16 +68,20 @@
+         if isinstance(token,str):headers['authorization']=['Bearer '+token]
+         else:headers['authorization']=U
+     if body is not MISSING:body=engine.json_wire(body,reason)
+-    targets=sorted(p.ix.handlers_for(verb,segments,host))
+-    if len(targets)!=1:raise AnalysisBoundary('Feign target handler is absent or ambiguous: '+reason,category='unknown_target')
+     interceptors=tuple(mid for mid in interceptors if not oauth or mid not in oauth_factories)
+     if interceptors:
+         if oauth and oauth_factories:
+             raise AnalysisBoundary('Feign mixed source/OAuth2 interceptor ordering is not modeled: '+reason,category='unsupported_semantics')
+         from .feign_interceptors import apply as apply_interceptors
+         headers=apply_interceptors(engine,unit,owner,interceptors,headers,reason)
++    from .spring_client_config import local_targets
++    targets=local_targets(engine,verb,address)
++    if targets is None:targets=p.ix.handlers_for(verb,address['segments'],address['hostname'])
++    targets=sorted(mid for mid in targets if p.enabled_type(p.methods[mid]['owner']))
++    if len(targets)!=1:raise AnalysisBoundary('Feign target handler is absent or ambiguous: '+reason,category='unknown_target')
+     target=targets[0];request=Request.http(p.ix.unit_of(target),verb,url,headers,body,session=session,
+-        provenance={'source_callsite':reason,'client_method':method,'oauth_boundary':'supplied verified context' if session is not U else 'unknown'})
++        provenance={'source_callsite':reason,'client_method':method,'wire_contract':wire_provenance,
++                    'oauth_boundary':'supplied verified context' if session is not U else 'unknown'})
+     def entered(request_id):
+         if unit!=p.ix.unit_of(target):engine.add(caller,'remote',target,reason,{'target_request':request_id,'url':url,'method':verb})
+     failed=False;request_index=len(engine.request_events)
+--- E7-integral-http-identity/analyzer/feign_wire.py
++++ E8-feign-wire/analyzer/feign_wire.py
+@@ -0,0 +1,234 @@
++"""Source Feign target and default EXPLODED named-parameter wire construction.
++
++The template rules are checked against Feign 10.10.1 and 13.5. This does not
++implement custom expanders, QueryMap, nondefault CollectionFormat or refresh.
++The result still goes through ordinary URI lookup and server HTTP binding.
++"""
++import json
++import re
++from urllib.parse import quote,urlsplit
++from baseline_closure import _split_args
++from .project import text
++from .state import U
++from .request import MISSING,wire_text
++from .symbolic_text import concat_text,_uuid_text
++from .http_integral_text import integral_origin
++
++
++def stop(message,reason,category='unsupported_semantics'):
++    from .engine import AnalysisBoundary
++    raise AnalysisBoundary('Feign '+message+': '+reason,category=category)
++
++
++def resolved(engine,value,reason):
++    """Resolve only the supplied environment of the calling deployment."""
++    module=engine.p.methods[engine.method]['module']
++    for _ in range(32):
++        if '#{' in value:stop('destination expression is not modeled',reason)
++        found=re.search(r'\$\{([^{}]+)\}',value)
++        if not found:
++            if '${' in value:stop('destination placeholder is malformed',reason)
++            return value
++        key,separator,default=found[1].partition(':')
++        item=engine.p.configuration.value(module,key,default if separator else U)
++        if item is U or isinstance(item,(dict,list)):stop('destination property is unresolved',reason)
++        item=str(item).lower() if type(item) is bool else str(item)
++        value=value[:found.start()]+item+value[found.end():]
++    stop('destination placeholder expansion exceeds the supported bound',reason)
++
++
++def destination(engine,annotation,reason):
++    fields={}
++    for part in _split_args(annotation.get('args','')):
++        pair=re.fullmatch(r'([\w]+)\s*=\s*(.*)',part,re.S)
++        key,value=(pair[1],pair[2]) if pair else ('value',part)
++        if key not in ('name','value','path','url','contextId'):continue
++        try:literal=json.loads(value)
++        except ValueError:literal=None
++        if key in fields or not isinstance(literal,str):stop('destination needs unique literal attributes',reason)
++        fields[key]=resolved(engine,literal,reason)
++    names={fields[key] for key in ('name','value') if fields.get(key)}
++    if len(names)!=1:stop('destination aliases are absent or conflicting',reason)
++    name=next(iter(names))
++    if not re.fullmatch(r'[\w.-]+',name,re.ASCII):stop('client name is outside the supported syntax',reason)
++    path=fields.get('path','').strip()
++    if any(c in path for c in '?#{}%\\') or any(c.isspace() for c in path) or '//' in path:stop('destination path syntax is not modeled',reason)
++    path=path.strip('/')
++    url=fields.get('url','')
++    if not url.strip():
++        # Property-defined targets and their version/refresh policy are a
++        # separate contract. A known override must never fall back to name.
++        module=engine.p.methods[engine.method]['module'];context_id=fields.get('contextId') or name
++        for prefix in ('spring.cloud.openfeign.client.config.','feign.client.config.'):
++            for key in (context_id,'default'):
++                configured=engine.p.configuration.raw(module,prefix+key+'.url',U)
++                if configured is not U and configured is not None and str(configured).strip():
++                    stop('property-defined target URL policy is not modeled',reason)
++        url='http://'+name
++    elif url!=url.strip():stop('destination URL whitespace is not modeled',reason)
++    elif '://' not in url:url='http://'+url
++    try:
++        parsed=urlsplit(url);parsed.port  # Validate a literal port without dropping it.
++    except ValueError:stop('destination URL is invalid',reason)
++    if (parsed.scheme not in ('http','https') or not parsed.hostname or parsed.username is not None or parsed.password is not None
++            or any(c in url for c in '?#{}\\') or any(c.isspace() for c in url) or not url.isascii()
++            or '//' in parsed.path):stop('destination URL policy is outside the supported scope',reason)
++    if re.search(r'%(?![0-9A-Fa-f]{2})|%2f|%5c|%3b',parsed.path,re.I):stop('destination escaped path policy is not modeled',reason)
++    # Target URL and FeignClient.path precede the method URI. Keep the scheme,
++    # authority and port exactly; lookup uses the decoded resulting address.
++    base=parsed.scheme+'://'+parsed.netloc+parsed.path.rstrip('/')
++    if path:base+='/'+path
++    return base,name
++
++
++def encode(value):
++    # UriUtils.encode(value, UTF_8) skips a string only when every byte is
++    # unreserved or '%' and at least one complete pct-escape occurs. Otherwise
++    # the entire value is encoded, including previous percent signs.
++    if re.fullmatch(r'[A-Za-z0-9._~%\-]*',value) and re.search(r'%[0-9A-Fa-f]{2}',value):return value
++    return quote(value,safe='-._~')
++
++
++def encode_literal(value):
++    # Template literals preserve reserved characters and existing pct escapes.
++    reserved=":/?#[]@!$&'()*+,;="
++    result=[];offset=0
++    for found in re.finditer(r'%[0-9A-Fa-f]{2}',value):
++        result.extend((quote(value[offset:found.start()],safe=reserved),found[0]));offset=found.end()
++    result.append(quote(value[offset:],safe=reserved))
++    return ''.join(result)
++
++
++def component(value,reason):
++    if type(value) in (str,int,bool):return encode(wire_text(value)).replace('%2F','/')
++    value=wire_text(value)
++    if integral_origin(value) is not None or _uuid_text(value):return value
++    stop('named value has no supported exact text expansion',reason,'unknown_value')
++
++
++def annotations(node):
++    mods=next((n for n in node.named_children if n.type=='modifiers'),None)
++    return [n for n in mods.named_children if n.type in ('annotation','marker_annotation')] if mods else []
++
++
++def parameter_name(engine,par,info,meta,reason):
++    kind=info['kind']
++    for node in annotations(par):
++        written=text(node.child_by_field_name('name'))
++        if any(engine.standard_type(written,fqn,meta) for fqn in (
++                'org.springframework.cloud.openfeign.SpringQueryMap','org.springframework.web.bind.annotation.RequestPart',
++                'org.springframework.web.bind.annotation.MatrixVariable','org.springframework.format.annotation.DateTimeFormat',
++                'org.springframework.format.annotation.NumberFormat')):stop('parameter customization is not modeled',reason)
++    if not kind:return info['wire_name']
++    native=[node for node in annotations(par) if engine.standard_type(text(node.child_by_field_name('name')),
++            'org.springframework.web.bind.annotation.'+kind,meta)]
++    if len(native)!=1:stop('named parameter annotation identity is not proven',reason)
++    aliases=[]
++    for part in _split_args(text(native[0].child_by_field_name('arguments'))):
++        pair=re.fullmatch(r'(\w+)\s*=\s*(.*)',part,re.S)
++        key,raw=(pair[1],pair[2]) if pair else ('value',part)
++        if key not in ('name','value'):continue
++        try:alias=json.loads(raw)
++        except ValueError:alias=None
++        if not isinstance(alias,str):stop('parameter name is not a literal',reason)
++        if alias:aliases.append(alias)
++    if len(set(aliases))>1:stop('parameter name aliases conflict',reason)
++    return aliases[0] if aliases else info['name']
++
++
++def query_values(value,reason):
++    if value is None:return []
++    from .native_arrays import JavaArray
++    if isinstance(value,JavaArray):stop('array query expansion is not modeled',reason)
++    if isinstance(value,list):
++        if getattr(value,'opaque',False) or not getattr(value,'order_known',True):stop('query collection membership/order is unresolved',reason)
++        result=''
++        for child in value:
++            if child is None:continue
++            child=component(child,reason)
++            if not isinstance(child,str):
++                # Preserve symbolic atoms without claiming the size/sign of a
++                # generated number. Empty string atoms need the exact Feign
++                # iterable expansion below and are handled as literal text.
++                if result and result!=',':result=concat_text(result,',')
++                result=concat_text(result,child)
++            elif child=='':result=concat_text(result,',')
++            else:
++                if result and result!=',':result=concat_text(result,',')
++                result=concat_text(result,child)
++        if isinstance(result,str) and ',' in result:
++            values=result.split(',')
++            while values and values[-1]=='':values.pop()
++            return values
++        if not isinstance(result,str):
++            # Each proven nonempty numeric/UUID atom has no commas. Split
++            # only the literal separators, keeping the atoms and their order.
++            chunks=result.get('__text_parts__',[result]);values=[];current=''
++            for chunk in chunks:
++                if isinstance(chunk,str):
++                    for i,part in enumerate(chunk.split(',')):
++                        if i:values.append(current);current=''
++                        current=concat_text(current,part)
++                else:current=concat_text(current,chunk)
++            values.append(current)
++            while values and values[-1]=='':values.pop()
++            return values
++        return [result]
++    return [component(value,reason)]
++
++
++def request_parts(engine,owner,method,args,annotation,reason):
++    p=engine.p;meta=p.methods[method]
++    mappings=('RequestMapping','GetMapping','PostMapping','PutMapping','DeleteMapping','PatchMapping')
++    def native_mapping(a,item):
++        return any(engine.standard_type(a['name'],'org.springframework.web.bind.annotation.'+kind,item) for kind in mappings)
++    if not any(native_mapping(a,meta) for a in meta.get('annotations',[])):
++        stop('method HTTP annotation identity is not proven',reason)
++    for item in [p.nodes[owner],meta]:
++        for a in item.get('annotations',[]):
++            if native_mapping(a,item) and re.search(r'\b(?:headers|params)\s*=',a.get('args','')):
++                stop('mapping header/query conditions are not modeled',reason)
++            if engine.standard_type(a['name'],'org.springframework.cloud.openfeign.CollectionFormat',item):
++                values=_split_args(a.get('args',''));raw=re.sub(r'^\s*value\s*=\s*','',values[0]) if len(values)==1 else ''
++                match=re.fullmatch(r'([\w.]+)\.EXPLODED',raw)
++                if match is None or not engine.standard_type(match[1],'feign.CollectionFormat',item):
++                    stop('nondefault collection format is not modeled',reason)
++    base,name=destination(engine,annotation,reason)
++    routes=[(verb,route) for mid,verb,route in p.client_routes if mid==method]
++    if len(routes)!=1:stop('HTTP mapping is ambiguous',reason,'unknown_target')
++    verb,route=routes[0];path={};headers={};body=MISSING;query=[];seen=set()
++    node=p.ast.get(method)
++    if node is None:stop('parameter source is absent',reason,'unknown_target')
++    nodes=[n for n in node.child_by_field_name('parameters').named_children if n.type=='formal_parameter']
++    infos=p.http_parameters(method)
++    if len(nodes)!=len(args) or len(infos)!=len(args):stop('parameter source signature is incomplete',reason,'unknown_target')
++    for info,par,value in zip(infos,nodes,args):
++        key=parameter_name(engine,par,info,meta,reason);kind=info['kind']
++        if kind in ('PathVariable','RequestHeader','RequestParam'):
++            if key in seen:stop('shared named template variable is not modeled',reason)
++            seen.add(key)
++        if kind=='PathVariable':path[key]=value
++        elif kind=='RequestHeader':
++            if value is not None:headers[key]=value
++        elif kind=='RequestParam':
++            if any(c in key for c in '{}'):stop('query name templates are not modeled',reason)
++            for expanded in query_values(value,reason):query.append((encode(encode_literal(key)),expanded))
++        elif body is MISSING:body=value
++        else:stop('multiple unannotated request bodies are not modeled',reason)
++    url=base
++    for segment in route:
++        if segment.startswith('{') and segment.endswith('}'):
++            if ':' in segment:stop('path expression patterns are not modeled',reason)
++            value=path.get(segment[1:-1].split(':',1)[0],U)
++            part=component(value,reason)
++        else:
++            if any(c in segment for c in '?#{}\\'):stop('method URI template syntax is not modeled',reason)
++            part=encode_literal(segment)
++        url=concat_text(concat_text(url,'/'),part)
++    for i,(key,value) in enumerate(query):
++        url=concat_text(concat_text(url,('?' if i==0 else '&')+key+'='),value)
++    address=engine.request_address(url)
++    if not address or address['segments'] is None or not address['query_complete'] or any(v is U for values in address['query'].values() for v in values):
++        stop('resolved URI layout or escaping is not modeled',reason)
++    return verb,url,address,headers,body,{'client_name':name,'target_policy':'source annotation/name and supplied caller configuration',
++                                      'query_format':'EXPLODED','uri_encoding':'Feign UriUtils finite values'}
+--- E7-integral-http-identity/analyzer/request_url.py
++++ E8-feign-wire/analyzer/request_url.py
+@@ -10,6 +10,7 @@
+ 
+ from .state import U
+ from .symbolic_text import concat_text, _uuid_text, _date_text
++from .http_integral_text import integral_origin
+ 
+ 
+ def request_address(value):
+@@ -26,7 +27,7 @@
+         else:
+             token = marker + str(len(atoms)) + '__'
+             atoms[token] = deepcopy(part)
+-            if unsafe is None and not (_uuid_text(part) or _date_text(part) or
++            if unsafe is None and not (_uuid_text(part) or _date_text(part) or integral_origin(part) is not None or
+                                        type(part) is dict and part.get('__uri_query_value__')):
+                 unsafe = len(rendered)
+             rendered += token
+--- E7-integral-http-identity/tests/test_feign_path33.py
++++ E8-feign-wire/tests/test_feign_path33.py
+@@ -52,16 +52,16 @@
+     assert not any(k=='executes' and t==ids['Target.read'] for _,k,t in e.edges)
+ 
+ 
+-@pytest.mark.parametrize('annotation',[
+-    '@FeignClient(name="service",path=PREFIX)',
+-    '@FeignClient(name="service",path="${client.prefix}")',
+-    '@FeignClient(name="service",value="different")',
+-    '@FeignClient(name="service",url="https://unmapped.example")',
++@pytest.mark.parametrize('annotation,outcome',[
++    ('@FeignClient(name="service",path=PREFIX)','unsupported_semantics boundary'),
++    ('@FeignClient(name="service",path="${client.prefix}")','unsupported_semantics boundary'),
++    ('@FeignClient(name="service",value="different")','unsupported_semantics boundary'),
++    ('@FeignClient(name="service",url="https://unmapped.example")','unknown_target boundary'),
+ ])
+-def test_unproved_destination_policy_is_not_silently_ignored(tmp_path,annotation):
++def test_unproved_destination_policy_is_not_silently_ignored(tmp_path,annotation,outcome):
+     e,ids=fixture(tmp_path,annotation,'')
+     assert e.run(ids['Api.entry'],{}) is U
+-    assert e.outcome=='unsupported_semantics boundary'
++    assert e.outcome==outcome
+     assert not any(request['request'] is not None for request in e.request_events)
+     assert not any(k=='executes' and t==ids['Target.read'] for _,k,t in e.edges)
+ 
+--- E7-integral-http-identity/tests/test_feign_wire33.py
++++ E8-feign-wire/tests/test_feign_wire33.py
+@@ -0,0 +1,167 @@
++"""Source-backed URL/query expectations, frozen before the implementation.
++
++Spring Cloud's FeignClientFactoryBean/RequestParam processor and OpenFeign
++10.10.1/13.5 Template, QueryTemplate, Expressions and UriUtils are the authority.
++No target Java application is compiled or run.
++"""
++import pytest
++from builders import build
++from analyzer.engine import Engine
++from analyzer.state import ScenarioState,U
++from analyzer.request import MISSING
++
++IMPORTS='''import org.springframework.cloud.openfeign.*;
++import org.springframework.web.bind.annotation.*;import java.util.*;'''
++
++
++def outbound(engine):return [r for r in engine.request_events if r['request'] is not None]
++
++
++def path_fixture(root,url,*,path='',prefix='',context=None,argument='7L',extra='',name='logical-client',parameters=''):
++    annotation='@FeignClient(name="'+name+'",url="'+url+'",path="'+path+'")'
++    source=IMPORTS+extra+annotation+'''interface Client{
++      @GetMapping("/items/{id}")String read(@PathVariable("id") Long id);}
++      class Api{Client client;String entry('''+parameters+'''){return client.read('''+argument+''');}}
++      @RestController @RequestMapping("'''+prefix+'''") class Target{
++        @GetMapping("/items/{id}")String read(@PathVariable("id")Long id){return "item-"+id;}}'''
++    p,db,ids=build(root,{'Api.java':source},context=context)
++    return Engine(p,ScenarioState(db)),ids
++
++
++@pytest.mark.parametrize('url,expected',[
++    ('http://service:8080','http://service:8080/items/7'),
++    ('https://service:8443','https://service:8443/items/7'),
++    ('service:8080','http://service:8080/items/7'),
++    ('http://service:8080/','http://service:8080/items/7'),
++])
++def test_explicit_url_is_used_instead_of_the_logical_client_name(tmp_path,url,expected):
++    e,ids=path_fixture(tmp_path,url)
++    assert e.run(ids['Api.entry'],{})=='item-7' and not e.approximate
++    sent=outbound(e);assert len(sent)==1
++    assert sent[0]['request']['url']==expected
++    assert sent[0]['entry']==ids['Target.read']
++    assert sent[0]['bound_arguments']==[{'name':'id','declared_type':'java.lang.Long','value':7}]
++    assert (ids['Api.entry'],'remote',ids['Target.read']) not in e.edges  # Same deployment in this fixture.
++
++
++def test_url_path_and_annotation_path_are_both_applied(tmp_path):
++    e,ids=path_fixture(tmp_path,'http://service:8080/root',path='/version/',prefix='/root/version')
++    assert e.run(ids['Api.entry'],{})=='item-7' and not e.approximate
++    assert outbound(e)[0]['request']['url']=='http://service:8080/root/version/items/7'
++
++
++@pytest.mark.parametrize('literal,properties',[
++    ('${client.url}',{'client.url':'http://service:8080/root'}),
++    ('http://${client.host}:${client.port}/root',{'client.host':'service','client.port':8080}),
++    ('${client.url:http://service:8080/root}',{}),
++    ('${client.url}',{'client.url':'http://${client.host}:8080/root','client.host':'service'}),
++])
++def test_url_placeholders_use_the_supplied_calling_deployment(tmp_path,literal,properties):
++    context={'configuration':{'service':{'propertySources':[{'name':'provided','source':properties}]}}}
++    e,ids=path_fixture(tmp_path,literal,path='/version',prefix='/root/version',context=context)
++    assert e.run(ids['Api.entry'],{})=='item-7' and not e.approximate
++    assert outbound(e)[0]['request']['url']=='http://service:8080/root/version/items/7'
++
++
++@pytest.mark.parametrize('url',[
++    '${missing.url}','#{dynamicTarget}','http://service:bad','ftp://service',
++    'http://user:password@service','http://service/path?unmodeled=1','http://service/#fragment',
++    'http://service/repeated//path','http://service/%2Fpath','http://service/{unresolved}',
++])
++def test_unsupported_url_policy_cannot_dispatch_to_a_convenient_handler(tmp_path,url):
++    e,ids=path_fixture(tmp_path,url)
++    assert e.run(ids['Api.entry'],{}) is U
++    assert not outbound(e)
++    assert not any(kind=='executes' and target==ids['Target.read'] for _,kind,target in e.edges)
++
++
++def test_foreign_configuration_does_not_resolve_a_missing_caller_property(tmp_path):
++    context={'configuration':{'foreign':{'propertySources':[{'name':'provided','source':{'client.url':'http://service'}}]}}}
++    e,ids=path_fixture(tmp_path,'${client.url}',context=context)
++    assert e.run(ids['Api.entry'],{}) is U and not outbound(e)
++
++
++def query_fixture(root,expression,*,typ='String',client_options='"q"',target_options='value="q",required=false,defaultValue="server-default"',
++                  target_type='String',returns='q',result_type='String',extra='',client_annotation=''):
++    source=IMPORTS+extra+'''@FeignClient(name="logical-client",url="http://service:8080")interface Client{
++      '''+client_annotation+'''@GetMapping("/query")'''+result_type+''' read(@RequestParam('''+client_options+''')'''+typ+''' q);}
++      class Api{Client client;'''+result_type+''' entry(){return client.read('''+expression+''');}}
++      @RestController class Target{@GetMapping("/query")'''+result_type+''' read(@RequestParam('''+target_options+''')'''+target_type+''' q){return '''+returns+''';}}'''
++    p,db,ids=build(root,{'Api.java':source})
++    return Engine(p,ScenarioState(db)),ids
++
++
++@pytest.mark.parametrize('expression,typ,expected,url',[
++    ('"plain"','String','plain','http://service:8080/query?q=plain'),
++    ('7L','Long','7','http://service:8080/query?q=7'),
++    ('true','Boolean','true','http://service:8080/query?q=true'),
++    ('"а б&c=1+%"','String','а б&c=1+%','http://service:8080/query?q=%D0%B0%20%D0%B1%26c%3D1%2B%25'),
++    ('"10%20off"','String','10 off','http://service:8080/query?q=10%20off'),
++    ('"10%20 off"','String','10%20 off','http://service:8080/query?q=10%2520%20off'),
++    ('""','String','server-default','http://service:8080/query?q='),
++    ('null','String','server-default','http://service:8080/query'),
++])
++def test_scalar_query_has_actual_encoding_and_normal_server_binding(tmp_path,expression,typ,expected,url):
++    e,ids=query_fixture(tmp_path,expression,typ=typ)
++    assert e.run(ids['Api.entry'],{})==expected and not e.approximate
++    sent=outbound(e);assert len(sent)==1 and sent[0]['request']['url']==url
++    assert sent[0]['request']['query_complete'] is True
++    assert sent[0]['request']['body'] is MISSING
++
++
++def test_client_default_value_does_not_invent_an_argument_or_override_the_server_default(tmp_path):
++    e,ids=query_fixture(tmp_path,'null',client_options='value="q",required=false,defaultValue="client-default"')
++    assert e.run(ids['Api.entry'],{})=='server-default' and not e.approximate
++    assert outbound(e)[0]['request']['query']=={}
++
++
++@pytest.mark.parametrize('expression,size,url,query',[
++    ('Arrays.asList("a","a","b")',3,'http://service:8080/query?q=a&q=a&q=b',{'q':['a','a','b']}),
++    ('Arrays.asList("a",null,"b")',2,'http://service:8080/query?q=a&q=b',{'q':['a','b']}),
++    ('new ArrayList<String>()',0,'http://service:8080/query?q=',{'q':['']}),
++    ('Arrays.asList("a","")',1,'http://service:8080/query?q=a',{'q':['a']}),
++    ('Arrays.asList("","b")',2,'http://service:8080/query?q=&q=b',{'q':['','b']}),
++    ('Arrays.asList("a,b","c")',2,'http://service:8080/query?q=a%2Cb&q=c',{'q':['a,b','c']}),
++])
++def test_default_exploded_query_preserves_order_duplicates_and_empty_expansion_rules(tmp_path,expression,size,url,query):
++    e,ids=query_fixture(tmp_path,expression,typ='List<String>',target_options='"q"',target_type='List<String>',returns='q.size()',result_type='Integer')
++    assert e.run(ids['Api.entry'],{})==size and not e.approximate
++    sent=outbound(e);assert len(sent)==1
++    assert sent[0]['request']['url']==url and sent[0]['request']['query']==query
++
++
++def test_a_single_comma_value_is_split_by_the_server_collection_converter(tmp_path):
++    e,ids=query_fixture(tmp_path,'Arrays.asList("a,b")',typ='List<String>',target_options='"q"',
++                        target_type='List<String>',returns='q.size()',result_type='Integer')
++    assert e.run(ids['Api.entry'],{})==2 and not e.approximate
++    assert outbound(e)[0]['request']['url']=='http://service:8080/query?q=a%2Cb'
++
++
++@pytest.mark.parametrize('extra,annotation',[
++    ('','@org.springframework.cloud.openfeign.CollectionFormat(feign.CollectionFormat.CSV)'),
++    ('@interface RequestParam{String value();}',''),
++])
++def test_nondefault_format_or_annotation_namesake_is_not_treated_as_default_query(tmp_path,extra,annotation):
++    e,ids=query_fixture(tmp_path,'"x"',extra=extra,client_annotation=annotation)
++    assert e.run(ids['Api.entry'],{}) is U and not outbound(e)
++
++
++def test_symbolic_integral_path_retains_the_producer_identity(tmp_path):
++    e,ids=path_fixture(tmp_path,'http://service:8080',argument='id',parameters='Long id')
++    value=e.state.generated_value('Long','independent source identity')
++    e.run(ids['Api.entry'],{'id':value})
++    sent=outbound(e);assert len(sent)==1
++    assert sent[0]['bound_arguments'][0]['value']==value
++    assert sent[0]['request']['path'][1]['__integral_origin__']==value
++    assert not e.approximate
++
++
++def test_source_interceptor_prefix_runs_even_when_destination_handler_is_unknown(tmp_path):
++    extra='''import org.springframework.boot.autoconfigure.SpringBootApplication;
++      import org.springframework.stereotype.Component;import feign.RequestInterceptor;import feign.RequestTemplate;
++      @SpringBootApplication @EnableFeignClients class App{}
++      @Component class Header implements RequestInterceptor{public void apply(RequestTemplate template){template.header("x-proof","source");}}'''
++    e,ids=path_fixture(tmp_path,'http://unmapped.example',extra=extra)
++    assert e.run(ids['Api.entry'],{}) is U and not outbound(e)
++    assert any(k=='executes' and t==ids['Header.apply'] for _,k,t in e.edges)
++    assert not any(k=='executes' and t==ids['Target.read'] for _,k,t in e.edges)
+--- E7-integral-http-identity/tests/test_feign_wire_controls33.py
++++ E8-feign-wire/tests/test_feign_wire_controls33.py
+@@ -0,0 +1,121 @@
++"""Independent counterexamples for native identity, order and configuration."""
++import pytest
++from builders import build
++from analyzer.engine import Engine
++from analyzer.state import ScenarioState,U
++from analyzer.native_storage import JavaList
++from analyzer.native_arrays import JavaArray
++
++IMPORTS='''import java.util.*;import org.springframework.web.bind.annotation.*;
++import org.springframework.cloud.openfeign.FeignClient;'''
++
++
++def outbound(e):return [r for r in e.request_events if r['request'] is not None]
++
++
++def test_configured_property_url_is_not_silently_replaced_by_the_client_name(tmp_path):
++    source=IMPORTS+'''@FeignClient(name="service")interface Client{@GetMapping("/read")String read();}
++      class Api{Client client;String entry(){return client.read();}}
++      @RestController class Target{@GetMapping("/read")String read(){return "wrong";}}'''
++    context={'configuration':{'service':{'propertySources':[{'name':'provided','source':{
++        'spring.cloud.openfeign.client.config.service.url':'http://unmapped.example'}}]}}}
++    p,db,ids=build(tmp_path,{'Api.java':source},context=context);e=Engine(p,ScenarioState(db))
++    assert e.run(ids['Api.entry'],{}) is U and not outbound(e)
++
++
++def test_an_annotation_url_has_priority_over_property_url(tmp_path):
++    source=IMPORTS+'''@FeignClient(name="service",url="http://service:8080")interface Client{@GetMapping("/read")String read();}
++      class Api{Client client;String entry(){return client.read();}}
++      @RestController class Target{@GetMapping("/read")String read(){return "right";}}'''
++    context={'configuration':{'service':{'propertySources':[{'name':'provided','source':{
++        'spring.cloud.openfeign.client.config.service.url':'http://unmapped.example'}}]}}}
++    p,db,ids=build(tmp_path,{'Api.java':source},context=context);e=Engine(p,ScenarioState(db))
++    assert e.run(ids['Api.entry'],{})=='right' and not e.approximate
++    assert outbound(e)[0]['request']['url']=='http://service:8080/read'
++
++
++@pytest.mark.parametrize('parameters,call',[
++    ('@RequestParam("q")String first,@RequestParam("q")String second','"a","b"'),
++    ('@RequestParam(QUERY)String q','"a"'),
++    ('@org.springframework.cloud.openfeign.SpringQueryMap Map<String,String> q','new HashMap<String,String>()'),
++])
++def test_unmodeled_named_template_customization_cannot_become_a_normal_body(tmp_path,parameters,call):
++    source=IMPORTS+'''@FeignClient(name="service",url="http://service:8080")interface Client{
++        String QUERY="q";@GetMapping("/read")String read('''+parameters+''');}
++      class Api{Client client;String entry(){return client.read('''+call+''');}}
++      @RestController class Target{@GetMapping("/read")String read(){return "wrong";}}'''
++    p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
++    assert e.run(ids['Api.entry'],{}) is U and not outbound(e)
++
++
++@pytest.mark.parametrize('array',[False,True])
++def test_unobserved_order_and_array_conversion_are_not_exploded_as_a_convenient_list(tmp_path,array):
++    source=IMPORTS+'''@FeignClient(name="service",url="http://service:8080")interface Client{
++      @GetMapping("/read")String read(@RequestParam("q")Object q);}
++      class Api{Client client;String entry(Object values){return client.read(values);}}
++      @RestController class Target{@GetMapping("/read")String read(){return "wrong";}}'''
++    p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
++    values=JavaArray(['a','b'],'java.lang.String',['String','String']) if array else JavaList(['a','b'],['String','String'])
++    if not array:values.order_known=False
++    assert e.run(ids['Api.entry'],{'values':values}) is U and not outbound(e)
++
++
++def test_a_leading_empty_element_does_not_duplicate_before_a_symbolic_integral(tmp_path):
++    source=IMPORTS+'''@FeignClient(name="service",url="http://service:8080")interface Client{
++      @GetMapping("/read")Integer read(@RequestParam("q")List<Object> q);}
++      class Api{Client client;Integer entry(Long id){return client.read(Arrays.asList("",id));}}
++      @RestController class Target{@GetMapping("/read")Integer read(@RequestParam("q")List<String> q){return q.size();}}'''
++    p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
++    identity=e.state.generated_value('Long','independent integral producer')
++    assert e.run(ids['Api.entry'],{'id':identity})==2 and not e.approximate
++    query=outbound(e)[0]['request']['query']['q']
++    assert len(query)==2 and query[0]=='' and query[1]['__integral_origin__']==identity
++
++
++@pytest.mark.parametrize('option',['headers="X-Mode=research"','params="mode=research"'])
++def test_unmodeled_mapping_conditions_are_an_analysis_boundary(tmp_path,option):
++    source=IMPORTS+'''@FeignClient(name="service",url="http://service:8080")interface Client{
++      @GetMapping(value="/read",'''+option+''')String read();}
++      class Api{Client client;String entry(){return client.read();}}
++      @RestController class Target{@GetMapping("/read")String read(){return "read";}}'''
++    p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
++    assert e.run(ids['Api.entry'],{}) is U and e.outcome=='unsupported_semantics boundary'
++    assert not outbound(e)
++
++
++def test_explicit_default_collection_format_uses_the_proven_native_enum(tmp_path):
++    source=IMPORTS+'''@FeignClient(name="service",url="http://service:8080")interface Client{
++      @org.springframework.cloud.openfeign.CollectionFormat(feign.CollectionFormat.EXPLODED)
++      @GetMapping("/read")Integer read(@RequestParam("q")List<String> q);}
++      class Api{Client client;Integer entry(){return client.read(Arrays.asList("a","a"));}}
++      @RestController class Target{@GetMapping("/read")Integer read(@RequestParam("q")List<String> q){return q.size();}}'''
++    p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
++    assert e.run(ids['Api.entry'],{})==2 and not e.approximate
++    assert outbound(e)[0]['request']['query']=={'q':['a','a']}
++
++
++def test_a_mapping_annotation_namesake_cannot_create_a_feign_http_method(tmp_path):
++    source='''import org.springframework.cloud.openfeign.FeignClient;
++      @interface GetMapping{String value();}
++      @FeignClient(name="service",url="http://service:8080")interface Client{@GetMapping("/read")String read();}
++      class Api{Client client;String entry(){return client.read();}}
++      @org.springframework.web.bind.annotation.RestController class Target{
++        @org.springframework.web.bind.annotation.GetMapping("/read")String read(){return "wrong";}}'''
++    p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
++    assert e.run(ids['Api.entry'],{}) is U and not outbound(e)
++
++
++@pytest.mark.parametrize('route,encoded',[
++    ('/items/a b','/items/a%20b'),
++    ('/items/пример','/items/%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80'),
++    ('/items/100%','/items/100%25'),
++    ('/items/a:b','/items/a:b'),
++])
++def test_literal_method_uri_uses_the_literal_encoding_contract(tmp_path,route,encoded):
++    source=IMPORTS+'''@FeignClient(name="service",url="http://service:8080")interface Client{
++      @GetMapping("'''+route+'''")String read();}
++      class Api{Client client;String entry(){return client.read();}}
++      @RestController class Target{@GetMapping("'''+route+'''")String read(){return "right";}}'''
++    p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
++    assert e.run(ids['Api.entry'],{})=='right' and not e.approximate
++    assert outbound(e)[0]['request']['url']=='http://service:8080'+encoded

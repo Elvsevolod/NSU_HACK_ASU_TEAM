@@ -1,0 +1,104 @@
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 13%]
+........................................................................ [ 17%]
+........................................................................ [ 22%]
+........................................................................ [ 26%]
+........................................................................ [ 31%]
+........................................................................ [ 35%]
+........................................................................ [ 40%]
+........................................................................ [ 44%]
+F....................................................................... [ 49%]
+........................................................................ [ 53%]
+........................................................................ [ 57%]
+........................................................................ [ 62%]
+........................................................................ [ 66%]
+........................................................................ [ 71%]
+........................................................................ [ 75%]
+........................................................................ [ 80%]
+........................................................................ [ 84%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+..............................                                           [100%]
+=================================== FAILURES ===================================
+______________ test_an_immutable_callback_node_is_not_deepcopied _______________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-148/test_an_immutable_callback_nod0')
+
+    def test_an_immutable_callback_node_is_not_deepcopied(tmp_path):
+        p,state,entry=fixture(tmp_path,'return true;','Object callback')
+        callback=('lambda',p.ast[entry],{},(),())
+>       paths=run_paths(p,state,entry,{'callback':callback},4)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_input_replay_isolation.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+analyzer/paths.py:52: in run_paths
+    result = engine.run(entry, owned_params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer/engine.py:362: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer/engine.py:435: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+analyzer/engine.py:497: in continue_filter
+    request_event['binding_candidate_arguments']=[{'name':name,'declared_type':render_source_type(self.p,typ,self.p.methods[frame['entry']],{},self.standard_type) or typ,
+analyzer/engine.py:498: in <listcomp>
+    'value':deepcopy(value)} for (name,typ),value in zip(self.p.parameters(frame['entry']),args)]
+            ^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/copy.py:146: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/copy.py:211: in _deepcopy_tuple
+    y = [deepcopy(a, memo) for a in x]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/copy.py:211: in <listcomp>
+    y = [deepcopy(a, memo) for a in x]
+         ^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = <Node type=method_declaration, start_point=(2, 16), end_point=(2, 59)>
+memo = {}, _nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        if memo is None:
+            memo = {}
+    
+        d = id(x)
+        y = memo.get(d, _nil)
+        if y is not _nil:
+            return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'tree_sitter.Node' object
+
+/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/copy.py:161: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_input_replay_isolation.py::test_an_immutable_callback_node_is_not_deepcopied
+1 failed, 1613 passed in 5.10s

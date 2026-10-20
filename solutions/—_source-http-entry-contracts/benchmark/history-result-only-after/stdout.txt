@@ -1,0 +1,30 @@
+...........................F.................................            [100%]
+=================================== FAILURES ===================================
+_ test_selected_identity_needs_its_exact_completed_response_field[unknown-path] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-186/test_selected_identity_needs_i5')
+mutation = 'unknown-path'
+
+    @pytest.mark.parametrize('mutation',[None,'other-path','other-value','other-type','other-producer','unknown-path'])
+    def test_selected_identity_needs_its_exact_completed_response_field(tmp_path,mutation):
+        p,ids,g,state=fixture(tmp_path);later=deepcopy(state.history[0])
+        later.update(step=2,entry=ids['ParcelController.getById'],action='Read the parcel')
+        selected={'entity':['parcel'],'value':7,'reference':'history[1].result.id',
+            'object':deepcopy(later['result']),'qualified_type':'Parcel','deployment':'service',
+            'producer_entry':ids['ParcelController.getById']}
+        if mutation=='other-path':selected['reference']='history[0].result.id'
+        elif mutation=='unknown-path':selected['reference']=U
+        elif mutation=='other-value':selected['value']=8
+        elif mutation=='other-type':selected['qualified_type']='Unrelated'
+        elif mutation=='other-producer':selected['producer_entry']=ids['ParcelController.create']
+        later['selected_objects']=[selected];state.history.append(later)
+        proposals,detail=g.step('Read the parcel just created again',state)
+        # Selection bookkeeping does not replace the actual complete response.
+>       assert len(proposals)==1 and proposals[0]['params']=={'id':7}
+E       assert (0 == 1)
+E        +  where 0 = len([])
+
+code/tests/test_history_request_choice33.py:146: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_history_request_choice33.py::test_selected_identity_needs_its_exact_completed_response_field[unknown-path]
+1 failed, 60 passed in 0.33s

@@ -1,0 +1,261 @@
+{
+  "passed": true,
+  "runs": [
+    {
+      "label": "legacy-analysis",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/compare_public_corpus.py",
+        "--fixtures",
+        "validation_inputs/legacy-real",
+        "--output",
+        "benchmark/inline-json-body-integration-02/legacy",
+        "--candidate-only"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.7236299159994815
+    },
+    {
+      "label": "legacy-state",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_legacy_state.py",
+        "--reports",
+        "benchmark/inline-json-body-integration-02/legacy",
+        "--output",
+        "benchmark/inline-json-body-integration-02/legacy/checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.039596167000127025
+    },
+    {
+      "label": "main",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/run_real_journey.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--output",
+        "benchmark/inline-json-body-integration-02/main",
+        "--path-limit",
+        "4"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.28807824999967124
+    },
+    {
+      "label": "main-values",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_real_journey.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-main.oracle-v3.json",
+        "--trace",
+        "benchmark/inline-json-body-integration-02/main/trace.json",
+        "--output",
+        "benchmark/inline-json-body-integration-02/main/checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.03989779100083979
+    },
+    {
+      "label": "main-semantic",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_semantic_projection.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-main.oracle-v3.json",
+        "--trace",
+        "benchmark/inline-json-body-integration-02/main/trace.json",
+        "--output",
+        "benchmark/inline-json-body-integration-02/main/semantic-checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.03462474999832921
+    },
+    {
+      "label": "main-mutations",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_journey_mutations.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-main.oracle-v3.json",
+        "--trace",
+        "benchmark/inline-json-body-integration-02/main/trace.json",
+        "--output",
+        "benchmark/inline-json-body-integration-02/main/mutations"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.44767487500212155
+    },
+    {
+      "label": "additional",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/run_additional_journey.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--output",
+        "benchmark/inline-json-body-integration-02/additional"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.23994741599744884
+    },
+    {
+      "label": "additional-values",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_additional_journey.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-additional.oracle-v3.json",
+        "--trace",
+        "benchmark/inline-json-body-integration-02/additional/trace.json",
+        "--output",
+        "benchmark/inline-json-body-integration-02/additional/checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.03700633400148945
+    },
+    {
+      "label": "additional-semantic",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_semantic_projection.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-additional.oracle-v3.json",
+        "--trace",
+        "benchmark/inline-json-body-integration-02/additional/trace.json",
+        "--output",
+        "benchmark/inline-json-body-integration-02/additional/semantic-checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.037387457996373996
+    },
+    {
+      "label": "additional-mutations",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_additional_mutations.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-additional.oracle-v3.json",
+        "--trace",
+        "benchmark/inline-json-body-integration-02/additional/trace.json",
+        "--output",
+        "benchmark/inline-json-body-integration-02/additional/mutations"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.23758429200097453
+    },
+    {
+      "label": "document",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/run_document_journey.py",
+        "--output",
+        "benchmark/inline-json-body-integration-02/document"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.2395512500006589
+    },
+    {
+      "label": "document-mutations",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_document_mutations.py",
+        "--input",
+        "benchmark/inline-json-body-integration-02/document"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.07708916700357804
+    },
+    {
+      "label": "actor-singleton-http",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_boundary_wires.py",
+        "--output",
+        "benchmark/inline-json-body-integration-02/boundary-wires"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.28983920800237684
+    },
+    {
+      "label": "flow-witnesses",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/export_flow_witnesses.py",
+        "--output",
+        "benchmark/inline-json-body-integration-02/flow-witnesses"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.6209339580018423
+    },
+    {
+      "label": "cart",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/run_cart_profile.py",
+        "--output",
+        "benchmark/inline-json-body-integration-02/cart"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 1.0029064580012346
+    },
+    {
+      "label": "cart-check",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_cart_profile.py",
+        "--trace",
+        "benchmark/inline-json-body-integration-02/cart",
+        "--output",
+        "benchmark/inline-json-body-integration-02/cart/checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.07461266699829139
+    },
+    {
+      "label": "cart-mutations",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_cart_mutations.py",
+        "--trace",
+        "benchmark/inline-json-body-integration-02/cart",
+        "--output",
+        "benchmark/inline-json-body-integration-02/cart/mutations"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 1.273121333004383
+    }
+  ],
+  "targets_started": false
+}

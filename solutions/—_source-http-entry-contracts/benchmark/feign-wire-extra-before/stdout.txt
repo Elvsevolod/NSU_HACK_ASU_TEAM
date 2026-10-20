@@ -1,0 +1,40 @@
+F......F                                                                 [100%]
+=================================== FAILURES ===================================
+___ test_configured_property_url_is_not_silently_replaced_by_the_client_name ___
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-111/test_configured_property_url_i0')
+
+    def test_configured_property_url_is_not_silently_replaced_by_the_client_name(tmp_path):
+        source=IMPORTS+'''@FeignClient(name="service")interface Client{@GetMapping("/read")String read();}
+          class Api{Client client;String entry(){return client.read();}}
+          @RestController class Target{@GetMapping("/read")String read(){return "wrong";}}'''
+        context={'configuration':{'service':{'propertySources':[{'name':'provided','source':{
+            'spring.cloud.openfeign.client.config.service.url':'http://unmapped.example'}}]}}}
+        p,db,ids=build(tmp_path,{'Api.java':source},context=context);e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Api.entry'],{}) is U and not outbound(e)
+E       AssertionError: assert ('wrong' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'wrong' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10418bc50>.run
+
+code/tests/test_feign_wire_controls33.py:23: AssertionError
+__ test_a_leading_empty_element_does_not_duplicate_before_a_symbolic_integral __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-111/test_a_leading_empty_element_d0')
+
+    def test_a_leading_empty_element_does_not_duplicate_before_a_symbolic_integral(tmp_path):
+        source=IMPORTS+'''@FeignClient(name="service",url="http://service:8080")interface Client{
+          @GetMapping("/read")Integer read(@RequestParam("q")List<Object> q);}
+          class Api{Client client;Integer entry(Long id){return client.read(Arrays.asList("",id));}}
+          @RestController class Target{@GetMapping("/read")Integer read(@RequestParam("q")List<String> q){return q.size();}}'''
+        p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
+        identity=e.state.generated_value('Long','independent integral producer')
+>       assert e.run(ids['Api.entry'],{'id':identity})==2 and not e.approximate
+E       AssertionError: assert (3 == 2)
+E        +  where 3 = run('method:service:Api#entry(Long)', {'id': {'__constraints__': ['non_null'], '__distinct_from__': [], '__distinct_symbols__': [], '__generation__': 'independent integral producer', ...}})
+E        +    where run = <analyzer.engine.Engine object at 0x104077a10>.run
+
+code/tests/test_feign_wire_controls33.py:70: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_feign_wire_controls33.py::test_configured_property_url_is_not_silently_replaced_by_the_client_name
+FAILED code/tests/test_feign_wire_controls33.py::test_a_leading_empty_element_does_not_duplicate_before_a_symbolic_integral
+2 failed, 6 passed in 0.14s

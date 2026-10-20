@@ -1,0 +1,2138 @@
+{
+  "oracle_loaded": false,
+  "targets_started": false,
+  "observer": "Records source JSON callback receiver/result without changing return, state or dispatch",
+  "cases": [
+    {
+      "id": "invalid-saving-null",
+      "request": {
+        "deployment": "account-service",
+        "method": "PUT",
+        "url": "/accounts/current",
+        "path": [
+          "accounts",
+          "current"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {
+          "accept": [
+            "application/json"
+          ],
+          "authorization": [
+            "Bearer supplied-user-token"
+          ],
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "saving": null
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "authenticated": true,
+          "principal": {
+            "name": "aurora"
+          },
+          "authorities": [],
+          "oauth2_request": {
+            "clientId": "browser",
+            "scope": [
+              "ui"
+            ]
+          }
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "candidates": [
+        "method:account-service:AccountController#saveCurrentAccount(Principal,Account)"
+      ],
+      "proposals": 0,
+      "selection": null,
+      "result": {
+        "unknown": true
+      },
+      "outcome": "HTTP binding failure",
+      "requests": [
+        {
+          "id": 1,
+          "entry": "method:account-service:AccountController#saveCurrentAccount(Principal,Account)",
+          "reason": "scenario request",
+          "request": {
+            "deployment": "account-service",
+            "method": "PUT",
+            "url": "/accounts/current",
+            "path": [
+              "accounts",
+              "current"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "accept": [
+                "application/json"
+              ],
+              "authorization": [
+                "Bearer supplied-user-token"
+              ],
+              "content-type": [
+                "application/json"
+              ]
+            },
+            "body": {
+              "saving": null
+            },
+            "actor": {
+              "unknown": true
+            },
+            "session": {
+              "authenticated": true,
+              "principal": {
+                "name": "aurora"
+              },
+              "authorities": [],
+              "oauth2_request": {
+                "clientId": "browser",
+                "scope": [
+                  "ui"
+                ]
+              }
+            },
+            "body_properties": {},
+            "provenance": []
+          },
+          "binding_candidate_arguments": [
+            {
+              "name": "principal",
+              "declared_type": "java.security.Principal",
+              "value": {
+                "__type__": "java.security.Principal",
+                "name": "aurora"
+              }
+            },
+            {
+              "name": "account",
+              "declared_type": "com.piggymetrics.account.domain.Account",
+              "value": {
+                "__type__": "com.piggymetrics.account.domain.Account",
+                "__http_entity__": false,
+                "name": null,
+                "lastSeen": null,
+                "incomes": null,
+                "expenses": null,
+                "saving": null,
+                "note": null
+              }
+            }
+          ]
+        }
+      ],
+      "responses": [
+        {
+          "request": 1,
+          "status": 400,
+          "entered": false
+        }
+      ],
+      "events": [
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Account#setSaving(Saving)"
+          ],
+          "request": 1,
+          "callsite": "JSON setter callback: scenario request",
+          "method": "method:account-service:Account#setSaving(Saving)",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "NoneType",
+                "value": null
+              }
+            ]
+          },
+          "cause": "framework_dispatch"
+        }
+      ],
+      "callbacks": [
+        {
+          "method": "method:account-service:Account#setSaving(Saving)",
+          "role": "setter",
+          "receiver_type": "com.piggymetrics.account.domain.Account",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Account",
+            "__http_entity__": false,
+            "name": null,
+            "lastSeen": null,
+            "incomes": null,
+            "expenses": null,
+            "saving": null,
+            "note": null
+          },
+          "result": {
+            "unknown": true
+          },
+          "arguments": [
+            null
+          ],
+          "declared_return": "void",
+          "completed_normally": true
+        }
+      ],
+      "edges": [
+        [
+          "",
+          "executes",
+          "method:account-service:Account#setSaving(Saving)"
+        ]
+      ],
+      "data_operations": [],
+      "warnings": [
+        "HTTP binding rejected request: Bean Validation NotNull rejected saving"
+      ],
+      "tables": {
+        "account-service.accounts": [
+          {
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": null,
+            "expenses": [],
+            "saving": {
+              "__type__": "com.piggymetrics.account.domain.Saving",
+              "__http_entity__": false,
+              "amount": {
+                "$decimal": "20"
+              },
+              "currency": {
+                "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                "__enum_type__": "type:account-service:Currency",
+                "name": "USD"
+              },
+              "interest": {
+                "$decimal": "0"
+              },
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          }
+        ],
+        "auth-service.users": [
+          {
+            "username": "occupied",
+            "password": "initial-hash"
+          }
+        ],
+        "statistics-service.datapoints": []
+      },
+      "unknown_tables": []
+    },
+    {
+      "id": "partly-known-real-list",
+      "request": {
+        "deployment": "account-service",
+        "method": "GET",
+        "url": "/accounts/aurora",
+        "path": [
+          "accounts",
+          "aurora"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {
+          "accept": [
+            "application/json"
+          ],
+          "authorization": [
+            "Bearer supplied-server-token"
+          ]
+        },
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "authenticated": true,
+          "principal": {
+            "name": "account-service"
+          },
+          "authorities": [],
+          "oauth2_request": {
+            "clientId": "account-service",
+            "scope": [
+              "server"
+            ]
+          }
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "candidates": [
+        "method:account-service:AccountController#getAccountByName(String)"
+      ],
+      "proposals": 0,
+      "selection": null,
+      "result": {
+        "expenses": [],
+        "incomes": [
+          {
+            "amount": {
+              "__symbol__": "seed.aurora.incomes[0].amount",
+              "__type__": "java.math.BigDecimal",
+              "__constraints__": []
+            },
+            "currency": {
+              "__symbol__": "seed.aurora.incomes[0].currency",
+              "__type__": "com.piggymetrics.account.domain.Currency",
+              "__constraints__": []
+            },
+            "icon": {
+              "__symbol__": "seed.aurora.incomes[0].icon",
+              "__type__": "java.lang.String",
+              "__constraints__": []
+            },
+            "period": {
+              "__symbol__": "seed.aurora.incomes[0].period",
+              "__type__": "com.piggymetrics.account.domain.TimePeriod",
+              "__constraints__": []
+            },
+            "title": {
+              "__symbol__": "seed.aurora.incomes[0].title",
+              "__type__": "java.lang.String",
+              "__constraints__": []
+            }
+          },
+          {
+            "amount": {
+              "$decimal": "7"
+            },
+            "currency": "USD",
+            "icon": "home",
+            "period": "MONTH",
+            "title": "Rent"
+          }
+        ],
+        "lastSeen": {
+          "$instant": "2026-10-18T00:00:00Z"
+        },
+        "name": "aurora",
+        "note": "partially-known-seed",
+        "saving": {
+          "amount": {
+            "$decimal": "20"
+          },
+          "capitalization": false,
+          "currency": "USD",
+          "deposit": false,
+          "interest": {
+            "$decimal": "0"
+          }
+        }
+      },
+      "outcome": "returned",
+      "requests": [
+        {
+          "id": 1,
+          "entry": "method:account-service:AccountController#getAccountByName(String)",
+          "reason": "scenario request",
+          "request": {
+            "deployment": "account-service",
+            "method": "GET",
+            "url": "/accounts/aurora",
+            "path": [
+              "accounts",
+              "aurora"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "accept": [
+                "application/json"
+              ],
+              "authorization": [
+                "Bearer supplied-server-token"
+              ]
+            },
+            "body": {
+              "missing": true
+            },
+            "actor": {
+              "unknown": true
+            },
+            "session": {
+              "authenticated": true,
+              "principal": {
+                "name": "account-service"
+              },
+              "authorities": [],
+              "oauth2_request": {
+                "clientId": "account-service",
+                "scope": [
+                  "server"
+                ]
+              }
+            },
+            "body_properties": {},
+            "provenance": []
+          },
+          "authorization_checked": true,
+          "bound_arguments": [
+            {
+              "name": "name",
+              "declared_type": "java.lang.String",
+              "value": "aurora"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        {
+          "request": 1,
+          "status": 200,
+          "entered": true,
+          "body_presence": "json"
+        }
+      ],
+      "events": [
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:AccountController#getAccountByName(String)"
+          ],
+          "request": 1,
+          "callsite": "scenario request",
+          "method": "method:account-service:AccountController#getAccountByName(String)",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "str",
+                "value": "aurora"
+              }
+            ]
+          },
+          "cause": "source_execution"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:AccountServiceImpl#findByName(String)"
+          ],
+          "request": 1,
+          "callsite": "call:method:account-service:AccountController#getAccountByName(String)@22:25",
+          "method": "method:account-service:AccountServiceImpl#findByName(String)",
+          "line": 22,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "str",
+                "value": "aurora"
+              }
+            ]
+          },
+          "cause": "source_execution"
+        },
+        {
+          "edge": [
+            "method:account-service:AccountServiceImpl#findByName(String)",
+            "data",
+            "res:collection:account-service.accounts"
+          ],
+          "request": 1,
+          "callsite": "call:method:account-service:AccountServiceImpl#findByName(String)@39:21",
+          "method": "method:account-service:AccountServiceImpl#findByName(String)",
+          "line": 39,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "str",
+                "value": "aurora"
+              }
+            ]
+          },
+          "cause": "datastore"
+        },
+        {
+          "edge": [
+            "method:account-service:AccountController#getAccountByName(String)",
+            "calls",
+            "method:account-service:AccountServiceImpl#findByName(String)"
+          ],
+          "request": 1,
+          "callsite": "call:method:account-service:AccountController#getAccountByName(String)@22:25",
+          "method": "method:account-service:AccountController#getAccountByName(String)",
+          "line": 22,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "str",
+                "value": "aurora"
+              }
+            ]
+          },
+          "cause": "direct_call"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Account#getExpenses()"
+          ],
+          "request": null,
+          "callsite": "JSON getter callback: method:account-service:AccountController#getAccountByName(String)",
+          "method": "method:account-service:Account#getExpenses()",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": []
+          },
+          "cause": "framework_dispatch"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Account#getIncomes()"
+          ],
+          "request": null,
+          "callsite": "JSON getter callback: method:account-service:AccountController#getAccountByName(String)",
+          "method": "method:account-service:Account#getIncomes()",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": []
+          },
+          "cause": "framework_dispatch"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Item#getAmount()"
+          ],
+          "request": null,
+          "callsite": "JSON getter callback: method:account-service:AccountController#getAccountByName(String)",
+          "method": "method:account-service:Item#getAmount()",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": []
+          },
+          "cause": "framework_dispatch"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Item#getCurrency()"
+          ],
+          "request": null,
+          "callsite": "JSON getter callback: method:account-service:AccountController#getAccountByName(String)",
+          "method": "method:account-service:Item#getCurrency()",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": []
+          },
+          "cause": "framework_dispatch"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Item#getIcon()"
+          ],
+          "request": null,
+          "callsite": "JSON getter callback: method:account-service:AccountController#getAccountByName(String)",
+          "method": "method:account-service:Item#getIcon()",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": []
+          },
+          "cause": "framework_dispatch"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Item#getPeriod()"
+          ],
+          "request": null,
+          "callsite": "JSON getter callback: method:account-service:AccountController#getAccountByName(String)",
+          "method": "method:account-service:Item#getPeriod()",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": []
+          },
+          "cause": "framework_dispatch"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Item#getTitle()"
+          ],
+          "request": null,
+          "callsite": "JSON getter callback: method:account-service:AccountController#getAccountByName(String)",
+          "method": "method:account-service:Item#getTitle()",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": []
+          },
+          "cause": "framework_dispatch"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Account#getLastSeen()"
+          ],
+          "request": null,
+          "callsite": "JSON getter callback: method:account-service:AccountController#getAccountByName(String)",
+          "method": "method:account-service:Account#getLastSeen()",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": []
+          },
+          "cause": "framework_dispatch"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Account#getName()"
+          ],
+          "request": null,
+          "callsite": "JSON getter callback: method:account-service:AccountController#getAccountByName(String)",
+          "method": "method:account-service:Account#getName()",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": []
+          },
+          "cause": "framework_dispatch"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Account#getNote()"
+          ],
+          "request": null,
+          "callsite": "JSON getter callback: method:account-service:AccountController#getAccountByName(String)",
+          "method": "method:account-service:Account#getNote()",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": []
+          },
+          "cause": "framework_dispatch"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Account#getSaving()"
+          ],
+          "request": null,
+          "callsite": "JSON getter callback: method:account-service:AccountController#getAccountByName(String)",
+          "method": "method:account-service:Account#getSaving()",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": []
+          },
+          "cause": "framework_dispatch"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Saving#getAmount()"
+          ],
+          "request": null,
+          "callsite": "JSON getter callback: method:account-service:AccountController#getAccountByName(String)",
+          "method": "method:account-service:Saving#getAmount()",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": []
+          },
+          "cause": "framework_dispatch"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Saving#getCapitalization()"
+          ],
+          "request": null,
+          "callsite": "JSON getter callback: method:account-service:AccountController#getAccountByName(String)",
+          "method": "method:account-service:Saving#getCapitalization()",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": []
+          },
+          "cause": "framework_dispatch"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Saving#getCurrency()"
+          ],
+          "request": null,
+          "callsite": "JSON getter callback: method:account-service:AccountController#getAccountByName(String)",
+          "method": "method:account-service:Saving#getCurrency()",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": []
+          },
+          "cause": "framework_dispatch"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Saving#getDeposit()"
+          ],
+          "request": null,
+          "callsite": "JSON getter callback: method:account-service:AccountController#getAccountByName(String)",
+          "method": "method:account-service:Saving#getDeposit()",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": []
+          },
+          "cause": "framework_dispatch"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:account-service:Saving#getInterest()"
+          ],
+          "request": null,
+          "callsite": "JSON getter callback: method:account-service:AccountController#getAccountByName(String)",
+          "method": "method:account-service:Saving#getInterest()",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": []
+          },
+          "cause": "framework_dispatch"
+        }
+      ],
+      "callbacks": [
+        {
+          "method": "method:account-service:Account#getExpenses()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Account",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Account",
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": [
+              {
+                "__type__": "com.piggymetrics.account.domain.Item",
+                "__http_entity__": false,
+                "title": {
+                  "__symbol__": "seed.aurora.incomes[0].title",
+                  "__type__": "java.lang.String",
+                  "__constraints__": []
+                },
+                "amount": {
+                  "__symbol__": "seed.aurora.incomes[0].amount",
+                  "__type__": "java.math.BigDecimal",
+                  "__constraints__": []
+                },
+                "currency": {
+                  "__symbol__": "seed.aurora.incomes[0].currency",
+                  "__type__": "com.piggymetrics.account.domain.Currency",
+                  "__constraints__": []
+                },
+                "period": {
+                  "__symbol__": "seed.aurora.incomes[0].period",
+                  "__type__": "com.piggymetrics.account.domain.TimePeriod",
+                  "__constraints__": []
+                },
+                "icon": {
+                  "__symbol__": "seed.aurora.incomes[0].icon",
+                  "__type__": "java.lang.String",
+                  "__constraints__": []
+                }
+              },
+              {
+                "__type__": "com.piggymetrics.account.domain.Item",
+                "__http_entity__": false,
+                "title": "Rent",
+                "amount": {
+                  "$decimal": "7"
+                },
+                "currency": {
+                  "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                  "__enum_type__": "type:account-service:Currency",
+                  "name": "USD"
+                },
+                "period": {
+                  "__enum__": "com.piggymetrics.account.domain.TimePeriod.MONTH",
+                  "__enum_type__": "type:account-service:TimePeriod",
+                  "name": "MONTH"
+                },
+                "icon": "home"
+              }
+            ],
+            "expenses": [],
+            "saving": {
+              "__type__": "com.piggymetrics.account.domain.Saving",
+              "__http_entity__": false,
+              "amount": {
+                "$decimal": "20"
+              },
+              "currency": {
+                "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                "__enum_type__": "type:account-service:Currency",
+                "name": "USD"
+              },
+              "interest": {
+                "$decimal": "0"
+              },
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          },
+          "result": [],
+          "arguments": [],
+          "declared_return": "List<Item>",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Account#getIncomes()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Account",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Account",
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": [
+              {
+                "__type__": "com.piggymetrics.account.domain.Item",
+                "__http_entity__": false,
+                "title": {
+                  "__symbol__": "seed.aurora.incomes[0].title",
+                  "__type__": "java.lang.String",
+                  "__constraints__": []
+                },
+                "amount": {
+                  "__symbol__": "seed.aurora.incomes[0].amount",
+                  "__type__": "java.math.BigDecimal",
+                  "__constraints__": []
+                },
+                "currency": {
+                  "__symbol__": "seed.aurora.incomes[0].currency",
+                  "__type__": "com.piggymetrics.account.domain.Currency",
+                  "__constraints__": []
+                },
+                "period": {
+                  "__symbol__": "seed.aurora.incomes[0].period",
+                  "__type__": "com.piggymetrics.account.domain.TimePeriod",
+                  "__constraints__": []
+                },
+                "icon": {
+                  "__symbol__": "seed.aurora.incomes[0].icon",
+                  "__type__": "java.lang.String",
+                  "__constraints__": []
+                }
+              },
+              {
+                "__type__": "com.piggymetrics.account.domain.Item",
+                "__http_entity__": false,
+                "title": "Rent",
+                "amount": {
+                  "$decimal": "7"
+                },
+                "currency": {
+                  "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                  "__enum_type__": "type:account-service:Currency",
+                  "name": "USD"
+                },
+                "period": {
+                  "__enum__": "com.piggymetrics.account.domain.TimePeriod.MONTH",
+                  "__enum_type__": "type:account-service:TimePeriod",
+                  "name": "MONTH"
+                },
+                "icon": "home"
+              }
+            ],
+            "expenses": [],
+            "saving": {
+              "__type__": "com.piggymetrics.account.domain.Saving",
+              "__http_entity__": false,
+              "amount": {
+                "$decimal": "20"
+              },
+              "currency": {
+                "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                "__enum_type__": "type:account-service:Currency",
+                "name": "USD"
+              },
+              "interest": {
+                "$decimal": "0"
+              },
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          },
+          "result": [
+            {
+              "__type__": "com.piggymetrics.account.domain.Item",
+              "__http_entity__": false,
+              "title": {
+                "__symbol__": "seed.aurora.incomes[0].title",
+                "__type__": "java.lang.String",
+                "__constraints__": []
+              },
+              "amount": {
+                "__symbol__": "seed.aurora.incomes[0].amount",
+                "__type__": "java.math.BigDecimal",
+                "__constraints__": []
+              },
+              "currency": {
+                "__symbol__": "seed.aurora.incomes[0].currency",
+                "__type__": "com.piggymetrics.account.domain.Currency",
+                "__constraints__": []
+              },
+              "period": {
+                "__symbol__": "seed.aurora.incomes[0].period",
+                "__type__": "com.piggymetrics.account.domain.TimePeriod",
+                "__constraints__": []
+              },
+              "icon": {
+                "__symbol__": "seed.aurora.incomes[0].icon",
+                "__type__": "java.lang.String",
+                "__constraints__": []
+              }
+            },
+            {
+              "__type__": "com.piggymetrics.account.domain.Item",
+              "__http_entity__": false,
+              "title": "Rent",
+              "amount": {
+                "$decimal": "7"
+              },
+              "currency": {
+                "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                "__enum_type__": "type:account-service:Currency",
+                "name": "USD"
+              },
+              "period": {
+                "__enum__": "com.piggymetrics.account.domain.TimePeriod.MONTH",
+                "__enum_type__": "type:account-service:TimePeriod",
+                "name": "MONTH"
+              },
+              "icon": "home"
+            }
+          ],
+          "arguments": [],
+          "declared_return": "List<Item>",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Item#getAmount()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Item",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Item",
+            "__http_entity__": false,
+            "title": {
+              "__symbol__": "seed.aurora.incomes[0].title",
+              "__type__": "java.lang.String",
+              "__constraints__": []
+            },
+            "amount": {
+              "__symbol__": "seed.aurora.incomes[0].amount",
+              "__type__": "java.math.BigDecimal",
+              "__constraints__": []
+            },
+            "currency": {
+              "__symbol__": "seed.aurora.incomes[0].currency",
+              "__type__": "com.piggymetrics.account.domain.Currency",
+              "__constraints__": []
+            },
+            "period": {
+              "__symbol__": "seed.aurora.incomes[0].period",
+              "__type__": "com.piggymetrics.account.domain.TimePeriod",
+              "__constraints__": []
+            },
+            "icon": {
+              "__symbol__": "seed.aurora.incomes[0].icon",
+              "__type__": "java.lang.String",
+              "__constraints__": []
+            }
+          },
+          "result": {
+            "__symbol__": "seed.aurora.incomes[0].amount",
+            "__type__": "java.math.BigDecimal",
+            "__constraints__": []
+          },
+          "arguments": [],
+          "declared_return": "BigDecimal",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Item#getCurrency()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Item",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Item",
+            "__http_entity__": false,
+            "title": {
+              "__symbol__": "seed.aurora.incomes[0].title",
+              "__type__": "java.lang.String",
+              "__constraints__": []
+            },
+            "amount": {
+              "__symbol__": "seed.aurora.incomes[0].amount",
+              "__type__": "java.math.BigDecimal",
+              "__constraints__": []
+            },
+            "currency": {
+              "__symbol__": "seed.aurora.incomes[0].currency",
+              "__type__": "com.piggymetrics.account.domain.Currency",
+              "__constraints__": []
+            },
+            "period": {
+              "__symbol__": "seed.aurora.incomes[0].period",
+              "__type__": "com.piggymetrics.account.domain.TimePeriod",
+              "__constraints__": []
+            },
+            "icon": {
+              "__symbol__": "seed.aurora.incomes[0].icon",
+              "__type__": "java.lang.String",
+              "__constraints__": []
+            }
+          },
+          "result": {
+            "__symbol__": "seed.aurora.incomes[0].currency",
+            "__type__": "com.piggymetrics.account.domain.Currency",
+            "__constraints__": []
+          },
+          "arguments": [],
+          "declared_return": "Currency",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Item#getIcon()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Item",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Item",
+            "__http_entity__": false,
+            "title": {
+              "__symbol__": "seed.aurora.incomes[0].title",
+              "__type__": "java.lang.String",
+              "__constraints__": []
+            },
+            "amount": {
+              "__symbol__": "seed.aurora.incomes[0].amount",
+              "__type__": "java.math.BigDecimal",
+              "__constraints__": []
+            },
+            "currency": {
+              "__symbol__": "seed.aurora.incomes[0].currency",
+              "__type__": "com.piggymetrics.account.domain.Currency",
+              "__constraints__": []
+            },
+            "period": {
+              "__symbol__": "seed.aurora.incomes[0].period",
+              "__type__": "com.piggymetrics.account.domain.TimePeriod",
+              "__constraints__": []
+            },
+            "icon": {
+              "__symbol__": "seed.aurora.incomes[0].icon",
+              "__type__": "java.lang.String",
+              "__constraints__": []
+            }
+          },
+          "result": {
+            "__symbol__": "seed.aurora.incomes[0].icon",
+            "__type__": "java.lang.String",
+            "__constraints__": []
+          },
+          "arguments": [],
+          "declared_return": "String",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Item#getPeriod()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Item",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Item",
+            "__http_entity__": false,
+            "title": {
+              "__symbol__": "seed.aurora.incomes[0].title",
+              "__type__": "java.lang.String",
+              "__constraints__": []
+            },
+            "amount": {
+              "__symbol__": "seed.aurora.incomes[0].amount",
+              "__type__": "java.math.BigDecimal",
+              "__constraints__": []
+            },
+            "currency": {
+              "__symbol__": "seed.aurora.incomes[0].currency",
+              "__type__": "com.piggymetrics.account.domain.Currency",
+              "__constraints__": []
+            },
+            "period": {
+              "__symbol__": "seed.aurora.incomes[0].period",
+              "__type__": "com.piggymetrics.account.domain.TimePeriod",
+              "__constraints__": []
+            },
+            "icon": {
+              "__symbol__": "seed.aurora.incomes[0].icon",
+              "__type__": "java.lang.String",
+              "__constraints__": []
+            }
+          },
+          "result": {
+            "__symbol__": "seed.aurora.incomes[0].period",
+            "__type__": "com.piggymetrics.account.domain.TimePeriod",
+            "__constraints__": []
+          },
+          "arguments": [],
+          "declared_return": "TimePeriod",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Item#getTitle()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Item",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Item",
+            "__http_entity__": false,
+            "title": {
+              "__symbol__": "seed.aurora.incomes[0].title",
+              "__type__": "java.lang.String",
+              "__constraints__": []
+            },
+            "amount": {
+              "__symbol__": "seed.aurora.incomes[0].amount",
+              "__type__": "java.math.BigDecimal",
+              "__constraints__": []
+            },
+            "currency": {
+              "__symbol__": "seed.aurora.incomes[0].currency",
+              "__type__": "com.piggymetrics.account.domain.Currency",
+              "__constraints__": []
+            },
+            "period": {
+              "__symbol__": "seed.aurora.incomes[0].period",
+              "__type__": "com.piggymetrics.account.domain.TimePeriod",
+              "__constraints__": []
+            },
+            "icon": {
+              "__symbol__": "seed.aurora.incomes[0].icon",
+              "__type__": "java.lang.String",
+              "__constraints__": []
+            }
+          },
+          "result": {
+            "__symbol__": "seed.aurora.incomes[0].title",
+            "__type__": "java.lang.String",
+            "__constraints__": []
+          },
+          "arguments": [],
+          "declared_return": "String",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Item#getAmount()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Item",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Item",
+            "__http_entity__": false,
+            "title": "Rent",
+            "amount": {
+              "$decimal": "7"
+            },
+            "currency": {
+              "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+              "__enum_type__": "type:account-service:Currency",
+              "name": "USD"
+            },
+            "period": {
+              "__enum__": "com.piggymetrics.account.domain.TimePeriod.MONTH",
+              "__enum_type__": "type:account-service:TimePeriod",
+              "name": "MONTH"
+            },
+            "icon": "home"
+          },
+          "result": {
+            "$decimal": "7"
+          },
+          "arguments": [],
+          "declared_return": "BigDecimal",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Item#getCurrency()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Item",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Item",
+            "__http_entity__": false,
+            "title": "Rent",
+            "amount": {
+              "$decimal": "7"
+            },
+            "currency": {
+              "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+              "__enum_type__": "type:account-service:Currency",
+              "name": "USD"
+            },
+            "period": {
+              "__enum__": "com.piggymetrics.account.domain.TimePeriod.MONTH",
+              "__enum_type__": "type:account-service:TimePeriod",
+              "name": "MONTH"
+            },
+            "icon": "home"
+          },
+          "result": {
+            "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+            "__enum_type__": "type:account-service:Currency",
+            "name": "USD"
+          },
+          "arguments": [],
+          "declared_return": "Currency",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Item#getIcon()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Item",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Item",
+            "__http_entity__": false,
+            "title": "Rent",
+            "amount": {
+              "$decimal": "7"
+            },
+            "currency": {
+              "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+              "__enum_type__": "type:account-service:Currency",
+              "name": "USD"
+            },
+            "period": {
+              "__enum__": "com.piggymetrics.account.domain.TimePeriod.MONTH",
+              "__enum_type__": "type:account-service:TimePeriod",
+              "name": "MONTH"
+            },
+            "icon": "home"
+          },
+          "result": "home",
+          "arguments": [],
+          "declared_return": "String",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Item#getPeriod()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Item",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Item",
+            "__http_entity__": false,
+            "title": "Rent",
+            "amount": {
+              "$decimal": "7"
+            },
+            "currency": {
+              "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+              "__enum_type__": "type:account-service:Currency",
+              "name": "USD"
+            },
+            "period": {
+              "__enum__": "com.piggymetrics.account.domain.TimePeriod.MONTH",
+              "__enum_type__": "type:account-service:TimePeriod",
+              "name": "MONTH"
+            },
+            "icon": "home"
+          },
+          "result": {
+            "__enum__": "com.piggymetrics.account.domain.TimePeriod.MONTH",
+            "__enum_type__": "type:account-service:TimePeriod",
+            "name": "MONTH"
+          },
+          "arguments": [],
+          "declared_return": "TimePeriod",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Item#getTitle()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Item",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Item",
+            "__http_entity__": false,
+            "title": "Rent",
+            "amount": {
+              "$decimal": "7"
+            },
+            "currency": {
+              "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+              "__enum_type__": "type:account-service:Currency",
+              "name": "USD"
+            },
+            "period": {
+              "__enum__": "com.piggymetrics.account.domain.TimePeriod.MONTH",
+              "__enum_type__": "type:account-service:TimePeriod",
+              "name": "MONTH"
+            },
+            "icon": "home"
+          },
+          "result": "Rent",
+          "arguments": [],
+          "declared_return": "String",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Account#getLastSeen()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Account",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Account",
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": [
+              {
+                "__type__": "com.piggymetrics.account.domain.Item",
+                "__http_entity__": false,
+                "title": {
+                  "__symbol__": "seed.aurora.incomes[0].title",
+                  "__type__": "java.lang.String",
+                  "__constraints__": []
+                },
+                "amount": {
+                  "__symbol__": "seed.aurora.incomes[0].amount",
+                  "__type__": "java.math.BigDecimal",
+                  "__constraints__": []
+                },
+                "currency": {
+                  "__symbol__": "seed.aurora.incomes[0].currency",
+                  "__type__": "com.piggymetrics.account.domain.Currency",
+                  "__constraints__": []
+                },
+                "period": {
+                  "__symbol__": "seed.aurora.incomes[0].period",
+                  "__type__": "com.piggymetrics.account.domain.TimePeriod",
+                  "__constraints__": []
+                },
+                "icon": {
+                  "__symbol__": "seed.aurora.incomes[0].icon",
+                  "__type__": "java.lang.String",
+                  "__constraints__": []
+                }
+              },
+              {
+                "__type__": "com.piggymetrics.account.domain.Item",
+                "__http_entity__": false,
+                "title": "Rent",
+                "amount": {
+                  "$decimal": "7"
+                },
+                "currency": {
+                  "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                  "__enum_type__": "type:account-service:Currency",
+                  "name": "USD"
+                },
+                "period": {
+                  "__enum__": "com.piggymetrics.account.domain.TimePeriod.MONTH",
+                  "__enum_type__": "type:account-service:TimePeriod",
+                  "name": "MONTH"
+                },
+                "icon": "home"
+              }
+            ],
+            "expenses": [],
+            "saving": {
+              "__type__": "com.piggymetrics.account.domain.Saving",
+              "__http_entity__": false,
+              "amount": {
+                "$decimal": "20"
+              },
+              "currency": {
+                "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                "__enum_type__": "type:account-service:Currency",
+                "name": "USD"
+              },
+              "interest": {
+                "$decimal": "0"
+              },
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          },
+          "result": {
+            "$instant": "2026-10-18T00:00:00Z"
+          },
+          "arguments": [],
+          "declared_return": "Date",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Account#getName()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Account",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Account",
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": [
+              {
+                "__type__": "com.piggymetrics.account.domain.Item",
+                "__http_entity__": false,
+                "title": {
+                  "__symbol__": "seed.aurora.incomes[0].title",
+                  "__type__": "java.lang.String",
+                  "__constraints__": []
+                },
+                "amount": {
+                  "__symbol__": "seed.aurora.incomes[0].amount",
+                  "__type__": "java.math.BigDecimal",
+                  "__constraints__": []
+                },
+                "currency": {
+                  "__symbol__": "seed.aurora.incomes[0].currency",
+                  "__type__": "com.piggymetrics.account.domain.Currency",
+                  "__constraints__": []
+                },
+                "period": {
+                  "__symbol__": "seed.aurora.incomes[0].period",
+                  "__type__": "com.piggymetrics.account.domain.TimePeriod",
+                  "__constraints__": []
+                },
+                "icon": {
+                  "__symbol__": "seed.aurora.incomes[0].icon",
+                  "__type__": "java.lang.String",
+                  "__constraints__": []
+                }
+              },
+              {
+                "__type__": "com.piggymetrics.account.domain.Item",
+                "__http_entity__": false,
+                "title": "Rent",
+                "amount": {
+                  "$decimal": "7"
+                },
+                "currency": {
+                  "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                  "__enum_type__": "type:account-service:Currency",
+                  "name": "USD"
+                },
+                "period": {
+                  "__enum__": "com.piggymetrics.account.domain.TimePeriod.MONTH",
+                  "__enum_type__": "type:account-service:TimePeriod",
+                  "name": "MONTH"
+                },
+                "icon": "home"
+              }
+            ],
+            "expenses": [],
+            "saving": {
+              "__type__": "com.piggymetrics.account.domain.Saving",
+              "__http_entity__": false,
+              "amount": {
+                "$decimal": "20"
+              },
+              "currency": {
+                "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                "__enum_type__": "type:account-service:Currency",
+                "name": "USD"
+              },
+              "interest": {
+                "$decimal": "0"
+              },
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          },
+          "result": "aurora",
+          "arguments": [],
+          "declared_return": "String",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Account#getNote()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Account",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Account",
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": [
+              {
+                "__type__": "com.piggymetrics.account.domain.Item",
+                "__http_entity__": false,
+                "title": {
+                  "__symbol__": "seed.aurora.incomes[0].title",
+                  "__type__": "java.lang.String",
+                  "__constraints__": []
+                },
+                "amount": {
+                  "__symbol__": "seed.aurora.incomes[0].amount",
+                  "__type__": "java.math.BigDecimal",
+                  "__constraints__": []
+                },
+                "currency": {
+                  "__symbol__": "seed.aurora.incomes[0].currency",
+                  "__type__": "com.piggymetrics.account.domain.Currency",
+                  "__constraints__": []
+                },
+                "period": {
+                  "__symbol__": "seed.aurora.incomes[0].period",
+                  "__type__": "com.piggymetrics.account.domain.TimePeriod",
+                  "__constraints__": []
+                },
+                "icon": {
+                  "__symbol__": "seed.aurora.incomes[0].icon",
+                  "__type__": "java.lang.String",
+                  "__constraints__": []
+                }
+              },
+              {
+                "__type__": "com.piggymetrics.account.domain.Item",
+                "__http_entity__": false,
+                "title": "Rent",
+                "amount": {
+                  "$decimal": "7"
+                },
+                "currency": {
+                  "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                  "__enum_type__": "type:account-service:Currency",
+                  "name": "USD"
+                },
+                "period": {
+                  "__enum__": "com.piggymetrics.account.domain.TimePeriod.MONTH",
+                  "__enum_type__": "type:account-service:TimePeriod",
+                  "name": "MONTH"
+                },
+                "icon": "home"
+              }
+            ],
+            "expenses": [],
+            "saving": {
+              "__type__": "com.piggymetrics.account.domain.Saving",
+              "__http_entity__": false,
+              "amount": {
+                "$decimal": "20"
+              },
+              "currency": {
+                "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                "__enum_type__": "type:account-service:Currency",
+                "name": "USD"
+              },
+              "interest": {
+                "$decimal": "0"
+              },
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          },
+          "result": "partially-known-seed",
+          "arguments": [],
+          "declared_return": "String",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Account#getSaving()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Account",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Account",
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": [
+              {
+                "__type__": "com.piggymetrics.account.domain.Item",
+                "__http_entity__": false,
+                "title": {
+                  "__symbol__": "seed.aurora.incomes[0].title",
+                  "__type__": "java.lang.String",
+                  "__constraints__": []
+                },
+                "amount": {
+                  "__symbol__": "seed.aurora.incomes[0].amount",
+                  "__type__": "java.math.BigDecimal",
+                  "__constraints__": []
+                },
+                "currency": {
+                  "__symbol__": "seed.aurora.incomes[0].currency",
+                  "__type__": "com.piggymetrics.account.domain.Currency",
+                  "__constraints__": []
+                },
+                "period": {
+                  "__symbol__": "seed.aurora.incomes[0].period",
+                  "__type__": "com.piggymetrics.account.domain.TimePeriod",
+                  "__constraints__": []
+                },
+                "icon": {
+                  "__symbol__": "seed.aurora.incomes[0].icon",
+                  "__type__": "java.lang.String",
+                  "__constraints__": []
+                }
+              },
+              {
+                "__type__": "com.piggymetrics.account.domain.Item",
+                "__http_entity__": false,
+                "title": "Rent",
+                "amount": {
+                  "$decimal": "7"
+                },
+                "currency": {
+                  "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                  "__enum_type__": "type:account-service:Currency",
+                  "name": "USD"
+                },
+                "period": {
+                  "__enum__": "com.piggymetrics.account.domain.TimePeriod.MONTH",
+                  "__enum_type__": "type:account-service:TimePeriod",
+                  "name": "MONTH"
+                },
+                "icon": "home"
+              }
+            ],
+            "expenses": [],
+            "saving": {
+              "__type__": "com.piggymetrics.account.domain.Saving",
+              "__http_entity__": false,
+              "amount": {
+                "$decimal": "20"
+              },
+              "currency": {
+                "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                "__enum_type__": "type:account-service:Currency",
+                "name": "USD"
+              },
+              "interest": {
+                "$decimal": "0"
+              },
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          },
+          "result": {
+            "__type__": "com.piggymetrics.account.domain.Saving",
+            "__http_entity__": false,
+            "amount": {
+              "$decimal": "20"
+            },
+            "currency": {
+              "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+              "__enum_type__": "type:account-service:Currency",
+              "name": "USD"
+            },
+            "interest": {
+              "$decimal": "0"
+            },
+            "deposit": false,
+            "capitalization": false
+          },
+          "arguments": [],
+          "declared_return": "Saving",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Saving#getAmount()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Saving",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Saving",
+            "__http_entity__": false,
+            "amount": {
+              "$decimal": "20"
+            },
+            "currency": {
+              "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+              "__enum_type__": "type:account-service:Currency",
+              "name": "USD"
+            },
+            "interest": {
+              "$decimal": "0"
+            },
+            "deposit": false,
+            "capitalization": false
+          },
+          "result": {
+            "$decimal": "20"
+          },
+          "arguments": [],
+          "declared_return": "BigDecimal",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Saving#getCapitalization()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Saving",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Saving",
+            "__http_entity__": false,
+            "amount": {
+              "$decimal": "20"
+            },
+            "currency": {
+              "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+              "__enum_type__": "type:account-service:Currency",
+              "name": "USD"
+            },
+            "interest": {
+              "$decimal": "0"
+            },
+            "deposit": false,
+            "capitalization": false
+          },
+          "result": false,
+          "arguments": [],
+          "declared_return": "Boolean",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Saving#getCurrency()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Saving",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Saving",
+            "__http_entity__": false,
+            "amount": {
+              "$decimal": "20"
+            },
+            "currency": {
+              "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+              "__enum_type__": "type:account-service:Currency",
+              "name": "USD"
+            },
+            "interest": {
+              "$decimal": "0"
+            },
+            "deposit": false,
+            "capitalization": false
+          },
+          "result": {
+            "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+            "__enum_type__": "type:account-service:Currency",
+            "name": "USD"
+          },
+          "arguments": [],
+          "declared_return": "Currency",
+          "completed_normally": true
+        },
+        {
+          "method": "method:account-service:Saving#getDeposit()",
+          "role": "getter",
+          "receiver_type": "com.piggymetrics.account.domain.Saving",
+          "receiver": {
+            "__type__": "com.piggymetrics.account.domain.Saving",
+            "__http_entity__": false,
+            "amount": {
+              "$decimal": "20"
+            },
+            "currency": {
+              "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+              "__enum_type__": "type:account-service:Currency",
+              "name": "USD"
+            },
+            "interest": {
+              "$decimal": "0"
+            },
+            "deposit": false,
+            "capitalization": false
+          },
+          "result": false,
+          "arguments": [],
+          "declared_return": "Boolean",
+          "completed_normally": true
+        }
+      ],
+      "edges": [
+        [
+          "",
+          "executes",
+          "method:account-service:Account#getExpenses()"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:Account#getIncomes()"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:Account#getLastSeen()"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:Account#getName()"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:Account#getNote()"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:Account#getSaving()"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:AccountController#getAccountByName(String)"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:AccountServiceImpl#findByName(String)"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:Item#getAmount()"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:Item#getCurrency()"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:Item#getIcon()"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:Item#getPeriod()"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:Item#getTitle()"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:Saving#getAmount()"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:Saving#getCapitalization()"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:Saving#getCurrency()"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:Saving#getDeposit()"
+        ],
+        [
+          "",
+          "executes",
+          "method:account-service:Saving#getInterest()"
+        ],
+        [
+          "method:account-service:AccountController#getAccountByName(String)",
+          "calls",
+          "method:account-service:AccountServiceImpl#findByName(String)"
+        ],
+        [
+          "method:account-service:AccountServiceImpl#findByName(String)",
+          "data",
+          "res:collection:account-service.accounts"
+        ]
+      ],
+      "data_operations": [
+        {
+          "method": "method:account-service:AccountServiceImpl#findByName(String)",
+          "resource": "res:collection:account-service.accounts",
+          "operation": "findByName",
+          "arguments": [
+            "aurora"
+          ],
+          "source_site": "call:method:account-service:AccountServiceImpl#findByName(String)@39:21",
+          "uncertain_write": false,
+          "sql_emitted": false,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:account-service:AccountServiceImpl#findByName(String)@39:21"
+        }
+      ],
+      "warnings": [
+        "framework method interception is not fully modeled: PreAuthorize at method:account-service:AccountController#getAccountByName(String)"
+      ],
+      "tables": {
+        "account-service.accounts": [
+          {
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": [
+              {
+                "__type__": "com.piggymetrics.account.domain.Item",
+                "__http_entity__": false,
+                "title": {
+                  "__symbol__": "seed.aurora.incomes[0].title",
+                  "__type__": "java.lang.String",
+                  "__constraints__": []
+                },
+                "amount": {
+                  "__symbol__": "seed.aurora.incomes[0].amount",
+                  "__type__": "java.math.BigDecimal",
+                  "__constraints__": []
+                },
+                "currency": {
+                  "__symbol__": "seed.aurora.incomes[0].currency",
+                  "__type__": "com.piggymetrics.account.domain.Currency",
+                  "__constraints__": []
+                },
+                "period": {
+                  "__symbol__": "seed.aurora.incomes[0].period",
+                  "__type__": "com.piggymetrics.account.domain.TimePeriod",
+                  "__constraints__": []
+                },
+                "icon": {
+                  "__symbol__": "seed.aurora.incomes[0].icon",
+                  "__type__": "java.lang.String",
+                  "__constraints__": []
+                }
+              },
+              {
+                "__type__": "com.piggymetrics.account.domain.Item",
+                "__http_entity__": false,
+                "title": "Rent",
+                "amount": {
+                  "$decimal": "7"
+                },
+                "currency": {
+                  "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                  "__enum_type__": "type:account-service:Currency",
+                  "name": "USD"
+                },
+                "period": {
+                  "__enum__": "com.piggymetrics.account.domain.TimePeriod.MONTH",
+                  "__enum_type__": "type:account-service:TimePeriod",
+                  "name": "MONTH"
+                },
+                "icon": "home"
+              }
+            ],
+            "expenses": [],
+            "saving": {
+              "__type__": "com.piggymetrics.account.domain.Saving",
+              "__http_entity__": false,
+              "amount": {
+                "$decimal": "20"
+              },
+              "currency": {
+                "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                "__enum_type__": "type:account-service:Currency",
+                "name": "USD"
+              },
+              "interest": {
+                "$decimal": "0"
+              },
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          }
+        ],
+        "auth-service.users": [
+          {
+            "username": "occupied",
+            "password": "initial-hash"
+          }
+        ],
+        "statistics-service.datapoints": []
+      },
+      "unknown_tables": []
+    },
+    {
+      "id": "ambiguous-account-read",
+      "request": null,
+      "candidates": [],
+      "proposals": 0,
+      "selection": {
+        "candidates": [
+          "method:account-service:AccountController#getAccountByName(String)",
+          "method:account-service:AccountController#getCurrentAccount(Principal)",
+          "method:account-service:AccountController#createNewAccount(User)",
+          "method:statistics-service:StatisticsController#getStatisticsByAccountName(String)",
+          "method:statistics-service:StatisticsController#saveAccountStatistics(String,Account)",
+          "method:account-service:AccountController#saveCurrentAccount(Principal,Account)"
+        ],
+        "ranking": [
+          {
+            "entry": "method:account-service:AccountController#getAccountByName(String)",
+            "ui_site": null,
+            "score": 5.042132251967802
+          },
+          {
+            "entry": "method:account-service:AccountController#getCurrentAccount(Principal)",
+            "ui_site": null,
+            "score": 4.94914188123583
+          },
+          {
+            "entry": "method:account-service:AccountController#createNewAccount(User)",
+            "ui_site": null,
+            "score": 0.3357225660093417
+          },
+          {
+            "entry": "method:statistics-service:StatisticsController#getStatisticsByAccountName(String)",
+            "ui_site": null,
+            "score": 0.02230455531941871
+          },
+          {
+            "entry": "method:statistics-service:StatisticsController#saveAccountStatistics(String,Account)",
+            "ui_site": null,
+            "score": 0.020635336512280396
+          },
+          {
+            "entry": "method:account-service:AccountController#saveCurrentAccount(Principal,Account)",
+            "ui_site": null,
+            "score": 0.02035360522054233
+          }
+        ],
+        "proposal": {
+          "hypotheses": []
+        },
+        "unresolved": [
+          "Unqualified entity lookup does not choose between current principal and named identity"
+        ],
+        "grounding_status": "unresolved_semantic_ambiguity",
+        "certainty_note": "Graph certainty is conditional on the selected source contract and validated bindings",
+        "semantic_candidates": [
+          "method:account-service:AccountController#getAccountByName(String)",
+          "method:account-service:AccountController#getCurrentAccount(Principal)"
+        ]
+      },
+      "result": {
+        "unknown": true
+      },
+      "outcome": "no unique request selected",
+      "requests": [],
+      "responses": [],
+      "events": [],
+      "callbacks": [],
+      "edges": [],
+      "data_operations": [],
+      "warnings": [],
+      "tables": {
+        "account-service.accounts": [
+          {
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": null,
+            "expenses": [],
+            "saving": {
+              "__type__": "com.piggymetrics.account.domain.Saving",
+              "__http_entity__": false,
+              "amount": {
+                "$decimal": "20"
+              },
+              "currency": {
+                "__enum__": "com.piggymetrics.account.domain.Currency.USD",
+                "__enum_type__": "type:account-service:Currency",
+                "name": "USD"
+              },
+              "interest": {
+                "$decimal": "0"
+              },
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          }
+        ],
+        "auth-service.users": [
+          {
+            "username": "occupied",
+            "password": "initial-hash"
+          }
+        ],
+        "statistics-service.datapoints": []
+      },
+      "unknown_tables": []
+    }
+  ]
+}

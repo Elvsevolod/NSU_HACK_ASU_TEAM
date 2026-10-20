@@ -1,0 +1,456 @@
+--- parent30/analyzer/engine.py
++++ candidate/analyzer/engine.py
+@@ -963,6 +963,10 @@
+         if value is None:return value
+         wanted=declaration_erasure(self,wanted)
+         if self.standard_type(wanted,'java.lang.Object'):return value
++        from .reference_types import collection_compatibility
++        compatibility=collection_compatibility(self,value,wanted)
++        if compatibility is True:return value
++        if compatibility is False:raise JavaThrow({'__type__':'ClassCastException'})
+         if isinstance(value,JavaArray):
+             if wanted==value.component+'[]':return value
+             if wanted.endswith('[]'):
+@@ -1328,11 +1332,21 @@
+             values = self.value(source, env)
+             from .persistence import load_collection
+             values=load_collection(self,values,self.method+':'+str(node.start_point.row+1))
+-            if self.opaque(values):values = U
+-            if isinstance(values,JavaList) and values.opaque:
+-                self.warnings.add('iteration over unresolved List contents or length: '+text(node))
+-                self.fallback(self.method)
+-                return U,None
++            if values is None:raise JavaThrow({'__type__':'NullPointerException'})
++            if (values is U or self.opaque(values) or isinstance(values,JavaList) and values.opaque or
++                    isinstance(values,JavaMapView) and not isinstance(values.backing.mapping,dict) or
++                    not isinstance(values,(list,JavaMapView))):
++                # No body execution is established. In particular, an opaque
++                # empty carrier cannot prove zero iterations or zero writes.
++                affected=list(owned_objects(env))
++                for value in affected:widen(value)
++                reason=self.method+':'+str(node.start_point.row+1)
++                self.effect_events.append({'model_version':'unknown-foreach-boundary/1',
++                    'operation':'foreach','callsite':reason,'heap_roots':sorted(env),
++                    'affected_native_objects':len(affected),'global_footprint':'reachable native heap',
++                    'callbacks':'not executed; membership unknown','completions':'unresolved'})
++                raise AnalysisBoundary('iteration over unknown collection membership: '+reason,
++                                       category='unsupported_semantics')
+             name = text(node.child_by_field_name('name'))
+             from .map_loop_proof import prove as map_noop
+             if map_noop(self,node,values,env):return U,None
+@@ -2613,7 +2627,7 @@
+                 else:self.initialize_instance(tid,obj,reason)
+             collection_base,_=type_parts(typ);collection_name=collection_base.rsplit('.',1)[-1]
+             if not tid and collection_name in ('ArrayList','LinkedList','List','HashSet','Set'):
+-                if (collection_name not in ('ArrayList','LinkedList') and not (collection_name=='HashSet' and not args)) or not self.standard_type(collection_base,'java.util.'+collection_name):
++                if collection_name not in ('ArrayList','LinkedList','HashSet') or not self.standard_type(collection_base,'java.util.'+collection_name):
+                     self.approximate=True
+                     self.warnings.add('native collection constructor kind or namespace is not modeled: '+reason)
+                     return U
+@@ -2623,10 +2637,14 @@
+                 elif args and (len(args)!=1 or not isinstance(args[0],list) or isinstance(args[0],JavaArray)):
+                     self.approximate=True;self.warnings.add('native List constructor overload is not modeled: '+reason);return U
+                 kinds=args[0].kinds if args and isinstance(args[0],JavaList) else None
+-                obj=JavaList(args[0] if args and isinstance(args[0],list) else (),kinds)
++                obj=JavaList(() if collection_name=='HashSet' else args[0] if args and isinstance(args[0],list) else (),
++                             None if collection_name=='HashSet' else kinds)
+                 obj.flavor=collection_name
+                 obj.order_known=collection_name!='HashSet' and (not args or getattr(args[0],'order_known',True))
+-                obj.opaque=bool(args and isinstance(args[0],JavaList) and args[0].opaque)
++                obj.opaque=bool(args and (self.opaque(args[0]) or isinstance(args[0],JavaList) and args[0].opaque))
++                if collection_name=='HashSet' and args and not obj.opaque:
++                    from .java_sets import call as set_call
++                    set_call(self,'addAll',obj,args,argument_kinds,reason)
+         if not targets and name=='sort' and args and isinstance(args[0],list) and len(args[0])<=1 and not self.opaque(args[0]) and not getattr(args[0],'opaque',False) and self.standard_type(text(objnode),'org.springframework.beans.support.PropertyComparator'):
+             return None
+         if not targets and name=='unmodifiableList' and len(args)==1 and self.standard_type(text(objnode),'java.util.Collections'):
+--- parent30/analyzer/map_loop_proof.py
++++ candidate/analyzer/map_loop_proof.py
+@@ -9,6 +9,7 @@
+ from .map_keys import key_spec
+ from .project import text
+ from .state import U
++from .reference_types import collection_compatibility
+ 
+ 
+ class OutsideProof(Exception):pass
+@@ -28,8 +29,8 @@
+         if engine.standard_type(typ,'java.lang.Object'):return True
+         scalar=engine.native_scalar_type(typ)
+         if scalar:return scalar==kind
+-        if isinstance(value,JavaList) and any(engine.standard_type(typ,'java.util.'+t) for t in ('List','Collection')):
+-            return value.flavor!='HashSet'
++        compatibility=collection_compatibility(engine,value,typ)
++        if compatibility is not None:return compatibility
+         return isinstance(value,JavaRecord) and engine.record_proves_type(value,typ)
+     entry_type=engine.standard_type(base,'java.util.Map.Entry') or base=='Map.Entry' and engine.standard_type('Map','java.util.Map')
+     if view.kind=='entries' and (not entry_type or parameters is None or len(parameters)!=2):return False
+--- parent30/analyzer/reference_types.py
++++ candidate/analyzer/reference_types.py
+@@ -0,0 +1,25 @@
++"""Pure compatibility for the supported native collection runtime classes."""
++from .native_arrays import JavaArray
++from .native_storage import JavaList
++
++
++def collection_compatibility(engine, value, wanted):
++    """True/False are proved; None leaves other reference rules responsible."""
++    kinds = [name for name in ('List', 'Set', 'Collection')
++             if engine.standard_type(wanted, 'java.util.' + name)]
++    if engine.standard_type(wanted, 'java.lang.Iterable'):
++        kinds.append('Iterable')
++    if not kinds:
++        return None
++    if value is None:
++        return True
++    if isinstance(value, JavaArray):
++        return False
++    if not isinstance(value, JavaList):
++        return None
++    flavor = value.flavor
++    if flavor not in ('ArrayList', 'LinkedList', 'Arrays.ArrayList', 'List', 'HashSet'):
++        return None
++    if kinds[0] in ('Collection', 'Iterable'):
++        return True
++    return (flavor == 'HashSet') == (kinds[0] == 'Set')
+--- parent30/analyzer/source_conversions.py
++++ candidate/analyzer/source_conversions.py
+@@ -75,6 +75,12 @@
+     p=engine.p;mid=engine.method;site=p.site(mid,call)
+     targets=p.targets(mid,site) if site else p.source_targets(mid,call)
+     if not targets:targets=p.source_targets(mid,call)
++    obj=call.child_by_field_name('object');receiver=compiled_type(engine,obj)
++    if not targets and obj is not None:
++        meta=p.methods[mid];owner=p.resolve_type(receiver,meta['module'],meta['file'])
++        arguments=call.child_by_field_name('arguments')
++        arity=sum(c.type not in ('line_comment','block_comment') for c in arguments.named_children)
++        if owner:targets=p.inherited_methods(owner,text(call.child_by_field_name('name')),arity)
+     if targets:
+         found=set()
+         with declaration_context(engine):
+@@ -84,17 +90,20 @@
+                 meta=p.methods[target];bindings,_,_=engine.generic_call_context(target,call)
+                 found.add(render(p,pars[index][1],meta,environment(bindings,meta),engine.standard_type,erase=True))
+         return next(iter(found)) if len(found)==1 else ''
+-    obj=call.child_by_field_name('object');receiver=compiled_type(engine,obj)
+     base,args=type_parts(receiver);name=text(call.child_by_field_name('name'))
+     standard=lambda short:engine.standard_type(base,'java.util.'+short)
+-    if any(standard(kind) for kind in ('List','ArrayList','LinkedList','Collection','Set')):
++    if any(standard(kind) for kind in ('List','ArrayList','LinkedList','Collection','Set','HashSet')):
+         element=args[0] if args and len(args)==1 else 'java.lang.Object'
+         if name in ('contains','indexOf','lastIndexOf','remove'):return 'java.lang.Object'
+         if name in ('get','set') and index==0:return 'int'
+         arity=sum(c.type not in ('line_comment','block_comment') for c in call.child_by_field_name('arguments').named_children)
+         if name=='add' and arity>1 and index==0:return 'int'
+         if name in ('add','set'):return element
+-        if name=='addAll':return 'java.util.Collection'
++        if name in ('removeAll','retainAll') and arity==1 and index==0:return 'java.util.Collection'
++        if name=='addAll':
++            if arity==1 and index==0:return 'java.util.Collection'
++            if arity==2 and any(standard(kind) for kind in ('List','ArrayList','LinkedList')):
++                return 'int' if index==0 else 'java.util.Collection' if index==1 else ''
+     if any(standard(kind) for kind in ('Map','HashMap','LinkedHashMap')):
+         if name in ('get','containsKey','containsValue','remove'):return 'java.lang.Object'
+         if name=='put' and index<2:return args[index] if args and len(args)==2 else 'java.lang.Object'
+--- parent30/tests/test_bulk_consumer_types.py
++++ candidate/tests/test_bulk_consumer_types.py
+@@ -0,0 +1,107 @@
++import pytest
++from analyzer.engine import Engine
++from analyzer.native_storage import JavaList
++from analyzer.state import ScenarioState, U
++from builders import build
++
++
++@pytest.mark.parametrize('flavor', ['ArrayList', 'HashSet'])
++@pytest.mark.parametrize('operation, expected', [('removeAll', ['A', 'C']), ('retainAll', ['B'])])
++def test_direct_generic_read_matches_typed_local(tmp_path, flavor, operation, expected):
++    results = []
++    for label, prepare, operand in [('direct', '', 'groups.get("obsolete")'),
++                                    ('local', 'List<String> selected=groups.get("obsolete");', 'selected')]:
++        source = '''import java.util.*;class Api{Collection<String> entry(){
++          Collection<String> out=new ''' + flavor + '''<>(Arrays.asList("A","B","C"));
++          Map<String,List<String>> groups=new HashMap<>();groups.put("obsolete",Arrays.asList("B"));
++          ''' + prepare + '''if(!out.''' + operation + '(' + operand + ''')){throw new IllegalStateException();}
++          return out;}}'''
++        p, db, ids = build(tmp_path / label, {'Api.java': source})
++        engine = Engine(p, ScenarioState(db))
++        result = engine.run(ids['Api.entry'], {})
++        assert isinstance(result, JavaList) and not result.opaque
++        assert sorted(result) == expected
++        assert result.kinds == ['String'] * len(expected)
++        assert engine.outcome == 'returned'
++        results.append((sorted(result), result.flavor, result.order_known))
++    assert results[0] == results[1]
++
++
++@pytest.mark.parametrize('flavor', ['ArrayList', 'HashSet'])
++@pytest.mark.parametrize('operation, expected', [('removeAll', True), ('retainAll', False)])
++def test_bulk_self_alias_preserves_boolean_contract(tmp_path, flavor, operation, expected):
++    p, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;class Api{boolean entry(){
++      Collection<String> out=new ''' + flavor + '''<>(Arrays.asList("A","B"));
++      boolean changed=out.''' + operation + '''(out);
++      if(out.size()!=''' + ('0' if operation == 'removeAll' else '2') + '''){throw new IllegalStateException();}
++      return changed;}}'''})
++    assert Engine(p, ScenarioState(db)).run(ids['Api.entry'], {}) is expected
++
++
++@pytest.mark.parametrize('flavor', ['ArrayList', 'HashSet'])
++@pytest.mark.parametrize('operation', ['removeAll', 'retainAll'])
++def test_null_bulk_operand_throws(tmp_path, flavor, operation):
++    p, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;class Api{String entry(){
++      Collection<String> out=new ''' + flavor + '''<>(Arrays.asList("A"));
++      Map<String,List<String>> groups=new HashMap<>();
++      try{out.''' + operation + '''(groups.get("missing"));}
++      catch(NullPointerException failure){return "null";}return "after";}}'''})
++    assert Engine(p, ScenarioState(db)).run(ids['Api.entry'], {}) == 'null'
++
++
++def test_polluted_map_array_is_not_a_collection(tmp_path):
++    p, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;class Api{String entry(){
++      String[] invalid="B".split(",");Map raw=new HashMap();raw.put("obsolete",invalid);
++      Map<String,List<String>> groups=raw;List<String> out=new ArrayList<>(Arrays.asList("A","B"));
++      try{out.removeAll(groups.get("obsolete"));}
++      catch(ClassCastException failure){return "cast";}return "after";}}'''})
++    assert Engine(p, ScenarioState(db)).run(ids['Api.entry'], {}) == 'cast'
++
++
++@pytest.mark.parametrize('constructor', ['Arrays.asList("A","B")',
++    'Collections.unmodifiableList(new ArrayList<>(Arrays.asList("A","B")))'])
++def test_fixed_and_unmodifiable_bulk_removal_throws(tmp_path, constructor):
++    p, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;class Api{String entry(){
++      List<String> out=''' + constructor + ''';Map<String,List<String>> groups=new HashMap<>();
++      groups.put("obsolete",Arrays.asList("B"));try{out.removeAll(groups.get("obsolete"));}
++      catch(UnsupportedOperationException failure){return "fixed";}return "after";}}'''})
++    assert Engine(p, ScenarioState(db)).run(ids['Api.entry'], {}) == 'fixed'
++
++
++def test_custom_namesake_uses_source_parameter_and_body(tmp_path):
++    p, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;
++      class Custom {boolean removeAll(List<String> values){return values.get(0).equals("B");}}
++      class Api {boolean entry(){Map<String,List<String>> groups=new HashMap<>();
++        groups.put("obsolete",Arrays.asList("B"));return new Custom().removeAll(groups.get("obsolete"));}}'''})
++    engine = Engine(p, ScenarioState(db))
++    assert engine.run(ids['Api.entry'], {}) is True
++    assert ('', 'executes', ids['Custom.removeAll']) in engine.edges
++
++
++def test_unknown_operand_keeps_unknown_membership(tmp_path):
++    p, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;class Api{
++      List<String> entry(Collection<String> selected){List<String> out=new ArrayList<>(Arrays.asList("A","B"));
++        out.removeAll(selected);return out;}}'''})
++    engine = Engine(p, ScenarioState(db))
++    result = engine.run(ids['Api.entry'], {'selected': U})
++    assert result is U or isinstance(result, JavaList) and result.opaque
++    assert any('bulk' in warning for warning in engine.warnings)
++
++
++def test_hashset_copy_preserves_unique_boxed_kinds_and_owns_container(tmp_path):
++    p, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;class Api{int entry(){
++      List<Object> values=new ArrayList<>();values.add(true);values.add(1);values.add(1L);
++      values.add(null);values.add(null);values.add(1);
++      Set<Object> copied=new HashSet<>(values);values.clear();return copied.size();}}'''})
++    assert Engine(p, ScenarioState(db)).run(ids['Api.entry'], {}) == 4
++
++
++def test_unsupported_array_allocation_remains_explicit_before_bulk(tmp_path):
++    p, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;class Api{Object entry(){
++      Map raw=new HashMap();raw.put("obsolete",new String[]{"B"});
++      Map<String,List<String>> groups=raw;List<String> out=new ArrayList<>(Arrays.asList("A","B"));
++      out.removeAll(groups.get("obsolete"));return out;}}'''})
++    engine = Engine(p, ScenarioState(db))
++    assert engine.run(ids['Api.entry'], {}) is U
++    assert engine.outcome == 'unsupported_semantics boundary'
++    assert any('array_creation_expression' in warning for warning in engine.warnings)
+--- parent30/tests/test_inventory_collection_journey.py
++++ candidate/tests/test_inventory_collection_journey.py
+@@ -2,7 +2,7 @@
+ import json
+ import pytest
+ from analyzer.project import Project
+-from analyzer.state import ScenarioState
++from analyzer.state import ScenarioState,U
+ from analyzer.request import Request
+ from analyzer.paths import run_paths
+ from analyzer.frontend import Frontend
+@@ -104,14 +104,27 @@
+     assert trace['steps'][2]['alternatives'][0]['result'][1]==second[0]['result']
+ 
+ 
+-def test_missing_category_declines_noop_and_exposes_generic_membership_boundary(tmp_path):
+-    from analyzer.state import U
++def test_missing_category_executes_live_removal_and_next_request(tmp_path):
+     p,db,ids=fixture(tmp_path);db.tables[('catalog','categories')]=[{'code':'hardware'}]
+     paths=run_paths(p,ScenarioState(db),ids['gateway.InventoryGateway.listProducts'],Request.http('gateway','GET','/inventory'),limit=4)
+-    assert paths and all(path['result'] is U for path in paths)
+-    assert all(any('membership is unresolved' in message for message in path['engine'].warnings) for path in paths)
++    assert paths and all([row['id'] for row in path['result']]==['SKU7','SKU9'] for path in paths)
++    assert all(path['engine'].outcome=='returned' for path in paths)
+     assert all(not any(e.get('model_version')=='native-map-noop/1' for e in path['engine'].effect_events) for path in paths)
+     assert all(not path['state'].database.unknown_tables for path in paths)
++    for path in paths:
++        selected=path['result'][1]
++        request=Request.http('gateway','POST','/inventory/reserve',body={'id':selected['id'],'revision':selected['revision']})
++        following=run_paths(p,path['state'],ids['gateway.InventoryGateway.reserveProduct'],request,limit=4)
++        assert all(row['result']=={'id':'SKU9','category':'hardware','revision':7,'quantity':9} for row in following)
++        assert all(row['state'].database.tables[('warehouse','products')][1]['revision']==5 for row in following)
++
++
++def test_unknown_category_rows_remain_a_negative_control(tmp_path):
++    p,db,ids=fixture(tmp_path);db.unknown_tables.add(('catalog','categories'))
++    paths=run_paths(p,ScenarioState(db),ids['gateway.InventoryGateway.listProducts'],Request.http('gateway','GET','/inventory'),limit=4)
++    assert paths and all(path['result'] is U for path in paths)
++    assert all(path['engine'].outcome=='unsupported_semantics boundary' for path in paths)
++    assert all(any('unknown collection' in warning for warning in path['engine'].warnings) for path in paths)
+ 
+ 
+ def test_remote_effect_inside_false_filter_is_not_omitted(tmp_path):
+--- parent30/tests/test_map_proof_casts.py
++++ candidate/tests/test_map_proof_casts.py
+@@ -0,0 +1,59 @@
++import pytest
++from analyzer.engine import Engine
++from analyzer.paths import run_paths
++from analyzer.state import ScenarioState
++from builders import build
++
++
++@pytest.mark.parametrize('proof_enabled', [True, False])
++def test_array_in_polluted_map_cannot_skip_required_cast(tmp_path, monkeypatch, proof_enabled):
++    import analyzer.map_loop_proof as proof
++    if not proof_enabled:
++        monkeypatch.setattr(proof, 'prove', lambda *args: False)
++    p, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;class Api{
++      void touch(){throw new IllegalStateException();}
++      String entry(){Map raw=new HashMap();raw.put("x","v".split(","));
++        Map<String,List<String>> typed=raw;
++        try{for(Map.Entry<String,List<String>> entry:typed.entrySet()){
++          List<String> values=entry.getValue();if(values==null){touch();}}}
++        catch(ClassCastException failure){return "cast";}return "after";}}'''})
++    engine = Engine(p, ScenarioState(db))
++    assert engine.run(ids['Api.entry'], {}) == 'cast'
++    assert ('', 'executes', ids['Api.touch']) not in engine.edges
++    assert not any(event.get('model_version') == 'native-map-noop/1' for event in engine.effect_events)
++
++
++@pytest.mark.parametrize('declared, actual, result', [
++    ('Collection<String>', 'new HashSet<String>()', 'after'),
++    ('List<String>', 'new HashSet<String>()', 'cast'),
++    ('List<String>', 'new ArrayList<String>()', 'after'),
++    ('Collection<String>', 'null', 'null'),
++])
++def test_pure_proof_and_ordinary_reference_cast_agree(tmp_path, monkeypatch, declared, actual, result):
++    import analyzer.map_loop_proof as proof
++    outcomes = []
++    original = proof.prove
++    for enabled in (True, False):
++        monkeypatch.setattr(proof, 'prove', original if enabled else lambda *args: False)
++        source = '''import java.util.*;class Api{String entry(){Map raw=new HashMap();raw.put("x",''' + actual + ''');
++          Map<String,''' + declared + '''> typed=raw;String answer="after";
++          try{for(Map.Entry<String,''' + declared + '''> entry:typed.entrySet()){
++             ''' + declared + ''' values=entry.getValue();if(values==null){return "null";}}}
++          catch(ClassCastException failure){return "cast";}return answer;}}'''
++        p, db, ids = build(tmp_path / str(enabled), {'Api.java': source})
++        engine = Engine(p, ScenarioState(db))
++        observed = engine.run(ids['Api.entry'], {})
++        assert observed == result
++        outcomes.append((observed, engine.outcome, engine.edges, engine.state.database.tables))
++    assert outcomes[0] == outcomes[1]
++
++
++def test_set_collection_false_guard_proof_is_side_effect_free(tmp_path):
++    p, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;class Api{int entry(){
++      Map<String,Collection<String>> values=new HashMap<>();values.put("x",new HashSet<String>());
++      for(Map.Entry<String,Collection<String>> entry:values.entrySet()){
++        Collection<String> group=entry.getValue();if(group==null){return 1;}}
++      return values.size();}}'''})
++    engine = Engine(p, ScenarioState(db))
++    assert engine.run(ids['Api.entry'], {}) == 1
++    assert any(event.get('model_version') == 'native-map-noop/1' for event in engine.effect_events)
+--- parent30/tests/test_unknown_collection_iteration.py
++++ candidate/tests/test_unknown_collection_iteration.py
+@@ -0,0 +1,84 @@
++import pytest
++from analyzer.engine import Engine
++from analyzer.native_storage import JavaList
++from analyzer.state import ScenarioState, U
++from builders import build
++
++
++SOURCE = '''import java.util.*;
++class Row {public String id;public String name;}
++class Api {Map<String,String> cache=new HashMap<>();
++ boolean local(List<Row> rows){Map<String,String> names=new HashMap<>();
++   for(Row row:rows){names.put(row.id,row.name);}return names.get("A")==null;}
++ void write(List<Row> rows){for(Row row:rows){cache.put(row.id,row.name);}}
++ boolean read(){return cache.get("A")==null;}
++}'''
++
++
++def opaque_rows():
++    rows = JavaList()
++    rows.opaque = True
++    return rows
++
++
++@pytest.mark.parametrize('opaque', [False, True])
++def test_unknown_membership_does_not_prove_local_map_empty(tmp_path, opaque):
++    p, db, ids = build(tmp_path, {'Api.java': SOURCE})
++    engine = Engine(p, ScenarioState(db))
++    assert engine.run(ids['Api.local'], {'rows': opaque_rows() if opaque else U}) is U
++    assert engine.outcome == 'unsupported_semantics boundary'
++    assert any('unknown collection' in warning for warning in engine.warnings)
++
++
++def test_skipped_effect_does_not_leave_shared_cache_known_empty(tmp_path):
++    p, db, ids = build(tmp_path, {'Api.java': SOURCE})
++    first = Engine(p, ScenarioState(db))
++    first.run(ids['Api.write'], {'rows': opaque_rows()})
++    second = Engine(p, first.state)
++    assert second.run(ids['Api.read'], {}) is U
++
++
++@pytest.mark.parametrize('source, expected', [
++    ('new ArrayList<Row>()', True),
++    ('Arrays.asList(row("A","one"))', False),
++    ('Arrays.asList(row("A","one"),row("B","two"))', False),
++])
++def test_known_empty_and_known_members_remain_exact(tmp_path, source, expected):
++    p, db, ids = build(tmp_path, {'Api.java': SOURCE.replace(
++        ' boolean local(', ' Row row(String id,String name){Row r=new Row();r.id=id;r.name=name;return r;}\n'
++        ' boolean entry(){return local(' + source + ');}\n boolean local(')})
++    engine = Engine(p, ScenarioState(db))
++    assert engine.run(ids['Api.entry'], {}) is expected
++
++
++def test_null_foreach_throws_before_body(tmp_path):
++    p, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;class Api{
++      String entry(){try{for(String value:(List<String>)null){return value;}}
++       catch(NullPointerException failure){return "null";}return "after";}}'''})
++    assert Engine(p, ScenarioState(db)).run(ids['Api.entry'], {}) == 'null'
++
++
++def test_unknown_repository_rows_do_not_prove_missing_key(tmp_path):
++    p, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;
++      import org.springframework.data.jpa.repository.JpaRepository;
++      @Entity @Table(name="rows") class Row {public String id;public String name;}
++      interface Rows extends JpaRepository<Row,String>{List<Row> findAll();}
++      class Api {Rows repository;boolean entry(){Map<String,String> names=new HashMap<>();
++        for(Row row:repository.findAll()){names.put(row.id,row.name);}
++        return names.get("A")==null;}}'''}, rows={'rows': [{'id': 'A', 'name': 'one'}]})
++    db.unknown_tables.add(('service', 'rows'))
++    engine = Engine(p, ScenarioState(db))
++    assert engine.run(ids['Api.entry'], {}) is U
++    assert engine.outcome == 'unsupported_semantics boundary'
++
++
++@pytest.mark.parametrize('body', ['return value;', 'throw new IllegalStateException();',
++                                  'break;', 'continue;'])
++def test_unknown_iteration_does_not_invent_body_completion(tmp_path, body):
++    p, db, ids = build(tmp_path, {'Api.java': '''import java.util.*;class Api{
++      String entry(List<String> rows){for(String value:rows){''' + body + '''}return "after";}}'''})
++    rows = JavaList(['old'], ['String'])
++    rows.opaque = True
++    engine = Engine(p, ScenarioState(db))
++    assert engine.run(ids['Api.entry'], {'rows': rows}) is U
++    assert engine.outcome == 'unsupported_semantics boundary'

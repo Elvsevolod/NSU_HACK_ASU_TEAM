@@ -1,0 +1,42 @@
+{
+  "id": "organization-state-chain",
+  "project": "organization",
+  "steps": [
+    {
+      "n": 1,
+      "action": "POST http://organization/\n{\"id\":\"O1\",\"name\":\"North Lab\",\"address\":\"Main Street\"}"
+    },
+    {
+      "n": 2,
+      "action": "POST http://department/\n{\"id\":\"D1\",\"organizationId\":\"O1\",\"name\":\"Research\"}"
+    },
+    {
+      "n": 3,
+      "action": "POST http://employee/\n{\"id\":\"E1\",\"organizationId\":\"O1\",\"departmentId\":\"D1\",\"name\":\"Ada\",\"age\":23,\"position\":\"Engineer\"}"
+    },
+    {
+      "n": 4,
+      "action": "GET http://department/D1/with-employees"
+    },
+    {
+      "n": 5,
+      "action": "POST http://employee/\n{\"id\":\"E1\",\"organizationId\":\"O1\",\"departmentId\":\"D1\",\"name\":\"Ada\",\"age\":24,\"position\":\"Senior Engineer\"}"
+    },
+    {
+      "n": 6,
+      "action": "GET http://organization/O1/with-departments-and-employees"
+    },
+    {
+      "n": 7,
+      "action": "GET http://employee/E1"
+    },
+    {
+      "n": 8,
+      "action": "GET http://employee/absent"
+    },
+    {
+      "n": 9,
+      "action": "GET http://employee/absent"
+    }
+  ]
+}

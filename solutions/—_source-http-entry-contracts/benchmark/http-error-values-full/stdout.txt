@@ -1,0 +1,178 @@
+........................................................................ [  3%]
+........................................................................ [  6%]
+........................................................................ [  9%]
+........................................................................ [ 12%]
+........................................................................ [ 15%]
+........................................................................ [ 18%]
+........................................................................ [ 21%]
+........................................................................ [ 24%]
+........................................................................ [ 28%]
+........................................................................ [ 31%]
+........................................................................ [ 34%]
+........................................................................ [ 37%]
+........................................................................ [ 40%]
+........................................................................ [ 43%]
+........................................................................ [ 46%]
+........................................................................ [ 49%]
+........................................................................ [ 52%]
+........................................................................ [ 56%]
+........................................................................ [ 59%]
+........................................................................ [ 62%]
+........................................................................ [ 65%]
+........................................................................ [ 68%]
+........................................................................ [ 71%]
+........................................................................ [ 74%]
+....................................F....................F.............. [ 77%]
+........................................................................ [ 81%]
+........................................................................ [ 84%]
+........................................................................ [ 87%]
+........................................................................ [ 90%]
+........................................................................ [ 93%]
+........................................................................ [ 96%]
+........................................................................ [ 99%]
+.......                                                                  [100%]
+=================================== FAILURES ===================================
+___________ test_http_error_status_does_not_become_a_successful_body ___________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-137/test_http_error_status_does_no0')
+
+    def test_http_error_status_does_not_become_a_successful_body(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.web.client.RestTemplate;import org.springframework.web.client.RestOperations;class Api {
+          @GetMapping("/records") ResponseEntity<String> get(){return ResponseEntity.status(HttpStatus.NOT_FOUND).body("missing");}}
+        class Caller {RestTemplate rest;void entry(){rest.getForObject("http://service/records",String.class);after();}void after(){}}'''})
+>       engine=Engine(project,ScenarioState(db));engine.run(ids['Caller.entry'],{})
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_review10_execution.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+code/analyzer/engine.py:389: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:481: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+code/analyzer/engine.py:572: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'],on_entry=entered)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:722: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds,on_entry)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:814: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1386: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1419: in execute_statement
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1386: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1621: in execute_statement
+    return self.value(node, env), None
+           ^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1675: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2132: in expression_value
+    return self.value(node.named_children[0], env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1675: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2115: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:3108: in call
+    response, _ = remote_alternative(remote[0], env, [url, headers, body, args])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:3065: in remote_alternative
+    rejected=self.choose(reason+':unknown-http-status-error',[True,False])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x110603610>
+label = 'call:method:service:Caller#entry()@3:55:unknown-http-status-error'
+choices = [True, False]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:call:method:service:Caller#entry()@3:55:unknown-http-status-error', [True, False])
+
+code/analyzer/engine.py:314: AlternativeRequired
+_________________ test_status_only_response_entity_has_no_body _________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-137/test_status_only_response_enti0')
+
+    def test_status_only_response_entity_has_no_body(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.web.client.RestTemplate;import org.springframework.web.client.RestOperations;class Api {@GetMapping("/ping") ResponseEntity<Void> ping(){
+          return new ResponseEntity<Void>(HttpStatus.OK);}}
+          class Caller {RestTemplate rest;String entry(){return rest.getForObject("http://service/ping",String.class);}}'''})
+>       assert Engine(project,ScenarioState(db)).run(ids['Caller.entry'],{}) is None
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_review10_execution.py:200: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+code/analyzer/engine.py:389: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:481: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+code/analyzer/engine.py:572: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'],on_entry=entered)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:722: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds,on_entry)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:814: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1386: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1419: in execute_statement
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1386: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1424: in execute_statement
+    value = self.value(node.named_children[0], env) if node.named_children else None
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1675: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2115: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:3108: in call
+    response, _ = remote_alternative(remote[0], env, [url, headers, body, args])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:3065: in remote_alternative
+    rejected=self.choose(reason+':unknown-http-status-error',[True,False])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x110612f90>
+label = 'call:method:service:Caller#entry()@3:66:unknown-http-status-error'
+choices = [True, False]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:call:method:service:Caller#entry()@3:66:unknown-http-status-error', [True, False])
+
+code/analyzer/engine.py:314: AlternativeRequired
+=========================== short test summary info ============================
+FAILED code/tests/test_review10_execution.py::test_http_error_status_does_not_become_a_successful_body
+FAILED code/tests/test_review10_execution.py::test_status_only_response_entity_has_no_body
+2 failed, 2309 passed in 12.24s

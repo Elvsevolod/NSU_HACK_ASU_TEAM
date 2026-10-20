@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Independent ready Java/Spring holdout package",
+  "type": "object",
+  "required": ["project", "source", "skeleton", "context", "explicit_scenarios", "nl_scenarios", "oracle", "files", "origin", "oracle_review"],
+  "properties": {
+    "project": {"type": "string"},
+    "source": {"type": "string"},
+    "skeleton": {"type": "string"},
+    "context": {"type": "string"},
+    "explicit_scenarios": {"type": "string"},
+    "nl_scenarios": {"type": "string"},
+    "oracle": {"type": "string"},
+    "files": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^[a-f0-9]{64}$"}},
+    "origin": {"type": "object", "required": ["repository", "revision", "domain", "license"]},
+    "oracle_review": {"type": "object", "required": ["reviewer", "source_evidence", "partial_sections", "inference_predictions_used"]},
+    "split": {"const": "untouched_application_holdout"}
+  },
+  "description": "Paths relative to this manifest. Provide an existing skeleton; this harness never builds one or launches the target. Keep paraphrase/mutation families in one split. Oracle scenario objects carry edges, complete boolean, and optional exact step_constraints. Partial edges yield coverage only."
+}

@@ -1,0 +1,146 @@
+...FF.FFFF                                                               [100%]
+=================================== FAILURES ===================================
+_ test_read_prefix_does_not_prove_repository_read_effects[@Procedure int getNextNumber();] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-227/test_read_prefix_does_not_prov0')
+signature = '@Procedure int getNextNumber();'
+
+    @pytest.mark.parametrize('signature',[
+        '@Procedure int getNextNumber();',
+        '@Modifying @Query("update Parcel p set p.id = ?1") int getById(String id);',
+        'default Parcel getById(String id){return save(new Parcel());}',
+    ])
+    def test_read_prefix_does_not_prove_repository_read_effects(tmp_path,signature):
+        method='getNextNumber()' if 'getNextNumber' in signature else 'getById("p1")'
+        p,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.data.jpa.repository.JpaRepository;
+          class Api{Store store;void entry(){store.'''+method+''';}}
+          @Entity @Table(name="parcels")class Parcel{@Id String id;}
+          interface Store extends JpaRepository<Parcel,String>{'''+signature+''' Parcel save(Parcel value);}'''},
+          rows={'parcels':[{'id':'p1'}]})
+        e=Engine(p,ScenarioState(db));e.method=ids['Api.entry'];e.fallback(ids['Api.entry'])
+>       assert ('service','parcels') in e.state.database.unknown_tables
+E       AssertionError: assert ('service', 'parcels') in set()
+E        +  where set() = <analyzer.state.Database object at 0x1068de6d0>.unknown_tables
+E        +    where <analyzer.state.Database object at 0x1068de6d0> = <analyzer.state.ScenarioState object at 0x1068de750>.database
+E        +      where <analyzer.state.ScenarioState object at 0x1068de750> = <analyzer.engine.Engine object at 0x1068de690>.state
+
+solutions/—_collection-value-flow/code/tests/test_fallback_read_effects.py:37: AssertionError
+_ test_read_prefix_does_not_prove_repository_read_effects[@Modifying @Query("update Parcel p set p.id = ?1") int getById(String id);] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-227/test_read_prefix_does_not_prov1')
+signature = '@Modifying @Query("update Parcel p set p.id = ?1") int getById(String id);'
+
+    @pytest.mark.parametrize('signature',[
+        '@Procedure int getNextNumber();',
+        '@Modifying @Query("update Parcel p set p.id = ?1") int getById(String id);',
+        'default Parcel getById(String id){return save(new Parcel());}',
+    ])
+    def test_read_prefix_does_not_prove_repository_read_effects(tmp_path,signature):
+        method='getNextNumber()' if 'getNextNumber' in signature else 'getById("p1")'
+        p,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.data.jpa.repository.JpaRepository;
+          class Api{Store store;void entry(){store.'''+method+''';}}
+          @Entity @Table(name="parcels")class Parcel{@Id String id;}
+          interface Store extends JpaRepository<Parcel,String>{'''+signature+''' Parcel save(Parcel value);}'''},
+          rows={'parcels':[{'id':'p1'}]})
+        e=Engine(p,ScenarioState(db));e.method=ids['Api.entry'];e.fallback(ids['Api.entry'])
+>       assert ('service','parcels') in e.state.database.unknown_tables
+E       AssertionError: assert ('service', 'parcels') in set()
+E        +  where set() = <analyzer.state.Database object at 0x1068de890>.unknown_tables
+E        +    where <analyzer.state.Database object at 0x1068de890> = <analyzer.state.ScenarioState object at 0x105ba0d50>.database
+E        +      where <analyzer.state.ScenarioState object at 0x105ba0d50> = <analyzer.engine.Engine object at 0x107877f10>.state
+
+solutions/—_collection-value-flow/code/tests/test_fallback_read_effects.py:37: AssertionError
+_ test_absence_proof_declines_unproven_alias_or_escape[Credentials alias=input;return alias.getChallenge()==null;] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-227/test_absence_proof_declines_un0')
+tail = 'Credentials alias=input;return alias.getChallenge()==null;'
+
+    @pytest.mark.parametrize('tail',[
+        'Credentials alias=input;return alias.getChallenge()==null;',
+        'saved=input;return saved.getChallenge()==null;',
+        'return inspect((Object)input);',
+    ])
+    def test_absence_proof_declines_unproven_alias_or_escape(tmp_path,tail):
+        p,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.util.StringUtils;import lombok.Data;
+          @Data class Credentials{private String challenge;}
+          class Api{Credentials saved;@PostMapping("/login")boolean login(@RequestBody Credentials input){
+            if(!StringUtils.isEmpty(input.getChallenge())){return false;}'''+tail+'''}
+            boolean inspect(Object escaped){return ((Credentials)escaped).getChallenge()==null;}}'''})
+        e=Engine(p,ScenarioState(db));e.method=ids['Api.login']
+>       assert not empty_equivalent(e,ids['Api.login'],'challenge')
+E       AssertionError: assert not True
+E        +  where True = empty_equivalent(<analyzer.engine.Engine object at 0x105c43310>, 'method:service:Api#login(Credentials)', 'challenge')
+
+solutions/—_collection-value-flow/code/tests/test_absence_escape.py:20: AssertionError
+_ test_absence_proof_declines_unproven_alias_or_escape[saved=input;return saved.getChallenge()==null;] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-227/test_absence_proof_declines_un1')
+tail = 'saved=input;return saved.getChallenge()==null;'
+
+    @pytest.mark.parametrize('tail',[
+        'Credentials alias=input;return alias.getChallenge()==null;',
+        'saved=input;return saved.getChallenge()==null;',
+        'return inspect((Object)input);',
+    ])
+    def test_absence_proof_declines_unproven_alias_or_escape(tmp_path,tail):
+        p,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.util.StringUtils;import lombok.Data;
+          @Data class Credentials{private String challenge;}
+          class Api{Credentials saved;@PostMapping("/login")boolean login(@RequestBody Credentials input){
+            if(!StringUtils.isEmpty(input.getChallenge())){return false;}'''+tail+'''}
+            boolean inspect(Object escaped){return ((Credentials)escaped).getChallenge()==null;}}'''})
+        e=Engine(p,ScenarioState(db));e.method=ids['Api.login']
+>       assert not empty_equivalent(e,ids['Api.login'],'challenge')
+E       AssertionError: assert not True
+E        +  where True = empty_equivalent(<analyzer.engine.Engine object at 0x107893ad0>, 'method:service:Api#login(Credentials)', 'challenge')
+
+solutions/—_collection-value-flow/code/tests/test_absence_escape.py:20: AssertionError
+_ test_absence_proof_declines_unproven_alias_or_escape[return inspect((Object)input);] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-227/test_absence_proof_declines_un2')
+tail = 'return inspect((Object)input);'
+
+    @pytest.mark.parametrize('tail',[
+        'Credentials alias=input;return alias.getChallenge()==null;',
+        'saved=input;return saved.getChallenge()==null;',
+        'return inspect((Object)input);',
+    ])
+    def test_absence_proof_declines_unproven_alias_or_escape(tmp_path,tail):
+        p,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.util.StringUtils;import lombok.Data;
+          @Data class Credentials{private String challenge;}
+          class Api{Credentials saved;@PostMapping("/login")boolean login(@RequestBody Credentials input){
+            if(!StringUtils.isEmpty(input.getChallenge())){return false;}'''+tail+'''}
+            boolean inspect(Object escaped){return ((Credentials)escaped).getChallenge()==null;}}'''})
+        e=Engine(p,ScenarioState(db));e.method=ids['Api.login']
+>       assert not empty_equivalent(e,ids['Api.login'],'challenge')
+E       AssertionError: assert not True
+E        +  where True = empty_equivalent(<analyzer.engine.Engine object at 0x1078b1a90>, 'method:service:Api#login(Credentials)', 'challenge')
+
+solutions/—_collection-value-flow/code/tests/test_absence_escape.py:20: AssertionError
+_________ test_joined_singleton_receiver_and_cache_share_later_writes __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-227/test_joined_singleton_receiver0')
+
+    def test_joined_singleton_receiver_and_cache_share_later_writes(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.stereotype.Component;
+          import javax.annotation.PostConstruct;
+          @Component class Counter {int revision;@PostConstruct void init(){revision=7;}
+            int set(boolean flag){if(flag){revision=8;}else{revision=9;}revision=10;return revision;}
+            int read(){return revision;}}
+          class Api {Counter counter;int write(boolean flag){return counter.set(flag);}int read(){return counter.read();}}'''})
+        first=Engine(p,ScenarioState(db),conservative=True)
+        assert first.run(ids['Api.write'],{'flag':U})==10
+        second=Engine(p,first.state)
+>       assert second.run(ids['Api.read'],{})==10
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 10
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#read()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10789cb10>.run
+
+solutions/—_collection-value-flow/code/tests/test_singleton_join_identity.py:16: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_collection-value-flow/code/tests/test_fallback_read_effects.py::test_read_prefix_does_not_prove_repository_read_effects[@Procedure int getNextNumber();]
+FAILED solutions/—_collection-value-flow/code/tests/test_fallback_read_effects.py::test_read_prefix_does_not_prove_repository_read_effects[@Modifying @Query("update Parcel p set p.id = ?1") int getById(String id);]
+FAILED solutions/—_collection-value-flow/code/tests/test_absence_escape.py::test_absence_proof_declines_unproven_alias_or_escape[Credentials alias=input;return alias.getChallenge()==null;]
+FAILED solutions/—_collection-value-flow/code/tests/test_absence_escape.py::test_absence_proof_declines_unproven_alias_or_escape[saved=input;return saved.getChallenge()==null;]
+FAILED solutions/—_collection-value-flow/code/tests/test_absence_escape.py::test_absence_proof_declines_unproven_alias_or_escape[return inspect((Object)input);]
+FAILED solutions/—_collection-value-flow/code/tests/test_singleton_join_identity.py::test_joined_singleton_receiver_and_cache_share_later_writes
+6 failed, 4 passed in 0.12s

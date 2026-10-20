@@ -1,0 +1,221 @@
+{
+  "project": "library",
+  "scenarios": {
+    "library-create-and-select": {
+      "edges": [
+        {
+          "source": "scenario:library-create-and-select",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#findAllByUser(Long)"
+        },
+        {
+          "source": "scenario:library-create-and-select",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#orderBook(BookOrderDTO)"
+        },
+        {
+          "source": "scenario:library-create-and-select",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findAllByUser(Long)"
+        },
+        {
+          "source": "scenario:library-create-and-select",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)"
+        },
+        {
+          "source": "scenario:library-create-and-select",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.service.InventoryServiceImpl#orderIfAvailable(Long)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#findAllByUser(Long)",
+          "relation": "calls",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findAllByUser(Long)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#orderBook(BookOrderDTO)",
+          "relation": "calls",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findAllByUser(Long)",
+          "relation": "data",
+          "target": "res:table:order.book_order"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)",
+          "relation": "calls",
+          "target": "method:order:com.dhitha.lms.order.service.InventoryServiceImpl#orderIfAvailable(Long)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)",
+          "relation": "data",
+          "target": "res:table:order.book_order"
+        }
+      ]
+    },
+    "library-existing-order-state": {
+      "edges": [
+        {
+          "source": "scenario:library-existing-order-state",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.config.GenericExceptionHandler#handleOrderNotFound(Exception)"
+        },
+        {
+          "source": "scenario:library-existing-order-state",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#collectBook(Long)"
+        },
+        {
+          "source": "scenario:library-existing-order-state",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#findById(Long)"
+        },
+        {
+          "source": "scenario:library-existing-order-state",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#returnBook(Long)"
+        },
+        {
+          "source": "scenario:library-existing-order-state",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.error.GenericException#getMessage()"
+        },
+        {
+          "source": "scenario:library-existing-order-state",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.error.OrderNotFoundException#<init>(String)"
+        },
+        {
+          "source": "scenario:library-existing-order-state",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#collectBook(Long)"
+        },
+        {
+          "source": "scenario:library-existing-order-state",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findById(Long)"
+        },
+        {
+          "source": "scenario:library-existing-order-state",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#mapToDTO(BookOrder)"
+        },
+        {
+          "source": "scenario:library-existing-order-state",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#returnBook(Long)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.config.GenericExceptionHandler#handleOrderNotFound(Exception)",
+          "relation": "calls",
+          "target": "method:order:com.dhitha.lms.order.error.GenericException#getMessage()"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#collectBook(Long)",
+          "relation": "calls",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#collectBook(Long)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#findById(Long)",
+          "relation": "calls",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findById(Long)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#returnBook(Long)",
+          "relation": "calls",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#returnBook(Long)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#collectBook(Long)",
+          "relation": "data",
+          "target": "res:table:order.book_order"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findById(Long)",
+          "relation": "calls",
+          "target": "method:order:com.dhitha.lms.order.error.OrderNotFoundException#<init>(String)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findById(Long)",
+          "relation": "calls",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#mapToDTO(BookOrder)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findById(Long)",
+          "relation": "data",
+          "target": "res:table:order.book_order"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#returnBook(Long)",
+          "relation": "calls",
+          "target": "method:order:com.dhitha.lms.order.error.OrderNotFoundException#<init>(String)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#returnBook(Long)",
+          "relation": "data",
+          "target": "res:table:order.book_order"
+        }
+      ]
+    },
+    "library-remote-refusal": {
+      "edges": [
+        {
+          "source": "scenario:library-remote-refusal",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#orderBook(BookOrderDTO)"
+        },
+        {
+          "source": "scenario:library-remote-refusal",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)"
+        },
+        {
+          "source": "scenario:library-remote-refusal",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.service.InventoryServiceImpl#orderIfAvailable(Long)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#orderBook(BookOrderDTO)",
+          "relation": "calls",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)",
+          "relation": "calls",
+          "target": "method:order:com.dhitha.lms.order.service.InventoryServiceImpl#orderIfAvailable(Long)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)",
+          "relation": "data",
+          "target": "res:table:order.book_order"
+        }
+      ]
+    },
+    "library-unordered-stock": {
+      "edges": [
+        {
+          "source": "scenario:library-unordered-stock",
+          "relation": "executes",
+          "target": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#orderIfAvailable(Long)"
+        },
+        {
+          "source": "scenario:library-unordered-stock",
+          "relation": "executes",
+          "target": "method:inventory:com.dhitha.lms.inventory.service.InventoryServiceImpl#orderBookIfAvailable(Long)"
+        },
+        {
+          "source": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#orderIfAvailable(Long)",
+          "relation": "calls",
+          "target": "method:inventory:com.dhitha.lms.inventory.service.InventoryServiceImpl#orderBookIfAvailable(Long)"
+        },
+        {
+          "source": "method:inventory:com.dhitha.lms.inventory.service.InventoryServiceImpl#orderBookIfAvailable(Long)",
+          "relation": "data",
+          "target": "res:table:inventory.inventory"
+        }
+      ]
+    }
+  }
+}

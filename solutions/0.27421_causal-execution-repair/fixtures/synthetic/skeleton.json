@@ -1,0 +1,524 @@
+{
+  "project": "fixture",
+  "nodes": {
+    "module:review": {
+      "kind": "module",
+      "name": "review",
+      "deployment_units": [
+        "review"
+      ]
+    },
+    "type:review:Gateway": {
+      "kind": "type",
+      "fqn": "Gateway",
+      "module": "gateway",
+      "file": "Gateway.java",
+      "annotations": []
+    },
+    "type:review:Warehouse": {
+      "kind": "type",
+      "fqn": "Warehouse",
+      "module": "warehouse",
+      "file": "Warehouse.java",
+      "annotations": []
+    },
+    "type:review:BookingInput": {
+      "kind": "type",
+      "fqn": "BookingInput",
+      "module": "warehouse",
+      "file": "Warehouse.java",
+      "annotations": []
+    },
+    "type:review:Booking": {
+      "kind": "type",
+      "fqn": "Booking",
+      "module": "warehouse",
+      "file": "Warehouse.java",
+      "annotations": [
+        {
+          "name": "Entity",
+          "args": ""
+        },
+        {
+          "name": "Table",
+          "args": "(name=\"bookings\")"
+        }
+      ]
+    },
+    "type:review:Store": {
+      "kind": "type",
+      "fqn": "Store",
+      "module": "warehouse",
+      "file": "Warehouse.java",
+      "annotations": []
+    },
+    "method:review:Gateway#createBooking(BookingInput)": {
+      "kind": "method",
+      "name": "createBooking",
+      "owner": "type:review:Gateway",
+      "module": "gateway",
+      "file": "Gateway.java",
+      "line": 4,
+      "end": 6,
+      "params_as_written": [
+        "BookingInput"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "PostMapping",
+          "args": "(\"/bookings\")"
+        }
+      ],
+      "return_raw": "Object"
+    },
+    "method:review:Gateway#failed()": {
+      "kind": "method",
+      "name": "failed",
+      "owner": "type:review:Gateway",
+      "module": "gateway",
+      "file": "Gateway.java",
+      "line": 7,
+      "end": 7,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "String"
+    },
+    "method:review:Gateway#listBookings()": {
+      "kind": "method",
+      "name": "listBookings",
+      "owner": "type:review:Gateway",
+      "module": "gateway",
+      "file": "Gateway.java",
+      "line": 8,
+      "end": 9,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": "(\"/bookings\")"
+        }
+      ],
+      "return_raw": "List<Booking>"
+    },
+    "method:review:Gateway#inspectBooking(String)": {
+      "kind": "method",
+      "name": "inspectBooking",
+      "owner": "type:review:Gateway",
+      "module": "gateway",
+      "file": "Gateway.java",
+      "line": 10,
+      "end": 11,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": "(\"/bookings/{bookingId}\")"
+        }
+      ],
+      "return_raw": "Booking"
+    },
+    "method:review:Gateway#cancelBooking(String)": {
+      "kind": "method",
+      "name": "cancelBooking",
+      "owner": "type:review:Gateway",
+      "module": "gateway",
+      "file": "Gateway.java",
+      "line": 12,
+      "end": 13,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "DeleteMapping",
+          "args": "(\"/bookings/{bookingId}\")"
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:review:Warehouse#reserve(BookingInput)": {
+      "kind": "method",
+      "name": "reserve",
+      "owner": "type:review:Warehouse",
+      "module": "warehouse",
+      "file": "Warehouse.java",
+      "line": 2,
+      "end": 4,
+      "params_as_written": [
+        "BookingInput"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "PostMapping",
+          "args": "(\"/reservations\")"
+        }
+      ],
+      "return_raw": "Booking"
+    },
+    "method:review:Warehouse#list()": {
+      "kind": "method",
+      "name": "list",
+      "owner": "type:review:Warehouse",
+      "module": "warehouse",
+      "file": "Warehouse.java",
+      "line": 5,
+      "end": 5,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": "(\"/reservations\")"
+        }
+      ],
+      "return_raw": "List<Booking>"
+    },
+    "method:review:Warehouse#read(String)": {
+      "kind": "method",
+      "name": "read",
+      "owner": "type:review:Warehouse",
+      "module": "warehouse",
+      "file": "Warehouse.java",
+      "line": 6,
+      "end": 6,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": "(\"/reservations/{id}\")"
+        }
+      ],
+      "return_raw": "Booking"
+    },
+    "method:review:Warehouse#remove(String)": {
+      "kind": "method",
+      "name": "remove",
+      "owner": "type:review:Warehouse",
+      "module": "warehouse",
+      "file": "Warehouse.java",
+      "line": 7,
+      "end": 7,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "DeleteMapping",
+          "args": "(\"/reservations/{id}\")"
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:review:Store#save(Booking)": {
+      "kind": "method",
+      "name": "save",
+      "owner": "type:review:Store",
+      "module": "warehouse",
+      "file": "Warehouse.java",
+      "line": 10,
+      "end": 10,
+      "params_as_written": [
+        "Booking"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "Booking"
+    },
+    "method:review:Store#findById(String)": {
+      "kind": "method",
+      "name": "findById",
+      "owner": "type:review:Store",
+      "module": "warehouse",
+      "file": "Warehouse.java",
+      "line": 10,
+      "end": 10,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "Booking"
+    },
+    "method:review:Store#findAll()": {
+      "kind": "method",
+      "name": "findAll",
+      "owner": "type:review:Store",
+      "module": "warehouse",
+      "file": "Warehouse.java",
+      "line": 10,
+      "end": 10,
+      "params_as_written": [],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "List<Booking>"
+    },
+    "method:review:Store#deleteById(String)": {
+      "kind": "method",
+      "name": "deleteById",
+      "owner": "type:review:Store",
+      "module": "warehouse",
+      "file": "Warehouse.java",
+      "line": 10,
+      "end": 10,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "res:table:review.bookings": {
+      "kind": "data_resource",
+      "resource_kind": "table",
+      "schema": "review",
+      "name": "bookings",
+      "origin": [
+        {
+          "file": "Warehouse.java"
+        }
+      ]
+    },
+    "call:method:review:Gateway#createBooking(BookingInput)@5:25": {
+      "kind": "call_site",
+      "method": "method:review:Gateway#createBooking(BookingInput)",
+      "callee": "postForObject",
+      "receiver": "client",
+      "receiver_type": "RestTemplate",
+      "line": 5,
+      "col": 25,
+      "arg_count": 3,
+      "file": "Gateway.java",
+      "module": "gateway"
+    },
+    "call:method:review:Gateway#createBooking(BookingInput)@5:71": {
+      "kind": "call_site",
+      "method": "method:review:Gateway#createBooking(BookingInput)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "HttpEntity",
+      "line": 5,
+      "col": 71,
+      "arg_count": 1,
+      "file": "Gateway.java",
+      "module": "gateway"
+    },
+    "call:method:review:Gateway#createBooking(BookingInput)@6:46": {
+      "kind": "call_site",
+      "method": "method:review:Gateway#createBooking(BookingInput)",
+      "callee": "failed",
+      "receiver": "",
+      "receiver_type": "Gateway",
+      "line": 6,
+      "col": 46,
+      "arg_count": 0,
+      "file": "Gateway.java",
+      "module": "gateway"
+    },
+    "call:method:review:Gateway#listBookings()@9:114": {
+      "kind": "call_site",
+      "method": "method:review:Gateway#listBookings()",
+      "callee": "getBody",
+      "receiver": "client.exchange(\n          \"http://warehouse/reservations\",HttpMethod.GET,null,new ParameterizedTypeReference<List<Booking>>(){})",
+      "receiver_type": "client.exchange(\n          \"http://warehouse/reservations\",HttpMethod.GET,null,new ParameterizedTypeReference<List<Booking>>(){})",
+      "line": 9,
+      "col": 114,
+      "arg_count": 0,
+      "file": "Gateway.java",
+      "module": "gateway"
+    },
+    "call:method:review:Gateway#listBookings()@8:77": {
+      "kind": "call_site",
+      "method": "method:review:Gateway#listBookings()",
+      "callee": "exchange",
+      "receiver": "client",
+      "receiver_type": "RestTemplate",
+      "line": 8,
+      "col": 77,
+      "arg_count": 4,
+      "file": "Gateway.java",
+      "module": "gateway"
+    },
+    "call:method:review:Gateway#listBookings()@9:63": {
+      "kind": "call_site",
+      "method": "method:review:Gateway#listBookings()",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "ParameterizedTypeReference<List<Booking>>",
+      "line": 9,
+      "col": 63,
+      "arg_count": 0,
+      "file": "Gateway.java",
+      "module": "gateway"
+    },
+    "call:method:review:Gateway#inspectBooking(String)@11:25": {
+      "kind": "call_site",
+      "method": "method:review:Gateway#inspectBooking(String)",
+      "callee": "getForObject",
+      "receiver": "client",
+      "receiver_type": "RestTemplate",
+      "line": 11,
+      "col": 25,
+      "arg_count": 2,
+      "file": "Gateway.java",
+      "module": "gateway"
+    },
+    "call:method:review:Gateway#cancelBooking(String)@13:18": {
+      "kind": "call_site",
+      "method": "method:review:Gateway#cancelBooking(String)",
+      "callee": "exchange",
+      "receiver": "client",
+      "receiver_type": "RestTemplate",
+      "line": 13,
+      "col": 18,
+      "arg_count": 4,
+      "file": "Gateway.java",
+      "module": "gateway"
+    },
+    "call:method:review:Warehouse#reserve(BookingInput)@3:34": {
+      "kind": "call_site",
+      "method": "method:review:Warehouse#reserve(BookingInput)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "IllegalArgumentException",
+      "line": 3,
+      "col": 34,
+      "arg_count": 0,
+      "file": "Warehouse.java",
+      "module": "warehouse"
+    },
+    "call:method:review:Warehouse#reserve(BookingInput)@4:22": {
+      "kind": "call_site",
+      "method": "method:review:Warehouse#reserve(BookingInput)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "Booking",
+      "line": 4,
+      "col": 22,
+      "arg_count": 0,
+      "file": "Warehouse.java",
+      "module": "warehouse"
+    },
+    "call:method:review:Warehouse#reserve(BookingInput)@4:82": {
+      "kind": "call_site",
+      "method": "method:review:Warehouse#reserve(BookingInput)",
+      "callee": "save",
+      "receiver": "store",
+      "receiver_type": "Store",
+      "line": 4,
+      "col": 82,
+      "arg_count": 1,
+      "file": "Warehouse.java",
+      "module": "warehouse"
+    },
+    "call:method:review:Warehouse#list()@5:70": {
+      "kind": "call_site",
+      "method": "method:review:Warehouse#list()",
+      "callee": "findAll",
+      "receiver": "store",
+      "receiver_type": "Store",
+      "line": 5,
+      "col": 70,
+      "arg_count": 0,
+      "file": "Warehouse.java",
+      "module": "warehouse"
+    },
+    "call:method:review:Warehouse#read(String)@6:92": {
+      "kind": "call_site",
+      "method": "method:review:Warehouse#read(String)",
+      "callee": "findById",
+      "receiver": "store",
+      "receiver_type": "Store",
+      "line": 6,
+      "col": 92,
+      "arg_count": 1,
+      "file": "Warehouse.java",
+      "module": "warehouse"
+    },
+    "call:method:review:Warehouse#remove(String)@7:87": {
+      "kind": "call_site",
+      "method": "method:review:Warehouse#remove(String)",
+      "callee": "deleteById",
+      "receiver": "store",
+      "receiver_type": "Store",
+      "line": 7,
+      "col": 87,
+      "arg_count": 1,
+      "file": "Warehouse.java",
+      "module": "warehouse"
+    },
+    "module:gateway": {
+      "kind": "module",
+      "name": "gateway",
+      "deployment_units": [
+        "gateway"
+      ]
+    },
+    "module:warehouse": {
+      "kind": "module",
+      "name": "warehouse",
+      "deployment_units": [
+        "warehouse"
+      ]
+    }
+  },
+  "edges": [
+    {
+      "source": "call:method:review:Gateway#createBooking(BookingInput)@6:46",
+      "type": "calls",
+      "target": "method:review:Gateway#failed()"
+    },
+    {
+      "source": "call:method:review:Warehouse#reserve(BookingInput)@4:82",
+      "type": "calls",
+      "target": "method:review:Store#save(Booking)"
+    },
+    {
+      "source": "call:method:review:Warehouse#reserve(BookingInput)@4:82",
+      "type": "data_access",
+      "target": "res:table:review.bookings"
+    },
+    {
+      "source": "call:method:review:Warehouse#list()@5:70",
+      "type": "calls",
+      "target": "method:review:Store#findAll()"
+    },
+    {
+      "source": "call:method:review:Warehouse#list()@5:70",
+      "type": "data_access",
+      "target": "res:table:review.bookings"
+    },
+    {
+      "source": "call:method:review:Warehouse#read(String)@6:92",
+      "type": "calls",
+      "target": "method:review:Store#findById(String)"
+    },
+    {
+      "source": "call:method:review:Warehouse#read(String)@6:92",
+      "type": "data_access",
+      "target": "res:table:review.bookings"
+    },
+    {
+      "source": "call:method:review:Warehouse#remove(String)@7:87",
+      "type": "calls",
+      "target": "method:review:Store#deleteById(String)"
+    },
+    {
+      "source": "call:method:review:Warehouse#remove(String)@7:87",
+      "type": "data_access",
+      "target": "res:table:review.bookings"
+    }
+  ],
+  "context": {}
+}

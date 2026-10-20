@@ -1,0 +1,21 @@
+F..                                                                      [100%]
+=================================== FAILURES ===================================
+_______ test_write_qualifier_does_not_multiply_internal_reference_score ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-170/test_write_qualifier_does_not_0')
+
+    def test_write_qualifier_does_not_multiply_internal_reference_score(tmp_path):
+        contracts, ids = index(tmp_path)
+        action = 'Pay for the invoice from the internal account balance'
+        # The independent contract is the public payment operation, not the status
+        # endpoint. The same action's "for invoice" must never boost a path ID.
+>       assert contracts.rank(action)[0][2]['entry'] == ids['BalancePaymentController.payFromBalance']
+E       AssertionError: assert 'method:servi...voice(String)' == 'method:servi...ance(Payment)'
+E         
+E         - method:service:BalancePaymentController#payFromBalance(Payment)
+E         + method:service:InvoiceController#payInvoice(String)
+
+solutions/—_request-array-continuity/code/tests/test_related_reference_scope.py:37: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_request-array-continuity/code/tests/test_related_reference_scope.py::test_write_qualifier_does_not_multiply_internal_reference_score
+1 failed, 2 passed in 0.14s

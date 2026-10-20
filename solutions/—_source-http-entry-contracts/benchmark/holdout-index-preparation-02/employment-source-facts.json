@@ -1,0 +1,971 @@
+{
+  "method:companyms:com.mohit.companyms.Company.CompanyController#createCompany(Company)|": {
+    "contract_id": "method:companyms:com.mohit.companyms.Company.CompanyController#createCompany(Company)|",
+    "entry": "method:companyms:com.mohit.companyms.Company.CompanyController#createCompany(Company)",
+    "facts": {
+      "entry": "method:companyms:com.mohit.companyms.Company.CompanyController#createCompany(Company)",
+      "method": "createCompany",
+      "owner": "com.mohit.companyms.Company.CompanyController",
+      "http_method": "POST",
+      "route": [
+        "companies"
+      ],
+      "annotations": [
+        {
+          "name": "PostMapping",
+          "args": ""
+        }
+      ],
+      "parameters": [
+        {
+          "name": "company",
+          "type": "Company",
+          "kind": "RequestBody",
+          "wire_name": "company",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        }
+      ],
+      "request_fields": {
+        "id": "Long",
+        "name": "String",
+        "description": "String",
+        "rating": "Double"
+      },
+      "return_type": "ResponseEntity<Company>",
+      "ui": null
+    },
+    "file": "companyms/src/main/java/com/mohit/companyms/Company/CompanyController.java",
+    "line": 20,
+    "source_sha256": "e14e4585abbfac5aa729bdc2be48f4dfe053f88813ca25ac0b0edad3e658d5e4",
+    "fact_text": "{\"annotations\": [{\"args\": \"\", \"name\": \"PostMapping\"}], \"entry\": \"method:companyms:com.mohit.companyms.Company.CompanyController#createCompany(Company)\", \"http_method\": \"POST\", \"method\": \"createCompany\", \"owner\": \"com.mohit.companyms.Company.CompanyController\", \"parameters\": [{\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"RequestBody\", \"name\": \"company\", \"required\": true, \"type\": \"Company\", \"wire_name\": \"company\"}], \"request_fields\": {\"description\": \"String\", \"id\": \"Long\", \"name\": \"String\", \"rating\": \"Double\"}, \"return_type\": \"ResponseEntity<Company>\", \"route\": [\"companies\"], \"ui\": null}",
+    "chunks": [
+      {
+        "id": "chunk:method:companyms:com.mohit.companyms.Company.CompanyController#createCompany(Company):444:687",
+        "entry": "method:companyms:com.mohit.companyms.Company.CompanyController#createCompany(Company)",
+        "file": "companyms/src/main/java/com/mohit/companyms/Company/CompanyController.java",
+        "line": 20,
+        "end_line": 25,
+        "start_byte": 444,
+        "end_byte": 687,
+        "source_sha256": "e14e4585abbfac5aa729bdc2be48f4dfe053f88813ca25ac0b0edad3e658d5e4",
+        "sha256": "effd68a40abff0382eab7066a74e3b361fa59b64d4419660d4bc1ebe992d7c1f",
+        "text": "@PostMapping\n    public ResponseEntity<Company> createCompany(@RequestBody Company  company){\n\n          Company CreatedCompany = service.createCompany(company);\n          return new ResponseEntity<>(CreatedCompany , HttpStatus.CREATED);\n    }"
+      }
+    ]
+  },
+  "method:companyms:com.mohit.companyms.Company.CompanyController#deleteCompany(Long)|": {
+    "contract_id": "method:companyms:com.mohit.companyms.Company.CompanyController#deleteCompany(Long)|",
+    "entry": "method:companyms:com.mohit.companyms.Company.CompanyController#deleteCompany(Long)",
+    "facts": {
+      "entry": "method:companyms:com.mohit.companyms.Company.CompanyController#deleteCompany(Long)",
+      "method": "deleteCompany",
+      "owner": "com.mohit.companyms.Company.CompanyController",
+      "http_method": "DELETE",
+      "route": [
+        "companies",
+        "{id}"
+      ],
+      "annotations": [
+        {
+          "name": "DeleteMapping",
+          "args": "(\"/{id}\")"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "type": "Long",
+          "kind": "PathVariable",
+          "wire_name": "id",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        }
+      ],
+      "request_fields": {
+        "id": "Long"
+      },
+      "return_type": "ResponseEntity<String>",
+      "ui": null
+    },
+    "file": "companyms/src/main/java/com/mohit/companyms/Company/CompanyController.java",
+    "line": 33,
+    "source_sha256": "e14e4585abbfac5aa729bdc2be48f4dfe053f88813ca25ac0b0edad3e658d5e4",
+    "fact_text": "{\"annotations\": [{\"args\": \"(\\\"/{id}\\\")\", \"name\": \"DeleteMapping\"}], \"entry\": \"method:companyms:com.mohit.companyms.Company.CompanyController#deleteCompany(Long)\", \"http_method\": \"DELETE\", \"method\": \"deleteCompany\", \"owner\": \"com.mohit.companyms.Company.CompanyController\", \"parameters\": [{\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"PathVariable\", \"name\": \"id\", \"required\": true, \"type\": \"Long\", \"wire_name\": \"id\"}], \"request_fields\": {\"id\": \"Long\"}, \"return_type\": \"ResponseEntity<String>\", \"route\": [\"companies\", \"{id}\"], \"ui\": null}",
+    "chunks": [
+      {
+        "id": "chunk:method:companyms:com.mohit.companyms.Company.CompanyController#deleteCompany(Long):877:1287",
+        "entry": "method:companyms:com.mohit.companyms.Company.CompanyController#deleteCompany(Long)",
+        "file": "companyms/src/main/java/com/mohit/companyms/Company/CompanyController.java",
+        "line": 33,
+        "end_line": 44,
+        "start_byte": 877,
+        "end_byte": 1287,
+        "source_sha256": "e14e4585abbfac5aa729bdc2be48f4dfe053f88813ca25ac0b0edad3e658d5e4",
+        "sha256": "9a58690c1be194dd22e63d599756a3c3a007420001edea0944b9962180f87c77",
+        "text": "@DeleteMapping(\"/{id}\")\n    public ResponseEntity<String>  deleteCompany( @PathVariable  Long id){\n         boolean deleteCompanyStatus = service.deleteCompany(id);\n\n         if( deleteCompanyStatus){\n             return  new ResponseEntity<>(\"Delete succefully\" , HttpStatus.OK);\n         }else {\n             return  new ResponseEntity<>(\"Deleted is not succesfully\", HttpStatus.CONFLICT);\n         }\n\n\n    }"
+      }
+    ]
+  },
+  "method:companyms:com.mohit.companyms.Company.CompanyController#getAllCompany()|": {
+    "contract_id": "method:companyms:com.mohit.companyms.Company.CompanyController#getAllCompany()|",
+    "entry": "method:companyms:com.mohit.companyms.Company.CompanyController#getAllCompany()",
+    "facts": {
+      "entry": "method:companyms:com.mohit.companyms.Company.CompanyController#getAllCompany()",
+      "method": "getAllCompany",
+      "owner": "com.mohit.companyms.Company.CompanyController",
+      "http_method": "GET",
+      "route": [
+        "companies"
+      ],
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": ""
+        }
+      ],
+      "parameters": [],
+      "request_fields": {},
+      "return_type": "ResponseEntity<List<Company>>",
+      "ui": null
+    },
+    "file": "companyms/src/main/java/com/mohit/companyms/Company/CompanyController.java",
+    "line": 56,
+    "source_sha256": "e14e4585abbfac5aa729bdc2be48f4dfe053f88813ca25ac0b0edad3e658d5e4",
+    "fact_text": "{\"annotations\": [{\"args\": \"\", \"name\": \"GetMapping\"}], \"entry\": \"method:companyms:com.mohit.companyms.Company.CompanyController#getAllCompany()\", \"http_method\": \"GET\", \"method\": \"getAllCompany\", \"owner\": \"com.mohit.companyms.Company.CompanyController\", \"parameters\": [], \"request_fields\": {}, \"return_type\": \"ResponseEntity<List<Company>>\", \"route\": [\"companies\"], \"ui\": null}",
+    "chunks": [
+      {
+        "id": "chunk:method:companyms:com.mohit.companyms.Company.CompanyController#getAllCompany():1522:1674",
+        "entry": "method:companyms:com.mohit.companyms.Company.CompanyController#getAllCompany()",
+        "file": "companyms/src/main/java/com/mohit/companyms/Company/CompanyController.java",
+        "line": 56,
+        "end_line": 60,
+        "start_byte": 1522,
+        "end_byte": 1674,
+        "source_sha256": "e14e4585abbfac5aa729bdc2be48f4dfe053f88813ca25ac0b0edad3e658d5e4",
+        "sha256": "46208ac38becfcec25ecad53ea466c228de63936e29922527787b9987e8ebe8b",
+        "text": "@GetMapping\n    public ResponseEntity<List<Company>> getAllCompany(){\n\n        return new ResponseEntity<>(service.getAllCompany(),HttpStatus.OK);\n    }"
+      }
+    ]
+  },
+  "method:companyms:com.mohit.companyms.Company.CompanyController#getCompany(Long)|": {
+    "contract_id": "method:companyms:com.mohit.companyms.Company.CompanyController#getCompany(Long)|",
+    "entry": "method:companyms:com.mohit.companyms.Company.CompanyController#getCompany(Long)",
+    "facts": {
+      "entry": "method:companyms:com.mohit.companyms.Company.CompanyController#getCompany(Long)",
+      "method": "getCompany",
+      "owner": "com.mohit.companyms.Company.CompanyController",
+      "http_method": "GET",
+      "route": [
+        "companies",
+        "{id}"
+      ],
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": "(\"/{id}\")"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "type": "Long",
+          "kind": "PathVariable",
+          "wire_name": "id",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        }
+      ],
+      "request_fields": {
+        "id": "Long"
+      },
+      "return_type": "ResponseEntity<Company>",
+      "ui": null
+    },
+    "file": "companyms/src/main/java/com/mohit/companyms/Company/CompanyController.java",
+    "line": 27,
+    "source_sha256": "e14e4585abbfac5aa729bdc2be48f4dfe053f88813ca25ac0b0edad3e658d5e4",
+    "fact_text": "{\"annotations\": [{\"args\": \"(\\\"/{id}\\\")\", \"name\": \"GetMapping\"}], \"entry\": \"method:companyms:com.mohit.companyms.Company.CompanyController#getCompany(Long)\", \"http_method\": \"GET\", \"method\": \"getCompany\", \"owner\": \"com.mohit.companyms.Company.CompanyController\", \"parameters\": [{\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"PathVariable\", \"name\": \"id\", \"required\": true, \"type\": \"Long\", \"wire_name\": \"id\"}], \"request_fields\": {\"id\": \"Long\"}, \"return_type\": \"ResponseEntity<Company>\", \"route\": [\"companies\", \"{id}\"], \"ui\": null}",
+    "chunks": [
+      {
+        "id": "chunk:method:companyms:com.mohit.companyms.Company.CompanyController#getCompany(Long):693:871",
+        "entry": "method:companyms:com.mohit.companyms.Company.CompanyController#getCompany(Long)",
+        "file": "companyms/src/main/java/com/mohit/companyms/Company/CompanyController.java",
+        "line": 27,
+        "end_line": 31,
+        "start_byte": 693,
+        "end_byte": 871,
+        "source_sha256": "e14e4585abbfac5aa729bdc2be48f4dfe053f88813ca25ac0b0edad3e658d5e4",
+        "sha256": "db39224c8274d89bc661e6a865694ecff19d208f32bfc188e12ee7bc423619bf",
+        "text": "@GetMapping(\"/{id}\")\n    public   ResponseEntity<Company>  getCompany( @PathVariable  Long id){\n\n        return  new ResponseEntity<>(service.getCompany(id),HttpStatus.OK);\n    }"
+      }
+    ]
+  },
+  "method:companyms:com.mohit.companyms.Company.CompanyController#updateCompany(Long,Company)|": {
+    "contract_id": "method:companyms:com.mohit.companyms.Company.CompanyController#updateCompany(Long,Company)|",
+    "entry": "method:companyms:com.mohit.companyms.Company.CompanyController#updateCompany(Long,Company)",
+    "facts": {
+      "entry": "method:companyms:com.mohit.companyms.Company.CompanyController#updateCompany(Long,Company)",
+      "method": "updateCompany",
+      "owner": "com.mohit.companyms.Company.CompanyController",
+      "http_method": "PUT",
+      "route": [
+        "companies",
+        "{id}"
+      ],
+      "annotations": [
+        {
+          "name": "PutMapping",
+          "args": "(\"/{id}\")"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "type": "Long",
+          "kind": "PathVariable",
+          "wire_name": "id",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        },
+        {
+          "name": "company",
+          "type": "Company",
+          "kind": "RequestBody",
+          "wire_name": "company",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        }
+      ],
+      "request_fields": {
+        "id": "Long",
+        "name": "String",
+        "description": "String",
+        "rating": "Double"
+      },
+      "return_type": "ResponseEntity<String>",
+      "ui": null
+    },
+    "file": "companyms/src/main/java/com/mohit/companyms/Company/CompanyController.java",
+    "line": 46,
+    "source_sha256": "e14e4585abbfac5aa729bdc2be48f4dfe053f88813ca25ac0b0edad3e658d5e4",
+    "fact_text": "{\"annotations\": [{\"args\": \"(\\\"/{id}\\\")\", \"name\": \"PutMapping\"}], \"entry\": \"method:companyms:com.mohit.companyms.Company.CompanyController#updateCompany(Long,Company)\", \"http_method\": \"PUT\", \"method\": \"updateCompany\", \"owner\": \"com.mohit.companyms.Company.CompanyController\", \"parameters\": [{\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"PathVariable\", \"name\": \"id\", \"required\": true, \"type\": \"Long\", \"wire_name\": \"id\"}, {\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"RequestBody\", \"name\": \"company\", \"required\": true, \"type\": \"Company\", \"wire_name\": \"company\"}], \"request_fields\": {\"description\": \"String\", \"id\": \"Long\", \"name\": \"String\", \"rating\": \"Double\"}, \"return_type\": \"ResponseEntity<String>\", \"route\": [\"companies\", \"{id}\"], \"ui\": null}",
+    "chunks": [
+      {
+        "id": "chunk:method:companyms:com.mohit.companyms.Company.CompanyController#updateCompany(Long,Company):1293:1516",
+        "entry": "method:companyms:com.mohit.companyms.Company.CompanyController#updateCompany(Long,Company)",
+        "file": "companyms/src/main/java/com/mohit/companyms/Company/CompanyController.java",
+        "line": 46,
+        "end_line": 54,
+        "start_byte": 1293,
+        "end_byte": 1516,
+        "source_sha256": "e14e4585abbfac5aa729bdc2be48f4dfe053f88813ca25ac0b0edad3e658d5e4",
+        "sha256": "4eb468ffd6d22c23b2df6860fb345cfdb510fd640a990523938b91f9ec6ebdde",
+        "text": "@PutMapping(\"/{id}\")\n    public ResponseEntity<String>  updateCompany(@PathVariable Long id, @RequestBody Company company){\n\n\n\n        return  new  ResponseEntity<>(service.updateCompany(id,company), HttpStatus.OK);\n\n\n    }"
+      }
+    ]
+  },
+  "method:jobms:com.mohit.jobms.job.JobController#createJob(Job)|": {
+    "contract_id": "method:jobms:com.mohit.jobms.job.JobController#createJob(Job)|",
+    "entry": "method:jobms:com.mohit.jobms.job.JobController#createJob(Job)",
+    "facts": {
+      "entry": "method:jobms:com.mohit.jobms.job.JobController#createJob(Job)",
+      "method": "createJob",
+      "owner": "com.mohit.jobms.job.JobController",
+      "http_method": "POST",
+      "route": [
+        "jobs"
+      ],
+      "annotations": [
+        {
+          "name": "PostMapping",
+          "args": ""
+        }
+      ],
+      "parameters": [
+        {
+          "name": "job",
+          "type": "Job",
+          "kind": "RequestBody",
+          "wire_name": "job",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        }
+      ],
+      "request_fields": {
+        "id": "Long",
+        "title": "String",
+        "description": "String",
+        "minSalary": "String",
+        "maxSalary": "String",
+        "location": "String",
+        "company": "Long"
+      },
+      "return_type": "ResponseEntity<String>",
+      "ui": null
+    },
+    "file": "jobms/src/main/java/com/mohit/jobms/job/JobController.java",
+    "line": 25,
+    "source_sha256": "4673c453073f91c1ff4097f97560c401252cfb7cb508a25e2b877fce01828219",
+    "fact_text": "{\"annotations\": [{\"args\": \"\", \"name\": \"PostMapping\"}], \"entry\": \"method:jobms:com.mohit.jobms.job.JobController#createJob(Job)\", \"http_method\": \"POST\", \"method\": \"createJob\", \"owner\": \"com.mohit.jobms.job.JobController\", \"parameters\": [{\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"RequestBody\", \"name\": \"job\", \"required\": true, \"type\": \"Job\", \"wire_name\": \"job\"}], \"request_fields\": {\"company\": \"Long\", \"description\": \"String\", \"id\": \"Long\", \"location\": \"String\", \"maxSalary\": \"String\", \"minSalary\": \"String\", \"title\": \"String\"}, \"return_type\": \"ResponseEntity<String>\", \"route\": [\"jobs\"], \"ui\": null}",
+    "chunks": [
+      {
+        "id": "chunk:method:jobms:com.mohit.jobms.job.JobController#createJob(Job):557:760",
+        "entry": "method:jobms:com.mohit.jobms.job.JobController#createJob(Job)",
+        "file": "jobms/src/main/java/com/mohit/jobms/job/JobController.java",
+        "line": 25,
+        "end_line": 31,
+        "start_byte": 557,
+        "end_byte": 760,
+        "source_sha256": "4673c453073f91c1ff4097f97560c401252cfb7cb508a25e2b877fce01828219",
+        "sha256": "747a6a8cadbacd74841b6f848b92f63f16bdf8697623b234c89c9baeab2fd89c",
+        "text": "@PostMapping\n    public ResponseEntity<String> createJob(@RequestBody Job job){\n\n        jobService.createJob(job);\n\n        return new ResponseEntity<>(\"Job added succesfully\",HttpStatus.CREATED);\n    }"
+      }
+    ]
+  },
+  "method:jobms:com.mohit.jobms.job.JobController#deleteJob(Long)|": {
+    "contract_id": "method:jobms:com.mohit.jobms.job.JobController#deleteJob(Long)|",
+    "entry": "method:jobms:com.mohit.jobms.job.JobController#deleteJob(Long)",
+    "facts": {
+      "entry": "method:jobms:com.mohit.jobms.job.JobController#deleteJob(Long)",
+      "method": "deleteJob",
+      "owner": "com.mohit.jobms.job.JobController",
+      "http_method": "DELETE",
+      "route": [
+        "jobs",
+        "{id}"
+      ],
+      "annotations": [
+        {
+          "name": "DeleteMapping",
+          "args": "(\"/{id}\")"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "type": "Long",
+          "kind": "PathVariable",
+          "wire_name": "id",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        }
+      ],
+      "request_fields": {
+        "id": "Long"
+      },
+      "return_type": "ResponseEntity<String>",
+      "ui": null
+    },
+    "file": "jobms/src/main/java/com/mohit/jobms/job/JobController.java",
+    "line": 45,
+    "source_sha256": "4673c453073f91c1ff4097f97560c401252cfb7cb508a25e2b877fce01828219",
+    "fact_text": "{\"annotations\": [{\"args\": \"(\\\"/{id}\\\")\", \"name\": \"DeleteMapping\"}], \"entry\": \"method:jobms:com.mohit.jobms.job.JobController#deleteJob(Long)\", \"http_method\": \"DELETE\", \"method\": \"deleteJob\", \"owner\": \"com.mohit.jobms.job.JobController\", \"parameters\": [{\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"PathVariable\", \"name\": \"id\", \"required\": true, \"type\": \"Long\", \"wire_name\": \"id\"}], \"request_fields\": {\"id\": \"Long\"}, \"return_type\": \"ResponseEntity<String>\", \"route\": [\"jobs\", \"{id}\"], \"ui\": null}",
+    "chunks": [
+      {
+        "id": "chunk:method:jobms:com.mohit.jobms.job.JobController#deleteJob(Long):1071:1393",
+        "entry": "method:jobms:com.mohit.jobms.job.JobController#deleteJob(Long)",
+        "file": "jobms/src/main/java/com/mohit/jobms/job/JobController.java",
+        "line": 45,
+        "end_line": 54,
+        "start_byte": 1071,
+        "end_byte": 1393,
+        "source_sha256": "4673c453073f91c1ff4097f97560c401252cfb7cb508a25e2b877fce01828219",
+        "sha256": "212ebb32523447be894fdd9ddbdccd1be550f4b84a387161591a91d1dcfa63bf",
+        "text": "@DeleteMapping(\"/{id}\")\n    public ResponseEntity<String> deleteJob(@PathVariable Long id){\n\n        boolean deleted = jobService.deleteJobById(id);\n\n        if (deleted)\n            return new  ResponseEntity<>(\"deletion succesfull\",HttpStatus.NOT_FOUND);\n\n        return new ResponseEntity<>(HttpStatus.NOT_FOUND);\n    }"
+      }
+    ]
+  },
+  "method:jobms:com.mohit.jobms.job.JobController#findAll()|": {
+    "contract_id": "method:jobms:com.mohit.jobms.job.JobController#findAll()|",
+    "entry": "method:jobms:com.mohit.jobms.job.JobController#findAll()",
+    "facts": {
+      "entry": "method:jobms:com.mohit.jobms.job.JobController#findAll()",
+      "method": "findAll",
+      "owner": "com.mohit.jobms.job.JobController",
+      "http_method": "GET",
+      "route": [
+        "jobs"
+      ],
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": ""
+        }
+      ],
+      "parameters": [],
+      "request_fields": {},
+      "return_type": "ResponseEntity<List<JobDTO>>",
+      "ui": null
+    },
+    "file": "jobms/src/main/java/com/mohit/jobms/job/JobController.java",
+    "line": 19,
+    "source_sha256": "4673c453073f91c1ff4097f97560c401252cfb7cb508a25e2b877fce01828219",
+    "fact_text": "{\"annotations\": [{\"args\": \"\", \"name\": \"GetMapping\"}], \"entry\": \"method:jobms:com.mohit.jobms.job.JobController#findAll()\", \"http_method\": \"GET\", \"method\": \"findAll\", \"owner\": \"com.mohit.jobms.job.JobController\", \"parameters\": [], \"request_fields\": {}, \"return_type\": \"ResponseEntity<List<JobDTO>>\", \"route\": [\"jobs\"], \"ui\": null}",
+    "chunks": [
+      {
+        "id": "chunk:method:jobms:com.mohit.jobms.job.JobController#findAll():426:551",
+        "entry": "method:jobms:com.mohit.jobms.job.JobController#findAll()",
+        "file": "jobms/src/main/java/com/mohit/jobms/job/JobController.java",
+        "line": 19,
+        "end_line": 23,
+        "start_byte": 426,
+        "end_byte": 551,
+        "source_sha256": "4673c453073f91c1ff4097f97560c401252cfb7cb508a25e2b877fce01828219",
+        "sha256": "ee8ff758d18f0271651f3c1bb37ae73adef8e8899a78a188364173cc2a22886f",
+        "text": "@GetMapping\n    public ResponseEntity<List<JobDTO>> findAll(){\n\n        return ResponseEntity.ok(jobService.findAll());\n    }"
+      }
+    ]
+  },
+  "method:jobms:com.mohit.jobms.job.JobController#getJob(Long)|": {
+    "contract_id": "method:jobms:com.mohit.jobms.job.JobController#getJob(Long)|",
+    "entry": "method:jobms:com.mohit.jobms.job.JobController#getJob(Long)",
+    "facts": {
+      "entry": "method:jobms:com.mohit.jobms.job.JobController#getJob(Long)",
+      "method": "getJob",
+      "owner": "com.mohit.jobms.job.JobController",
+      "http_method": "GET",
+      "route": [
+        "jobs",
+        "{id}"
+      ],
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": "(\"/{id}\")"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "type": "Long",
+          "kind": "PathVariable",
+          "wire_name": "id",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        }
+      ],
+      "request_fields": {
+        "id": "Long"
+      },
+      "return_type": "ResponseEntity<JobDTO>",
+      "ui": null
+    },
+    "file": "jobms/src/main/java/com/mohit/jobms/job/JobController.java",
+    "line": 33,
+    "source_sha256": "4673c453073f91c1ff4097f97560c401252cfb7cb508a25e2b877fce01828219",
+    "fact_text": "{\"annotations\": [{\"args\": \"(\\\"/{id}\\\")\", \"name\": \"GetMapping\"}], \"entry\": \"method:jobms:com.mohit.jobms.job.JobController#getJob(Long)\", \"http_method\": \"GET\", \"method\": \"getJob\", \"owner\": \"com.mohit.jobms.job.JobController\", \"parameters\": [{\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"PathVariable\", \"name\": \"id\", \"required\": true, \"type\": \"Long\", \"wire_name\": \"id\"}], \"request_fields\": {\"id\": \"Long\"}, \"return_type\": \"ResponseEntity<JobDTO>\", \"route\": [\"jobs\", \"{id}\"], \"ui\": null}",
+    "chunks": [
+      {
+        "id": "chunk:method:jobms:com.mohit.jobms.job.JobController#getJob(Long):766:1065",
+        "entry": "method:jobms:com.mohit.jobms.job.JobController#getJob(Long)",
+        "file": "jobms/src/main/java/com/mohit/jobms/job/JobController.java",
+        "line": 33,
+        "end_line": 43,
+        "start_byte": 766,
+        "end_byte": 1065,
+        "source_sha256": "4673c453073f91c1ff4097f97560c401252cfb7cb508a25e2b877fce01828219",
+        "sha256": "05f77bdd3dd2e6c7822c8f6e23c1f006474d6e5c0706643f7ac8b7d114b791a2",
+        "text": "@GetMapping(\"/{id}\")\n    public ResponseEntity<JobDTO> getJob(@PathVariable Long id){\n\n        JobDTO job = jobService.getJobById(id);\n\n        if(job != null){\n             return  new ResponseEntity<>(job, HttpStatus.OK);\n\n        }\n        return new ResponseEntity<>(HttpStatus.NOT_FOUND);\n    }"
+      }
+    ]
+  },
+  "method:jobms:com.mohit.jobms.job.JobController#updateJob(Long,Job)|": {
+    "contract_id": "method:jobms:com.mohit.jobms.job.JobController#updateJob(Long,Job)|",
+    "entry": "method:jobms:com.mohit.jobms.job.JobController#updateJob(Long,Job)",
+    "facts": {
+      "entry": "method:jobms:com.mohit.jobms.job.JobController#updateJob(Long,Job)",
+      "method": "updateJob",
+      "owner": "com.mohit.jobms.job.JobController",
+      "http_method": "PUT",
+      "route": [
+        "jobs",
+        "{id}"
+      ],
+      "annotations": [
+        {
+          "name": "PutMapping",
+          "args": "(\"/{id}\")"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "type": "Long",
+          "kind": "PathVariable",
+          "wire_name": "id",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        },
+        {
+          "name": "updatedJob",
+          "type": "Job",
+          "kind": "RequestBody",
+          "wire_name": "updatedJob",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        }
+      ],
+      "request_fields": {
+        "id": "Long",
+        "title": "String",
+        "description": "String",
+        "minSalary": "String",
+        "maxSalary": "String",
+        "location": "String",
+        "company": "Long"
+      },
+      "return_type": "ResponseEntity<String>",
+      "ui": null
+    },
+    "file": "jobms/src/main/java/com/mohit/jobms/job/JobController.java",
+    "line": 56,
+    "source_sha256": "4673c453073f91c1ff4097f97560c401252cfb7cb508a25e2b877fce01828219",
+    "fact_text": "{\"annotations\": [{\"args\": \"(\\\"/{id}\\\")\", \"name\": \"PutMapping\"}], \"entry\": \"method:jobms:com.mohit.jobms.job.JobController#updateJob(Long,Job)\", \"http_method\": \"PUT\", \"method\": \"updateJob\", \"owner\": \"com.mohit.jobms.job.JobController\", \"parameters\": [{\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"PathVariable\", \"name\": \"id\", \"required\": true, \"type\": \"Long\", \"wire_name\": \"id\"}, {\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"RequestBody\", \"name\": \"updatedJob\", \"required\": true, \"type\": \"Job\", \"wire_name\": \"updatedJob\"}], \"request_fields\": {\"company\": \"Long\", \"description\": \"String\", \"id\": \"Long\", \"location\": \"String\", \"maxSalary\": \"String\", \"minSalary\": \"String\", \"title\": \"String\"}, \"return_type\": \"ResponseEntity<String>\", \"route\": [\"jobs\", \"{id}\"], \"ui\": null}",
+    "chunks": [
+      {
+        "id": "chunk:method:jobms:com.mohit.jobms.job.JobController#updateJob(Long,Job):1399:1751",
+        "entry": "method:jobms:com.mohit.jobms.job.JobController#updateJob(Long,Job)",
+        "file": "jobms/src/main/java/com/mohit/jobms/job/JobController.java",
+        "line": 56,
+        "end_line": 63,
+        "start_byte": 1399,
+        "end_byte": 1751,
+        "source_sha256": "4673c453073f91c1ff4097f97560c401252cfb7cb508a25e2b877fce01828219",
+        "sha256": "ab02520af0763857027e3aa3547920ecbe393529c529f71157441d615cb56334",
+        "text": "@PutMapping(\"/{id}\")\n    public ResponseEntity<String> updateJob(@PathVariable Long id, @RequestBody Job updatedJob){\n        boolean updated = jobService.updateJob(id, updatedJob);\n        if (updated)\n            return new  ResponseEntity<>(\"Job updated succesfully\", HttpStatus.OK);\n        return new ResponseEntity<>(HttpStatus.NOT_FOUND);\n\n    }"
+      }
+    ]
+  },
+  "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#addReview(Long,Review)|": {
+    "contract_id": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#addReview(Long,Review)|",
+    "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#addReview(Long,Review)",
+    "facts": {
+      "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#addReview(Long,Review)",
+      "method": "addReview",
+      "owner": "com.mohit.reviewms.Reviews.ReviewController",
+      "http_method": "POST",
+      "route": [
+        "reviews"
+      ],
+      "annotations": [
+        {
+          "name": "PostMapping",
+          "args": ""
+        }
+      ],
+      "parameters": [
+        {
+          "name": "companyId",
+          "type": "Long",
+          "kind": "RequestParam",
+          "wire_name": "companyId",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        },
+        {
+          "name": "review",
+          "type": "Review",
+          "kind": "RequestBody",
+          "wire_name": "review",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        }
+      ],
+      "request_fields": {
+        "companyId": "Long",
+        "id": "Long",
+        "title": "String",
+        "description": "String",
+        "rating": "double"
+      },
+      "return_type": "ResponseEntity<String>",
+      "ui": null
+    },
+    "file": "reviewms/src/main/java/com/mohit/reviewms/Reviews/ReviewController.java",
+    "line": 32,
+    "source_sha256": "f3f47a9fdc7abb7412d312c0ccd5354386cdfa1ca7504f7fa2a613765f36341f",
+    "fact_text": "{\"annotations\": [{\"args\": \"\", \"name\": \"PostMapping\"}], \"entry\": \"method:reviewms:com.mohit.reviewms.Reviews.ReviewController#addReview(Long,Review)\", \"http_method\": \"POST\", \"method\": \"addReview\", \"owner\": \"com.mohit.reviewms.Reviews.ReviewController\", \"parameters\": [{\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"RequestParam\", \"name\": \"companyId\", \"required\": true, \"type\": \"Long\", \"wire_name\": \"companyId\"}, {\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"RequestBody\", \"name\": \"review\", \"required\": true, \"type\": \"Review\", \"wire_name\": \"review\"}], \"request_fields\": {\"companyId\": \"Long\", \"description\": \"String\", \"id\": \"Long\", \"rating\": \"double\", \"title\": \"String\"}, \"return_type\": \"ResponseEntity<String>\", \"route\": [\"reviews\"], \"ui\": null}",
+    "chunks": [
+      {
+        "id": "chunk:method:reviewms:com.mohit.reviewms.Reviews.ReviewController#addReview(Long,Review):870:1351",
+        "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#addReview(Long,Review)",
+        "file": "reviewms/src/main/java/com/mohit/reviewms/Reviews/ReviewController.java",
+        "line": 32,
+        "end_line": 44,
+        "start_byte": 870,
+        "end_byte": 1351,
+        "source_sha256": "f3f47a9fdc7abb7412d312c0ccd5354386cdfa1ca7504f7fa2a613765f36341f",
+        "sha256": "c45698c9a267e85b415272955f859e5c58f5effb0a8bc2fcb51245986d812591",
+        "text": "@PostMapping\n    public ResponseEntity<String>  addReview(@RequestParam Long companyId, @RequestBody Review review){\n\n        boolean isReviewSaved =   reviewService.CreateReview(companyId,review);\n        if (isReviewSaved){\n            reviewMessageProducer.sendMessage(review);\n            return  new ResponseEntity<>(\"revieve added succesfully\",HttpStatus.OK);\n        }else {\n\n            return new ResponseEntity<>(\"Review not added\",HttpStatus.NOT_FOUND);\n        }\n\n    }"
+      }
+    ]
+  },
+  "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#deleteReview(Long)|": {
+    "contract_id": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#deleteReview(Long)|",
+    "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#deleteReview(Long)",
+    "facts": {
+      "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#deleteReview(Long)",
+      "method": "deleteReview",
+      "owner": "com.mohit.reviewms.Reviews.ReviewController",
+      "http_method": "DELETE",
+      "route": [
+        "reviews",
+        "{reviewId}"
+      ],
+      "annotations": [
+        {
+          "name": "DeleteMapping",
+          "args": "(\"/{reviewId}\")"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "reviewId",
+          "type": "Long",
+          "kind": "PathVariable",
+          "wire_name": "reviewId",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        }
+      ],
+      "request_fields": {
+        "reviewId": "Long"
+      },
+      "return_type": "ResponseEntity<String>",
+      "ui": null
+    },
+    "file": "reviewms/src/main/java/com/mohit/reviewms/Reviews/ReviewController.java",
+    "line": 69,
+    "source_sha256": "f3f47a9fdc7abb7412d312c0ccd5354386cdfa1ca7504f7fa2a613765f36341f",
+    "fact_text": "{\"annotations\": [{\"args\": \"(\\\"/{reviewId}\\\")\", \"name\": \"DeleteMapping\"}], \"entry\": \"method:reviewms:com.mohit.reviewms.Reviews.ReviewController#deleteReview(Long)\", \"http_method\": \"DELETE\", \"method\": \"deleteReview\", \"owner\": \"com.mohit.reviewms.Reviews.ReviewController\", \"parameters\": [{\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"PathVariable\", \"name\": \"reviewId\", \"required\": true, \"type\": \"Long\", \"wire_name\": \"reviewId\"}], \"request_fields\": {\"reviewId\": \"Long\"}, \"return_type\": \"ResponseEntity<String>\", \"route\": [\"reviews\", \"{reviewId}\"], \"ui\": null}",
+    "chunks": [
+      {
+        "id": "chunk:method:reviewms:com.mohit.reviewms.Reviews.ReviewController#deleteReview(Long):2047:2406",
+        "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#deleteReview(Long)",
+        "file": "reviewms/src/main/java/com/mohit/reviewms/Reviews/ReviewController.java",
+        "line": 69,
+        "end_line": 81,
+        "start_byte": 2047,
+        "end_byte": 2406,
+        "source_sha256": "f3f47a9fdc7abb7412d312c0ccd5354386cdfa1ca7504f7fa2a613765f36341f",
+        "sha256": "b937bd09d475187b30fe0d785e2abfadc244a5a4b4fcdce39f15a4ec9417e67c",
+        "text": "@DeleteMapping(\"/{reviewId}\")\n    public  ResponseEntity<String> deleteReview( @PathVariable Long reviewId){\n\n         if (reviewService.deleteReview( reviewId)){\n\n             return  new ResponseEntity<>(\"deleted\",HttpStatus.OK);\n         }else {\n\n             return new ResponseEntity<>(\" not deleted\",HttpStatus.INTERNAL_SERVER_ERROR);\n         }\n\n\n    }"
+      }
+    ]
+  },
+  "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getAllreview(Long)|": {
+    "contract_id": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getAllreview(Long)|",
+    "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getAllreview(Long)",
+    "facts": {
+      "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getAllreview(Long)",
+      "method": "getAllreview",
+      "owner": "com.mohit.reviewms.Reviews.ReviewController",
+      "http_method": "GET",
+      "route": [
+        "reviews"
+      ],
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": ""
+        }
+      ],
+      "parameters": [
+        {
+          "name": "companyId",
+          "type": "Long",
+          "kind": "RequestParam",
+          "wire_name": "companyId",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        }
+      ],
+      "request_fields": {
+        "companyId": "Long"
+      },
+      "return_type": "ResponseEntity<List<Review>>",
+      "ui": null
+    },
+    "file": "reviewms/src/main/java/com/mohit/reviewms/Reviews/ReviewController.java",
+    "line": 26,
+    "source_sha256": "f3f47a9fdc7abb7412d312c0ccd5354386cdfa1ca7504f7fa2a613765f36341f",
+    "fact_text": "{\"annotations\": [{\"args\": \"\", \"name\": \"GetMapping\"}], \"entry\": \"method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getAllreview(Long)\", \"http_method\": \"GET\", \"method\": \"getAllreview\", \"owner\": \"com.mohit.reviewms.Reviews.ReviewController\", \"parameters\": [{\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"RequestParam\", \"name\": \"companyId\", \"required\": true, \"type\": \"Long\", \"wire_name\": \"companyId\"}], \"request_fields\": {\"companyId\": \"Long\"}, \"return_type\": \"ResponseEntity<List<Review>>\", \"route\": [\"reviews\"], \"ui\": null}",
+    "chunks": [
+      {
+        "id": "chunk:method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getAllreview(Long):670:864",
+        "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getAllreview(Long)",
+        "file": "reviewms/src/main/java/com/mohit/reviewms/Reviews/ReviewController.java",
+        "line": 26,
+        "end_line": 30,
+        "start_byte": 670,
+        "end_byte": 864,
+        "source_sha256": "f3f47a9fdc7abb7412d312c0ccd5354386cdfa1ca7504f7fa2a613765f36341f",
+        "sha256": "7bcb6c9dbe362c0d0601129369e3b56a954ed61c8eae88d13690ff2f0d77c8f7",
+        "text": "@GetMapping\n    public ResponseEntity<List<Review>> getAllreview(@RequestParam Long companyId) {\n\n        return new ResponseEntity<>(reviewService.getAllreview(companyId), HttpStatus.OK);\n    }"
+      }
+    ]
+  },
+  "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getAverageRating(Long)|": {
+    "contract_id": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getAverageRating(Long)|",
+    "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getAverageRating(Long)",
+    "facts": {
+      "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getAverageRating(Long)",
+      "method": "getAverageRating",
+      "owner": "com.mohit.reviewms.Reviews.ReviewController",
+      "http_method": "GET",
+      "route": [
+        "reviews",
+        "averageRating"
+      ],
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": "(\"/averageRating\")"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "companyId",
+          "type": "Long",
+          "kind": "RequestParam",
+          "wire_name": "companyId",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        }
+      ],
+      "request_fields": {
+        "companyId": "Long"
+      },
+      "return_type": "Double",
+      "ui": null
+    },
+    "file": "reviewms/src/main/java/com/mohit/reviewms/Reviews/ReviewController.java",
+    "line": 83,
+    "source_sha256": "f3f47a9fdc7abb7412d312c0ccd5354386cdfa1ca7504f7fa2a613765f36341f",
+    "fact_text": "{\"annotations\": [{\"args\": \"(\\\"/averageRating\\\")\", \"name\": \"GetMapping\"}], \"entry\": \"method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getAverageRating(Long)\", \"http_method\": \"GET\", \"method\": \"getAverageRating\", \"owner\": \"com.mohit.reviewms.Reviews.ReviewController\", \"parameters\": [{\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"RequestParam\", \"name\": \"companyId\", \"required\": true, \"type\": \"Long\", \"wire_name\": \"companyId\"}], \"request_fields\": {\"companyId\": \"Long\"}, \"return_type\": \"Double\", \"route\": [\"reviews\", \"averageRating\"], \"ui\": null}",
+    "chunks": [
+      {
+        "id": "chunk:method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getAverageRating(Long):2412:2674",
+        "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getAverageRating(Long)",
+        "file": "reviewms/src/main/java/com/mohit/reviewms/Reviews/ReviewController.java",
+        "line": 83,
+        "end_line": 89,
+        "start_byte": 2412,
+        "end_byte": 2674,
+        "source_sha256": "f3f47a9fdc7abb7412d312c0ccd5354386cdfa1ca7504f7fa2a613765f36341f",
+        "sha256": "c7d49a8024c0cf9d564ee1cc0dddad67afb3adb29a5c8da60e6e9a9a1617b114",
+        "text": "@GetMapping(\"/averageRating\")\n    public Double getAverageRating(@RequestParam Long companyId){\n\n       List<Review> reviewList =  reviewService.getAllreview(companyId);\n       return reviewList.stream().mapToDouble(Review::getRating).average().orElse(0);\n\n    }"
+      }
+    ]
+  },
+  "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getReview(Long)|": {
+    "contract_id": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getReview(Long)|",
+    "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getReview(Long)",
+    "facts": {
+      "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getReview(Long)",
+      "method": "getReview",
+      "owner": "com.mohit.reviewms.Reviews.ReviewController",
+      "http_method": "GET",
+      "route": [
+        "reviews",
+        "{reviewId}"
+      ],
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": "(\"/{reviewId}\")"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "reviewId",
+          "type": "Long",
+          "kind": "PathVariable",
+          "wire_name": "reviewId",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        }
+      ],
+      "request_fields": {
+        "reviewId": "Long"
+      },
+      "return_type": "ResponseEntity<Review>",
+      "ui": null
+    },
+    "file": "reviewms/src/main/java/com/mohit/reviewms/Reviews/ReviewController.java",
+    "line": 46,
+    "source_sha256": "f3f47a9fdc7abb7412d312c0ccd5354386cdfa1ca7504f7fa2a613765f36341f",
+    "fact_text": "{\"annotations\": [{\"args\": \"(\\\"/{reviewId}\\\")\", \"name\": \"GetMapping\"}], \"entry\": \"method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getReview(Long)\", \"http_method\": \"GET\", \"method\": \"getReview\", \"owner\": \"com.mohit.reviewms.Reviews.ReviewController\", \"parameters\": [{\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"PathVariable\", \"name\": \"reviewId\", \"required\": true, \"type\": \"Long\", \"wire_name\": \"reviewId\"}], \"request_fields\": {\"reviewId\": \"Long\"}, \"return_type\": \"ResponseEntity<Review>\", \"route\": [\"reviews\", \"{reviewId}\"], \"ui\": null}",
+    "chunks": [
+      {
+        "id": "chunk:method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getReview(Long):1357:1551",
+        "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getReview(Long)",
+        "file": "reviewms/src/main/java/com/mohit/reviewms/Reviews/ReviewController.java",
+        "line": 46,
+        "end_line": 50,
+        "start_byte": 1357,
+        "end_byte": 1551,
+        "source_sha256": "f3f47a9fdc7abb7412d312c0ccd5354386cdfa1ca7504f7fa2a613765f36341f",
+        "sha256": "084abd0f626c5300b24d70a3fd19e5d4a87882cf25b32d119584ff16b36247dd",
+        "text": "@GetMapping(\"/{reviewId}\")\n    public  ResponseEntity<Review> getReview(@PathVariable Long reviewId){\n\n        return new ResponseEntity<>(reviewService.getReview(reviewId),HttpStatus.OK);\n    }"
+      }
+    ]
+  },
+  "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#updateReview(Long,Review)|": {
+    "contract_id": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#updateReview(Long,Review)|",
+    "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#updateReview(Long,Review)",
+    "facts": {
+      "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#updateReview(Long,Review)",
+      "method": "updateReview",
+      "owner": "com.mohit.reviewms.Reviews.ReviewController",
+      "http_method": "PUT",
+      "route": [
+        "reviews",
+        "{reviewId}"
+      ],
+      "annotations": [
+        {
+          "name": "PutMapping",
+          "args": "(\"/{reviewId}\")"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "reviewId",
+          "type": "Long",
+          "kind": "PathVariable",
+          "wire_name": "reviewId",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        },
+        {
+          "name": "review",
+          "type": "Review",
+          "kind": "RequestBody",
+          "wire_name": "review",
+          "required": true,
+          "default": {
+            "knowledge": "unknown"
+          },
+          "explicit_name": false,
+          "custom_conversion": false,
+          "binding_metadata_unknown": false
+        }
+      ],
+      "request_fields": {
+        "reviewId": "Long",
+        "id": "Long",
+        "title": "String",
+        "description": "String",
+        "rating": "double",
+        "companyId": "Long"
+      },
+      "return_type": "ResponseEntity<String>",
+      "ui": null
+    },
+    "file": "reviewms/src/main/java/com/mohit/reviewms/Reviews/ReviewController.java",
+    "line": 53,
+    "source_sha256": "f3f47a9fdc7abb7412d312c0ccd5354386cdfa1ca7504f7fa2a613765f36341f",
+    "fact_text": "{\"annotations\": [{\"args\": \"(\\\"/{reviewId}\\\")\", \"name\": \"PutMapping\"}], \"entry\": \"method:reviewms:com.mohit.reviewms.Reviews.ReviewController#updateReview(Long,Review)\", \"http_method\": \"PUT\", \"method\": \"updateReview\", \"owner\": \"com.mohit.reviewms.Reviews.ReviewController\", \"parameters\": [{\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"PathVariable\", \"name\": \"reviewId\", \"required\": true, \"type\": \"Long\", \"wire_name\": \"reviewId\"}, {\"binding_metadata_unknown\": false, \"custom_conversion\": false, \"default\": {\"knowledge\": \"unknown\"}, \"explicit_name\": false, \"kind\": \"RequestBody\", \"name\": \"review\", \"required\": true, \"type\": \"Review\", \"wire_name\": \"review\"}], \"request_fields\": {\"companyId\": \"Long\", \"description\": \"String\", \"id\": \"Long\", \"rating\": \"double\", \"reviewId\": \"Long\", \"title\": \"String\"}, \"return_type\": \"ResponseEntity<String>\", \"route\": [\"reviews\", \"{reviewId}\"], \"ui\": null}",
+    "chunks": [
+      {
+        "id": "chunk:method:reviewms:com.mohit.reviewms.Reviews.ReviewController#updateReview(Long,Review):1558:2041",
+        "entry": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#updateReview(Long,Review)",
+        "file": "reviewms/src/main/java/com/mohit/reviewms/Reviews/ReviewController.java",
+        "line": 53,
+        "end_line": 67,
+        "start_byte": 1558,
+        "end_byte": 2041,
+        "source_sha256": "f3f47a9fdc7abb7412d312c0ccd5354386cdfa1ca7504f7fa2a613765f36341f",
+        "sha256": "d4a1b0393965f8997fcce667526f4cd9ba4ab7b9cefaa12f1cf1081dc97cb273",
+        "text": "@PutMapping(\"/{reviewId}\")\n    public ResponseEntity<String> updateReview(@PathVariable Long reviewId,\n                                               @RequestBody Review review){\n\n          boolean isReviewUpdated =   reviewService.updateReview( reviewId, review);\n\n          if (isReviewUpdated){\n\n              return  new ResponseEntity<>(\"updated\",HttpStatus.OK);\n          }else {\n\n              return new ResponseEntity<>(\"Not Updated\",HttpStatus.NOT_FOUND);\n          }\n\n   }"
+      }
+    ]
+  }
+}

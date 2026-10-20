@@ -1,0 +1,53 @@
+........................................................................ [  4%]
+........................................................................ [  9%]
+........................................................................ [ 13%]
+........................................................................ [ 18%]
+........................................................................ [ 23%]
+........................................................................ [ 27%]
+........................................................................ [ 32%]
+........................................................................ [ 37%]
+........................................................................ [ 41%]
+........................................................................ [ 46%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 60%]
+........................................................................ [ 64%]
+........................................................................ [ 69%]
+........................................................................ [ 74%]
+...................................................F.................... [ 78%]
+........................................................................ [ 83%]
+........................................................................ [ 88%]
+........................................................................ [ 92%]
+...........F................................F........................... [ 97%]
+........................................                                 [100%]
+=================================== FAILURES ===================================
+____________ test_explicit_header_value_is_bound_case_insensitively ____________
+solutions/—_request-event-foundation/code/tests/test_review10_execution.py:238: in test_explicit_header_value_is_bound_case_insensitively
+    assert Engine(project,ScenarioState(db)).run(ids['Caller.entry'],{})=='north'
+E   AssertionError: assert <Unknown.VALUE: 'unknown'> == 'north'
+E    +  where <Unknown.VALUE: 'unknown'> = run('method:service:Caller#entry()', {})
+E    +    where run = <analyzer.engine.Engine object at 0x111163090>.run
+E    +      where <analyzer.engine.Engine object at 0x111163090> = Engine(<analyzer.project.Project object at 0x111408510>, <analyzer.state.ScenarioState object at 0x111270cd0>)
+E    +        where <analyzer.state.ScenarioState object at 0x111270cd0> = ScenarioState(<analyzer.state.Database object at 0x1112e29d0>)
+_____ test_explicit_selection_carries_identity_and_fields_to_later_request _____
+solutions/—_request-event-foundation/code/tests/test_source_inputs.py:462: in test_explicit_selection_carries_identity_and_fields_to_later_request
+    assert choice['result']=='b:Second'
+E   AssertionError: assert <Unknown.VALUE: 'unknown'> == 'b:Second'
+----------------------------- Captured stdout call -----------------------------
+library-focus step 1 paths 1
+library-focus step 2 paths 1
+library-focus step 3 paths 1
+library-focus step 4 paths 1
+library-focus step 5 paths 1
+_ test_unobserved_preparation_does_not_become_confirmed_in_next_request[False] _
+solutions/—_request-event-foundation/code/tests/test_state_certainty.py:51: in test_unobserved_preparation_does_not_become_confirmed_in_next_request
+    assert ids['Api.approved'] in {e['target'] for e in second['edges'] if e['relation']=='executes'}
+E   AssertionError: assert 'method:service:Api#approved()' in {'method:service:Api#inspect()'}
+----------------------------- Captured stdout call -----------------------------
+widgets step 1 paths 1
+widgets step 2 paths 1
+=========================== short test summary info ============================
+FAILED solutions/—_request-event-foundation/code/tests/test_review10_execution.py::test_explicit_header_value_is_bound_case_insensitively
+FAILED solutions/—_request-event-foundation/code/tests/test_source_inputs.py::test_explicit_selection_carries_identity_and_fields_to_later_request
+FAILED solutions/—_request-event-foundation/code/tests/test_state_certainty.py::test_unobserved_preparation_does_not_become_confirmed_in_next_request[False]
+3 failed, 1549 passed in 4.43s

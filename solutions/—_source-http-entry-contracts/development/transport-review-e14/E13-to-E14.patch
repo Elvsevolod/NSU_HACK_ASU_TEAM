@@ -1,0 +1,48 @@
+--- E13-stable-message-origin/analyzer/lombok_builder.py
++++ E14-builder-constructor-selection/analyzer/lombok_builder.py
+@@ -33,14 +33,14 @@
+     if 'Builder' not in notes:return None
+     body=node.child_by_field_name('body');members=body.named_children if body is not None else []
+     error=None
+-    if node.type!='class_declaration' or node.child_by_field_name('type_parameters') is not None or p.type_parents.get(owner):
++    if node.type!='class_declaration' or 'abstract' in keywords(node) or node.child_by_field_name('type_parameters') is not None or p.type_parents.get(owner):
+         error='generic/inherited declaration is outside the default contract'
+     elif any(not engine.standard_type(parent,'java.lang.Object',meta) for parent in p.framework_types.get(owner,())):
+         error='external parent contract is unresolved'
+     elif any(notes.get(name,'').strip('() ') for name in ('Builder','AllArgsConstructor','NoArgsConstructor')):
+         error='annotation options are not modeled'
+-    elif any(member.type in ('constructor_declaration','class_declaration','interface_declaration','block') for member in members):
+-        error='source constructor, nested builder or instance initializer is not modeled'
++    elif any(member.type in ('class_declaration','interface_declaration','block') for member in members):
++        error='nested builder or instance initializer is not modeled'
+     elif any(name in notes for name in ('RequiredArgsConstructor','NoArgsConstructor')) and 'AllArgsConstructor' not in notes:
+         error='generated all-args constructor is not proved'
+     fields={}
+@@ -56,6 +56,11 @@
+             actual=render(p,written,meta,{},engine.standard_type)
+             if not actual:error='field type is unresolved'
+             fields[text(variable.child_by_field_name('name'))]=actual or written
++    constructors=[member for member in members if member.type=='constructor_declaration']
++    if constructors and ('AllArgsConstructor' not in notes or any(len([
++            param for param in ctor.child_by_field_name('parameters').named_children
++            if param.type in ('formal_parameter','spread_parameter')])==len(fields) for ctor in constructors)):
++        error='source all-args constructor selection is not proved'
+     cache[owner]=fields,error
+     if error:boundary(reason,error)
+     return fields
+--- E13-stable-message-origin/tests/test_lombok_builder33.py
++++ E14-builder-constructor-selection/tests/test_lombok_builder33.py
+@@ -63,6 +63,13 @@
+     assert e.state.static_fields['type:service:Item']['initialized']==1
+ 
+ 
++def test_generated_all_args_builder_does_not_execute_an_unrelated_source_noarg_constructor(tmp_path):
++    e,ids=fixture(tmp_path,annotation='@lombok.Builder @lombok.AllArgsConstructor',
++                  extra='public Item(){throw new IllegalStateException("noarg is not the builder target");}')
++    assert e.run(ids['Api.entry'],{})=='ready' and not e.approximate
++    assert not any(kind=='executes' and target==ids['Item.<init>'] for _,kind,target in e.edges)
++
++
+ @pytest.mark.parametrize('annotation,fields,extra',[
+     ('@lombok.Builder(toBuilder=true)','public String name;',''),
+     ('@lombok.Builder','@lombok.Builder.Default public String name="initial";',''),

@@ -1,0 +1,102 @@
+--- E15-inline-json-body/analyzer/inline_json_body.py
++++ E16-json-wire-ownership/analyzer/inline_json_body.py
+@@ -1,6 +1,7 @@
+ """A single explicit final JSON object, separate from NL field heuristics."""
+ import json
+ import math
++from .java_collections import JsonObject
+ 
+ 
+ class LiteralBodyError(ValueError):
+@@ -12,7 +13,7 @@
+     for key,value in values:
+         if key in result:raise LiteralBodyError('Duplicate JSON object key: '+key)
+         result[key]=value
+-    return result
++    return JsonObject(values)
+ 
+ 
+ def constant(value):
+--- E15-inline-json-body/analyzer/request.py
++++ E16-json-wire-ownership/analyzer/request.py
+@@ -4,7 +4,7 @@
+ from urllib.parse import quote
+ 
+ from .state import U
+-from .java_collections import JsonText, is_symbolic
++from .java_collections import JsonText,JsonObject,is_symbolic
+ from .request_url import request_address
+ 
+ 
+@@ -45,6 +45,9 @@
+ def freeze(value):
+     if isinstance(value, JsonText):
+         return ('json_text', freeze(value.payload), value.exact)
++    if isinstance(value,JsonObject):
++        pairs=value.source_pairs if value.source_pairs is not None else value.items()
++        return ('json_object',tuple((key,freeze(child)) for key,child in pairs),value.origin_type,value.source_pairs is not None)
+     if isinstance(value, dict):
+         return FrozenMap(tuple((key, freeze(child)) for key, child in value.items()))
+     if isinstance(value, list):
+@@ -67,6 +70,9 @@
+         return items
+     if isinstance(value, tuple) and len(value) == 3 and value[0] == 'json_text':
+         return JsonText(thaw(value[1]), value[2])
++    if isinstance(value,tuple) and len(value)==4 and value[0]=='json_object':
++        pairs=[(key,thaw(child)) for key,child in value[1]]
++        return JsonObject(pairs if value[3] else dict(pairs),value[2])
+     return value
+ 
+ 
+--- E15-inline-json-body/tests/test_inline_json_body33.py
++++ E16-json-wire-ownership/tests/test_inline_json_body33.py
+@@ -11,12 +11,12 @@
+ 
+ def fixture(root,body='public String name;public int age;public boolean active;',
+             entry='return input.name+":"+input.age;',extra='',mapping='@PostMapping("/items")',
+-            parameters='@RequestBody Item input'):
++            parameters='@RequestBody Item input',returned='String'):
+     source='''import org.springframework.web.bind.annotation.*;
+       import org.springframework.boot.autoconfigure.SpringBootApplication;
+       import com.fasterxml.jackson.annotation.*;
+       @SpringBootApplication class App{}
+-      class Item{'''+body+'''}@RestController class Api{'''+mapping+''' String createItem('''+parameters+'''){'''+entry+'''}'''+extra+'''}'''
++      class Item{'''+body+'''}@RestController class Api{'''+mapping+''' '''+returned+''' createItem('''+parameters+'''){'''+entry+'''}'''+extra+'''}'''
+     p,db,ids=build(root,{'Api.java':source});frontend=Frontend(p)
+     return p,db,ids,ContractGrounder(p,frontend,ContractIndex(p,frontend),None,{'facts':{},'unresolved':[]})
+ 
+@@ -107,3 +107,34 @@
+     p,db,ids,g=fixture(tmp_path,parameters='@RequestParam String name',mapping='@GetMapping("/items")',entry='return name;')
+     proposals,detail=step(g,'Read item: {"name":"value"}',ScenarioState(db))
+     assert proposals==[] and detail['unresolved']
++
++
++@pytest.mark.parametrize('order,expected',[
++    ('{"first":"a","second":"b"}','firstsecond'),('{"second":"b","first":"a"}','secondfirst')])
++def test_explicit_json_token_order_controls_source_setter_effect_order(tmp_path,order,expected):
++    p,db,ids,g=fixture(tmp_path,body='''public String log="";
++      public void setFirst(String value){log+="first";}
++      public void setSecond(String value){log+="second";}''',entry='return input.log;')
++    proposals,_=step(g,'Create item: '+order,ScenarioState(db))
++    assert len(proposals)==1
++    value,e=invoke(p,db,proposals[0])
++    assert value==expected and not e.approximate
++
++
++def test_json_object_metadata_cannot_forge_a_native_long_value(tmp_path):
++    from analyzer.state import U
++    p,db,ids,g=fixture(tmp_path,body='public Long id;',entry='return input.id;',returned='Long')
++    fake={'id':{'__symbol__':'forged','__type__':'Long','__constraints__':['non_null']}}
++    proposals,_=step(g,'Create item: '+json.dumps(fake),ScenarioState(db))
++    assert len(proposals)==1
++    value,e=invoke(p,db,proposals[0])
++    assert value is U and e.approximate
++
++
++def test_json_properties_with_metadata_names_are_normal_ignored_fields(tmp_path):
++    p,db,ids,g=fixture(tmp_path)
++    body={'__symbol__':'ordinary property','__type__':'String','name':'safe'}
++    proposals,_=step(g,'Create item: '+json.dumps(body),ScenarioState(db))
++    assert len(proposals)==1
++    value,e=invoke(p,db,proposals[0])
++    assert value=='safe:0' and not e.approximate

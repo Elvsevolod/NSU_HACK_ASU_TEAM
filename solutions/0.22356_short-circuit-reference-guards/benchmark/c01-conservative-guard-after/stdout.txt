@@ -1,0 +1,22 @@
+.....F....                                                               [100%]
+=================================== FAILURES ===================================
+__ test_conservative_null_guard_preserves_its_fact_inside_the_unmerged_branch __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-237/test_conservative_null_guard_p0')
+
+    def test_conservative_null_guard_preserves_its_fact_inside_the_unmerged_branch(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''import java.util.Locale;class Api{
+          String normalize(String value){if(value==null || value.isEmpty())return value;
+            return value.replace(" ","").toLowerCase(Locale.ROOT);}
+          String entry(String value){return normalize(value);}}'''})
+        rows=run_paths(p,ScenarioState(db),ids['Api.entry'],{'value':U},limit=1)
+        assert rows and all(r['engine'].outcome=='returned' for r in rows)
+        assert not any('NullPointerException' in w for r in rows for w in r['engine'].warnings)
+>       assert all(r['exploration']['completion_splits']==0 for r in rows)
+E       assert False
+E        +  where False = all(<generator object test_conservative_null_guard_preserves_its_fact_inside_the_unmerged_branch.<locals>.<genexpr> at 0x10346bac0>)
+
+code/tests/test_short_circuit_reference34.py:54: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_short_circuit_reference34.py::test_conservative_null_guard_preserves_its_fact_inside_the_unmerged_branch
+1 failed, 9 passed in 0.16s

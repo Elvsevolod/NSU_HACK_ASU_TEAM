@@ -1,0 +1,47 @@
+...........................................FF........................... [ 78%]
+....................                                                     [100%]
+=================================== FAILURES ===================================
+_ test_a_later_response_must_prove_the_same_created_identity[7-HTTP error response-True-False] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-204/test_a_later_response_must_pro2')
+value = 7, outcome = 'HTTP error response', complete = True, accepted = False
+
+    @pytest.mark.parametrize('value,outcome,complete,accepted',[
+        (7,'returned',True,True),(8,'returned',True,False),
+        (7,'HTTP error response',True,False),(7,'returned',False,False),
+    ])
+    def test_a_later_response_must_prove_the_same_created_identity(tmp_path,value,outcome,complete,accepted):
+        p,ids,g,state=fixture(tmp_path);later=deepcopy(state.history[0])
+        later.update(step=2,entry=ids['ParcelController.getById'],action='Read the parcel',outcome=outcome)
+        later['result']['id']=value;later['exploration']['complete']=complete
+        state.history.append(later)
+        proposals,detail=g.step('Read the parcel just created again',state)
+>       assert bool(proposals)==accepted
+E       AssertionError: assert True == False
+E        +  where True = bool([{'actor': <Unknown.VALUE: 'unknown'>, 'bindings': {'id': {'producer_observation': {'digest': '0f7cf696ea64373d4448245...ult.id', 'resolved': True, ...}}, 'body_omissions': {}, 'entry': 'method:service:ParcelController#getById(Long)', ...}])
+
+code/tests/test_history_request_choice33.py:114: AssertionError
+_ test_a_later_response_must_prove_the_same_created_identity[7-returned-False-False] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-204/test_a_later_response_must_pro3')
+value = 7, outcome = 'returned', complete = False, accepted = False
+
+    @pytest.mark.parametrize('value,outcome,complete,accepted',[
+        (7,'returned',True,True),(8,'returned',True,False),
+        (7,'HTTP error response',True,False),(7,'returned',False,False),
+    ])
+    def test_a_later_response_must_prove_the_same_created_identity(tmp_path,value,outcome,complete,accepted):
+        p,ids,g,state=fixture(tmp_path);later=deepcopy(state.history[0])
+        later.update(step=2,entry=ids['ParcelController.getById'],action='Read the parcel',outcome=outcome)
+        later['result']['id']=value;later['exploration']['complete']=complete
+        state.history.append(later)
+        proposals,detail=g.step('Read the parcel just created again',state)
+>       assert bool(proposals)==accepted
+E       AssertionError: assert True == False
+E        +  where True = bool([{'actor': <Unknown.VALUE: 'unknown'>, 'bindings': {'id': {'producer_observation': {'digest': '0f7cf696ea64373d4448245...ult.id', 'resolved': True, ...}}, 'body_omissions': {}, 'entry': 'method:service:ParcelController#getById(Long)', ...}])
+
+code/tests/test_history_request_choice33.py:114: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_history_request_choice33.py::test_a_later_response_must_prove_the_same_created_identity[7-HTTP error response-True-False]
+FAILED code/tests/test_history_request_choice33.py::test_a_later_response_must_prove_the_same_created_identity[7-returned-False-False]
+2 failed, 90 passed in 0.49s

@@ -1,0 +1,99 @@
+{
+  "project": "fixture",
+  "scenarios": {
+    "review-journey": {
+      "edges": [
+        {
+          "source": "scenario:review-journey",
+          "relation": "executes",
+          "target": "method:review:Gateway#cancelBooking(String)"
+        },
+        {
+          "source": "scenario:review-journey",
+          "relation": "executes",
+          "target": "method:review:Gateway#createBooking(BookingInput)"
+        },
+        {
+          "source": "scenario:review-journey",
+          "relation": "executes",
+          "target": "method:review:Gateway#failed()"
+        },
+        {
+          "source": "scenario:review-journey",
+          "relation": "executes",
+          "target": "method:review:Gateway#inspectBooking(String)"
+        },
+        {
+          "source": "scenario:review-journey",
+          "relation": "executes",
+          "target": "method:review:Gateway#listBookings()"
+        },
+        {
+          "source": "scenario:review-journey",
+          "relation": "executes",
+          "target": "method:review:Warehouse#list()"
+        },
+        {
+          "source": "scenario:review-journey",
+          "relation": "executes",
+          "target": "method:review:Warehouse#read(String)"
+        },
+        {
+          "source": "scenario:review-journey",
+          "relation": "executes",
+          "target": "method:review:Warehouse#remove(String)"
+        },
+        {
+          "source": "scenario:review-journey",
+          "relation": "executes",
+          "target": "method:review:Warehouse#reserve(BookingInput)"
+        },
+        {
+          "source": "method:review:Gateway#cancelBooking(String)",
+          "relation": "remote",
+          "target": "method:review:Warehouse#remove(String)"
+        },
+        {
+          "source": "method:review:Gateway#createBooking(BookingInput)",
+          "relation": "calls",
+          "target": "method:review:Gateway#failed()"
+        },
+        {
+          "source": "method:review:Gateway#createBooking(BookingInput)",
+          "relation": "remote",
+          "target": "method:review:Warehouse#reserve(BookingInput)"
+        },
+        {
+          "source": "method:review:Gateway#inspectBooking(String)",
+          "relation": "remote",
+          "target": "method:review:Warehouse#read(String)"
+        },
+        {
+          "source": "method:review:Gateway#listBookings()",
+          "relation": "remote",
+          "target": "method:review:Warehouse#list()"
+        },
+        {
+          "source": "method:review:Warehouse#list()",
+          "relation": "data",
+          "target": "res:table:review.bookings"
+        },
+        {
+          "source": "method:review:Warehouse#read(String)",
+          "relation": "data",
+          "target": "res:table:review.bookings"
+        },
+        {
+          "source": "method:review:Warehouse#remove(String)",
+          "relation": "data",
+          "target": "res:table:review.bookings"
+        },
+        {
+          "source": "method:review:Warehouse#reserve(BookingInput)",
+          "relation": "data",
+          "target": "res:table:review.bookings"
+        }
+      ]
+    }
+  }
+}

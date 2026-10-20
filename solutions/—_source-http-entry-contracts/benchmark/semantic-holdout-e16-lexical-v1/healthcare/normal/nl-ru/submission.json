@@ -1,0 +1,73 @@
+{
+  "project": "holdout-healthcare-v1",
+  "scenarios": {
+    "healthcare-ambiguous-ru": {
+      "edges": []
+    },
+    "healthcare-fresh-state-nl-ru": {
+      "edges": []
+    },
+    "healthcare-no-handler-ru": {
+      "edges": []
+    },
+    "healthcare-state-chain-nl-ru": {
+      "edges": [
+        {
+          "source": "scenario:healthcare-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+        },
+        {
+          "source": "scenario:healthcare-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "relation": "calls",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+          "relation": "calls",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)",
+          "relation": "data",
+          "target": "res:table:hospital_db.patients"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "relation": "data",
+          "target": "res:table:hospital_db.patients"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+          "relation": "calls",
+          "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+        },
+        {
+          "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+          "relation": "data",
+          "target": "res:table:hospital_db.patients"
+        }
+      ]
+    }
+  }
+}

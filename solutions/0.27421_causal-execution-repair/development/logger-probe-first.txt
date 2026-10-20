@@ -1,0 +1,109 @@
+FFFFF.                                                                   [100%]
+=================================== FAILURES ===================================
+______ test_standard_logger_spelling_keeps_the_same_continuation[LOGGER] _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-112/test_standard_logger_spelling_0')
+receiver = 'LOGGER'
+
+    @pytest.mark.parametrize('receiver', ['LOGGER', 'Api.LOGGER', 'sample.Api.LOGGER'])
+    def test_standard_logger_spelling_keeps_the_same_continuation(tmp_path, receiver):
+        project, database, ids = qualified_project(tmp_path, {'Api.java': '''package sample;
+          import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+          class Api {static final Logger LOGGER=LoggerFactory.getLogger(Api.class);
+            int entry(){''' + receiver + '''.info("message {}", 3); return after();}
+            int after(){return 17;} }'''})
+        outcomes = run_paths(project, ScenarioState(database), ids['Api.entry'], {}, limit=1)
+        assert outcomes and all(row['result'] == 17 for row in outcomes)
+        assert all(any(target == ids['Api.after'] for _, relation, target in row['engine'].edges
+                       if relation == 'executes') for row in outcomes)
+>       assert not any(effect['operation'] == 'info' for row in outcomes for effect in row['engine'].call_effects)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_causal-execution-repair/code/tests/test_regression_logger.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x10472bac0>
+
+>   assert not any(effect['operation'] == 'info' for row in outcomes for effect in row['engine'].call_effects)
+                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'Engine' object has no attribute 'call_effects'
+
+solutions/—_causal-execution-repair/code/tests/test_regression_logger.py:32: AttributeError
+____ test_standard_logger_spelling_keeps_the_same_continuation[Api.LOGGER] _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-112/test_standard_logger_spelling_1')
+receiver = 'Api.LOGGER'
+
+    @pytest.mark.parametrize('receiver', ['LOGGER', 'Api.LOGGER', 'sample.Api.LOGGER'])
+    def test_standard_logger_spelling_keeps_the_same_continuation(tmp_path, receiver):
+        project, database, ids = qualified_project(tmp_path, {'Api.java': '''package sample;
+          import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+          class Api {static final Logger LOGGER=LoggerFactory.getLogger(Api.class);
+            int entry(){''' + receiver + '''.info("message {}", 3); return after();}
+            int after(){return 17;} }'''})
+        outcomes = run_paths(project, ScenarioState(database), ids['Api.entry'], {}, limit=1)
+>       assert outcomes and all(row['result'] == 17 for row in outcomes)
+E       AssertionError: assert ([{'approximate': True, 'decisions': {'1:call:method:service:Api#entry()@4:32:opaque-completion': 'normal'}, 'engine': ...@4:32:opaque-completion': 'throw'}, 'engine': <analyzer.engine.Engine object at 0x105823390>, 'pruned_paths': [], ...}] and False)
+E        +  where False = all(<generator object test_standard_logger_spelling_keeps_the_same_continuation.<locals>.<genexpr> at 0x10475f030>)
+
+solutions/—_causal-execution-repair/code/tests/test_regression_logger.py:29: AssertionError
+_ test_standard_logger_spelling_keeps_the_same_continuation[sample.Api.LOGGER] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-112/test_standard_logger_spelling_2')
+receiver = 'sample.Api.LOGGER'
+
+    @pytest.mark.parametrize('receiver', ['LOGGER', 'Api.LOGGER', 'sample.Api.LOGGER'])
+    def test_standard_logger_spelling_keeps_the_same_continuation(tmp_path, receiver):
+        project, database, ids = qualified_project(tmp_path, {'Api.java': '''package sample;
+          import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+          class Api {static final Logger LOGGER=LoggerFactory.getLogger(Api.class);
+            int entry(){''' + receiver + '''.info("message {}", 3); return after();}
+            int after(){return 17;} }'''})
+        outcomes = run_paths(project, ScenarioState(database), ids['Api.entry'], {}, limit=1)
+>       assert outcomes and all(row['result'] == 17 for row in outcomes)
+E       AssertionError: assert ([{'approximate': True, 'decisions': {'1:call:method:service:Api#entry()@4:39:opaque-completion': 'normal'}, 'engine': ...@4:39:opaque-completion': 'throw'}, 'engine': <analyzer.engine.Engine object at 0x1047732d0>, 'pruned_paths': [], ...}] and False)
+E        +  where False = all(<generator object test_standard_logger_spelling_keeps_the_same_continuation.<locals>.<genexpr> at 0x105b85970>)
+
+solutions/—_causal-execution-repair/code/tests/test_regression_logger.py:29: AssertionError
+__________ test_imported_static_logger_uses_the_declaring_field_type ___________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-112/test_imported_static_logger_us0')
+
+    def test_imported_static_logger_uses_the_declaring_field_type(tmp_path):
+        project, database, ids = qualified_project(tmp_path, {
+            'Api.java': '''package sample; import org.slf4j.Logger;
+              class Api {public static final Logger LOGGER=null;}''',
+            'Other.java': '''package sample; import static sample.Api.LOGGER;
+              class Other {int entry(){LOGGER.debug("quiet");return 23;}}'''})
+        # The model is source-typed; a runtime null field must still throw. A supplied
+        # external logger is represented by the usual uninitialized framework value.
+        project.constants.pop('Api.LOGGER', None)
+        outcomes = run_paths(project, ScenarioState(database), ids['Other.entry'], {}, limit=1)
+>       assert outcomes and all(row['result'] == 23 for row in outcomes)
+E       AssertionError: assert ([{'approximate': True, 'decisions': {'1:call:method:service:Other#entry()@2:43:opaque-completion': 'normal'}, 'engine'...@2:43:opaque-completion': 'throw'}, 'engine': <analyzer.engine.Engine object at 0x105b58d90>, 'pruned_paths': [], ...}] and False)
+E        +  where False = all(<generator object test_imported_static_logger_uses_the_declaring_field_type.<locals>.<genexpr> at 0x105b87510>)
+
+solutions/—_causal-execution-repair/code/tests/test_regression_logger.py:45: AssertionError
+________________ test_logger_arguments_keep_source_side_effects ________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-112/test_logger_arguments_keep_sou0')
+
+    def test_logger_arguments_keep_source_side_effects(tmp_path):
+        project, database, ids = qualified_project(tmp_path, {'Api.java': '''package sample;
+          import org.slf4j.Logger;
+          class Api {Logger log; int count;
+            int touch(){count++;return count;}
+            int entry(){log.debug("value {}",touch());return count;} }'''})
+        outcomes = run_paths(project, ScenarioState(database), ids['Api.entry'], {}, limit=1)
+>       assert outcomes and all(row['result'] == 1 for row in outcomes)
+E       AssertionError: assert ([{'approximate': True, 'decisions': {}, 'engine': <analyzer.engine.Engine object at 0x105b5a350>, 'pruned_paths': [], ...}] and False)
+E        +  where False = all(<generator object test_logger_arguments_keep_source_side_effects.<locals>.<genexpr> at 0x105b86f60>)
+
+solutions/—_causal-execution-repair/code/tests/test_regression_logger.py:56: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_logger.py::test_standard_logger_spelling_keeps_the_same_continuation[LOGGER]
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_logger.py::test_standard_logger_spelling_keeps_the_same_continuation[Api.LOGGER]
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_logger.py::test_standard_logger_spelling_keeps_the_same_continuation[sample.Api.LOGGER]
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_logger.py::test_imported_static_logger_uses_the_declaring_field_type
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_logger.py::test_logger_arguments_keep_source_side_effects
+5 failed, 1 passed in 0.14s

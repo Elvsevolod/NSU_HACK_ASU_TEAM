@@ -1,0 +1,144 @@
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 13%]
+........................F............................................... [ 17%]
+........................................................................ [ 22%]
+.........................................F.............................. [ 26%]
+................................FFF..F.................................. [ 31%]
+........................................................................ [ 35%]
+........................................................................ [ 40%]
+........................................................................ [ 44%]
+........................................................................ [ 49%]
+........................................................................ [ 53%]
+........................................................................ [ 57%]
+........................................................................ [ 62%]
+........................................................................ [ 66%]
+........................................................................ [ 71%]
+........................................................................ [ 75%]
+........................................................................ [ 80%]
+........................................................................ [ 84%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+..............................                                           [100%]
+=================================== FAILURES ===================================
+________________ test_grounding_has_no_independent_ui_selection ________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-144/test_grounding_has_no_independ0')
+
+    def test_grounding_has_no_independent_ui_selection(tmp_path):
+        sources = dict(LIBRARY)
+        javascript = '''$.ajax({url:"/books", type:"POST", data:{title:"A"}});
+        $.ajax({url:"/catalog", type:"GET", data:{query:"B"}});'''
+        project, db, ids = build(tmp_path, sources)
+        (tmp_path / 'ui.js').write_text(javascript)
+        frontend = Frontend(project)
+        index = ContractIndex(project, frontend)
+        grounder = ContractGrounder(project, frontend, index, None, {'facts': {}})
+        choices, detail = grounder.step('Add book title "New book"', ScenarioState(db))
+        assert choices and choices[0]['entry'] == ids['BookController.add']
+>       assert choices[0]['entry'] in choices[0]['site']['handlers']
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'NoneType' object is not subscriptable
+
+tests/test_contracts.py:76: TypeError
+_____ test_ordinal_choice_follows_its_ui_producer_not_an_unrelated_listing _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-144/test_ordinal_choice_follows_it0')
+
+    def test_ordinal_choice_follows_its_ui_producer_not_an_unrelated_listing(tmp_path):
+        sources={'Api.java':'''import java.util.*;
+          class Api {
+            @PostMapping("/parcels") int add(@RequestBody Parcel input){return input.coating;}
+            @GetMapping("/coatings") List<CoatingType> list(){List<CoatingType> output=new ArrayList<>();
+              for(CoatingType item:CoatingType.values()){output.add(item);} return output;}
+          } class Parcel {int coating;}
+          enum CoatingType {GOLD(17),SILVER(43);int code;CoatingType(int code){this.code=code;}}
+          class Unrelated {List<CoatingType> all(){List<CoatingType> output=new ArrayList<>();
+            for(CoatingType item:CoatingType.values()){output.add(item);}return output;}}
+        '''}
+        def bind(folder, java, transform=''):
+            project, db, _=build(folder, {'Api.java':java})
+            (folder/'ui.js').write_text('''function load(){ $.ajax({url:"/coatings",type:"GET",
+              success:function(reply){var rows=reply;var control=document.getElementById("coat");
+              TRANSFORM
+              for(var i=0;i<rows.length;i++){var opt=document.createElement("option");
+                opt.value=rows[i].code;opt.innerText=rows[i].code;control.appendChild(opt);}}});}
+              function add(){ $.ajax({url:"/parcels",type:"POST",data:{coating:$("#coat").val()}}); }
+            '''.replace('TRANSFORM',transform))
+            frontend=Frontend(project)
+            grounder=ContractGrounder(project,frontend,ContractIndex(project,frontend),None,{'facts':{}})
+            choices,_=grounder.step('Add parcel with coating of the second type',ScenarioState(db))
+            return choices[0]['params']
+>       assert bind(tmp_path/'plain',sources['Api.java'])['coating']==43
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'coating'
+
+tests/test_dom_choices.py:125: KeyError
+________ test_source_equations_transfer_a_selected_row_across_handlers _________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-144/test_source_equations_transfer0')
+
+    def test_source_equations_transfer_a_selected_row_across_handlers(tmp_path):
+        grounder,site,state=form_fixture(tmp_path)
+        proposal=grounder.step('Amend the second invoice',state)[0][0]
+>       assert proposal['params']=={'invoiceId':'two','destination':'South','name':'Bea','date':'2024-01-09'}
+E       AssertionError: assert {'invoiceId': 'two'} == {'date': '202...'name': 'Bea'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Right contains 3 more items:
+E         {'date': '2024-01-09', 'destination': 'South', 'name': 'Bea'}
+E         Use -v to get more diff
+
+tests/test_form_flow.py:112: AssertionError
+________ test_new_edit_cannot_reuse_an_old_prefill_without_a_new_value _________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-144/test_new_edit_cannot_reuse_an_0')
+
+    def test_new_edit_cannot_reuse_an_old_prefill_without_a_new_value(tmp_path):
+        grounder,site,state=form_fixture(tmp_path)
+        proposal=grounder.step("Change the second invoice's name",state)[0][0]
+        assert 'name' not in proposal['params']
+>       assert proposal['params']['destination']=='South'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'destination'
+
+tests/test_form_flow.py:123: KeyError
+_____ test_ambiguous_writers_and_unobserved_collections_prevent_projection _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-144/test_ambiguous_writers_and_uno0')
+
+    def test_ambiguous_writers_and_unobserved_collections_prevent_projection(tmp_path):
+        grounder,site,state=form_fixture(tmp_path,',replace(){this.place="different";}')
+        proposal=grounder.step('Amend the second invoice',state)[0][0]
+>       assert proposal['params']['destination']==''
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'destination'
+
+tests/test_form_flow.py:131: KeyError
+__________ test_preparation_reads_the_state_before_user_input_updates __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-144/test_preparation_reads_the_sta0')
+
+    def test_preparation_reads_the_state_before_user_input_updates(tmp_path):
+        grounder,site,state=form_fixture(tmp_path)
+        source=grounder.project.root/site['file']
+        source.write_text(source.read_text().replace('this.place=label;this.caption=person;','this.caption=this.place;this.place=label;'))
+        frontend=Frontend(grounder.project)
+        grounder=ContractGrounder(grounder.project,frontend,ContractIndex(grounder.project,frontend),None,{'facts':{}})
+        state.browser['form']['place']='Before'
+        proposal=grounder.step('Amend the second invoice with destination="After"',state)[0][0]
+        assert proposal['params']['destination']=='After'
+>       assert proposal['params']['name']=='Before'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'name'
+
+tests/test_form_flow.py:161: KeyError
+=========================== short test summary info ============================
+FAILED tests/test_contracts.py::test_grounding_has_no_independent_ui_selection
+FAILED tests/test_dom_choices.py::test_ordinal_choice_follows_its_ui_producer_not_an_unrelated_listing
+FAILED tests/test_form_flow.py::test_source_equations_transfer_a_selected_row_across_handlers
+FAILED tests/test_form_flow.py::test_new_edit_cannot_reuse_an_old_prefill_without_a_new_value
+FAILED tests/test_form_flow.py::test_ambiguous_writers_and_unobserved_collections_prevent_projection
+FAILED tests/test_form_flow.py::test_preparation_reads_the_state_before_user_input_updates
+6 failed, 1608 passed in 4.93s

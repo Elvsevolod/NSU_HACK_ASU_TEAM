@@ -1,0 +1,75 @@
+--- E12-transport-values-and-witnesses/analyzer/feign_errors.py
++++ E13-stable-message-origin/analyzer/feign_errors.py
+@@ -1,5 +1,7 @@
+ """Default error decoding retains a String's origin, never guessed error bytes."""
+ from copy import deepcopy
++from datetime import datetime
++from decimal import Decimal
+ import hashlib
+ import json
+ import re
+@@ -8,6 +10,13 @@
+ from .java_exceptions import JavaThrow,ExceptionBound
+ from .models import header_values
+ from .state import U
++
++
++def scalar(value):
++    if value is U:return {'unknown':True}
++    if isinstance(value,datetime):return value.isoformat()
++    if isinstance(value,Decimal):return str(value)
++    raise TypeError('Unsupported error-message witness scalar: '+type(value).__name__)
+ 
+ 
+ def default_error(engine,method,target,response,status,request_index,reason):
+@@ -32,7 +41,7 @@
+     facts={'model_version':'feign-default-error-message/1','request_id':event['id'],'status':status,
+            'client_method':method,'request':request,'response_body':deepcopy(payload),
+            'exact_text':False,'limits':['Version, reason phrase, charset and body-preview bytes are not materialized']}
+-    digest=hashlib.sha256(json.dumps(facts,sort_keys=True,ensure_ascii=True,default=str).encode()).hexdigest()[:20]
++    digest=hashlib.sha256(json.dumps(facts,sort_keys=True,ensure_ascii=True,default=scalar).encode()).hexdigest()[:20]
+     message={'__symbol__':'feign-message-'+digest,'__type__':'String','__constraints__':['non_null'],
+              '__feign_error_message__':facts}
+     family=ExceptionBound('feign.FeignException')
+--- E12-transport-values-and-witnesses/tests/test_feign_error_message33.py
++++ E13-stable-message-origin/tests/test_feign_error_message33.py
+@@ -1,11 +1,14 @@
+ """Feign error messages are typed String values with response provenance."""
+ import pytest
++from datetime import datetime
++import hashlib
++import json
+ from builders import build
+ from analyzer.engine import Engine
+ from analyzer.state import ScenarioState,U
+ 
+ 
+-def fixture(root,status=404,extra='',entry='''try{client.read();return after();}
++def fixture(root,status=404,extra='',body='"source error"',returned='String',entry='''try{client.read();return after();}
+     catch(feign.FeignException failure){return failure.getMessage();}'''):
+     p,db,ids=build(root,{'Api.java':'''import org.springframework.cloud.openfeign.*;
+       import org.springframework.boot.autoconfigure.SpringBootApplication;
+@@ -14,7 +17,7 @@
+       @SpringBootApplication @EnableFeignClients class App{}
+       @FeignClient(name="service",url="http://service:8080")interface Client{@GetMapping("/item") String read();}
+       class Api{Client client;String entry(){'''+entry+'''}String after(){return "wrong";}}
+-      @RestController class Target{@GetMapping("/item")ResponseEntity<String> read(){return ResponseEntity.status('''+str(status)+''').body("source error");}}'''+extra})
++      @RestController class Target{@GetMapping("/item")ResponseEntity<'''+returned+'''> read(){return ResponseEntity.status('''+str(status)+''').body('''+body+''');}}'''+extra})
+     return Engine(p,ScenarioState(db)),ids
+ 
+ 
+@@ -46,3 +49,14 @@
+     assert e.run(ids['Api.entry'],{}) is U and e.approximate
+     assert any(kind=='executes' and target==ids['Target.read'] for _,kind,target in e.edges)
+     assert not any(kind=='executes' and target==ids['Api.after'] for _,kind,target in e.edges)
++
++
++def test_error_message_symbol_survives_the_report_datetime_representation(tmp_path):
++    e,ids=fixture(tmp_path,returned='Wire',body='new Wire()',
++        extra='class Wire{public java.time.LocalDateTime timestamp=java.time.LocalDateTime.now();}')
++    e.state.now=datetime(2026,1,2,3,4,5)
++    value=e.run(ids['Api.entry'],{})
++    assert value is not U and not e.approximate
++    recorded=json.loads(json.dumps(value,default=lambda value:value.isoformat()))
++    expected='feign-message-'+hashlib.sha256(json.dumps(recorded['__feign_error_message__'],sort_keys=True,ensure_ascii=True).encode()).hexdigest()[:20]
++    assert recorded['__symbol__']==expected

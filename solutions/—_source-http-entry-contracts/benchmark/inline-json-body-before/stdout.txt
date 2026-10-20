@@ -1,0 +1,233 @@
+FFFFFFFFFFFFF                                                            [100%]
+=================================== FAILURES ===================================
+_ test_literal_json_preserves_string_number_boolean_and_whole_body[Create item: ] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-155/test_literal_json_preserves_st0')
+prefix = 'Create item: '
+
+    @pytest.mark.parametrize('prefix',['Create item: ','Создать item: '])
+    def test_literal_json_preserves_string_number_boolean_and_whole_body(tmp_path,prefix):
+        p,db,ids,g=fixture(tmp_path);body={'name':'Mira Bell / "quoted"','age':29,'active':True}
+        proposals,detail=g.step(prefix+json.dumps(body,ensure_ascii=False),ScenarioState(db))
+        assert len(proposals)==1 and proposals[0]['entry']==ids['Api.createItem']
+        proposal=proposals[0]
+>       assert proposal['request'].body==body and proposal['bindings']['input']['source']=='literal'
+               ^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'request'
+
+code/tests/test_inline_json_body33.py:35: KeyError
+_ test_literal_json_preserves_string_number_boolean_and_whole_body[\u0421\u043e\u0437\u0434\u0430\u0442\u044c item: ] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-155/test_literal_json_preserves_st1')
+prefix = 'Создать item: '
+
+    @pytest.mark.parametrize('prefix',['Create item: ','Создать item: '])
+    def test_literal_json_preserves_string_number_boolean_and_whole_body(tmp_path,prefix):
+        p,db,ids,g=fixture(tmp_path);body={'name':'Mira Bell / "quoted"','age':29,'active':True}
+        proposals,detail=g.step(prefix+json.dumps(body,ensure_ascii=False),ScenarioState(db))
+        assert len(proposals)==1 and proposals[0]['entry']==ids['Api.createItem']
+        proposal=proposals[0]
+>       assert proposal['request'].body==body and proposal['bindings']['input']['source']=='literal'
+               ^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'request'
+
+code/tests/test_inline_json_body33.py:35: KeyError
+_____ test_body_property_with_same_name_cannot_overwrite_the_path_argument _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-155/test_body_property_with_same_n0')
+
+    def test_body_property_with_same_name_cannot_overwrite_the_path_argument(tmp_path):
+        p,db,ids,g=fixture(tmp_path,body='public Long id;public String name;',
+            mapping='@PutMapping("/items/{id}")',parameters='@PathVariable Long id,@RequestBody Item input',
+            entry='if(id==7L && input.id==9L){return correct();}return "wrong";',extra='String correct(){return "ready";}')
+        proposals,_=g.step('Update item with id=7: {"id":9,"name":"literal"}',ScenarioState(db))
+        assert len(proposals)==1
+>       proposal=proposals[0];assert proposal['request'].record()['path']==['items','7']
+                                     ^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'request'
+
+code/tests/test_inline_json_body33.py:46: KeyError
+_ test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request[{"name":"first","name":"second"}] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-155/test_invalid_or_ambiguous_expl0')
+literal = '{"name":"first","name":"second"}'
+
+    @pytest.mark.parametrize('literal',[
+        '{"name":"first","name":"second"}', '{"age":NaN}', '{"age":Infinity}',
+        '{"name":"unterminated}', '{"age":1,}', '{"name":"first"} and body: {"name":"second"}',
+    ])
+    def test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request(tmp_path,literal):
+        p,db,ids,g=fixture(tmp_path)
+        proposals,detail=g.step('Create item: '+literal,ScenarioState(db))
+>       assert proposals==[] and detail['unresolved']
+E       assert ([{'actor': <U...(Item)', ...}] == []
+E         
+E         Left contains one more item: {'actor': <Unknown.VALUE: 'unknown'>, 'bindings': {'name': {'quote': 'name":"', 'reference': 'action', 'resolved': True, 'source': 'literal'}}, 'body_omissions': {'input': []}, 'entry': 'method:service:Api#createItem(Item)', ...}
+E         Use -v to get more diff)
+
+code/tests/test_inline_json_body33.py:60: AssertionError
+_ test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request[{"age":NaN}] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-155/test_invalid_or_ambiguous_expl1')
+literal = '{"age":NaN}'
+
+    @pytest.mark.parametrize('literal',[
+        '{"name":"first","name":"second"}', '{"age":NaN}', '{"age":Infinity}',
+        '{"name":"unterminated}', '{"age":1,}', '{"name":"first"} and body: {"name":"second"}',
+    ])
+    def test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request(tmp_path,literal):
+        p,db,ids,g=fixture(tmp_path)
+        proposals,detail=g.step('Create item: '+literal,ScenarioState(db))
+>       assert proposals==[] and detail['unresolved']
+E       AssertionError: assert ([{'actor': <U...(Item)', ...}] == []
+E         
+E         Left contains one more item: {'actor': <Unknown.VALUE: 'unknown'>, 'bindings': {}, 'body_omissions': {'input': []}, 'entry': 'method:service:Api#createItem(Item)', ...}
+E         Use -v to get more diff)
+
+code/tests/test_inline_json_body33.py:60: AssertionError
+_ test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request[{"age":Infinity}] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-155/test_invalid_or_ambiguous_expl2')
+literal = '{"age":Infinity}'
+
+    @pytest.mark.parametrize('literal',[
+        '{"name":"first","name":"second"}', '{"age":NaN}', '{"age":Infinity}',
+        '{"name":"unterminated}', '{"age":1,}', '{"name":"first"} and body: {"name":"second"}',
+    ])
+    def test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request(tmp_path,literal):
+        p,db,ids,g=fixture(tmp_path)
+        proposals,detail=g.step('Create item: '+literal,ScenarioState(db))
+>       assert proposals==[] and detail['unresolved']
+E       AssertionError: assert ([{'actor': <U...(Item)', ...}] == []
+E         
+E         Left contains one more item: {'actor': <Unknown.VALUE: 'unknown'>, 'bindings': {}, 'body_omissions': {'input': []}, 'entry': 'method:service:Api#createItem(Item)', ...}
+E         Use -v to get more diff)
+
+code/tests/test_inline_json_body33.py:60: AssertionError
+_ test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request[{"name":"unterminated}] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-155/test_invalid_or_ambiguous_expl3')
+literal = '{"name":"unterminated}'
+
+    @pytest.mark.parametrize('literal',[
+        '{"name":"first","name":"second"}', '{"age":NaN}', '{"age":Infinity}',
+        '{"name":"unterminated}', '{"age":1,}', '{"name":"first"} and body: {"name":"second"}',
+    ])
+    def test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request(tmp_path,literal):
+        p,db,ids,g=fixture(tmp_path)
+        proposals,detail=g.step('Create item: '+literal,ScenarioState(db))
+>       assert proposals==[] and detail['unresolved']
+E       assert ([{'actor': <U...(Item)', ...}] == []
+E         
+E         Left contains one more item: {'actor': <Unknown.VALUE: 'unknown'>, 'bindings': {'name': {'quote': 'name":"', 'reference': 'action', 'resolved': True, 'source': 'literal'}}, 'body_omissions': {'input': []}, 'entry': 'method:service:Api#createItem(Item)', ...}
+E         Use -v to get more diff)
+
+code/tests/test_inline_json_body33.py:60: AssertionError
+_ test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request[{"age":1,}] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-155/test_invalid_or_ambiguous_expl4')
+literal = '{"age":1,}'
+
+    @pytest.mark.parametrize('literal',[
+        '{"name":"first","name":"second"}', '{"age":NaN}', '{"age":Infinity}',
+        '{"name":"unterminated}', '{"age":1,}', '{"name":"first"} and body: {"name":"second"}',
+    ])
+    def test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request(tmp_path,literal):
+        p,db,ids,g=fixture(tmp_path)
+        proposals,detail=g.step('Create item: '+literal,ScenarioState(db))
+>       assert proposals==[] and detail['unresolved']
+E       AssertionError: assert ([{'actor': <U...(Item)', ...}] == []
+E         
+E         Left contains one more item: {'actor': <Unknown.VALUE: 'unknown'>, 'bindings': {}, 'body_omissions': {'input': []}, 'entry': 'method:service:Api#createItem(Item)', ...}
+E         Use -v to get more diff)
+
+code/tests/test_inline_json_body33.py:60: AssertionError
+_ test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request[{"name":"first"} and body: {"name":"second"}] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-155/test_invalid_or_ambiguous_expl5')
+literal = '{"name":"first"} and body: {"name":"second"}'
+
+    @pytest.mark.parametrize('literal',[
+        '{"name":"first","name":"second"}', '{"age":NaN}', '{"age":Infinity}',
+        '{"name":"unterminated}', '{"age":1,}', '{"name":"first"} and body: {"name":"second"}',
+    ])
+    def test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request(tmp_path,literal):
+        p,db,ids,g=fixture(tmp_path)
+        proposals,detail=g.step('Create item: '+literal,ScenarioState(db))
+>       assert proposals==[] and detail['unresolved']
+E       assert ([{'actor': <U...(Item)', ...}] == []
+E         
+E         Left contains one more item: {'actor': <Unknown.VALUE: 'unknown'>, 'bindings': {'name': {'quote': 'name":"', 'reference': 'action', 'resolved': True, 'source': 'literal'}}, 'body_omissions': {'input': []}, 'entry': 'method:service:Api#createItem(Item)', ...}
+E         Use -v to get more diff)
+
+code/tests/test_inline_json_body33.py:60: AssertionError
+____________ test_json_wire_names_are_decoded_by_the_source_setter _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-155/test_json_wire_names_are_decod0')
+
+    def test_json_wire_names_are_decoded_by_the_source_setter(tmp_path):
+        p,db,ids,g=fixture(tmp_path,body='''@JsonProperty("full_name") private String fullName;
+          public void setFullName(String value){fullName=value.toUpperCase();}public String getFullName(){return fullName;}''',
+            entry='return input.getFullName();')
+        proposals,_=g.step('Create item: {"full_name":"alpha"}',ScenarioState(db))
+>       assert len(proposals)==1 and proposals[0]['request'].body=={'full_name':'alpha'}
+                                     ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'request'
+
+code/tests/test_inline_json_body33.py:68: KeyError
+_____ test_explicit_json_omission_is_distinct_from_explicit_null[body0-7] ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-155/test_explicit_json_omission_is0')
+body = {}, expected = 7
+
+    @pytest.mark.parametrize('body,expected',[({},7),({'count':None},0)])
+    def test_explicit_json_omission_is_distinct_from_explicit_null(tmp_path,body,expected):
+        p,db,ids,g=fixture(tmp_path,body='public int count=7;',entry='return "count="+input.count;')
+        proposals,_=g.step('Create item: '+json.dumps(body),ScenarioState(db))
+>       assert len(proposals)==1 and proposals[0]['request'].body==body
+                                     ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'request'
+
+code/tests/test_inline_json_body33.py:78: KeyError
+_____ test_explicit_json_omission_is_distinct_from_explicit_null[body1-0] ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-155/test_explicit_json_omission_is1')
+body = {'count': None}, expected = 0
+
+    @pytest.mark.parametrize('body,expected',[({},7),({'count':None},0)])
+    def test_explicit_json_omission_is_distinct_from_explicit_null(tmp_path,body,expected):
+        p,db,ids,g=fixture(tmp_path,body='public int count=7;',entry='return "count="+input.count;')
+        proposals,_=g.step('Create item: '+json.dumps(body),ScenarioState(db))
+>       assert len(proposals)==1 and proposals[0]['request'].body==body
+                                     ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'request'
+
+code/tests/test_inline_json_body33.py:78: KeyError
+_ test_nested_literals_and_unknown_json_properties_are_not_flattened_or_deleted _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-155/test_nested_literals_and_unkno0')
+
+    def test_nested_literals_and_unknown_json_properties_are_not_flattened_or_deleted(tmp_path):
+        p,db,ids,g=fixture(tmp_path,body='public String name;public java.util.List<String> tags;',entry='return input.tags.get(0);')
+        body={'name':'sample','tags':['first','second'],'extra':{'name':'nested'}}
+        proposals,_=g.step('Create item: '+json.dumps(body),ScenarioState(db))
+>       assert len(proposals)==1 and proposals[0]['request'].body==body
+                                     ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'request'
+
+code/tests/test_inline_json_body33.py:87: KeyError
+=========================== short test summary info ============================
+FAILED code/tests/test_inline_json_body33.py::test_literal_json_preserves_string_number_boolean_and_whole_body[Create item: ]
+FAILED code/tests/test_inline_json_body33.py::test_literal_json_preserves_string_number_boolean_and_whole_body[\u0421\u043e\u0437\u0434\u0430\u0442\u044c item: ]
+FAILED code/tests/test_inline_json_body33.py::test_body_property_with_same_name_cannot_overwrite_the_path_argument
+FAILED code/tests/test_inline_json_body33.py::test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request[{"name":"first","name":"second"}]
+FAILED code/tests/test_inline_json_body33.py::test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request[{"age":NaN}]
+FAILED code/tests/test_inline_json_body33.py::test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request[{"age":Infinity}]
+FAILED code/tests/test_inline_json_body33.py::test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request[{"name":"unterminated}]
+FAILED code/tests/test_inline_json_body33.py::test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request[{"age":1,}]
+FAILED code/tests/test_inline_json_body33.py::test_invalid_or_ambiguous_explicit_json_does_not_become_a_different_request[{"name":"first"} and body: {"name":"second"}]
+FAILED code/tests/test_inline_json_body33.py::test_json_wire_names_are_decoded_by_the_source_setter
+FAILED code/tests/test_inline_json_body33.py::test_explicit_json_omission_is_distinct_from_explicit_null[body0-7]
+FAILED code/tests/test_inline_json_body33.py::test_explicit_json_omission_is_distinct_from_explicit_null[body1-0]
+FAILED code/tests/test_inline_json_body33.py::test_nested_literals_and_unknown_json_properties_are_not_flattened_or_deleted
+13 failed in 0.23s

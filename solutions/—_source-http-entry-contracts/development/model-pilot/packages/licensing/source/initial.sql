@@ -1,0 +1,1 @@
+-- Empty ranking-only state; no application execution claimed.

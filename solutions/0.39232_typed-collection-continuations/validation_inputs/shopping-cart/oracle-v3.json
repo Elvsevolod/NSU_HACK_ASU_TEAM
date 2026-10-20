@@ -1,0 +1,335 @@
+{
+  "version": 3,
+  "review": "Stronger source-derived regression obligations after implementation; not a new blind oracle.",
+  "source_commit": "64273c71575d61db8de6ba1a582b02f6a11103b3",
+  "scope": "post-authentication controller/application/persistence HTTP profile; JWT filter, validation and server startup are outside this oracle",
+  "steps": [
+    {
+      "n": 1,
+      "module": "payment-service",
+      "method": "GET",
+      "path": "/api/payments?orderId=11",
+      "status": 200,
+      "rows": [
+        {
+          "id": 21,
+          "orderId": 11,
+          "status": "APPROVED"
+        },
+        {
+          "id": 23,
+          "orderId": 11,
+          "status": "REJECTED"
+        }
+      ],
+      "required_executes": [
+        "method:payment-service:PaymentController#getByOrder(Long)"
+      ],
+      "bound_arguments": [
+        {
+          "name": "orderId",
+          "declared_type": "java.lang.Long",
+          "value": 11
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "module": "payment-service",
+      "method": "PATCH",
+      "path": "/api/payments/21/refund",
+      "status": 200,
+      "result_fields": {
+        "id": 21,
+        "orderId": 11,
+        "status": "REFUNDED"
+      },
+      "changes": {
+        "payments.21.status": "REFUNDED",
+        "orders.11.status": "PENDING"
+      },
+      "remote": {
+        "method": "PATCH",
+        "path": "/api/orders/11/revert-payment",
+        "deployment": "order-service",
+        "url": "http://localhost:8083/api/orders/11/revert-payment",
+        "entry": "method:order-service:OrderController#revertPayment(Long)",
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.Long",
+            "value": 11
+          }
+        ],
+        "status": 200,
+        "result_fields": {
+          "id": 11,
+          "status": "PENDING",
+          "total": 12.5
+        }
+      },
+      "writes": [
+        "payments",
+        "orders"
+      ],
+      "required_executes": [
+        "method:payment-service:PaymentController#refund(Long)",
+        "method:order-service:OrderHttpMapper#toResponse(Order)",
+        "method:order-service:OrderPersistenceMapper#toDomain(OrderJpaEntity)",
+        "method:order-service:Order#total()",
+        "method:order-service:OrderDetail#subtotal()"
+      ],
+      "bound_arguments": [
+        {
+          "name": "id",
+          "declared_type": "java.lang.Long",
+          "value": 21
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "module": "payment-service",
+      "method": "GET",
+      "path": "/api/payments/21",
+      "status": 200,
+      "result_fields": {
+        "id": 21,
+        "status": "REFUNDED"
+      },
+      "required_executes": [
+        "method:payment-service:PaymentController#getById(Long)"
+      ],
+      "bound_arguments": [
+        {
+          "name": "id",
+          "declared_type": "java.lang.Long",
+          "value": 21
+        }
+      ]
+    },
+    {
+      "n": 4,
+      "module": "order-service",
+      "method": "GET",
+      "path": "/api/orders/11",
+      "status": 200,
+      "result_fields": {
+        "id": 11,
+        "status": "PENDING",
+        "total": 12.5
+      },
+      "required_executes": [
+        "method:order-service:OrderController#getById(Long)",
+        "method:order-service:OrderHttpMapper#toResponse(Order)",
+        "method:order-service:OrderPersistenceMapper#toDomain(OrderJpaEntity)",
+        "method:order-service:Order#total()",
+        "method:order-service:OrderDetail#subtotal()"
+      ],
+      "bound_arguments": [
+        {
+          "name": "id",
+          "declared_type": "java.lang.Long",
+          "value": 11
+        }
+      ]
+    },
+    {
+      "n": 5,
+      "module": "payment-service",
+      "method": "PATCH",
+      "path": "/api/payments/21/refund",
+      "status": 409,
+      "error_code": "PAYMENT_ALREADY_PROCESSED",
+      "writes": [],
+      "remote": null,
+      "required_executes": [
+        "method:payment-service:PaymentController#refund(Long)"
+      ],
+      "bound_arguments": [
+        {
+          "name": "id",
+          "declared_type": "java.lang.Long",
+          "value": 21
+        }
+      ]
+    },
+    {
+      "n": 6,
+      "module": "payment-service",
+      "method": "GET",
+      "path": "/api/payments/999",
+      "status": 404,
+      "error_code": "PAYMENT_NOT_FOUND",
+      "writes": [],
+      "required_executes": [
+        "method:payment-service:PaymentController#getById(Long)"
+      ],
+      "bound_arguments": [
+        {
+          "name": "id",
+          "declared_type": "java.lang.Long",
+          "value": 999
+        }
+      ]
+    },
+    {
+      "n": 7,
+      "ambiguous": true,
+      "must_not_choose": true,
+      "state_unchanged": true
+    },
+    {
+      "n": 8,
+      "module": "payment-service",
+      "method": "GET",
+      "path": "/api/payments?orderId=11",
+      "status": 200,
+      "rows": [
+        {
+          "id": 21,
+          "orderId": 11,
+          "status": "REFUNDED"
+        },
+        {
+          "id": 23,
+          "orderId": 11,
+          "status": "REJECTED"
+        }
+      ],
+      "required_executes": [
+        "method:payment-service:PaymentController#getByOrder(Long)"
+      ],
+      "bound_arguments": [
+        {
+          "name": "orderId",
+          "declared_type": "java.lang.Long",
+          "value": 11
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    "payment 22 and order 12 are unchanged",
+    "payment/order/detail cardinalities remain 3/2/2",
+    "IDs for steps 2\u20135 must come from step 1/2 responses, not checker constants",
+    "repeat refund throws before save/remote; no rollback is invented around the prior successful request"
+  ],
+  "expected_nonempty_relations": [
+    "executes",
+    "calls",
+    "remote",
+    "data"
+  ],
+  "graph_oracle_status": "required source edges below; incomplete precision oracle, never score precision against this subset",
+  "required_edges": [
+    [
+      "method:payment-service:PaymentController#getByOrder(Long)",
+      "calls",
+      "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+    ],
+    [
+      "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+      "calls",
+      "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+    ],
+    [
+      "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+      "calls",
+      "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+    ],
+    [
+      "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+      "calls",
+      "method:payment-service:PaymentPersistenceMapper#toDomain(PaymentJpaEntity)"
+    ],
+    [
+      "method:payment-service:PaymentPersistenceMapper#toDomain(PaymentJpaEntity)",
+      "calls",
+      "method:payment-service:Payment#reconstitute(Long,Long,Long,BigDecimal,PaymentMethod,PaymentStatus,LocalDateTime)"
+    ],
+    [
+      "method:payment-service:PaymentController#refund(Long)",
+      "calls",
+      "method:payment-service:PaymentCommandService#refund(Long)"
+    ],
+    [
+      "method:payment-service:PaymentCommandService#refund(Long)",
+      "calls",
+      "method:payment-service:RefundPaymentUseCase#execute(Long)"
+    ],
+    [
+      "method:payment-service:RefundPaymentUseCase#execute(Long)",
+      "calls",
+      "method:payment-service:Payment#refund()"
+    ],
+    [
+      "method:payment-service:RefundPaymentUseCase#execute(Long)",
+      "calls",
+      "method:payment-service:PaymentPersistenceAdapter#save(Payment)"
+    ],
+    [
+      "method:payment-service:RefundPaymentUseCase#execute(Long)",
+      "calls",
+      "method:payment-service:OrderClientAdapter#revertToPending(Long)"
+    ],
+    [
+      "method:payment-service:OrderClientAdapter#revertToPending(Long)",
+      "remote",
+      "method:order-service:OrderController#revertPayment(Long)"
+    ],
+    [
+      "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+      "data",
+      "res:table:payment-service.payments"
+    ],
+    [
+      "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+      "data",
+      "res:table:payment-service.payments"
+    ],
+    [
+      "method:payment-service:PaymentPersistenceAdapter#save(Payment)",
+      "data",
+      "res:table:payment-service.payments"
+    ],
+    [
+      "method:order-service:OrderController#revertPayment(Long)",
+      "calls",
+      "method:order-service:OrderCommandService#revertToPending(Long)"
+    ],
+    [
+      "method:order-service:OrderCommandService#revertToPending(Long)",
+      "calls",
+      "method:order-service:RevertOrderToPendingUseCase#execute(Long)"
+    ],
+    [
+      "method:order-service:RevertOrderToPendingUseCase#execute(Long)",
+      "calls",
+      "method:order-service:Order#revertToPending()"
+    ],
+    [
+      "method:order-service:OrderPersistenceAdapter#save(Order)",
+      "data",
+      "res:table:order-service.orders"
+    ]
+  ],
+  "delta_from_v1": [
+    "Application-after-authentication entry is explicit; JWT/security not evaluated.",
+    "Unchanged order_details rows are invariants; cascade/save alone does not prove physical UPDATE.",
+    "Per-step source executes obligations, exact request/response pairing, producer links and all untouched rows are checked."
+  ],
+  "created_at": "2026-10-18T20:03:35.738347+00:00",
+  "delta_from_v2": [
+    "Require exact controller entry and typed native Long arguments for every root and remote request.",
+    "Require the server body and source response mapper/total/subtotal even when the client asks for Void.class.",
+    "This adds source-derived regression checks after observing implementation; oracle-v1/v2 remain unchanged."
+  ],
+  "source_contract_files": {
+    "order-service/src/main/java/com/shoppingcart/order/framework/input/controller/OrderController.java": "962864496c804e5b81a864b0828e4cf81c030bba10cb14bb9b91f85ebb5b66e8",
+    "order-service/src/main/java/com/shoppingcart/order/framework/input/mapper/OrderHttpMapper.java": "1089453a12048d89db761a05a78e7b314d1f191ff4497aac8a36f4245de1a97d",
+    "order-service/src/main/java/com/shoppingcart/order/framework/output/mapper/OrderPersistenceMapper.java": "d3cf14e7e2353c19319e28e26175874e6477e8e10197f0926b75bdb4b5a5b453",
+    "order-service/src/main/java/com/shoppingcart/order/domain/entity/Order.java": "00889e53263f4ee46d409ad63f51aa6ae54fb9bc2b29097089d40cda0f2c24bc",
+    "order-service/src/main/java/com/shoppingcart/order/domain/entity/OrderDetail.java": "f863e8a5c4128985e3457ae36afd4a621f42a09e244363054c4880d116e84c51"
+  }
+}

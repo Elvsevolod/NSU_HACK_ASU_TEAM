@@ -1,0 +1,41 @@
+Traceback (most recent call last):
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_state-semantics-and-retrieval/checks/export_flow_witnesses.py", line 61, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_state-semantics-and-retrieval/checks/export_flow_witnesses.py", line 40, in main
+    e=Engine(p,state);result=e.run(ids[entry],request);state=e.state;rows.append({'n':n,**capture(e,request,result)})
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_state-semantics-and-retrieval/code/analyzer/engine.py", line 389, in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_state-semantics-and-retrieval/code/analyzer/engine.py", line 481, in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_state-semantics-and-retrieval/code/analyzer/engine.py", line 572, in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'],on_entry=entered)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_state-semantics-and-retrieval/code/analyzer/engine.py", line 722, in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds,on_entry)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_state-semantics-and-retrieval/code/analyzer/engine.py", line 814, in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_state-semantics-and-retrieval/code/analyzer/engine.py", line 1380, in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_state-semantics-and-retrieval/code/analyzer/engine.py", line 1413, in execute_statement
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_state-semantics-and-retrieval/code/analyzer/engine.py", line 1380, in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_state-semantics-and-retrieval/code/analyzer/engine.py", line 1492, in execute_statement
+    for index,item in enumerate(items):
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_state-semantics-and-retrieval/code/analyzer/java_lists.py", line 32, in iteration
+    index=next_index(engine,iterator,reason)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_state-semantics-and-retrieval/code/analyzer/java_sets.py", line 39, in next_index
+    selected=engine.choose(reason+':unordered-collection-next',choices) if len(choices)>1 else choices[0]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_state-semantics-and-retrieval/code/analyzer/engine.py", line 314, in choose
+    raise AlternativeRequired(key, choices)
+analyzer.engine.AlternativeRequired: ('1:method:gateway:InventoryGateway#listProducts():13:unordered-collection-next', [0, 1])

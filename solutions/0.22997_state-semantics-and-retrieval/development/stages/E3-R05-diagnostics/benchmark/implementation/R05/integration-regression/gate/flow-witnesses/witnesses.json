@@ -1,0 +1,4188 @@
+{
+  "schema": "producer-consumer/1",
+  "chains": [
+    {
+      "schema": "producer-consumer/1",
+      "case": "inventory/explicit",
+      "steps": [
+        {
+          "step": 1,
+          "source_producers": [
+            {
+              "unmeasured_or_initial_context": true
+            }
+          ],
+          "preceding_step_result": {
+            "initial_context": true
+          },
+          "consumer_request": {
+            "deployment": "gateway",
+            "method": "GET",
+            "url": "/inventory",
+            "path": [
+              "inventory"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {},
+            "body": {
+              "missing": true
+            },
+            "actor": {
+              "unknown": true
+            },
+            "session": {
+              "unknown": true
+            },
+            "body_properties": {},
+            "provenance": []
+          },
+          "actual_arguments": [
+            [],
+            [],
+            [
+              {
+                "name": "codes",
+                "declared_type": "java.util.List<java.lang.String>",
+                "value": [
+                  "hardware",
+                  "office"
+                ],
+                "collection_shapes": [
+                  {
+                    "path": "value",
+                    "size": 2,
+                    "order": "unspecified"
+                  }
+                ]
+              }
+            ]
+          ],
+          "result": [
+            {
+              "category": "hardware",
+              "id": "SKU7",
+              "quantity": 8,
+              "revision": 4
+            },
+            {
+              "category": "office",
+              "id": "SKU8",
+              "quantity": 9,
+              "revision": 5
+            },
+            {
+              "category": "hardware",
+              "id": "SKU9",
+              "quantity": 10,
+              "revision": 6
+            }
+          ],
+          "state_delta": {
+            "beans_and_aliases": {
+              "before": {
+                "missing": true
+              },
+              "after": {
+                "$id": "h1",
+                "kind": "dict",
+                "fields": {
+                  "actor_browsers": {
+                    "$id": "h2",
+                    "kind": "dict",
+                    "fields": {}
+                  },
+                  "beans": {
+                    "$id": "h3",
+                    "kind": "dict",
+                    "fields": {}
+                  },
+                  "browser": {
+                    "$id": "h4",
+                    "kind": "dict",
+                    "fields": {
+                      "dom": {
+                        "$id": "h5",
+                        "kind": "dict",
+                        "fields": {}
+                      },
+                      "form": {
+                        "$id": "h6",
+                        "kind": "dict",
+                        "fields": {}
+                      },
+                      "options": {
+                        "$id": "h7",
+                        "kind": "dict",
+                        "fields": {}
+                      },
+                      "script": {
+                        "$id": "h8",
+                        "kind": "dict",
+                        "fields": {}
+                      },
+                      "storage": {
+                        "$id": "h9",
+                        "kind": "dict",
+                        "fields": {}
+                      },
+                      "url": {
+                        "$id": "h10",
+                        "kind": "dict",
+                        "fields": {}
+                      }
+                    }
+                  },
+                  "class_initialization": {
+                    "$id": "h11",
+                    "kind": "dict",
+                    "fields": {}
+                  },
+                  "static_fields": {
+                    "$id": "h12",
+                    "kind": "dict",
+                    "fields": {}
+                  }
+                }
+              }
+            },
+            "browser": {
+              "before": {
+                "missing": true
+              },
+              "after": {
+                "storage": {},
+                "form": {},
+                "dom": {},
+                "url": {},
+                "options": {},
+                "script": {}
+              }
+            },
+            "database": {
+              "before": {
+                "missing": true
+              },
+              "after": {
+                "warehouse.products": [
+                  {
+                    "id": "SKU7",
+                    "category": "hardware",
+                    "revision": 4,
+                    "quantity": 8
+                  },
+                  {
+                    "id": "SKU8",
+                    "category": "office",
+                    "revision": 5,
+                    "quantity": 9
+                  },
+                  {
+                    "id": "SKU9",
+                    "category": "hardware",
+                    "revision": 6,
+                    "quantity": 10
+                  }
+                ],
+                "catalog.categories": [
+                  {
+                    "code": "hardware"
+                  },
+                  {
+                    "code": "office"
+                  }
+                ]
+              }
+            }
+          },
+          "per_step_edges": [
+            [
+              "",
+              "executes",
+              "method:catalog:CategoryController#lookup(List<String>)"
+            ],
+            [
+              "",
+              "executes",
+              "method:gateway:InventoryGateway#listProducts()"
+            ],
+            [
+              "",
+              "executes",
+              "method:warehouse:StockController#listProducts()"
+            ],
+            [
+              "method:catalog:CategoryController#lookup(List<String>)",
+              "data",
+              "res:table:catalog.categories"
+            ],
+            [
+              "method:gateway:InventoryGateway#listProducts()",
+              "remote",
+              "method:catalog:CategoryController#lookup(List<String>)"
+            ],
+            [
+              "method:gateway:InventoryGateway#listProducts()",
+              "remote",
+              "method:warehouse:StockController#listProducts()"
+            ],
+            [
+              "method:warehouse:StockController#listProducts()",
+              "data",
+              "res:table:warehouse.products"
+            ]
+          ],
+          "diagnostics": [],
+          "first_loss": null
+        },
+        {
+          "step": 2,
+          "source_producers": [
+            {
+              "unmeasured_or_initial_context": true
+            }
+          ],
+          "preceding_step_result": [
+            {
+              "category": "hardware",
+              "id": "SKU7",
+              "quantity": 8,
+              "revision": 4
+            },
+            {
+              "category": "office",
+              "id": "SKU8",
+              "quantity": 9,
+              "revision": 5
+            },
+            {
+              "category": "hardware",
+              "id": "SKU9",
+              "quantity": 10,
+              "revision": 6
+            }
+          ],
+          "consumer_request": {
+            "deployment": "gateway",
+            "method": "POST",
+            "url": "/inventory/reserve",
+            "path": [
+              "inventory",
+              "reserve"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "content-type": [
+                "application/json"
+              ]
+            },
+            "body": {
+              "id": "SKU8",
+              "revision": 5
+            },
+            "actor": {
+              "unknown": true
+            },
+            "session": {
+              "unknown": true
+            },
+            "body_properties": {},
+            "provenance": []
+          },
+          "actual_arguments": [
+            [
+              {
+                "name": "input",
+                "declared_type": "ProductRequest",
+                "value": {
+                  "__type__": "ProductRequest",
+                  "__http_entity__": false,
+                  "id": "SKU8",
+                  "revision": 5
+                }
+              }
+            ],
+            [
+              {
+                "name": "id",
+                "declared_type": "java.lang.String",
+                "value": "SKU8"
+              },
+              {
+                "name": "input",
+                "declared_type": "ProductRequest",
+                "value": {
+                  "__type__": "ProductRequest",
+                  "__http_entity__": false,
+                  "id": "SKU8",
+                  "revision": 5
+                }
+              }
+            ]
+          ],
+          "result": {
+            "category": "office",
+            "id": "SKU8",
+            "quantity": 8,
+            "revision": 6
+          },
+          "state_delta": {
+            "database": {
+              "before": {
+                "warehouse.products": [
+                  {
+                    "id": "SKU7",
+                    "category": "hardware",
+                    "revision": 4,
+                    "quantity": 8
+                  },
+                  {
+                    "id": "SKU8",
+                    "category": "office",
+                    "revision": 5,
+                    "quantity": 9
+                  },
+                  {
+                    "id": "SKU9",
+                    "category": "hardware",
+                    "revision": 6,
+                    "quantity": 10
+                  }
+                ],
+                "catalog.categories": [
+                  {
+                    "code": "hardware"
+                  },
+                  {
+                    "code": "office"
+                  }
+                ]
+              },
+              "after": {
+                "warehouse.products": [
+                  {
+                    "id": "SKU7",
+                    "category": "hardware",
+                    "revision": 4,
+                    "quantity": 8
+                  },
+                  {
+                    "id": "SKU8",
+                    "category": "office",
+                    "revision": 6,
+                    "quantity": 8,
+                    "__type__": "Product"
+                  },
+                  {
+                    "id": "SKU9",
+                    "category": "hardware",
+                    "revision": 6,
+                    "quantity": 10
+                  }
+                ],
+                "catalog.categories": [
+                  {
+                    "code": "hardware"
+                  },
+                  {
+                    "code": "office"
+                  }
+                ]
+              }
+            }
+          },
+          "per_step_edges": [
+            [
+              "",
+              "executes",
+              "method:gateway:InventoryGateway#reserveProduct(ProductRequest)"
+            ],
+            [
+              "",
+              "executes",
+              "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+            ],
+            [
+              "method:gateway:InventoryGateway#reserveProduct(ProductRequest)",
+              "remote",
+              "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+            ],
+            [
+              "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+              "data",
+              "res:table:warehouse.products"
+            ]
+          ],
+          "diagnostics": [],
+          "first_loss": null
+        },
+        {
+          "step": 3,
+          "source_producers": [
+            {
+              "unmeasured_or_initial_context": true
+            }
+          ],
+          "preceding_step_result": {
+            "category": "office",
+            "id": "SKU8",
+            "quantity": 8,
+            "revision": 6
+          },
+          "consumer_request": {
+            "deployment": "gateway",
+            "method": "GET",
+            "url": "/inventory",
+            "path": [
+              "inventory"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {},
+            "body": {
+              "missing": true
+            },
+            "actor": {
+              "unknown": true
+            },
+            "session": {
+              "unknown": true
+            },
+            "body_properties": {},
+            "provenance": []
+          },
+          "actual_arguments": [
+            [],
+            [],
+            [
+              {
+                "name": "codes",
+                "declared_type": "java.util.List<java.lang.String>",
+                "value": [
+                  "hardware",
+                  "office"
+                ],
+                "collection_shapes": [
+                  {
+                    "path": "value",
+                    "size": 2,
+                    "order": "unspecified"
+                  }
+                ]
+              }
+            ]
+          ],
+          "result": [
+            {
+              "category": "hardware",
+              "id": "SKU7",
+              "quantity": 8,
+              "revision": 4
+            },
+            {
+              "category": "office",
+              "id": "SKU8",
+              "quantity": 8,
+              "revision": 6
+            },
+            {
+              "category": "hardware",
+              "id": "SKU9",
+              "quantity": 10,
+              "revision": 6
+            }
+          ],
+          "state_delta": {},
+          "per_step_edges": [
+            [
+              "",
+              "executes",
+              "method:catalog:CategoryController#lookup(List<String>)"
+            ],
+            [
+              "",
+              "executes",
+              "method:gateway:InventoryGateway#listProducts()"
+            ],
+            [
+              "",
+              "executes",
+              "method:warehouse:StockController#listProducts()"
+            ],
+            [
+              "method:catalog:CategoryController#lookup(List<String>)",
+              "data",
+              "res:table:catalog.categories"
+            ],
+            [
+              "method:gateway:InventoryGateway#listProducts()",
+              "remote",
+              "method:catalog:CategoryController#lookup(List<String>)"
+            ],
+            [
+              "method:gateway:InventoryGateway#listProducts()",
+              "remote",
+              "method:warehouse:StockController#listProducts()"
+            ],
+            [
+              "method:warehouse:StockController#listProducts()",
+              "data",
+              "res:table:warehouse.products"
+            ]
+          ],
+          "diagnostics": [],
+          "first_loss": null
+        }
+      ]
+    },
+    {
+      "schema": "producer-consumer/1",
+      "case": "inventory/NL",
+      "steps": [
+        {
+          "step": 1,
+          "source_producers": [
+            {
+              "unmeasured_or_initial_context": true
+            }
+          ],
+          "preceding_step_result": {
+            "initial_context": true
+          },
+          "consumer_request": {
+            "deployment": "gateway",
+            "method": "GET",
+            "url": "/inventory",
+            "path": [
+              "inventory"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "__rest_unknown__": true
+            },
+            "body": {
+              "missing": true
+            },
+            "actor": {
+              "unknown": true
+            },
+            "session": {
+              "storage": {},
+              "actor": {
+                "unknown": true
+              }
+            },
+            "body_properties": {},
+            "provenance": {
+              "__assumptions__": []
+            }
+          },
+          "actual_arguments": [
+            [],
+            [],
+            [
+              {
+                "name": "codes",
+                "declared_type": "java.util.List<java.lang.String>",
+                "value": [
+                  "hardware",
+                  "office"
+                ],
+                "collection_shapes": [
+                  {
+                    "path": "value",
+                    "size": 2,
+                    "order": "unspecified"
+                  }
+                ]
+              }
+            ]
+          ],
+          "result": [
+            {
+              "category": "hardware",
+              "id": "SKU7",
+              "quantity": 8,
+              "revision": 4
+            },
+            {
+              "category": "office",
+              "id": "SKU8",
+              "quantity": 9,
+              "revision": 5
+            },
+            {
+              "category": "hardware",
+              "id": "SKU9",
+              "quantity": 10,
+              "revision": 6
+            }
+          ],
+          "state_delta": {
+            "beans_and_aliases": {
+              "before": {
+                "missing": true
+              },
+              "after": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "beans": {
+                      "$id": "h3",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h4",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "gateway/page.html",
+                        "dom": {
+                          "$id": "h5",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "dom_text": {
+                          "$id": "h6",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h7",
+                          "kind": "dict",
+                          "fields": {
+                            "products": {
+                              "$id": "h8",
+                              "kind": "list",
+                              "fields": []
+                            }
+                          }
+                        },
+                        "options": {
+                          "$id": "h9",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h10",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h11",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h12",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h13",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "url": {
+                          "$id": "h14",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h15",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h16",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              }
+            },
+            "browser": {
+              "before": {
+                "missing": true
+              },
+              "after": {
+                "storage": {},
+                "form": {
+                  "products": [
+                    {
+                      "category": "hardware",
+                      "id": "SKU7",
+                      "quantity": 8,
+                      "revision": 4
+                    },
+                    {
+                      "category": "office",
+                      "id": "SKU8",
+                      "quantity": 9,
+                      "revision": 5
+                    },
+                    {
+                      "category": "hardware",
+                      "id": "SKU9",
+                      "quantity": 10,
+                      "revision": 6
+                    }
+                  ]
+                },
+                "dom": {},
+                "url": {},
+                "options": {},
+                "script": {},
+                "pages": {},
+                "dom_text": {},
+                "script_unknown": false,
+                "active_page": "gateway/page.html",
+                "source_options": []
+              }
+            },
+            "database": {
+              "before": {
+                "missing": true
+              },
+              "after": {
+                "warehouse.products": [
+                  {
+                    "id": "SKU7",
+                    "category": "hardware",
+                    "revision": 4,
+                    "quantity": 8
+                  },
+                  {
+                    "id": "SKU8",
+                    "category": "office",
+                    "revision": 5,
+                    "quantity": 9
+                  },
+                  {
+                    "id": "SKU9",
+                    "category": "hardware",
+                    "revision": 6,
+                    "quantity": 10
+                  }
+                ],
+                "catalog.categories": [
+                  {
+                    "code": "hardware"
+                  },
+                  {
+                    "code": "office"
+                  }
+                ]
+              }
+            }
+          },
+          "per_step_edges": [
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:catalog:CategoryController#lookup(List<String>)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:gateway:InventoryGateway#listProducts()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:warehouse:StockController#listProducts()"
+            },
+            {
+              "source": "method:catalog:CategoryController#lookup(List<String>)",
+              "relation": "data",
+              "target": "res:table:catalog.categories"
+            },
+            {
+              "source": "method:gateway:InventoryGateway#listProducts()",
+              "relation": "remote",
+              "target": "method:catalog:CategoryController#lookup(List<String>)"
+            },
+            {
+              "source": "method:gateway:InventoryGateway#listProducts()",
+              "relation": "remote",
+              "target": "method:warehouse:StockController#listProducts()"
+            },
+            {
+              "source": "method:warehouse:StockController#listProducts()",
+              "relation": "data",
+              "target": "res:table:warehouse.products"
+            }
+          ],
+          "diagnostics": [],
+          "first_loss": null
+        },
+        {
+          "step": 2,
+          "source_producers": [
+            {
+              "consumer_field": "id",
+              "source": "ui",
+              "reference": "gateway/ui.js:3:url0:item.id;row=gateway/page.html:2;history[0].result[1].id"
+            },
+            {
+              "consumer_field": "revision",
+              "source": "ui",
+              "reference": "gateway/ui.js:3:url0:item.revision;row=gateway/page.html:2;history[0].result[1].id"
+            }
+          ],
+          "preceding_step_result": [
+            {
+              "category": "hardware",
+              "id": "SKU7",
+              "quantity": 8,
+              "revision": 4
+            },
+            {
+              "category": "office",
+              "id": "SKU8",
+              "quantity": 9,
+              "revision": 5
+            },
+            {
+              "category": "hardware",
+              "id": "SKU9",
+              "quantity": 10,
+              "revision": 6
+            }
+          ],
+          "consumer_request": {
+            "deployment": "gateway",
+            "method": "POST",
+            "url": "/inventory/reserve",
+            "path": [
+              "inventory",
+              "reserve"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "__rest_unknown__": true,
+              "content-type": [
+                "application/json"
+              ]
+            },
+            "body": {
+              "id": "SKU8",
+              "revision": 5
+            },
+            "actor": {
+              "unknown": true
+            },
+            "session": {
+              "storage": {},
+              "actor": {
+                "unknown": true
+              }
+            },
+            "body_properties": {
+              "input": {}
+            },
+            "provenance": {
+              "id": {
+                "source": "ui",
+                "reference": "gateway/ui.js:3:url0:item.id;row=gateway/page.html:2;history[0].result[1].id",
+                "quote": "",
+                "resolved": true
+              },
+              "revision": {
+                "source": "ui",
+                "reference": "gateway/ui.js:3:url0:item.revision;row=gateway/page.html:2;history[0].result[1].id",
+                "quote": "",
+                "resolved": true
+              },
+              "__assumptions__": []
+            }
+          },
+          "actual_arguments": [
+            [
+              {
+                "name": "input",
+                "declared_type": "ProductRequest",
+                "value": {
+                  "__type__": "ProductRequest",
+                  "__http_entity__": false,
+                  "id": "SKU8",
+                  "revision": 5
+                }
+              }
+            ],
+            [
+              {
+                "name": "id",
+                "declared_type": "java.lang.String",
+                "value": "SKU8"
+              },
+              {
+                "name": "input",
+                "declared_type": "ProductRequest",
+                "value": {
+                  "__type__": "ProductRequest",
+                  "__http_entity__": false,
+                  "id": "SKU8",
+                  "revision": 5
+                }
+              }
+            ]
+          ],
+          "result": {
+            "category": "office",
+            "id": "SKU8",
+            "quantity": 8,
+            "revision": 6
+          },
+          "state_delta": {
+            "beans_and_aliases": {
+              "before": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "beans": {
+                      "$id": "h3",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h4",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "gateway/page.html",
+                        "dom": {
+                          "$id": "h5",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "dom_text": {
+                          "$id": "h6",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h7",
+                          "kind": "dict",
+                          "fields": {
+                            "products": {
+                              "$id": "h8",
+                              "kind": "list",
+                              "fields": []
+                            }
+                          }
+                        },
+                        "options": {
+                          "$id": "h9",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h10",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h11",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h12",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h13",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "url": {
+                          "$id": "h14",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h15",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h16",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              },
+              "after": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "beans": {
+                      "$id": "h3",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h4",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "gateway/page.html",
+                        "dom": {
+                          "$id": "h5",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "dom_text": {
+                          "$id": "h6",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h7",
+                          "kind": "dict",
+                          "fields": {
+                            "products": {
+                              "$id": "h8",
+                              "kind": "list",
+                              "fields": [
+                                {
+                                  "$id": "h9",
+                                  "kind": "JsonObject",
+                                  "fields": {
+                                    "category": "hardware",
+                                    "id": "SKU7",
+                                    "quantity": 8,
+                                    "revision": 4
+                                  }
+                                },
+                                {
+                                  "$id": "h10",
+                                  "kind": "JsonObject",
+                                  "fields": {
+                                    "category": "office",
+                                    "id": "SKU8",
+                                    "quantity": 9,
+                                    "revision": 5
+                                  }
+                                },
+                                {
+                                  "$id": "h11",
+                                  "kind": "JsonObject",
+                                  "fields": {
+                                    "category": "hardware",
+                                    "id": "SKU9",
+                                    "quantity": 10,
+                                    "revision": 6
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        },
+                        "options": {
+                          "$id": "h12",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h13",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h14",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h15",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h16",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "url": {
+                          "$id": "h17",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h18",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h19",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              }
+            },
+            "database": {
+              "before": {
+                "warehouse.products": [
+                  {
+                    "id": "SKU7",
+                    "category": "hardware",
+                    "revision": 4,
+                    "quantity": 8
+                  },
+                  {
+                    "id": "SKU8",
+                    "category": "office",
+                    "revision": 5,
+                    "quantity": 9
+                  },
+                  {
+                    "id": "SKU9",
+                    "category": "hardware",
+                    "revision": 6,
+                    "quantity": 10
+                  }
+                ],
+                "catalog.categories": [
+                  {
+                    "code": "hardware"
+                  },
+                  {
+                    "code": "office"
+                  }
+                ]
+              },
+              "after": {
+                "warehouse.products": [
+                  {
+                    "id": "SKU7",
+                    "category": "hardware",
+                    "revision": 4,
+                    "quantity": 8
+                  },
+                  {
+                    "id": "SKU8",
+                    "category": "office",
+                    "revision": 6,
+                    "quantity": 8,
+                    "__type__": "Product"
+                  },
+                  {
+                    "id": "SKU9",
+                    "category": "hardware",
+                    "revision": 6,
+                    "quantity": 10
+                  }
+                ],
+                "catalog.categories": [
+                  {
+                    "code": "hardware"
+                  },
+                  {
+                    "code": "office"
+                  }
+                ]
+              }
+            }
+          },
+          "per_step_edges": [
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:gateway:InventoryGateway#reserveProduct(ProductRequest)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+            },
+            {
+              "source": "method:gateway:InventoryGateway#reserveProduct(ProductRequest)",
+              "relation": "remote",
+              "target": "method:warehouse:StockController#reserveProduct(String,ProductRequest)"
+            },
+            {
+              "source": "method:warehouse:StockController#reserveProduct(String,ProductRequest)",
+              "relation": "data",
+              "target": "res:table:warehouse.products"
+            }
+          ],
+          "diagnostics": [],
+          "first_loss": null
+        },
+        {
+          "step": 3,
+          "source_producers": [
+            {
+              "unmeasured_or_initial_context": true
+            }
+          ],
+          "preceding_step_result": {
+            "category": "office",
+            "id": "SKU8",
+            "quantity": 8,
+            "revision": 6
+          },
+          "consumer_request": {
+            "deployment": "gateway",
+            "method": "GET",
+            "url": "/inventory",
+            "path": [
+              "inventory"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "__rest_unknown__": true
+            },
+            "body": {
+              "missing": true
+            },
+            "actor": {
+              "unknown": true
+            },
+            "session": {
+              "storage": {},
+              "actor": {
+                "unknown": true
+              }
+            },
+            "body_properties": {},
+            "provenance": {
+              "__assumptions__": []
+            }
+          },
+          "actual_arguments": [
+            [],
+            [],
+            [
+              {
+                "name": "codes",
+                "declared_type": "java.util.List<java.lang.String>",
+                "value": [
+                  "hardware",
+                  "office"
+                ],
+                "collection_shapes": [
+                  {
+                    "path": "value",
+                    "size": 2,
+                    "order": "unspecified"
+                  }
+                ]
+              }
+            ]
+          ],
+          "result": [
+            {
+              "category": "hardware",
+              "id": "SKU7",
+              "quantity": 8,
+              "revision": 4
+            },
+            {
+              "category": "office",
+              "id": "SKU8",
+              "quantity": 8,
+              "revision": 6
+            },
+            {
+              "category": "hardware",
+              "id": "SKU9",
+              "quantity": 10,
+              "revision": 6
+            }
+          ],
+          "state_delta": {
+            "browser": {
+              "before": {
+                "storage": {},
+                "form": {
+                  "products": [
+                    {
+                      "category": "hardware",
+                      "id": "SKU7",
+                      "quantity": 8,
+                      "revision": 4
+                    },
+                    {
+                      "category": "office",
+                      "id": "SKU8",
+                      "quantity": 9,
+                      "revision": 5
+                    },
+                    {
+                      "category": "hardware",
+                      "id": "SKU9",
+                      "quantity": 10,
+                      "revision": 6
+                    }
+                  ]
+                },
+                "dom": {},
+                "url": {},
+                "options": {},
+                "script": {},
+                "pages": {},
+                "dom_text": {},
+                "script_unknown": false,
+                "active_page": "gateway/page.html",
+                "source_options": []
+              },
+              "after": {
+                "storage": {},
+                "form": {
+                  "products": [
+                    {
+                      "category": "hardware",
+                      "id": "SKU7",
+                      "quantity": 8,
+                      "revision": 4
+                    },
+                    {
+                      "category": "office",
+                      "id": "SKU8",
+                      "quantity": 8,
+                      "revision": 6
+                    },
+                    {
+                      "category": "hardware",
+                      "id": "SKU9",
+                      "quantity": 10,
+                      "revision": 6
+                    }
+                  ]
+                },
+                "dom": {},
+                "url": {},
+                "options": {},
+                "script": {},
+                "pages": {},
+                "dom_text": {},
+                "script_unknown": false,
+                "active_page": "gateway/page.html",
+                "source_options": []
+              }
+            }
+          },
+          "per_step_edges": [
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:catalog:CategoryController#lookup(List<String>)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:gateway:InventoryGateway#listProducts()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:warehouse:StockController#listProducts()"
+            },
+            {
+              "source": "method:catalog:CategoryController#lookup(List<String>)",
+              "relation": "data",
+              "target": "res:table:catalog.categories"
+            },
+            {
+              "source": "method:gateway:InventoryGateway#listProducts()",
+              "relation": "remote",
+              "target": "method:catalog:CategoryController#lookup(List<String>)"
+            },
+            {
+              "source": "method:gateway:InventoryGateway#listProducts()",
+              "relation": "remote",
+              "target": "method:warehouse:StockController#listProducts()"
+            },
+            {
+              "source": "method:warehouse:StockController#listProducts()",
+              "relation": "data",
+              "target": "res:table:warehouse.products"
+            }
+          ],
+          "diagnostics": [],
+          "first_loss": null
+        }
+      ]
+    },
+    {
+      "schema": "producer-consumer/1",
+      "case": "angular/source-token",
+      "steps": [
+        {
+          "step": 1,
+          "source_producers": [
+            {
+              "consumer_field": "name",
+              "source": "literal",
+              "reference": "action"
+            },
+            {
+              "consumer_field": "password",
+              "source": "literal",
+              "reference": "action"
+            }
+          ],
+          "preceding_step_result": {
+            "initial_context": true
+          },
+          "consumer_request": {
+            "deployment": "service",
+            "method": "POST",
+            "url": "/login",
+            "path": [
+              "login"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "__rest_unknown__": true,
+              "content-type": [
+                "application/json"
+              ]
+            },
+            "body": {
+              "name": "alice",
+              "password": "secret"
+            },
+            "actor": "alice",
+            "session": {
+              "storage": {},
+              "actor": "alice"
+            },
+            "body_properties": {
+              "input": {}
+            },
+            "provenance": {
+              "name": {
+                "source": "literal",
+                "reference": "action",
+                "quote": "name \"alice\"",
+                "resolved": true
+              },
+              "password": {
+                "source": "literal",
+                "reference": "action",
+                "quote": "password \"secret\"",
+                "resolved": true
+              },
+              "__assumptions__": []
+            }
+          },
+          "actual_arguments": [
+            [
+              {
+                "name": "input",
+                "declared_type": "Credentials",
+                "value": {
+                  "__type__": "Credentials",
+                  "__http_entity__": false,
+                  "name": "alice",
+                  "password": "secret"
+                }
+              }
+            ]
+          ],
+          "result": {
+            "name": "alice",
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+          },
+          "state_delta": {
+            "beans_and_aliases": {
+              "before": {
+                "missing": true
+              },
+              "after": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "beans": {
+                      "$id": "h3",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h4",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "page.html",
+                        "actor": "alice",
+                        "dom": {
+                          "$id": "h5",
+                          "kind": "dict",
+                          "fields": {
+                            "#name": "alice",
+                            "#password": "secret"
+                          }
+                        },
+                        "dom_text": {
+                          "$id": "h6",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h7",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "options": {
+                          "$id": "h8",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h9",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h10",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h11",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h12",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "url": {
+                          "$id": "h13",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h14",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h15",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              }
+            },
+            "browser": {
+              "before": {
+                "missing": true
+              },
+              "after": {
+                "storage": {
+                  "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                },
+                "form": {},
+                "dom": {
+                  "#name": "alice",
+                  "#password": "secret"
+                },
+                "url": {},
+                "options": {},
+                "script": {},
+                "actor": "alice",
+                "pages": {},
+                "dom_text": {},
+                "script_unknown": false,
+                "active_page": "page.html",
+                "source_options": []
+              }
+            },
+            "database": {
+              "before": {
+                "missing": true
+              },
+              "after": {}
+            }
+          },
+          "per_step_edges": [
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Login#login(Credentials)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#<init>(String,String,boolean)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#getAuthorities()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#getPassword()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#getUsername()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isAccountNonExpired()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isAccountNonLocked()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isCredentialsNonExpired()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isEnabled()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Provider#loadUserByUsername(String)"
+            },
+            {
+              "source": "method:service:Provider#loadUserByUsername(String)",
+              "relation": "calls",
+              "target": "method:service:Profile#<init>(String,String,boolean)"
+            }
+          ],
+          "diagnostics": [
+            "request filter registration is assumed from source classes; full bean registration is not modeled"
+          ],
+          "first_loss": "request filter registration is assumed from source classes; full bean registration is not modeled"
+        },
+        {
+          "step": 2,
+          "source_producers": [
+            {
+              "consumer_field": "headers.authorization",
+              "reference": "step 1.result.token",
+              "evidence": "exact source-created token equality; source storage/header operations in the full trace"
+            }
+          ],
+          "preceding_step_result": {
+            "name": "alice",
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+          },
+          "consumer_request": {
+            "deployment": "service",
+            "method": "GET",
+            "url": "/protected",
+            "path": [
+              "protected"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "authorization": [
+                "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+              ],
+              "__rest_unknown__": true
+            },
+            "body": {
+              "missing": true
+            },
+            "actor": "alice",
+            "session": {
+              "storage": {
+                "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+              },
+              "actor": "alice"
+            },
+            "body_properties": {},
+            "provenance": {
+              "__assumptions__": []
+            }
+          },
+          "actual_arguments": [
+            []
+          ],
+          "result": "protected-data",
+          "state_delta": {
+            "beans_and_aliases": {
+              "before": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "beans": {
+                      "$id": "h3",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h4",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "page.html",
+                        "actor": "alice",
+                        "dom": {
+                          "$id": "h5",
+                          "kind": "dict",
+                          "fields": {
+                            "#name": "alice",
+                            "#password": "secret"
+                          }
+                        },
+                        "dom_text": {
+                          "$id": "h6",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h7",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "options": {
+                          "$id": "h8",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h9",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h10",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h11",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h12",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "url": {
+                          "$id": "h13",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h14",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h15",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              },
+              "after": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "beans": {
+                      "$id": "h3",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h4",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "page.html",
+                        "actor": "alice",
+                        "dom": {
+                          "$id": "h5",
+                          "kind": "dict",
+                          "fields": {
+                            "#name": "alice",
+                            "#password": "secret"
+                          }
+                        },
+                        "dom_text": {
+                          "$id": "h6",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h7",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "options": {
+                          "$id": "h8",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h9",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h10",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h11",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h12",
+                          "kind": "dict",
+                          "fields": {
+                            "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                          }
+                        },
+                        "url": {
+                          "$id": "h13",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h14",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h15",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "per_step_edges": [
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Login#read()"
+            }
+          ],
+          "diagnostics": [
+            "request filter registration is assumed from source classes; full bean registration is not modeled",
+            "State depends on earlier analysis assumptions: step 1: unresolved source/request/state assumptions"
+          ],
+          "first_loss": "request filter registration is assumed from source classes; full bean registration is not modeled"
+        }
+      ]
+    },
+    {
+      "schema": "producer-consumer/1",
+      "case": "jquery/source-token",
+      "steps": [
+        {
+          "step": 1,
+          "source_producers": [
+            {
+              "consumer_field": "name",
+              "source": "literal",
+              "reference": "action"
+            },
+            {
+              "consumer_field": "password",
+              "source": "literal",
+              "reference": "action"
+            }
+          ],
+          "preceding_step_result": {
+            "initial_context": true
+          },
+          "consumer_request": {
+            "deployment": "service",
+            "method": "POST",
+            "url": "/login",
+            "path": [
+              "login"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "__rest_unknown__": true,
+              "content-type": [
+                "application/json"
+              ]
+            },
+            "body": {
+              "name": "alice",
+              "password": "secret"
+            },
+            "actor": "alice",
+            "session": {
+              "storage": {},
+              "actor": "alice"
+            },
+            "body_properties": {
+              "input": {}
+            },
+            "provenance": {
+              "name": {
+                "source": "literal",
+                "reference": "action",
+                "quote": "name \"alice\"",
+                "resolved": true
+              },
+              "password": {
+                "source": "literal",
+                "reference": "action",
+                "quote": "password \"secret\"",
+                "resolved": true
+              },
+              "__assumptions__": []
+            }
+          },
+          "actual_arguments": [
+            [
+              {
+                "name": "input",
+                "declared_type": "Credentials",
+                "value": {
+                  "__type__": "Credentials",
+                  "__http_entity__": false,
+                  "name": "alice",
+                  "password": "secret"
+                }
+              }
+            ]
+          ],
+          "result": {
+            "name": "alice",
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+          },
+          "state_delta": {
+            "beans_and_aliases": {
+              "before": {
+                "missing": true
+              },
+              "after": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "beans": {
+                      "$id": "h3",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h4",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "page.html",
+                        "actor": "alice",
+                        "dom": {
+                          "$id": "h5",
+                          "kind": "dict",
+                          "fields": {
+                            "#name": "alice",
+                            "#password": "secret"
+                          }
+                        },
+                        "dom_text": {
+                          "$id": "h6",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h7",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "options": {
+                          "$id": "h8",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h9",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h10",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h11",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h12",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "url": {
+                          "$id": "h13",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h14",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h15",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              }
+            },
+            "browser": {
+              "before": {
+                "missing": true
+              },
+              "after": {
+                "storage": {
+                  "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                },
+                "form": {},
+                "dom": {
+                  "#name": "alice",
+                  "#password": "secret"
+                },
+                "url": {},
+                "options": {},
+                "script": {},
+                "actor": "alice",
+                "pages": {},
+                "dom_text": {},
+                "script_unknown": false,
+                "active_page": "page.html",
+                "source_options": []
+              }
+            },
+            "database": {
+              "before": {
+                "missing": true
+              },
+              "after": {}
+            }
+          },
+          "per_step_edges": [
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Login#login(Credentials)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#<init>(String,String,boolean)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#getAuthorities()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#getPassword()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#getUsername()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isAccountNonExpired()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isAccountNonLocked()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isCredentialsNonExpired()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isEnabled()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Provider#loadUserByUsername(String)"
+            },
+            {
+              "source": "method:service:Provider#loadUserByUsername(String)",
+              "relation": "calls",
+              "target": "method:service:Profile#<init>(String,String,boolean)"
+            }
+          ],
+          "diagnostics": [
+            "request filter registration is assumed from source classes; full bean registration is not modeled"
+          ],
+          "first_loss": "request filter registration is assumed from source classes; full bean registration is not modeled"
+        },
+        {
+          "step": 2,
+          "source_producers": [
+            {
+              "consumer_field": "headers.authorization",
+              "reference": "step 1.result.token",
+              "evidence": "exact source-created token equality; source storage/header operations in the full trace"
+            }
+          ],
+          "preceding_step_result": {
+            "name": "alice",
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+          },
+          "consumer_request": {
+            "deployment": "service",
+            "method": "GET",
+            "url": "/protected",
+            "path": [
+              "protected"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "authorization": [
+                "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+              ],
+              "__rest_unknown__": true
+            },
+            "body": {
+              "missing": true
+            },
+            "actor": "alice",
+            "session": {
+              "storage": {
+                "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+              },
+              "actor": "alice"
+            },
+            "body_properties": {},
+            "provenance": {
+              "__assumptions__": []
+            }
+          },
+          "actual_arguments": [
+            []
+          ],
+          "result": "protected-data",
+          "state_delta": {
+            "beans_and_aliases": {
+              "before": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "beans": {
+                      "$id": "h3",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h4",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "page.html",
+                        "actor": "alice",
+                        "dom": {
+                          "$id": "h5",
+                          "kind": "dict",
+                          "fields": {
+                            "#name": "alice",
+                            "#password": "secret"
+                          }
+                        },
+                        "dom_text": {
+                          "$id": "h6",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h7",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "options": {
+                          "$id": "h8",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h9",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h10",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h11",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h12",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "url": {
+                          "$id": "h13",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h14",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h15",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              },
+              "after": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "beans": {
+                      "$id": "h3",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h4",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "page.html",
+                        "actor": "alice",
+                        "dom": {
+                          "$id": "h5",
+                          "kind": "dict",
+                          "fields": {
+                            "#name": "alice",
+                            "#password": "secret"
+                          }
+                        },
+                        "dom_text": {
+                          "$id": "h6",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h7",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "options": {
+                          "$id": "h8",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h9",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h10",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h11",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h12",
+                          "kind": "dict",
+                          "fields": {
+                            "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                          }
+                        },
+                        "url": {
+                          "$id": "h13",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h14",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h15",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "per_step_edges": [
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Login#read()"
+            }
+          ],
+          "diagnostics": [
+            "request filter registration is assumed from source classes; full bean registration is not modeled",
+            "State depends on earlier analysis assumptions: step 1: unresolved source/request/state assumptions"
+          ],
+          "first_loss": "request filter registration is assumed from source classes; full bean registration is not modeled"
+        }
+      ]
+    },
+    {
+      "schema": "producer-consumer/1",
+      "case": "two-actors/source-tokens-and-403",
+      "steps": [
+        {
+          "step": 1,
+          "source_producers": [
+            {
+              "consumer_field": "username",
+              "source": "context",
+              "reference": "actor[alice].username"
+            },
+            {
+              "consumer_field": "password",
+              "source": "context",
+              "reference": "actor[alice].password"
+            }
+          ],
+          "preceding_step_result": {
+            "initial_context": true
+          },
+          "consumer_request": {
+            "deployment": "service",
+            "method": "POST",
+            "url": "/login",
+            "path": [
+              "login"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "__rest_unknown__": true,
+              "content-type": [
+                "application/json"
+              ]
+            },
+            "body": {
+              "username": "alice",
+              "password": "secret"
+            },
+            "actor": "alice",
+            "session": {
+              "storage": {},
+              "actor": "alice"
+            },
+            "body_properties": {
+              "input": {}
+            },
+            "provenance": {
+              "username": {
+                "source": "context",
+                "reference": "actor[alice].username",
+                "quote": "alice",
+                "resolved": true
+              },
+              "password": {
+                "source": "context",
+                "reference": "actor[alice].password",
+                "quote": "secret",
+                "resolved": true
+              },
+              "__assumptions__": []
+            }
+          },
+          "actual_arguments": [
+            [
+              {
+                "name": "input",
+                "declared_type": "Credentials",
+                "value": {
+                  "__type__": "Credentials",
+                  "__http_entity__": false,
+                  "username": "alice",
+                  "password": "secret"
+                }
+              }
+            ]
+          ],
+          "result": {
+            "name": "alice",
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+          },
+          "state_delta": {
+            "beans_and_aliases": {
+              "before": {
+                "missing": true
+              },
+              "after": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "beans": {
+                      "$id": "h3",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h4",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "page.html",
+                        "actor": "alice",
+                        "dom": {
+                          "$id": "h5",
+                          "kind": "dict",
+                          "fields": {
+                            "#password": "secret",
+                            "#username": "alice"
+                          }
+                        },
+                        "dom_text": {
+                          "$id": "h6",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h7",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "options": {
+                          "$id": "h8",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h9",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h10",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h11",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h12",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "url": {
+                          "$id": "h13",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h14",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h15",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              }
+            },
+            "browser": {
+              "before": {
+                "missing": true
+              },
+              "after": {
+                "storage": {
+                  "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                },
+                "form": {},
+                "dom": {
+                  "#username": "alice",
+                  "#password": "secret"
+                },
+                "url": {},
+                "options": {},
+                "script": {},
+                "actor": "alice",
+                "pages": {},
+                "dom_text": {},
+                "script_unknown": false,
+                "active_page": "page.html",
+                "source_options": []
+              }
+            },
+            "database": {
+              "before": {
+                "missing": true
+              },
+              "after": {}
+            }
+          },
+          "per_step_edges": [
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Login#login(Credentials)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#<init>(String,String,boolean)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#getAuthorities()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#getPassword()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#getUsername()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isAccountNonExpired()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isAccountNonLocked()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isCredentialsNonExpired()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isEnabled()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Provider#loadUserByUsername(String)"
+            },
+            {
+              "source": "method:service:Provider#loadUserByUsername(String)",
+              "relation": "calls",
+              "target": "method:service:Profile#<init>(String,String,boolean)"
+            }
+          ],
+          "diagnostics": [
+            "request filter registration is assumed from source classes; full bean registration is not modeled"
+          ],
+          "first_loss": "request filter registration is assumed from source classes; full bean registration is not modeled"
+        },
+        {
+          "step": 2,
+          "source_producers": [
+            {
+              "consumer_field": "headers.authorization",
+              "reference": "step 1.result.token",
+              "evidence": "exact source-created token equality; source storage/header operations in the full trace"
+            }
+          ],
+          "preceding_step_result": {
+            "name": "alice",
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+          },
+          "consumer_request": {
+            "deployment": "service",
+            "method": "GET",
+            "url": "/protected",
+            "path": [
+              "protected"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "authorization": [
+                "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+              ],
+              "__rest_unknown__": true
+            },
+            "body": {
+              "missing": true
+            },
+            "actor": "alice",
+            "session": {
+              "storage": {
+                "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+              },
+              "actor": "alice"
+            },
+            "body_properties": {},
+            "provenance": {
+              "__assumptions__": []
+            }
+          },
+          "actual_arguments": [
+            []
+          ],
+          "result": "protected-data",
+          "state_delta": {
+            "beans_and_aliases": {
+              "before": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "beans": {
+                      "$id": "h3",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h4",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "page.html",
+                        "actor": "alice",
+                        "dom": {
+                          "$id": "h5",
+                          "kind": "dict",
+                          "fields": {
+                            "#password": "secret",
+                            "#username": "alice"
+                          }
+                        },
+                        "dom_text": {
+                          "$id": "h6",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h7",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "options": {
+                          "$id": "h8",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h9",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h10",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h11",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h12",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "url": {
+                          "$id": "h13",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h14",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h15",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              },
+              "after": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "beans": {
+                      "$id": "h3",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h4",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "page.html",
+                        "actor": "alice",
+                        "dom": {
+                          "$id": "h5",
+                          "kind": "dict",
+                          "fields": {
+                            "#password": "secret",
+                            "#username": "alice"
+                          }
+                        },
+                        "dom_text": {
+                          "$id": "h6",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h7",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "options": {
+                          "$id": "h8",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h9",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h10",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h11",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h12",
+                          "kind": "dict",
+                          "fields": {
+                            "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                          }
+                        },
+                        "url": {
+                          "$id": "h13",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h14",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h15",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "per_step_edges": [
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Login#read()"
+            }
+          ],
+          "diagnostics": [
+            "request filter registration is assumed from source classes; full bean registration is not modeled",
+            "State depends on earlier analysis assumptions: step 1: unresolved source/request/state assumptions"
+          ],
+          "first_loss": "request filter registration is assumed from source classes; full bean registration is not modeled"
+        },
+        {
+          "step": 3,
+          "source_producers": [
+            {
+              "consumer_field": "username",
+              "source": "context",
+              "reference": "actor[bob].username"
+            },
+            {
+              "consumer_field": "password",
+              "source": "context",
+              "reference": "actor[bob].password"
+            }
+          ],
+          "preceding_step_result": "protected-data",
+          "consumer_request": {
+            "deployment": "service",
+            "method": "POST",
+            "url": "/login",
+            "path": [
+              "login"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "__rest_unknown__": true,
+              "content-type": [
+                "application/json"
+              ]
+            },
+            "body": {
+              "username": "bob",
+              "password": "bravo"
+            },
+            "actor": "bob",
+            "session": {
+              "storage": {},
+              "actor": "bob"
+            },
+            "body_properties": {
+              "input": {}
+            },
+            "provenance": {
+              "username": {
+                "source": "context",
+                "reference": "actor[bob].username",
+                "quote": "bob",
+                "resolved": true
+              },
+              "password": {
+                "source": "context",
+                "reference": "actor[bob].password",
+                "quote": "bravo",
+                "resolved": true
+              },
+              "__assumptions__": []
+            }
+          },
+          "actual_arguments": [
+            [
+              {
+                "name": "input",
+                "declared_type": "Credentials",
+                "value": {
+                  "__type__": "Credentials",
+                  "__http_entity__": false,
+                  "username": "bob",
+                  "password": "bravo"
+                }
+              }
+            ]
+          ],
+          "result": {
+            "name": "bob",
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJib2IiLCJyb2xlcyI6WyJyZWFkZXIiXSwiaWF0IjoxNzkyMjgxNjAwLCJleHAiOjE3OTIyODE2NjB9.etXiJo7FJUsNDh8nUc_35taUanodO9nr93NXnUH2RlM"
+          },
+          "state_delta": {
+            "beans_and_aliases": {
+              "before": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "beans": {
+                      "$id": "h3",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h4",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "page.html",
+                        "actor": "alice",
+                        "dom": {
+                          "$id": "h5",
+                          "kind": "dict",
+                          "fields": {
+                            "#password": "secret",
+                            "#username": "alice"
+                          }
+                        },
+                        "dom_text": {
+                          "$id": "h6",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h7",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "options": {
+                          "$id": "h8",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h9",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h10",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h11",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h12",
+                          "kind": "dict",
+                          "fields": {
+                            "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                          }
+                        },
+                        "url": {
+                          "$id": "h13",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h14",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h15",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              },
+              "after": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {
+                        "alice": {
+                          "$id": "h3",
+                          "kind": "dict",
+                          "fields": {
+                            "active_page": "page.html",
+                            "actor": "alice",
+                            "dom": {
+                              "$id": "h4",
+                              "kind": "dict",
+                              "fields": {
+                                "#password": "secret",
+                                "#username": "alice"
+                              }
+                            },
+                            "dom_text": {
+                              "$id": "h5",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "form": {
+                              "$id": "h6",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "options": {
+                              "$id": "h7",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "pages": {
+                              "$id": "h8",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "script": {
+                              "$id": "h9",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "script_unknown": false,
+                            "source_options": {
+                              "$id": "h10",
+                              "kind": "list",
+                              "fields": []
+                            },
+                            "storage": {
+                              "$id": "h11",
+                              "kind": "dict",
+                              "fields": {
+                                "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                              }
+                            },
+                            "url": {
+                              "$id": "h12",
+                              "kind": "dict",
+                              "fields": {}
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "beans": {
+                      "$id": "h13",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h14",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "page.html",
+                        "actor": "bob",
+                        "dom": {
+                          "$id": "h15",
+                          "kind": "dict",
+                          "fields": {
+                            "#password": "bravo",
+                            "#username": "bob"
+                          }
+                        },
+                        "dom_text": {
+                          "$id": "h16",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h17",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "options": {
+                          "$id": "h18",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h19",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h20",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h21",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h22",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "url": {
+                          "$id": "h23",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h24",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h25",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              }
+            },
+            "browser": {
+              "before": {
+                "storage": {
+                  "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                },
+                "form": {},
+                "dom": {
+                  "#username": "alice",
+                  "#password": "secret"
+                },
+                "url": {},
+                "options": {},
+                "script": {},
+                "actor": "alice",
+                "pages": {},
+                "dom_text": {},
+                "script_unknown": false,
+                "active_page": "page.html",
+                "source_options": []
+              },
+              "after": {
+                "storage": {
+                  "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJib2IiLCJyb2xlcyI6WyJyZWFkZXIiXSwiaWF0IjoxNzkyMjgxNjAwLCJleHAiOjE3OTIyODE2NjB9.etXiJo7FJUsNDh8nUc_35taUanodO9nr93NXnUH2RlM"
+                },
+                "form": {},
+                "dom": {
+                  "#username": "bob",
+                  "#password": "bravo"
+                },
+                "url": {},
+                "options": {},
+                "script": {},
+                "actor": "bob",
+                "pages": {},
+                "dom_text": {},
+                "script_unknown": false,
+                "active_page": "page.html",
+                "source_options": []
+              }
+            }
+          },
+          "per_step_edges": [
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Login#login(Credentials)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#<init>(String,String,boolean)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#getAuthorities()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#getPassword()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#getUsername()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isAccountNonExpired()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isAccountNonLocked()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isCredentialsNonExpired()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isEnabled()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Provider#loadUserByUsername(String)"
+            },
+            {
+              "source": "method:service:Provider#loadUserByUsername(String)",
+              "relation": "calls",
+              "target": "method:service:Profile#<init>(String,String,boolean)"
+            }
+          ],
+          "diagnostics": [
+            "request filter registration is assumed from source classes; full bean registration is not modeled",
+            "State depends on earlier analysis assumptions: step 1: unresolved source/request/state assumptions"
+          ],
+          "first_loss": "request filter registration is assumed from source classes; full bean registration is not modeled"
+        },
+        {
+          "step": 4,
+          "source_producers": [
+            {
+              "consumer_field": "headers.authorization",
+              "reference": "step 3.result.token",
+              "evidence": "exact source-created token equality; source storage/header operations in the full trace"
+            }
+          ],
+          "preceding_step_result": {
+            "name": "bob",
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJib2IiLCJyb2xlcyI6WyJyZWFkZXIiXSwiaWF0IjoxNzkyMjgxNjAwLCJleHAiOjE3OTIyODE2NjB9.etXiJo7FJUsNDh8nUc_35taUanodO9nr93NXnUH2RlM"
+          },
+          "consumer_request": {
+            "deployment": "service",
+            "method": "GET",
+            "url": "/protected",
+            "path": [
+              "protected"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "authorization": [
+                "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJib2IiLCJyb2xlcyI6WyJyZWFkZXIiXSwiaWF0IjoxNzkyMjgxNjAwLCJleHAiOjE3OTIyODE2NjB9.etXiJo7FJUsNDh8nUc_35taUanodO9nr93NXnUH2RlM"
+              ],
+              "__rest_unknown__": true
+            },
+            "body": {
+              "missing": true
+            },
+            "actor": "bob",
+            "session": {
+              "storage": {
+                "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJib2IiLCJyb2xlcyI6WyJyZWFkZXIiXSwiaWF0IjoxNzkyMjgxNjAwLCJleHAiOjE3OTIyODE2NjB9.etXiJo7FJUsNDh8nUc_35taUanodO9nr93NXnUH2RlM"
+              },
+              "actor": "bob"
+            },
+            "body_properties": {},
+            "provenance": {
+              "__assumptions__": []
+            }
+          },
+          "actual_arguments": [
+            null
+          ],
+          "result": {
+            "unknown": true
+          },
+          "state_delta": {
+            "beans_and_aliases": {
+              "before": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {
+                        "alice": {
+                          "$id": "h3",
+                          "kind": "dict",
+                          "fields": {
+                            "active_page": "page.html",
+                            "actor": "alice",
+                            "dom": {
+                              "$id": "h4",
+                              "kind": "dict",
+                              "fields": {
+                                "#password": "secret",
+                                "#username": "alice"
+                              }
+                            },
+                            "dom_text": {
+                              "$id": "h5",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "form": {
+                              "$id": "h6",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "options": {
+                              "$id": "h7",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "pages": {
+                              "$id": "h8",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "script": {
+                              "$id": "h9",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "script_unknown": false,
+                            "source_options": {
+                              "$id": "h10",
+                              "kind": "list",
+                              "fields": []
+                            },
+                            "storage": {
+                              "$id": "h11",
+                              "kind": "dict",
+                              "fields": {
+                                "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                              }
+                            },
+                            "url": {
+                              "$id": "h12",
+                              "kind": "dict",
+                              "fields": {}
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "beans": {
+                      "$id": "h13",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h14",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "page.html",
+                        "actor": "bob",
+                        "dom": {
+                          "$id": "h15",
+                          "kind": "dict",
+                          "fields": {
+                            "#password": "bravo",
+                            "#username": "bob"
+                          }
+                        },
+                        "dom_text": {
+                          "$id": "h16",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h17",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "options": {
+                          "$id": "h18",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h19",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h20",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h21",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h22",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "url": {
+                          "$id": "h23",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h24",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h25",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              },
+              "after": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {
+                        "alice": {
+                          "$id": "h3",
+                          "kind": "dict",
+                          "fields": {
+                            "active_page": "page.html",
+                            "actor": "alice",
+                            "dom": {
+                              "$id": "h4",
+                              "kind": "dict",
+                              "fields": {
+                                "#password": "secret",
+                                "#username": "alice"
+                              }
+                            },
+                            "dom_text": {
+                              "$id": "h5",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "form": {
+                              "$id": "h6",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "options": {
+                              "$id": "h7",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "pages": {
+                              "$id": "h8",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "script": {
+                              "$id": "h9",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "script_unknown": false,
+                            "source_options": {
+                              "$id": "h10",
+                              "kind": "list",
+                              "fields": []
+                            },
+                            "storage": {
+                              "$id": "h11",
+                              "kind": "dict",
+                              "fields": {
+                                "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                              }
+                            },
+                            "url": {
+                              "$id": "h12",
+                              "kind": "dict",
+                              "fields": {}
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "beans": {
+                      "$id": "h13",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h14",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "page.html",
+                        "actor": "bob",
+                        "dom": {
+                          "$id": "h15",
+                          "kind": "dict",
+                          "fields": {
+                            "#password": "bravo",
+                            "#username": "bob"
+                          }
+                        },
+                        "dom_text": {
+                          "$id": "h16",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h17",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "options": {
+                          "$id": "h18",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h19",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h20",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h21",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h22",
+                          "kind": "dict",
+                          "fields": {
+                            "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJib2IiLCJyb2xlcyI6WyJyZWFkZXIiXSwiaWF0IjoxNzkyMjgxNjAwLCJleHAiOjE3OTIyODE2NjB9.etXiJo7FJUsNDh8nUc_35taUanodO9nr93NXnUH2RlM"
+                          }
+                        },
+                        "url": {
+                          "$id": "h23",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h24",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h25",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "per_step_edges": [
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+            }
+          ],
+          "diagnostics": [
+            "request filter registration is assumed from source classes; full bean registration is not modeled",
+            "State depends on earlier analysis assumptions: step 1: unresolved source/request/state assumptions"
+          ],
+          "first_loss": "request filter registration is assumed from source classes; full bean registration is not modeled"
+        },
+        {
+          "step": 5,
+          "source_producers": [
+            {
+              "consumer_field": "headers.authorization",
+              "reference": "step 1.result.token",
+              "evidence": "exact source-created token equality; source storage/header operations in the full trace"
+            }
+          ],
+          "preceding_step_result": {
+            "unknown": true
+          },
+          "consumer_request": {
+            "deployment": "service",
+            "method": "GET",
+            "url": "/protected",
+            "path": [
+              "protected"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "authorization": [
+                "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+              ],
+              "__rest_unknown__": true
+            },
+            "body": {
+              "missing": true
+            },
+            "actor": "alice",
+            "session": {
+              "storage": {
+                "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+              },
+              "actor": "alice"
+            },
+            "body_properties": {},
+            "provenance": {
+              "__assumptions__": []
+            }
+          },
+          "actual_arguments": [
+            []
+          ],
+          "result": "protected-data",
+          "state_delta": {
+            "beans_and_aliases": {
+              "before": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {
+                        "alice": {
+                          "$id": "h3",
+                          "kind": "dict",
+                          "fields": {
+                            "active_page": "page.html",
+                            "actor": "alice",
+                            "dom": {
+                              "$id": "h4",
+                              "kind": "dict",
+                              "fields": {
+                                "#password": "secret",
+                                "#username": "alice"
+                              }
+                            },
+                            "dom_text": {
+                              "$id": "h5",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "form": {
+                              "$id": "h6",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "options": {
+                              "$id": "h7",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "pages": {
+                              "$id": "h8",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "script": {
+                              "$id": "h9",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "script_unknown": false,
+                            "source_options": {
+                              "$id": "h10",
+                              "kind": "list",
+                              "fields": []
+                            },
+                            "storage": {
+                              "$id": "h11",
+                              "kind": "dict",
+                              "fields": {
+                                "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                              }
+                            },
+                            "url": {
+                              "$id": "h12",
+                              "kind": "dict",
+                              "fields": {}
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "beans": {
+                      "$id": "h13",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h14",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "page.html",
+                        "actor": "bob",
+                        "dom": {
+                          "$id": "h15",
+                          "kind": "dict",
+                          "fields": {
+                            "#password": "bravo",
+                            "#username": "bob"
+                          }
+                        },
+                        "dom_text": {
+                          "$id": "h16",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h17",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "options": {
+                          "$id": "h18",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h19",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h20",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h21",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h22",
+                          "kind": "dict",
+                          "fields": {
+                            "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJib2IiLCJyb2xlcyI6WyJyZWFkZXIiXSwiaWF0IjoxNzkyMjgxNjAwLCJleHAiOjE3OTIyODE2NjB9.etXiJo7FJUsNDh8nUc_35taUanodO9nr93NXnUH2RlM"
+                          }
+                        },
+                        "url": {
+                          "$id": "h23",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h24",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h25",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              },
+              "after": {
+                "phase": "backend return, browser callback effects in state_after",
+                "graph": {
+                  "$id": "h1",
+                  "kind": "dict",
+                  "fields": {
+                    "actor_browsers": {
+                      "$id": "h2",
+                      "kind": "dict",
+                      "fields": {
+                        "bob": {
+                          "$id": "h3",
+                          "kind": "dict",
+                          "fields": {
+                            "active_page": "page.html",
+                            "actor": "bob",
+                            "dom": {
+                              "$id": "h4",
+                              "kind": "dict",
+                              "fields": {
+                                "#password": "bravo",
+                                "#username": "bob"
+                              }
+                            },
+                            "dom_text": {
+                              "$id": "h5",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "form": {
+                              "$id": "h6",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "options": {
+                              "$id": "h7",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "pages": {
+                              "$id": "h8",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "script": {
+                              "$id": "h9",
+                              "kind": "dict",
+                              "fields": {}
+                            },
+                            "script_unknown": false,
+                            "source_options": {
+                              "$id": "h10",
+                              "kind": "list",
+                              "fields": []
+                            },
+                            "storage": {
+                              "$id": "h11",
+                              "kind": "dict",
+                              "fields": {
+                                "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJib2IiLCJyb2xlcyI6WyJyZWFkZXIiXSwiaWF0IjoxNzkyMjgxNjAwLCJleHAiOjE3OTIyODE2NjB9.etXiJo7FJUsNDh8nUc_35taUanodO9nr93NXnUH2RlM"
+                              }
+                            },
+                            "url": {
+                              "$id": "h12",
+                              "kind": "dict",
+                              "fields": {}
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "beans": {
+                      "$id": "h13",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "browser": {
+                      "$id": "h14",
+                      "kind": "dict",
+                      "fields": {
+                        "active_page": "page.html",
+                        "actor": "alice",
+                        "dom": {
+                          "$id": "h15",
+                          "kind": "dict",
+                          "fields": {
+                            "#password": "secret",
+                            "#username": "alice"
+                          }
+                        },
+                        "dom_text": {
+                          "$id": "h16",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "form": {
+                          "$id": "h17",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "options": {
+                          "$id": "h18",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "pages": {
+                          "$id": "h19",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script": {
+                          "$id": "h20",
+                          "kind": "dict",
+                          "fields": {}
+                        },
+                        "script_unknown": false,
+                        "source_options": {
+                          "$id": "h21",
+                          "kind": "list",
+                          "fields": []
+                        },
+                        "storage": {
+                          "$id": "h22",
+                          "kind": "dict",
+                          "fields": {
+                            "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                          }
+                        },
+                        "url": {
+                          "$id": "h23",
+                          "kind": "dict",
+                          "fields": {}
+                        }
+                      }
+                    },
+                    "class_initialization": {
+                      "$id": "h24",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "static_fields": {
+                      "$id": "h25",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              }
+            },
+            "browser": {
+              "before": {
+                "storage": {
+                  "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJib2IiLCJyb2xlcyI6WyJyZWFkZXIiXSwiaWF0IjoxNzkyMjgxNjAwLCJleHAiOjE3OTIyODE2NjB9.etXiJo7FJUsNDh8nUc_35taUanodO9nr93NXnUH2RlM"
+                },
+                "form": {},
+                "dom": {
+                  "#username": "bob",
+                  "#password": "bravo"
+                },
+                "url": {},
+                "options": {},
+                "script": {},
+                "actor": "bob",
+                "pages": {},
+                "dom_text": {},
+                "script_unknown": false,
+                "active_page": "page.html",
+                "source_options": []
+              },
+              "after": {
+                "storage": {
+                  "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                },
+                "form": {},
+                "dom": {
+                  "#username": "alice",
+                  "#password": "secret"
+                },
+                "url": {},
+                "options": {},
+                "script": {},
+                "actor": "alice",
+                "pages": {},
+                "dom_text": {},
+                "script_unknown": false,
+                "active_page": "page.html",
+                "source_options": []
+              }
+            }
+          },
+          "per_step_edges": [
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Login#read()"
+            }
+          ],
+          "diagnostics": [
+            "request filter registration is assumed from source classes; full bean registration is not modeled",
+            "State depends on earlier analysis assumptions: step 1: unresolved source/request/state assumptions"
+          ],
+          "first_loss": "request filter registration is assumed from source classes; full bean registration is not modeled"
+        }
+      ]
+    }
+  ],
+  "oracle_available_to_inference": false,
+  "manual_token_or_id_insertion": false,
+  "targets_started": false
+}

@@ -1,0 +1,45 @@
+.....................F..                                                 [100%]
+=================================== FAILURES ===================================
+______________ test_meaningful_negative_is_rejected[missing-call] ______________
+
+mutation = 'missing-call'
+
+    @pytest.mark.parametrize('mutation',[
+     'missing-step','duplicate-step','wrong-payment','wrong-producer-type','lost-producer','wrong-status','lost-code',
+     'wrong-root','swapped-responses','foreign-row','write-after-refusal','remote-other-step','ambiguous-write',
+     'arbitrary-read','missing-execute','duplicate-row','wrong-row-type','missing-state-before','lost-scope','lost-body','missing-call','missing-data'])
+    def test_meaningful_negative_is_rejected(mutation):
+        t=positive();rows=t['steps'];a=rows[1]['alternatives'][0]
+        if mutation=='missing-step':rows.pop(2)
+        elif mutation=='duplicate-step':rows[2]['n']=2
+        elif mutation=='wrong-payment':rows[1]['request']['url']='/api/payments/22/refund'
+        elif mutation=='wrong-producer-type':rows[1]['producer']['producer_step']=True
+        elif mutation=='lost-producer':rows[1].pop('producer')
+        elif mutation=='wrong-status':rows[4]['alternatives'][0]['responses'][0]['status']=200
+        elif mutation=='lost-code':rows[4]['alternatives'][0]['result']={}
+        elif mutation=='wrong-root':a['responses'][-1]['request']=2
+        elif mutation=='swapped-responses':
+            a['responses'][0]['request'],a['responses'][1]['request']=1,2
+        elif mutation=='foreign-row':a['state_after']['tables']['payment-service.payments'][2]['amount']=0.0
+        elif mutation=='write-after-refusal':rows[4]['alternatives'][0]['data_operations']=deepcopy(a['data_operations'])
+        elif mutation=='remote-other-step':
+            rows[2]['alternatives'][0]['edges'].append(a['edges'].pop())
+        elif mutation=='ambiguous-write':rows[6]['alternatives']=[deepcopy(a),deepcopy(a)]
+        elif mutation=='arbitrary-read':rows[6]['alternatives']=[deepcopy(rows[2]['alternatives'][0])]
+        elif mutation=='missing-execute':a['edges'].pop(0)
+        elif mutation=='duplicate-row':rows[0]['alternatives'][0]['result'][1]=deepcopy(rows[0]['alternatives'][0]['result'][0])
+        elif mutation=='wrong-row-type':rows[0]['alternatives'][0]['result'][0]['id']=True
+        elif mutation=='missing-state-before':rows[3].pop('state_before')
+        elif mutation=='lost-scope':t.pop('entry_boundary')
+        elif mutation in ('missing-call','missing-data'):
+            rel=mutation.removeprefix('missing-');a['edges']=[e for e in a['edges'] if e[1]!=rel]
+        elif mutation=='lost-body':a['responses'][-1].pop('body')
+>       result=evaluate(t);assert not result['passed'],mutation
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: missing-call
+E       assert not True
+
+checks/tests/test_cart_evaluator_v2.py:103: AssertionError
+=========================== short test summary info ============================
+FAILED checks/tests/test_cart_evaluator_v2.py::test_meaningful_negative_is_rejected[missing-call]
+1 failed, 23 passed in 0.07s

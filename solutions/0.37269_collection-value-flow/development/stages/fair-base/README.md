@@ -1,0 +1,1 @@
+Exact parent inference with the same phase-only portable.py timing instrumentation used in final. No algorithm/context/grounding changes. Compare adjacent -timings.json; old elapsed/analysis fields include repeated serialization and are not comparable.

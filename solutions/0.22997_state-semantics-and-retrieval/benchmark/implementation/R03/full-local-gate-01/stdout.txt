@@ -1,0 +1,333 @@
+.............................................F.......................... [  3%]
+............................................F........................... [  7%]
+.......................F................................................ [ 10%]
+........................................................................ [ 14%]
+........................................................................ [ 18%]
+........................................................................ [ 21%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 32%]
+.........................................F....F......................... [ 36%]
+........................................................................ [ 39%]
+................F....................................................... [ 43%]
+........................................................................ [ 47%]
+.....................................F.................................. [ 50%]
+........................F..................F............................ [ 54%]
+................................F....................................... [ 58%]
+........................................................................ [ 61%]
+........................................................................ [ 65%]
+......F...............FFFF.............................................. [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+...............................................................F........ [ 79%]
+........................................................................ [ 83%]
+......................................................................F. [ 87%]
+........................................................................ [ 90%]
+........................................................................ [ 94%]
+........................................................................ [ 97%]
+........................................                                 [100%]
+=================================== FAILURES ===================================
+_____________ test_unknown_branch_join_preserves_a_known_map_alias _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_unknown_branch_join_prese0')
+
+    def test_unknown_branch_join_preserves_a_known_map_alias(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{Object entry(boolean flag){
+          Map map=new HashMap();Map alias=map;if(flag){map.put("key","same");}else{map.put("key","same");}
+          alias.put("later","visible");return map.get("later");}}'''})
+>       engine=Engine(project,ScenarioState(db),conservative=True);assert engine.run(ids['Api.entry'],{'flag':U})=='visible'
+                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'visible'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry(boolean)', {'flag': <Unknown.VALUE: 'unknown'>})
+E        +    where run = <analyzer.engine.Engine object at 0x10723af10>.run
+
+code/tests/test_backed_map_views.py:70: AssertionError
+____________ test_agreed_branch_box_provenance_survives_frame_join _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_agreed_branch_box_provena0')
+
+    def test_agreed_branch_box_provenance_survives_frame_join(tmp_path):
+        result,e,_=run(tmp_path,'Object value=null;if(flag){value=1L;}else{value=1L;}return (Long)value;',
+                       parameters='boolean flag',params={'flag':U},conservative=True)
+>       assert result==1
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 1
+
+code/tests/test_boxed_heap_flow.py:125: AssertionError
+_________ test_an_iterator_alias_keeps_identity_through_a_branch_clone _________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_an_iterator_alias_keeps_i0')
+
+    def test_an_iterator_alias_keeps_identity_through_a_branch_clone(tmp_path):
+        result,e,_=run(tmp_path,'List values=new ArrayList();Iterator first=values.iterator();Iterator second=first;if(flag){values.add(1L);}else{values.add(1L);}return first==second;',
+                       parameters='boolean flag',params={'flag':U},conservative=True)
+>       assert result is True and not any('identity' in w for w in e.warnings)
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> is True)
+
+code/tests/test_boxed_heap_flow.py:376: AssertionError
+__________________ test_joined_map_aliases_share_later_writes __________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_joined_map_aliases_share_0')
+
+    def test_joined_map_aliases_share_later_writes(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{Object entry(boolean flag){
+          Map map=new HashMap();Map alias=map;if(flag){map.put("key","same");}else{map.put("key","same");}
+          alias.put("later","visible");return map.get("later");}}'''})
+>       assert Engine(project,ScenarioState(db),conservative=True).run(ids['Api.entry'],{'flag':U})=='visible'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'visible'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry(boolean)', {'flag': <Unknown.VALUE: 'unknown'>})
+E        +    where run = <analyzer.engine.Engine object at 0x107556fd0>.run
+E        +      where <analyzer.engine.Engine object at 0x107556fd0> = Engine(<analyzer.project.Project object at 0x1075190d0>, <analyzer.state.ScenarioState object at 0x10751b4d0>, conservative=True)
+E        +        where <analyzer.state.ScenarioState object at 0x10751b4d0> = ScenarioState(<analyzer.state.Database object at 0x10751ff90>)
+
+code/tests/test_heap_alias_join.py:10: AssertionError
+___________ test_captured_map_alias_survives_join_and_later_callback ___________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_captured_map_alias_surviv0')
+
+    def test_captured_map_alias_survives_join_and_later_callback(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import java.util.function.Function;import java.util.stream.Collectors;
+          class Api{Object entry(boolean flag){Map data=new HashMap();Function<String,String> writer=key->{data.put(key,"visible");return key;};
+          Function<String,String> alias=writer;if(flag){data.put("before","same");}else{data.put("before","same");}
+          Arrays.asList("later").stream().map(alias).collect(Collectors.toList());return data.get("later");}}'''})
+>       assert Engine(project,ScenarioState(db),conservative=True).run(ids['Api.entry'],{'flag':U})=='visible'
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 'visible'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry(boolean)', {'flag': <Unknown.VALUE: 'unknown'>})
+E        +    where run = <analyzer.engine.Engine object at 0x1072ca3d0>.run
+E        +      where <analyzer.engine.Engine object at 0x1072ca3d0> = Engine(<analyzer.project.Project object at 0x10762d210>, <analyzer.state.ScenarioState object at 0x1072cbad0>, conservative=True)
+E        +        where <analyzer.state.ScenarioState object at 0x1072cbad0> = ScenarioState(<analyzer.state.Database object at 0x10759d410>)
+
+code/tests/test_heap_alias_join.py:49: AssertionError
+_______ test_conservative_restart_does_not_apply_a_prebranch_write_twice _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_conservative_restart_does0')
+
+    def test_conservative_restart_does_not_apply_a_prebranch_write_twice(tmp_path):
+        p,state,entry=fixture(tmp_path,'item.count=item.count+1;if(flag){}return item.count;')
+        initial=item();paths=run_paths(p,state,entry,{'item':initial,'flag':U},limit=1)
+>       assert len(paths)==1 and paths[0]['result']==1 and initial['count']==0
+E       AssertionError: assert (1 == 1 and <Unknown.VALUE: 'unknown'> == 1)
+E        +  where 1 = len([{'approximate': True, 'decisions': {}, 'engine': <analyzer.engine.Engine object at 0x1075d5050>, 'pruned_paths': [], ...}])
+
+code/tests/test_input_replay_isolation.py:42: AssertionError
+__________ test_array_view_alias_survives_a_conservative_branch_join ___________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_array_view_alias_survives0')
+
+    def test_array_view_alias_survives_a_conservative_branch_join(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import com.fasterxml.jackson.databind.ObjectMapper;
+          class Api{String entry(boolean flag){String[] array=new ObjectMapper().readValue("[\\"a\\"]",String[].class);
+          List<String> view=Arrays.asList(array);if(flag){view.set(0,"x");}else{array[0]="x";}return view.get(0);}}'''})
+        outcomes=run_paths(p,ScenarioState(db),ids['Api.entry'],{'flag':U},limit=1)
+>       assert {row['result'] for row in outcomes}=={'x'}
+E       AssertionError: assert {<Unknown.VALUE: 'unknown'>} == {'x'}
+E         
+E         Extra items in the left set:
+E         <Unknown.VALUE: 'unknown'>
+E         Extra items in the right set:
+E         'x'
+E         Use -v to get more diff
+
+code/tests/test_json_java_arrays.py:149: AssertionError
+____________ test_replay_applies_an_update_only_once_per_owned_path ____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_replay_applies_an_update_0')
+
+    def test_replay_applies_an_update_only_once_per_owned_path(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''class Counter{int count;}
+          class Api{int entry(Counter counter,boolean flag){counter.count++;if(flag){}return counter.count;}}'''})
+        value=counter();paths=run_paths(project,ScenarioState(db),ids['Api.entry'],{'counter':value,'flag':U},limit=1)
+>       assert [p['result'] for p in paths]==[11] and value['count']==10
+E       AssertionError: assert ([<Unknown.VALUE: 'unknown'>] == [11]
+E         
+E         At index 0 diff: <Unknown.VALUE: 'unknown'> != 11
+E         Use -v to get more diff)
+
+code/tests/test_lvalue_evaluation.py:115: AssertionError
+_____ test_static_storage_is_diagnosed_instead_of_writing_an_instance_slot _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_static_storage_is_diagnos0')
+
+    def test_static_storage_is_diagnosed_instead_of_writing_an_instance_slot(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'class Globals{static int count=0;}class Api{int entry(){return ++Globals.count;}}'})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{}) is U and engine.approximate
+E       AssertionError: assert (1 is <Unknown.VALUE: 'unknown'>)
+E        +  where 1 = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x107728ad0>.run
+
+code/tests/test_lvalue_evaluation.py:205: AssertionError
+_________ test_view_keeps_backing_identity_after_agreed_branch_writes __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_view_keeps_backing_identi0')
+
+    def test_view_keeps_backing_identity_after_agreed_branch_writes(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{Object entry(boolean flag){Map map=new HashMap();Set keys=map.keySet();
+          if(flag){map.put("k","v");}else{map.put("k","v");}keys.clear();return map.isEmpty();}}'''})
+>       assert Engine(p,ScenarioState(db),conservative=True).run(ids['Api.entry'],{'flag':U}) is True
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> is True
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry(boolean)', {'flag': <Unknown.VALUE: 'unknown'>})
+E        +    where run = <analyzer.engine.Engine object at 0x107711390>.run
+E        +      where <analyzer.engine.Engine object at 0x107711390> = Engine(<analyzer.project.Project object at 0x107710350>, <analyzer.state.ScenarioState object at 0x10759d9d0>, conservative=True)
+E        +        where <analyzer.state.ScenarioState object at 0x10759d9d0> = ScenarioState(<analyzer.state.Database object at 0x107557590>)
+
+code/tests/test_map_view_iteration.py:62: AssertionError
+_____ test_selected_completion_keeps_locals_receiver_and_joint_aliases[1] ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_selected_completion_keeps0')
+limit = 1
+
+    @pytest.mark.parametrize('limit', [1, 2, 4, 8])
+    def test_selected_completion_keeps_locals_receiver_and_joint_aliases(tmp_path, limit):
+        project, database, ids = build(tmp_path, {'Api.java': '''class Box {int n;}
+          class Api {Box held;
+            int entry(Box box, boolean flag){
+              Box local=box; held=box;
+              try {if(flag){box.n=7;throw new IllegalStateException();}else{box.n=9;}}
+              catch(IllegalStateException failure){return local.n*10+held.n;}
+              return local.n*10+held.n;
+            }
+          }'''})
+        box = JavaRecord('Box', {'__type__':'Box','n':0}, ['n'])
+        state = ScenarioState(database)
+        state.browser['form']['alias'] = box
+        state.database.tables[('service','boxes')] = [box]
+        outcomes = run_paths(project, state, ids['Api.entry'], {'box':box,'flag':U}, limit=limit)
+>       assert {row['result'] for row in outcomes} == {77, 99}
+E       AssertionError: assert {<Unknown.VALUE: 'unknown'>} == {77, 99}
+E         
+E         Extra items in the left set:
+E         <Unknown.VALUE: 'unknown'>
+E         Extra items in the right set:
+E         99
+E         77
+E         Use -v to get more diff
+
+code/tests/test_regression_adopt.py:25: AssertionError
+______ test_standard_logger_spelling_keeps_the_same_continuation[LOGGER] _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_standard_logger_spelling_0')
+receiver = 'LOGGER'
+
+    @pytest.mark.parametrize('receiver', ['LOGGER', 'Api.LOGGER', 'sample.Api.LOGGER'])
+    def test_standard_logger_spelling_keeps_the_same_continuation(tmp_path, receiver):
+        project, database, ids = qualified_project(tmp_path, {'Api.java': '''package sample;
+          import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+          class Api {static final Logger LOGGER=LoggerFactory.getLogger(Api.class);
+            int entry(){''' + receiver + '''.info("message {}", 3); return after();}
+            int after(){return 17;} }'''})
+        outcomes = run_paths(project, ScenarioState(database), ids['Api.entry'], {}, limit=1)
+>       assert outcomes and all(row['result'] == 17 for row in outcomes)
+E       AssertionError: assert ([{'approximate': True, 'decisions': {'1:Api.java:3:opaque-completion': 'normal'}, 'engine': <analyzer.engine.Engine ob...ava:3:opaque-completion': 'throw'}, 'engine': <analyzer.engine.Engine object at 0x107360210>, 'pruned_paths': [], ...}] and False)
+E        +  where False = all(<generator object test_standard_logger_spelling_keeps_the_same_continuation.<locals>.<genexpr> at 0x1077d4040>)
+
+code/tests/test_regression_logger.py:30: AssertionError
+____ test_standard_logger_spelling_keeps_the_same_continuation[Api.LOGGER] _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_standard_logger_spelling_1')
+receiver = 'Api.LOGGER'
+
+    @pytest.mark.parametrize('receiver', ['LOGGER', 'Api.LOGGER', 'sample.Api.LOGGER'])
+    def test_standard_logger_spelling_keeps_the_same_continuation(tmp_path, receiver):
+        project, database, ids = qualified_project(tmp_path, {'Api.java': '''package sample;
+          import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+          class Api {static final Logger LOGGER=LoggerFactory.getLogger(Api.class);
+            int entry(){''' + receiver + '''.info("message {}", 3); return after();}
+            int after(){return 17;} }'''})
+        outcomes = run_paths(project, ScenarioState(database), ids['Api.entry'], {}, limit=1)
+>       assert outcomes and all(row['result'] == 17 for row in outcomes)
+E       AssertionError: assert ([{'approximate': True, 'decisions': {'1:Api.java:3:opaque-completion': 'normal'}, 'engine': <analyzer.engine.Engine ob...ava:3:opaque-completion': 'throw'}, 'engine': <analyzer.engine.Engine object at 0x10801ed90>, 'pruned_paths': [], ...}] and False)
+E        +  where False = all(<generator object test_standard_logger_spelling_keeps_the_same_continuation.<locals>.<genexpr> at 0x10776f920>)
+
+code/tests/test_regression_logger.py:30: AssertionError
+_ test_standard_logger_spelling_keeps_the_same_continuation[sample.Api.LOGGER] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_standard_logger_spelling_2')
+receiver = 'sample.Api.LOGGER'
+
+    @pytest.mark.parametrize('receiver', ['LOGGER', 'Api.LOGGER', 'sample.Api.LOGGER'])
+    def test_standard_logger_spelling_keeps_the_same_continuation(tmp_path, receiver):
+        project, database, ids = qualified_project(tmp_path, {'Api.java': '''package sample;
+          import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+          class Api {static final Logger LOGGER=LoggerFactory.getLogger(Api.class);
+            int entry(){''' + receiver + '''.info("message {}", 3); return after();}
+            int after(){return 17;} }'''})
+        outcomes = run_paths(project, ScenarioState(database), ids['Api.entry'], {}, limit=1)
+>       assert outcomes and all(row['result'] == 17 for row in outcomes)
+E       AssertionError: assert ([{'approximate': True, 'decisions': {'1:Api.java:3:opaque-completion': 'normal'}, 'engine': <analyzer.engine.Engine ob...ava:3:opaque-completion': 'throw'}, 'engine': <analyzer.engine.Engine object at 0x1077f6c90>, 'pruned_paths': [], ...}] and False)
+E        +  where False = all(<generator object test_standard_logger_spelling_keeps_the_same_continuation.<locals>.<genexpr> at 0x10804ee90>)
+
+code/tests/test_regression_logger.py:30: AssertionError
+__________ test_imported_static_logger_uses_the_declaring_field_type ___________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_imported_static_logger_us0')
+
+    def test_imported_static_logger_uses_the_declaring_field_type(tmp_path):
+        project, database, ids = qualified_project(tmp_path, {
+            'Api.java': '''package sample; import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+              class Api {public static final Logger LOGGER=LoggerFactory.getLogger(Api.class);}''',
+            'Other.java': '''package sample; import static sample.Api.LOGGER;
+              class Other {int entry(){LOGGER.debug("quiet");return 23;}}'''})
+        outcomes = run_paths(project, ScenarioState(database), ids['Other.entry'], {}, limit=1)
+>       assert outcomes and all(row['result'] == 23 for row in outcomes)
+E       AssertionError: assert ([{'approximate': True, 'decisions': {'1:Api.java:2:opaque-completion': 'normal'}, 'engine': <analyzer.engine.Engine ob...ava:2:opaque-completion': 'throw'}, 'engine': <analyzer.engine.Engine object at 0x108009e10>, 'pruned_paths': [], ...}] and False)
+E        +  where False = all(<generator object test_imported_static_logger_uses_the_declaring_field_type.<locals>.<genexpr> at 0x108040520>)
+
+code/tests/test_regression_logger.py:43: AssertionError
+_____________ test_join_preserves_readonly_view_and_backing_alias ______________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_join_preserves_readonly_v0')
+
+    def test_join_preserves_readonly_view_and_backing_alias(tmp_path):
+        source='''import java.util.*;class Api{int entry(boolean flag){List<Integer> items=new ArrayList<>();items.add(1);
+          List<Integer> view=Collections.unmodifiableList(items);if(flag){items.set(0,7);}else{items.set(0,8);}
+          try{view.add(9);}catch(UnsupportedOperationException e){caught();return view.get(0);}return -1;}void caught(){}}'''
+        project,db,ids=build(tmp_path,{'Api.java':source})
+        paths=run_paths(project,ScenarioState(db),ids['Api.entry'],{'flag':U},limit=1)
+>       assert all(row['result'] is U for row in paths)
+E       assert False
+E        +  where False = all(<generator object test_join_preserves_readonly_view_and_backing_alias.<locals>.<genexpr> at 0x1080fedc0>)
+
+code/tests/test_review_public_mechanisms.py:71: AssertionError
+_________ test_joined_singleton_receiver_and_cache_share_later_writes __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-6/test_joined_singleton_receiver0')
+
+    def test_joined_singleton_receiver_and_cache_share_later_writes(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.stereotype.Component;
+          import javax.annotation.PostConstruct;
+          @Component class Counter {int revision;@PostConstruct void init(){revision=7;}
+            int set(boolean flag){if(flag){revision=8;}else{revision=9;}revision=10;return revision;}
+            int read(){return revision;}}
+          class Api {Counter counter;int write(boolean flag){return counter.set(flag);}int read(){return counter.read();}}'''})
+        first=Engine(p,ScenarioState(db),conservative=True)
+>       assert first.run(ids['Api.write'],{'flag':U})==10
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 10
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#write(boolean)', {'flag': <Unknown.VALUE: 'unknown'>})
+E        +    where run = <analyzer.engine.Engine object at 0x107706a10>.run
+
+code/tests/test_singleton_join_identity.py:14: AssertionError
+=============================== warnings summary ===============================
+checks/tests/test_archive_support.py::test_duplicate_symlink_or_corruption[options0]
+  /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/zipfile.py:1566: UserWarning: Duplicate name: 'submission.json'
+    return self._open_to_write(zinfo, force_zip64=force_zip64)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED code/tests/test_backed_map_views.py::test_unknown_branch_join_preserves_a_known_map_alias
+FAILED code/tests/test_boxed_heap_flow.py::test_agreed_branch_box_provenance_survives_frame_join
+FAILED code/tests/test_boxed_heap_flow.py::test_an_iterator_alias_keeps_identity_through_a_branch_clone
+FAILED code/tests/test_heap_alias_join.py::test_joined_map_aliases_share_later_writes
+FAILED code/tests/test_heap_alias_join.py::test_captured_map_alias_survives_join_and_later_callback
+FAILED code/tests/test_input_replay_isolation.py::test_conservative_restart_does_not_apply_a_prebranch_write_twice
+FAILED code/tests/test_json_java_arrays.py::test_array_view_alias_survives_a_conservative_branch_join
+FAILED code/tests/test_lvalue_evaluation.py::test_replay_applies_an_update_only_once_per_owned_path
+FAILED code/tests/test_lvalue_evaluation.py::test_static_storage_is_diagnosed_instead_of_writing_an_instance_slot
+FAILED code/tests/test_map_view_iteration.py::test_view_keeps_backing_identity_after_agreed_branch_writes
+FAILED code/tests/test_regression_adopt.py::test_selected_completion_keeps_locals_receiver_and_joint_aliases[1]
+FAILED code/tests/test_regression_logger.py::test_standard_logger_spelling_keeps_the_same_continuation[LOGGER]
+FAILED code/tests/test_regression_logger.py::test_standard_logger_spelling_keeps_the_same_continuation[Api.LOGGER]
+FAILED code/tests/test_regression_logger.py::test_standard_logger_spelling_keeps_the_same_continuation[sample.Api.LOGGER]
+FAILED code/tests/test_regression_logger.py::test_imported_static_logger_uses_the_declaring_field_type
+FAILED code/tests/test_review_public_mechanisms.py::test_join_preserves_readonly_view_and_backing_alias
+FAILED code/tests/test_singleton_join_identity.py::test_joined_singleton_receiver_and_cache_share_later_writes
+17 failed, 1967 passed, 1 warning in 9.58s

@@ -1,0 +1,1712 @@
+{
+  "graph_policy": "observed-union",
+  "analysis_status": "partial",
+  "certainty_scope": "relative to supplied inputs, proposed bindings and supported semantics; not a runtime trace",
+  "confirmed": [
+    {
+      "source": "scenario:witness",
+      "relation": "executes",
+      "target": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+    },
+    {
+      "source": "scenario:witness",
+      "relation": "executes",
+      "target": "method:service:Login#login(Credentials)"
+    },
+    {
+      "source": "scenario:witness",
+      "relation": "executes",
+      "target": "method:service:Profile#<init>(String,String,boolean)"
+    },
+    {
+      "source": "scenario:witness",
+      "relation": "executes",
+      "target": "method:service:Profile#getAuthorities()"
+    },
+    {
+      "source": "scenario:witness",
+      "relation": "executes",
+      "target": "method:service:Profile#getPassword()"
+    },
+    {
+      "source": "scenario:witness",
+      "relation": "executes",
+      "target": "method:service:Profile#getUsername()"
+    },
+    {
+      "source": "scenario:witness",
+      "relation": "executes",
+      "target": "method:service:Profile#isAccountNonExpired()"
+    },
+    {
+      "source": "scenario:witness",
+      "relation": "executes",
+      "target": "method:service:Profile#isAccountNonLocked()"
+    },
+    {
+      "source": "scenario:witness",
+      "relation": "executes",
+      "target": "method:service:Profile#isCredentialsNonExpired()"
+    },
+    {
+      "source": "scenario:witness",
+      "relation": "executes",
+      "target": "method:service:Profile#isEnabled()"
+    },
+    {
+      "source": "scenario:witness",
+      "relation": "executes",
+      "target": "method:service:Provider#loadUserByUsername(String)"
+    },
+    {
+      "source": "method:service:Provider#loadUserByUsername(String)",
+      "relation": "calls",
+      "target": "method:service:Profile#<init>(String,String,boolean)"
+    }
+  ],
+  "possible": [
+    {
+      "source": "scenario:witness",
+      "relation": "executes",
+      "target": "method:service:Login#read()"
+    }
+  ],
+  "unresolved": [
+    "State depends on earlier analysis assumptions: step 1: unresolved source/request/state assumptions",
+    "request filter registration is assumed from source classes; full bean registration is not modeled"
+  ],
+  "steps": [
+    {
+      "n": 1,
+      "action": "As alice, login name \"alice\" password \"secret\"",
+      "selection": {
+        "candidates": [
+          "method:service:Login#login(Credentials)",
+          "method:service:Login#read()"
+        ],
+        "ranking": [
+          {
+            "entry": "method:service:Login#login(Credentials)",
+            "ui_site": "ui.js:1:url0",
+            "score": 0.9302472402896105
+          },
+          {
+            "entry": "method:service:Login#read()",
+            "ui_site": "ui.js:5:url0",
+            "score": 0.03225223871012668
+          }
+        ],
+        "proposal": {
+          "hypotheses": []
+        },
+        "unresolved": [],
+        "grounding_status": "lexical_hypothesis",
+        "certainty_note": "Graph certainty is conditional on the selected source contract and validated bindings"
+      },
+      "state_before": {
+        "browser": {
+          "storage": {},
+          "form": {},
+          "dom": {},
+          "url": {},
+          "options": {},
+          "script": {}
+        },
+        "history": [],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {},
+        "unknown_tables": [],
+        "analysis_assumptions": [],
+        "limitations": [],
+        "tables": {}
+      },
+      "state_after": {
+        "browser": {
+          "storage": {
+            "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+          },
+          "form": {},
+          "dom": {
+            "#name": "alice",
+            "#password": "secret"
+          },
+          "url": {},
+          "options": {},
+          "script": {},
+          "actor": "alice",
+          "pages": {},
+          "dom_text": {},
+          "script_unknown": false,
+          "active_page": "page.html",
+          "source_options": []
+        },
+        "history": [
+          {
+            "step": 1,
+            "entry": "method:service:Login#login(Credentials)",
+            "action": "As alice, login name \"alice\" password \"secret\""
+          }
+        ],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {},
+        "unknown_tables": [],
+        "analysis_assumptions": [
+          "step 1: unresolved source/request/state assumptions"
+        ],
+        "limitations": [],
+        "tables": {}
+      },
+      "alternatives": [
+        {
+          "entry": "method:service:Login#login(Credentials)",
+          "parameters": {
+            "name": "alice",
+            "password": "secret"
+          },
+          "grounding_reason": "Highest weighted source/UI contract score: 0.9302472402896105",
+          "grounding_repairs": [],
+          "retrieval_candidates": [
+            "method:service:Login#login(Credentials)",
+            "method:service:Login#read()"
+          ],
+          "ui_site": "ui.js:1:url0",
+          "bindings": {
+            "name": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "name \"alice\"",
+              "resolved": true
+            },
+            "password": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "password \"secret\"",
+              "resolved": true
+            }
+          },
+          "result": {
+            "name": "alice",
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+          },
+          "state_before": {
+            "browser": {
+              "storage": {},
+              "form": {},
+              "dom": {
+                "#name": "alice",
+                "#password": "secret"
+              },
+              "url": {},
+              "options": {},
+              "script": {},
+              "actor": "alice",
+              "pages": {},
+              "dom_text": {},
+              "script_unknown": false,
+              "active_page": "page.html",
+              "source_options": []
+            },
+            "history": [],
+            "clock": "2026-10-18T00:00:00",
+            "database_rows": {},
+            "unknown_tables": [],
+            "analysis_assumptions": [],
+            "limitations": [],
+            "tables": {}
+          },
+          "selected_objects": [],
+          "request": {
+            "deployment": "service",
+            "method": "POST",
+            "url": "/login",
+            "path": [
+              "login"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "__rest_unknown__": true,
+              "content-type": [
+                "application/json"
+              ]
+            },
+            "body": {
+              "name": "alice",
+              "password": "secret"
+            },
+            "actor": "alice",
+            "session": {
+              "storage": {},
+              "actor": "alice"
+            },
+            "body_properties": {
+              "input": {}
+            },
+            "provenance": {
+              "name": {
+                "source": "literal",
+                "reference": "action",
+                "quote": "name \"alice\"",
+                "resolved": true
+              },
+              "password": {
+                "source": "literal",
+                "reference": "action",
+                "quote": "password \"secret\"",
+                "resolved": true
+              },
+              "__assumptions__": []
+            }
+          },
+          "created_objects": [],
+          "path_conditions": [
+            {
+              "method": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+              "line": 19,
+              "condition": "(req.getRequestURI().equals(\"/protected\"))",
+              "value": false
+            }
+          ],
+          "decisions": {},
+          "pruned_paths": [],
+          "outcome": "returned",
+          "unresolved": [
+            "request filter registration is assumed from source classes; full bean registration is not modeled"
+          ],
+          "operation_issues": [],
+          "data_operations": [],
+          "events": [
+            {
+              "edge": {
+                "source": "scenario:witness",
+                "relation": "executes",
+                "target": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+              },
+              "request": 1,
+              "callsite": "project request filter",
+              "method": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+              "line": null,
+              "context": "C1",
+              "values": {
+                "version": "value-witness/1",
+                "arguments": [
+                  {
+                    "kind": "object",
+                    "type": "HttpServletRequest",
+                    "fields": [
+                      "headers",
+                      "method",
+                      "uri",
+                      "actor",
+                      "session"
+                    ]
+                  },
+                  {
+                    "kind": "object",
+                    "type": "HttpServletResponse",
+                    "fields": [
+                      "status",
+                      "body"
+                    ]
+                  },
+                  {
+                    "kind": "object",
+                    "type": null,
+                    "fields": []
+                  }
+                ]
+              },
+              "cause": "framework_dispatch"
+            },
+            {
+              "edge": {
+                "source": "scenario:witness",
+                "relation": "executes",
+                "target": "method:service:Login#login(Credentials)"
+              },
+              "request": 1,
+              "callsite": "scenario request",
+              "method": "method:service:Login#login(Credentials)",
+              "line": null,
+              "context": "C1",
+              "values": {
+                "version": "value-witness/1",
+                "arguments": [
+                  {
+                    "kind": "object",
+                    "type": "Credentials",
+                    "fields": [
+                      "name",
+                      "password"
+                    ]
+                  }
+                ]
+              },
+              "cause": "source_execution"
+            },
+            {
+              "edge": {
+                "source": "scenario:witness",
+                "relation": "executes",
+                "target": "method:service:Provider#loadUserByUsername(String)"
+              },
+              "request": 1,
+              "callsite": "Spring authentication callback at call:method:service:Login#login(Credentials)@9:45",
+              "method": "method:service:Provider#loadUserByUsername(String)",
+              "line": null,
+              "context": "C1",
+              "values": {
+                "version": "value-witness/1",
+                "arguments": [
+                  {
+                    "kind": "str",
+                    "value": "alice"
+                  }
+                ]
+              },
+              "cause": "framework_dispatch"
+            },
+            {
+              "edge": {
+                "source": "scenario:witness",
+                "relation": "executes",
+                "target": "method:service:Profile#<init>(String,String,boolean)"
+              },
+              "request": 1,
+              "callsite": "call:method:service:Provider#loadUserByUsername(String)@20:60",
+              "method": "method:service:Profile#<init>(String,String,boolean)",
+              "line": 20,
+              "context": "C1",
+              "values": {
+                "version": "value-witness/1",
+                "arguments": [
+                  {
+                    "kind": "str",
+                    "value": "alice"
+                  },
+                  {
+                    "kind": "str",
+                    "value": "{noop}secret"
+                  },
+                  {
+                    "kind": "bool",
+                    "value": true
+                  }
+                ]
+              },
+              "cause": "source_execution"
+            },
+            {
+              "edge": {
+                "source": "method:service:Provider#loadUserByUsername(String)",
+                "relation": "calls",
+                "target": "method:service:Profile#<init>(String,String,boolean)"
+              },
+              "request": 1,
+              "callsite": "call:method:service:Provider#loadUserByUsername(String)@20:60",
+              "method": "method:service:Provider#loadUserByUsername(String)",
+              "line": 20,
+              "context": "C1",
+              "values": {
+                "version": "value-witness/1",
+                "arguments": [
+                  {
+                    "kind": "str",
+                    "value": "alice"
+                  },
+                  {
+                    "kind": "str",
+                    "value": "{noop}secret"
+                  },
+                  {
+                    "kind": "bool",
+                    "value": true
+                  }
+                ]
+              },
+              "cause": "direct_call"
+            },
+            {
+              "edge": {
+                "source": "scenario:witness",
+                "relation": "executes",
+                "target": "method:service:Profile#isAccountNonLocked()"
+              },
+              "request": 1,
+              "callsite": "UserDetails isAccountNonLocked callback at call:method:service:Login#login(Credentials)@9:45",
+              "method": "method:service:Profile#isAccountNonLocked()",
+              "line": null,
+              "context": "C1",
+              "values": {
+                "version": "value-witness/1",
+                "arguments": []
+              },
+              "cause": "framework_dispatch"
+            },
+            {
+              "edge": {
+                "source": "scenario:witness",
+                "relation": "executes",
+                "target": "method:service:Profile#isEnabled()"
+              },
+              "request": 1,
+              "callsite": "UserDetails isEnabled callback at call:method:service:Login#login(Credentials)@9:45",
+              "method": "method:service:Profile#isEnabled()",
+              "line": null,
+              "context": "C1",
+              "values": {
+                "version": "value-witness/1",
+                "arguments": []
+              },
+              "cause": "framework_dispatch"
+            },
+            {
+              "edge": {
+                "source": "scenario:witness",
+                "relation": "executes",
+                "target": "method:service:Profile#isAccountNonExpired()"
+              },
+              "request": 1,
+              "callsite": "UserDetails isAccountNonExpired callback at call:method:service:Login#login(Credentials)@9:45",
+              "method": "method:service:Profile#isAccountNonExpired()",
+              "line": null,
+              "context": "C1",
+              "values": {
+                "version": "value-witness/1",
+                "arguments": []
+              },
+              "cause": "framework_dispatch"
+            },
+            {
+              "edge": {
+                "source": "scenario:witness",
+                "relation": "executes",
+                "target": "method:service:Profile#getPassword()"
+              },
+              "request": 1,
+              "callsite": "UserDetails getPassword callback at call:method:service:Login#login(Credentials)@9:45",
+              "method": "method:service:Profile#getPassword()",
+              "line": null,
+              "context": "C1",
+              "values": {
+                "version": "value-witness/1",
+                "arguments": []
+              },
+              "cause": "framework_dispatch"
+            },
+            {
+              "edge": {
+                "source": "scenario:witness",
+                "relation": "executes",
+                "target": "method:service:Profile#isCredentialsNonExpired()"
+              },
+              "request": 1,
+              "callsite": "UserDetails isCredentialsNonExpired callback at call:method:service:Login#login(Credentials)@9:45",
+              "method": "method:service:Profile#isCredentialsNonExpired()",
+              "line": null,
+              "context": "C1",
+              "values": {
+                "version": "value-witness/1",
+                "arguments": []
+              },
+              "cause": "framework_dispatch"
+            },
+            {
+              "edge": {
+                "source": "scenario:witness",
+                "relation": "executes",
+                "target": "method:service:Profile#getAuthorities()"
+              },
+              "request": 1,
+              "callsite": "UserDetails getAuthorities callback at call:method:service:Login#login(Credentials)@9:45",
+              "method": "method:service:Profile#getAuthorities()",
+              "line": null,
+              "context": "C1",
+              "values": {
+                "version": "value-witness/1",
+                "arguments": []
+              },
+              "cause": "framework_dispatch"
+            },
+            {
+              "edge": {
+                "source": "scenario:witness",
+                "relation": "executes",
+                "target": "method:service:Profile#getUsername()"
+              },
+              "request": 1,
+              "callsite": "UserDetails getUsername callback at call:method:service:Login#login(Credentials)@10:58",
+              "method": "method:service:Profile#getUsername()",
+              "line": null,
+              "context": "C1",
+              "values": {
+                "version": "value-witness/1",
+                "arguments": []
+              },
+              "cause": "framework_dispatch"
+            },
+            {
+              "edge": {
+                "source": "scenario:witness",
+                "relation": "executes",
+                "target": "method:service:Profile#getUsername()"
+              },
+              "request": 1,
+              "callsite": "UserDetails getUsername callback at call:method:service:Login#login(Credentials)@13:89",
+              "method": "method:service:Profile#getUsername()",
+              "line": null,
+              "context": "C1",
+              "values": {
+                "version": "value-witness/1",
+                "arguments": []
+              },
+              "cause": "framework_dispatch"
+            }
+          ],
+          "semantic_callbacks": [],
+          "reflection_edges": [],
+          "assumptions": {},
+          "event_contexts": {
+            "C1": {
+              "guards": [],
+              "assumptions": []
+            }
+          },
+          "requests": [
+            {
+              "id": 1,
+              "entry": "method:service:Login#login(Credentials)",
+              "reason": "scenario request",
+              "request": {
+                "deployment": "service",
+                "method": "POST",
+                "url": "/login",
+                "path": [
+                  "login"
+                ],
+                "query": {},
+                "query_complete": true,
+                "headers": {
+                  "__rest_unknown__": true,
+                  "content-type": [
+                    "application/json"
+                  ]
+                },
+                "body": {
+                  "name": "alice",
+                  "password": "secret"
+                },
+                "actor": "alice",
+                "session": {
+                  "storage": {},
+                  "actor": "alice"
+                },
+                "body_properties": {
+                  "input": {}
+                },
+                "provenance": {
+                  "name": {
+                    "source": "literal",
+                    "reference": "action",
+                    "quote": "name \"alice\"",
+                    "resolved": true
+                  },
+                  "password": {
+                    "source": "literal",
+                    "reference": "action",
+                    "quote": "password \"secret\"",
+                    "resolved": true
+                  },
+                  "__assumptions__": []
+                }
+              },
+              "authorization_checked": false,
+              "bound_arguments": [
+                {
+                  "name": "input",
+                  "declared_type": "Credentials",
+                  "value": {
+                    "__type__": "Credentials",
+                    "__http_entity__": false,
+                    "name": "alice",
+                    "password": "secret"
+                  }
+                }
+              ]
+            }
+          ],
+          "responses": [
+            {
+              "request": 1,
+              "status": 200,
+              "entered": true,
+              "body_presence": "json",
+              "body": {
+                "name": "alice",
+                "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+              }
+            }
+          ],
+          "call_effects": [],
+          "persistence": [],
+          "static_candidates": [],
+          "state_after": {
+            "browser": {
+              "storage": {
+                "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+              },
+              "form": {},
+              "dom": {
+                "#name": "alice",
+                "#password": "secret"
+              },
+              "url": {},
+              "options": {},
+              "script": {},
+              "actor": "alice",
+              "pages": {},
+              "dom_text": {},
+              "script_unknown": false,
+              "active_page": "page.html",
+              "source_options": []
+            },
+            "history": [
+              {
+                "step": 1,
+                "entry": "method:service:Login#login(Credentials)",
+                "action": "As alice, login name \"alice\" password \"secret\""
+              }
+            ],
+            "clock": "2026-10-18T00:00:00",
+            "database_rows": {},
+            "unknown_tables": [],
+            "analysis_assumptions": [
+              "step 1: unresolved source/request/state assumptions"
+            ],
+            "limitations": [],
+            "tables": {}
+          },
+          "edges": [
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Login#login(Credentials)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#<init>(String,String,boolean)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#getAuthorities()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#getPassword()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#getUsername()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isAccountNonExpired()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isAccountNonLocked()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isCredentialsNonExpired()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Profile#isEnabled()"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Provider#loadUserByUsername(String)"
+            },
+            {
+              "source": "method:service:Provider#loadUserByUsername(String)",
+              "relation": "calls",
+              "target": "method:service:Profile#<init>(String,String,boolean)"
+            }
+          ],
+          "heap_after": {
+            "phase": "backend return, browser callback effects in state_after",
+            "graph": {
+              "$id": "h1",
+              "kind": "dict",
+              "fields": {
+                "actor_browsers": {
+                  "$id": "h2",
+                  "kind": "dict",
+                  "fields": {}
+                },
+                "beans": {
+                  "$id": "h3",
+                  "kind": "dict",
+                  "fields": {}
+                },
+                "browser": {
+                  "$id": "h4",
+                  "kind": "dict",
+                  "fields": {
+                    "active_page": "page.html",
+                    "actor": "alice",
+                    "dom": {
+                      "$id": "h5",
+                      "kind": "dict",
+                      "fields": {
+                        "#name": "alice",
+                        "#password": "secret"
+                      }
+                    },
+                    "dom_text": {
+                      "$id": "h6",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "form": {
+                      "$id": "h7",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "options": {
+                      "$id": "h8",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "pages": {
+                      "$id": "h9",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "script": {
+                      "$id": "h10",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "script_unknown": false,
+                    "source_options": {
+                      "$id": "h11",
+                      "kind": "list",
+                      "fields": []
+                    },
+                    "storage": {
+                      "$id": "h12",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "url": {
+                      "$id": "h13",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "action": "As alice, read protected",
+      "selection": {
+        "candidates": [
+          "method:service:Login#read()"
+        ],
+        "ranking": [
+          {
+            "entry": "method:service:Login#read()",
+            "ui_site": "ui.js:5:url0",
+            "score": 12.048905020219287
+          }
+        ],
+        "proposal": {
+          "hypotheses": []
+        },
+        "unresolved": [],
+        "grounding_status": "lexical_hypothesis",
+        "certainty_note": "Graph certainty is conditional on the selected source contract and validated bindings"
+      },
+      "state_before": {
+        "browser": {
+          "storage": {
+            "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+          },
+          "form": {},
+          "dom": {
+            "#name": "alice",
+            "#password": "secret"
+          },
+          "url": {},
+          "options": {},
+          "script": {},
+          "actor": "alice",
+          "pages": {},
+          "dom_text": {},
+          "script_unknown": false,
+          "active_page": "page.html",
+          "source_options": []
+        },
+        "history": [
+          {
+            "step": 1,
+            "entry": "method:service:Login#login(Credentials)",
+            "action": "As alice, login name \"alice\" password \"secret\""
+          }
+        ],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {},
+        "unknown_tables": [],
+        "analysis_assumptions": [
+          "step 1: unresolved source/request/state assumptions"
+        ],
+        "limitations": [],
+        "tables": {}
+      },
+      "state_after": {
+        "browser": {
+          "storage": {
+            "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+          },
+          "form": {},
+          "dom": {
+            "#name": "alice",
+            "#password": "secret"
+          },
+          "url": {},
+          "options": {},
+          "script": {},
+          "actor": "alice",
+          "pages": {},
+          "dom_text": {},
+          "script_unknown": false,
+          "active_page": "page.html",
+          "source_options": []
+        },
+        "history": [
+          {
+            "step": 1,
+            "entry": "method:service:Login#login(Credentials)",
+            "action": "As alice, login name \"alice\" password \"secret\""
+          },
+          {
+            "step": 2,
+            "entry": "method:service:Login#read()",
+            "action": "As alice, read protected"
+          }
+        ],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {},
+        "unknown_tables": [],
+        "analysis_assumptions": [
+          "step 1: unresolved source/request/state assumptions"
+        ],
+        "limitations": [],
+        "tables": {}
+      },
+      "alternatives": [
+        {
+          "entry": "method:service:Login#read()",
+          "parameters": {},
+          "grounding_reason": "Highest weighted source/UI contract score: 12.048905020219287",
+          "grounding_repairs": [],
+          "retrieval_candidates": [
+            "method:service:Login#read()"
+          ],
+          "ui_site": "ui.js:5:url0",
+          "bindings": {},
+          "result": "protected-data",
+          "state_before": {
+            "browser": {
+              "storage": {
+                "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+              },
+              "form": {},
+              "dom": {
+                "#name": "alice",
+                "#password": "secret"
+              },
+              "url": {},
+              "options": {},
+              "script": {},
+              "actor": "alice",
+              "pages": {},
+              "dom_text": {},
+              "script_unknown": false,
+              "active_page": "page.html",
+              "source_options": []
+            },
+            "history": [
+              {
+                "step": 1,
+                "entry": "method:service:Login#login(Credentials)",
+                "action": "As alice, login name \"alice\" password \"secret\""
+              }
+            ],
+            "clock": "2026-10-18T00:00:00",
+            "database_rows": {},
+            "unknown_tables": [],
+            "analysis_assumptions": [
+              "step 1: unresolved source/request/state assumptions"
+            ],
+            "limitations": [],
+            "tables": {}
+          },
+          "selected_objects": [],
+          "request": {
+            "deployment": "service",
+            "method": "GET",
+            "url": "/protected",
+            "path": [
+              "protected"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "authorization": [
+                "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+              ],
+              "__rest_unknown__": true
+            },
+            "body": {
+              "missing": true
+            },
+            "actor": "alice",
+            "session": {
+              "storage": {
+                "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+              },
+              "actor": "alice"
+            },
+            "body_properties": {},
+            "provenance": {
+              "__assumptions__": []
+            }
+          },
+          "created_objects": [],
+          "path_conditions": [
+            {
+              "method": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+              "line": 19,
+              "condition": "(req.getRequestURI().equals(\"/protected\"))",
+              "value": true
+            },
+            {
+              "method": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+              "line": 20,
+              "condition": "(header==null)",
+              "value": false
+            },
+            {
+              "method": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+              "line": 22,
+              "condition": "(!claims.getSubject().equals(\"alice\"))",
+              "value": false
+            }
+          ],
+          "decisions": {},
+          "pruned_paths": [],
+          "outcome": "returned",
+          "unresolved": [
+            "request filter registration is assumed from source classes; full bean registration is not modeled",
+            "State depends on earlier analysis assumptions: step 1: unresolved source/request/state assumptions"
+          ],
+          "operation_issues": [],
+          "data_operations": [],
+          "events": [
+            {
+              "edge": {
+                "source": "scenario:witness",
+                "relation": "executes",
+                "target": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+              },
+              "request": 1,
+              "callsite": "project request filter",
+              "method": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)",
+              "line": null,
+              "context": "C1",
+              "values": {
+                "version": "value-witness/1",
+                "arguments": [
+                  {
+                    "kind": "object",
+                    "type": "HttpServletRequest",
+                    "fields": [
+                      "headers",
+                      "method",
+                      "uri",
+                      "actor",
+                      "session"
+                    ]
+                  },
+                  {
+                    "kind": "object",
+                    "type": "HttpServletResponse",
+                    "fields": [
+                      "status",
+                      "body"
+                    ]
+                  },
+                  {
+                    "kind": "object",
+                    "type": null,
+                    "fields": []
+                  }
+                ]
+              },
+              "cause": "framework_dispatch"
+            },
+            {
+              "edge": {
+                "source": "scenario:witness",
+                "relation": "executes",
+                "target": "method:service:Login#read()"
+              },
+              "request": 1,
+              "callsite": "scenario request",
+              "method": "method:service:Login#read()",
+              "line": null,
+              "context": "C2",
+              "values": {
+                "version": "value-witness/1",
+                "arguments": []
+              },
+              "cause": "source_execution"
+            }
+          ],
+          "semantic_callbacks": [],
+          "reflection_edges": [],
+          "assumptions": {
+            "A1": "HTTP content type is unresolved: method:service:Login#read()"
+          },
+          "event_contexts": {
+            "C1": {
+              "guards": [],
+              "assumptions": []
+            },
+            "C2": {
+              "guards": [],
+              "assumptions": [
+                "A1"
+              ]
+            }
+          },
+          "requests": [
+            {
+              "id": 1,
+              "entry": "method:service:Login#read()",
+              "reason": "scenario request",
+              "request": {
+                "deployment": "service",
+                "method": "GET",
+                "url": "/protected",
+                "path": [
+                  "protected"
+                ],
+                "query": {},
+                "query_complete": true,
+                "headers": {
+                  "authorization": [
+                    "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                  ],
+                  "__rest_unknown__": true
+                },
+                "body": {
+                  "missing": true
+                },
+                "actor": "alice",
+                "session": {
+                  "storage": {
+                    "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                  },
+                  "actor": "alice"
+                },
+                "body_properties": {},
+                "provenance": {
+                  "__assumptions__": []
+                }
+              },
+              "authorization_checked": false,
+              "bound_arguments": []
+            }
+          ],
+          "responses": [
+            {
+              "request": 1,
+              "status": 200,
+              "entered": true,
+              "body_presence": "json",
+              "body": "protected-data"
+            }
+          ],
+          "call_effects": [],
+          "persistence": [],
+          "static_candidates": [],
+          "state_after": {
+            "browser": {
+              "storage": {
+                "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+              },
+              "form": {},
+              "dom": {
+                "#name": "alice",
+                "#password": "secret"
+              },
+              "url": {},
+              "options": {},
+              "script": {},
+              "actor": "alice",
+              "pages": {},
+              "dom_text": {},
+              "script_unknown": false,
+              "active_page": "page.html",
+              "source_options": []
+            },
+            "history": [
+              {
+                "step": 1,
+                "entry": "method:service:Login#login(Credentials)",
+                "action": "As alice, login name \"alice\" password \"secret\""
+              },
+              {
+                "step": 2,
+                "entry": "method:service:Login#read()",
+                "action": "As alice, read protected"
+              }
+            ],
+            "clock": "2026-10-18T00:00:00",
+            "database_rows": {},
+            "unknown_tables": [],
+            "analysis_assumptions": [
+              "step 1: unresolved source/request/state assumptions"
+            ],
+            "limitations": [],
+            "tables": {}
+          },
+          "edges": [
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+            },
+            {
+              "source": "scenario:witness",
+              "relation": "executes",
+              "target": "method:service:Login#read()"
+            }
+          ],
+          "heap_after": {
+            "phase": "backend return, browser callback effects in state_after",
+            "graph": {
+              "$id": "h1",
+              "kind": "dict",
+              "fields": {
+                "actor_browsers": {
+                  "$id": "h2",
+                  "kind": "dict",
+                  "fields": {}
+                },
+                "beans": {
+                  "$id": "h3",
+                  "kind": "dict",
+                  "fields": {}
+                },
+                "browser": {
+                  "$id": "h4",
+                  "kind": "dict",
+                  "fields": {
+                    "active_page": "page.html",
+                    "actor": "alice",
+                    "dom": {
+                      "$id": "h5",
+                      "kind": "dict",
+                      "fields": {
+                        "#name": "alice",
+                        "#password": "secret"
+                      }
+                    },
+                    "dom_text": {
+                      "$id": "h6",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "form": {
+                      "$id": "h7",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "options": {
+                      "$id": "h8",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "pages": {
+                      "$id": "h9",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "script": {
+                      "$id": "h10",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "script_unknown": false,
+                    "source_options": {
+                      "$id": "h11",
+                      "kind": "list",
+                      "fields": []
+                    },
+                    "storage": {
+                      "$id": "h12",
+                      "kind": "dict",
+                      "fields": {
+                        "login_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInJvbGVzIjpbInJlYWRlciJdLCJpYXQiOjE3OTIyODE2MDAsImV4cCI6MTc5MjI4MTY2MH0.8DQLtjHtaOF_-m6ZH8Z_x2Q6Dx36iOOPszzOPga9raA"
+                      }
+                    },
+                    "url": {
+                      "$id": "h13",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "edge": {
+        "source": "scenario:witness",
+        "relation": "executes",
+        "target": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+      },
+      "grounds": [
+        {
+          "step": 1,
+          "entry": "method:service:Login#login(Credentials)",
+          "ui_site": "ui.js:1:url0",
+          "alternative": 0,
+          "source_sites": [
+            "project request filter"
+          ],
+          "approximate": true,
+          "source_locations": [
+            {
+              "file": "Web.java",
+              "line": 18,
+              "method": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+            }
+          ],
+          "applied_rules": [
+            "project request filter"
+          ]
+        },
+        {
+          "step": 2,
+          "entry": "method:service:Login#read()",
+          "ui_site": "ui.js:5:url0",
+          "alternative": 0,
+          "source_sites": [
+            "project request filter"
+          ],
+          "approximate": true,
+          "source_locations": [
+            {
+              "file": "Web.java",
+              "line": 18,
+              "method": "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+            }
+          ],
+          "applied_rules": [
+            "project request filter"
+          ]
+        }
+      ]
+    },
+    {
+      "edge": {
+        "source": "scenario:witness",
+        "relation": "executes",
+        "target": "method:service:Login#login(Credentials)"
+      },
+      "grounds": [
+        {
+          "step": 1,
+          "entry": "method:service:Login#login(Credentials)",
+          "ui_site": "ui.js:1:url0",
+          "alternative": 0,
+          "source_sites": [
+            "scenario request"
+          ],
+          "approximate": true,
+          "source_locations": [
+            {
+              "file": "Web.java",
+              "line": 8,
+              "method": "method:service:Login#login(Credentials)"
+            }
+          ],
+          "applied_rules": [
+            "Source method invocation or scenario HTTP entry"
+          ]
+        }
+      ]
+    },
+    {
+      "edge": {
+        "source": "scenario:witness",
+        "relation": "executes",
+        "target": "method:service:Login#read()"
+      },
+      "grounds": [
+        {
+          "step": 2,
+          "entry": "method:service:Login#read()",
+          "ui_site": "ui.js:5:url0",
+          "alternative": 0,
+          "source_sites": [
+            "scenario request"
+          ],
+          "approximate": true,
+          "source_locations": [
+            {
+              "file": "Web.java",
+              "line": 15,
+              "method": "method:service:Login#read()"
+            }
+          ],
+          "applied_rules": [
+            "Source method invocation or scenario HTTP entry"
+          ]
+        }
+      ]
+    },
+    {
+      "edge": {
+        "source": "scenario:witness",
+        "relation": "executes",
+        "target": "method:service:Profile#<init>(String,String,boolean)"
+      },
+      "grounds": [
+        {
+          "step": 1,
+          "entry": "method:service:Login#login(Credentials)",
+          "ui_site": "ui.js:1:url0",
+          "alternative": 0,
+          "source_sites": [
+            "call:method:service:Provider#loadUserByUsername(String)@20:60"
+          ],
+          "approximate": true,
+          "source_locations": [
+            {
+              "file": "Security.java",
+              "line": 20,
+              "call_site": "call:method:service:Provider#loadUserByUsername(String)@20:60"
+            },
+            {
+              "file": "Security.java",
+              "line": 10,
+              "method": "method:service:Profile#<init>(String,String,boolean)"
+            }
+          ],
+          "applied_rules": [
+            "Source method invocation or scenario HTTP entry"
+          ]
+        }
+      ]
+    },
+    {
+      "edge": {
+        "source": "scenario:witness",
+        "relation": "executes",
+        "target": "method:service:Profile#getAuthorities()"
+      },
+      "grounds": [
+        {
+          "step": 1,
+          "entry": "method:service:Login#login(Credentials)",
+          "ui_site": "ui.js:1:url0",
+          "alternative": 0,
+          "source_sites": [
+            "UserDetails getAuthorities callback at call:method:service:Login#login(Credentials)@9:45"
+          ],
+          "approximate": true,
+          "source_locations": [
+            {
+              "file": "Security.java",
+              "line": 17,
+              "method": "method:service:Profile#getAuthorities()"
+            }
+          ],
+          "applied_rules": [
+            "UserDetails getAuthorities callback at call:method:service:Login#login(Credentials)@9:45"
+          ]
+        }
+      ]
+    },
+    {
+      "edge": {
+        "source": "scenario:witness",
+        "relation": "executes",
+        "target": "method:service:Profile#getPassword()"
+      },
+      "grounds": [
+        {
+          "step": 1,
+          "entry": "method:service:Login#login(Credentials)",
+          "ui_site": "ui.js:1:url0",
+          "alternative": 0,
+          "source_sites": [
+            "UserDetails getPassword callback at call:method:service:Login#login(Credentials)@9:45"
+          ],
+          "approximate": true,
+          "source_locations": [
+            {
+              "file": "Security.java",
+              "line": 12,
+              "method": "method:service:Profile#getPassword()"
+            }
+          ],
+          "applied_rules": [
+            "UserDetails getPassword callback at call:method:service:Login#login(Credentials)@9:45"
+          ]
+        }
+      ]
+    },
+    {
+      "edge": {
+        "source": "scenario:witness",
+        "relation": "executes",
+        "target": "method:service:Profile#getUsername()"
+      },
+      "grounds": [
+        {
+          "step": 1,
+          "entry": "method:service:Login#login(Credentials)",
+          "ui_site": "ui.js:1:url0",
+          "alternative": 0,
+          "source_sites": [
+            "UserDetails getUsername callback at call:method:service:Login#login(Credentials)@10:58",
+            "UserDetails getUsername callback at call:method:service:Login#login(Credentials)@13:89"
+          ],
+          "approximate": true,
+          "source_locations": [
+            {
+              "file": "Security.java",
+              "line": 11,
+              "method": "method:service:Profile#getUsername()"
+            }
+          ],
+          "applied_rules": [
+            "UserDetails getUsername callback at call:method:service:Login#login(Credentials)@10:58",
+            "UserDetails getUsername callback at call:method:service:Login#login(Credentials)@13:89"
+          ]
+        }
+      ]
+    },
+    {
+      "edge": {
+        "source": "scenario:witness",
+        "relation": "executes",
+        "target": "method:service:Profile#isAccountNonExpired()"
+      },
+      "grounds": [
+        {
+          "step": 1,
+          "entry": "method:service:Login#login(Credentials)",
+          "ui_site": "ui.js:1:url0",
+          "alternative": 0,
+          "source_sites": [
+            "UserDetails isAccountNonExpired callback at call:method:service:Login#login(Credentials)@9:45"
+          ],
+          "approximate": true,
+          "source_locations": [
+            {
+              "file": "Security.java",
+              "line": 13,
+              "method": "method:service:Profile#isAccountNonExpired()"
+            }
+          ],
+          "applied_rules": [
+            "UserDetails isAccountNonExpired callback at call:method:service:Login#login(Credentials)@9:45"
+          ]
+        }
+      ]
+    },
+    {
+      "edge": {
+        "source": "scenario:witness",
+        "relation": "executes",
+        "target": "method:service:Profile#isAccountNonLocked()"
+      },
+      "grounds": [
+        {
+          "step": 1,
+          "entry": "method:service:Login#login(Credentials)",
+          "ui_site": "ui.js:1:url0",
+          "alternative": 0,
+          "source_sites": [
+            "UserDetails isAccountNonLocked callback at call:method:service:Login#login(Credentials)@9:45"
+          ],
+          "approximate": true,
+          "source_locations": [
+            {
+              "file": "Security.java",
+              "line": 14,
+              "method": "method:service:Profile#isAccountNonLocked()"
+            }
+          ],
+          "applied_rules": [
+            "UserDetails isAccountNonLocked callback at call:method:service:Login#login(Credentials)@9:45"
+          ]
+        }
+      ]
+    },
+    {
+      "edge": {
+        "source": "scenario:witness",
+        "relation": "executes",
+        "target": "method:service:Profile#isCredentialsNonExpired()"
+      },
+      "grounds": [
+        {
+          "step": 1,
+          "entry": "method:service:Login#login(Credentials)",
+          "ui_site": "ui.js:1:url0",
+          "alternative": 0,
+          "source_sites": [
+            "UserDetails isCredentialsNonExpired callback at call:method:service:Login#login(Credentials)@9:45"
+          ],
+          "approximate": true,
+          "source_locations": [
+            {
+              "file": "Security.java",
+              "line": 15,
+              "method": "method:service:Profile#isCredentialsNonExpired()"
+            }
+          ],
+          "applied_rules": [
+            "UserDetails isCredentialsNonExpired callback at call:method:service:Login#login(Credentials)@9:45"
+          ]
+        }
+      ]
+    },
+    {
+      "edge": {
+        "source": "scenario:witness",
+        "relation": "executes",
+        "target": "method:service:Profile#isEnabled()"
+      },
+      "grounds": [
+        {
+          "step": 1,
+          "entry": "method:service:Login#login(Credentials)",
+          "ui_site": "ui.js:1:url0",
+          "alternative": 0,
+          "source_sites": [
+            "UserDetails isEnabled callback at call:method:service:Login#login(Credentials)@9:45"
+          ],
+          "approximate": true,
+          "source_locations": [
+            {
+              "file": "Security.java",
+              "line": 16,
+              "method": "method:service:Profile#isEnabled()"
+            }
+          ],
+          "applied_rules": [
+            "UserDetails isEnabled callback at call:method:service:Login#login(Credentials)@9:45"
+          ]
+        }
+      ]
+    },
+    {
+      "edge": {
+        "source": "scenario:witness",
+        "relation": "executes",
+        "target": "method:service:Provider#loadUserByUsername(String)"
+      },
+      "grounds": [
+        {
+          "step": 1,
+          "entry": "method:service:Login#login(Credentials)",
+          "ui_site": "ui.js:1:url0",
+          "alternative": 0,
+          "source_sites": [
+            "Spring authentication callback at call:method:service:Login#login(Credentials)@9:45"
+          ],
+          "approximate": true,
+          "source_locations": [
+            {
+              "file": "Security.java",
+              "line": 20,
+              "method": "method:service:Provider#loadUserByUsername(String)"
+            }
+          ],
+          "applied_rules": [
+            "Spring authentication callback at call:method:service:Login#login(Credentials)@9:45"
+          ]
+        }
+      ]
+    },
+    {
+      "edge": {
+        "source": "method:service:Provider#loadUserByUsername(String)",
+        "relation": "calls",
+        "target": "method:service:Profile#<init>(String,String,boolean)"
+      },
+      "grounds": [
+        {
+          "step": 1,
+          "entry": "method:service:Login#login(Credentials)",
+          "ui_site": "ui.js:1:url0",
+          "alternative": 0,
+          "source_sites": [
+            "call:method:service:Provider#loadUserByUsername(String)@20:60"
+          ],
+          "approximate": true,
+          "source_locations": [
+            {
+              "file": "Security.java",
+              "line": 20,
+              "call_site": "call:method:service:Provider#loadUserByUsername(String)@20:60"
+            },
+            {
+              "file": "Security.java",
+              "line": 20,
+              "method": "method:service:Provider#loadUserByUsername(String)"
+            }
+          ],
+          "applied_rules": [
+            "Source method invocation or scenario HTTP entry"
+          ]
+        }
+      ]
+    }
+  ]
+}

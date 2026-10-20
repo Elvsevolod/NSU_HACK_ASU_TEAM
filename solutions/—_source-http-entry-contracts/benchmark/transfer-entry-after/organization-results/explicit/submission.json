@@ -1,0 +1,248 @@
+{
+  "project": "organization",
+  "scenarios": {
+    "organization-fresh-isolation": {
+      "edges": [
+        {
+          "source": "scenario:organization-fresh-isolation",
+          "relation": "executes",
+          "target": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)"
+        },
+        {
+          "source": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)",
+          "relation": "calls",
+          "target": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)"
+        }
+      ]
+    },
+    "organization-state-chain": {
+      "edges": [
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:department-service:pl.piomin.services.department.controller.DepartmentController#add(Department)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findById(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findByIdWithEmployees(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:department-service:pl.piomin.services.department.controller.DepartmentWithRestTemplateController#findById(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:department-service:pl.piomin.services.department.model.Department#setId(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:department-service:pl.piomin.services.department.model.Department#setName(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:department-service:pl.piomin.services.department.model.Department#setOrganizationId(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:department-service:pl.piomin.services.department.model.Department#toString()"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#add(Employee)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:employee-service:pl.piomin.services.employee.model.Employee#setAge(int)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:employee-service:pl.piomin.services.employee.model.Employee#setDepartmentId(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:employee-service:pl.piomin.services.employee.model.Employee#setId(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:employee-service:pl.piomin.services.employee.model.Employee#setName(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:employee-service:pl.piomin.services.employee.model.Employee#setOrganizationId(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:employee-service:pl.piomin.services.employee.model.Employee#setPosition(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:employee-service:pl.piomin.services.employee.model.Employee#toString()"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#add(Organization)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#findById(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#findByIdWithDepartmentsAndEmployees(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Department#getId()"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Employee#getId()"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Organization#getId()"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Organization#setAddress(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Organization#setId(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Organization#setName(String)"
+        },
+        {
+          "source": "scenario:organization-state-chain",
+          "relation": "executes",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Organization#toString()"
+        },
+        {
+          "source": "method:department-service:pl.piomin.services.department.controller.DepartmentController#add(Department)",
+          "relation": "calls",
+          "target": "method:department-service:pl.piomin.services.department.model.Department#toString()"
+        },
+        {
+          "source": "method:department-service:pl.piomin.services.department.controller.DepartmentController#add(Department)",
+          "relation": "data",
+          "target": "res:table:department-service.department"
+        },
+        {
+          "source": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findById(String)",
+          "relation": "calls",
+          "target": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findById(String)"
+        },
+        {
+          "source": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findById(String)",
+          "relation": "calls",
+          "target": "method:department-service:pl.piomin.services.department.controller.DepartmentWithRestTemplateController#findById(String)"
+        },
+        {
+          "source": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findByIdWithEmployees(String)",
+          "relation": "calls",
+          "target": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findById(String)"
+        },
+        {
+          "source": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findByIdWithEmployees(String)",
+          "relation": "calls",
+          "target": "method:department-service:pl.piomin.services.department.controller.DepartmentWithRestTemplateController#findById(String)"
+        },
+        {
+          "source": "method:department-service:pl.piomin.services.department.controller.DepartmentWithRestTemplateController#findById(String)",
+          "relation": "calls",
+          "target": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findById(String)"
+        },
+        {
+          "source": "method:department-service:pl.piomin.services.department.controller.DepartmentWithRestTemplateController#findById(String)",
+          "relation": "calls",
+          "target": "method:department-service:pl.piomin.services.department.controller.DepartmentWithRestTemplateController#findById(String)"
+        },
+        {
+          "source": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#add(Employee)",
+          "relation": "calls",
+          "target": "method:employee-service:pl.piomin.services.employee.model.Employee#toString()"
+        },
+        {
+          "source": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#add(Employee)",
+          "relation": "data",
+          "target": "res:table:employee-service.employee"
+        },
+        {
+          "source": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)",
+          "relation": "calls",
+          "target": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)"
+        },
+        {
+          "source": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#add(Organization)",
+          "relation": "calls",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Organization#toString()"
+        },
+        {
+          "source": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#add(Organization)",
+          "relation": "data",
+          "target": "res:table:organization-service.organization"
+        },
+        {
+          "source": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#findById(String)",
+          "relation": "calls",
+          "target": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#findById(String)"
+        },
+        {
+          "source": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#findByIdWithDepartmentsAndEmployees(String)",
+          "relation": "calls",
+          "target": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#findById(String)"
+        },
+        {
+          "source": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#findByIdWithDepartmentsAndEmployees(String)",
+          "relation": "calls",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Department#getId()"
+        },
+        {
+          "source": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#findByIdWithDepartmentsAndEmployees(String)",
+          "relation": "calls",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Employee#getId()"
+        },
+        {
+          "source": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#findByIdWithDepartmentsAndEmployees(String)",
+          "relation": "calls",
+          "target": "method:organization-service:pl.piomin.services.organization.model.Organization#getId()"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,1097 @@
+{
+  "same_explicit_search_request": {
+    "deployment": "ts-travel-service",
+    "method": "POST",
+    "url": "/api/v1/travelservice/trips/left",
+    "path": [
+      "api",
+      "v1",
+      "travelservice",
+      "trips",
+      "left"
+    ],
+    "query": {},
+    "query_complete": true,
+    "headers": {
+      "content-type": [
+        "application/json"
+      ]
+    },
+    "body": {
+      "startPlace": "Shang Hai",
+      "endPlace": "Su Zhou",
+      "departureTime": "2026-10-01"
+    },
+    "actor": {
+      "unknown": true
+    },
+    "session": {
+      "unknown": true
+    },
+    "body_properties": {},
+    "provenance": []
+  },
+  "alternatives": [
+    {
+      "outcome": "returned",
+      "result": {
+        "data": [],
+        "msg": {
+          "unknown": true
+        },
+        "status": 1
+      },
+      "arguments": [
+        {
+          "method": "method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-station-service.station",
+          "operation": "findByNames",
+          "arguments": [
+            [
+              "shanghai",
+              "suzhou"
+            ]
+          ],
+          "source_site": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@105:45",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 2,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@105:45"
+        },
+        {
+          "method": "method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-train-service.train_type",
+          "operation": "findByNames",
+          "arguments": [
+            [
+              "GaoTieOne",
+              "DongCheOne",
+              "GaoTieTwo"
+            ]
+          ],
+          "source_site": "call:method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)@64:41",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 3,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)@64:41"
+        },
+        {
+          "method": "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-route-service.route",
+          "operation": "findByIds",
+          "arguments": [
+            [
+              "aefcef3f-3f42-46e8-afd7-6cb2a928bd3d",
+              "a3f256c1-0e43-4f7d-9c21-121bf258101f",
+              "92708982-77af-4318-be25-57ccb0ff69ad",
+              "f3d4d4ef-693b-4456-8eed-59c0d717dd08",
+              "0b23bd3e-876a-4af3-b920-c50a90c90b04",
+              "084837bb-53c8-4438-87c8-0321a4d09917"
+            ]
+          ],
+          "source_site": "call:method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)@94:46",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 6,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)@94:46"
+        }
+      ],
+      "noop_proofs": [
+        {
+          "model_version": "native-map-noop/1",
+          "operation": "foreach",
+          "callsite": "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders):219",
+          "iterations": 3,
+          "guards": [
+            {
+              "line": 221,
+              "key": "GaoTieOne",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            },
+            {
+              "line": 221,
+              "key": "DongCheOne",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            },
+            {
+              "line": 221,
+              "key": "GaoTieTwo",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            }
+          ],
+          "heap_roots": [],
+          "resource_writes": [],
+          "global_footprint": "none",
+          "callbacks": [],
+          "completions": [
+            "normal"
+          ]
+        }
+      ],
+      "remaining_loop": [
+        "Map iteration budget or contents remain unresolved: method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders):242"
+      ]
+    },
+    {
+      "outcome": "analysis completion budget exhausted",
+      "result": {
+        "unknown": true
+      },
+      "arguments": [
+        {
+          "method": "method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-station-service.station",
+          "operation": "findByNames",
+          "arguments": [
+            [
+              "shanghai",
+              "suzhou"
+            ]
+          ],
+          "source_site": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@105:45",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 2,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@105:45"
+        },
+        {
+          "method": "method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-train-service.train_type",
+          "operation": "findByNames",
+          "arguments": [
+            [
+              "GaoTieOne",
+              "DongCheOne",
+              "GaoTieTwo"
+            ]
+          ],
+          "source_site": "call:method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)@64:41",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 3,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)@64:41"
+        },
+        {
+          "method": "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-route-service.route",
+          "operation": "findByIds",
+          "arguments": [
+            [
+              "aefcef3f-3f42-46e8-afd7-6cb2a928bd3d",
+              "a3f256c1-0e43-4f7d-9c21-121bf258101f",
+              "92708982-77af-4318-be25-57ccb0ff69ad",
+              "f3d4d4ef-693b-4456-8eed-59c0d717dd08",
+              "0b23bd3e-876a-4af3-b920-c50a90c90b04",
+              "084837bb-53c8-4438-87c8-0321a4d09917"
+            ]
+          ],
+          "source_site": "call:method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)@94:46",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 6,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)@94:46"
+        }
+      ],
+      "noop_proofs": [
+        {
+          "model_version": "native-map-noop/1",
+          "operation": "foreach",
+          "callsite": "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders):219",
+          "iterations": 3,
+          "guards": [
+            {
+              "line": 221,
+              "key": "GaoTieOne",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            },
+            {
+              "line": 221,
+              "key": "DongCheOne",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            },
+            {
+              "line": 221,
+              "key": "GaoTieTwo",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            }
+          ],
+          "heap_roots": [],
+          "resource_writes": [],
+          "global_footprint": "none",
+          "callbacks": [],
+          "completions": [
+            "normal"
+          ]
+        }
+      ],
+      "remaining_loop": [
+        "Map iteration budget or contents remain unresolved: method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders):242"
+      ]
+    },
+    {
+      "outcome": "returned",
+      "result": {
+        "data": [],
+        "msg": {
+          "unknown": true
+        },
+        "status": 1
+      },
+      "arguments": [
+        {
+          "method": "method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-station-service.station",
+          "operation": "findByNames",
+          "arguments": [
+            [
+              "shanghai",
+              "suzhou"
+            ]
+          ],
+          "source_site": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@105:45",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 2,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@105:45"
+        },
+        {
+          "method": "method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-train-service.train_type",
+          "operation": "findByNames",
+          "arguments": [
+            [
+              "GaoTieOne",
+              "DongCheOne",
+              "GaoTieTwo"
+            ]
+          ],
+          "source_site": "call:method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)@64:41",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 3,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)@64:41"
+        },
+        {
+          "method": "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-route-service.route",
+          "operation": "findByIds",
+          "arguments": [
+            [
+              "aefcef3f-3f42-46e8-afd7-6cb2a928bd3d",
+              "a3f256c1-0e43-4f7d-9c21-121bf258101f",
+              "92708982-77af-4318-be25-57ccb0ff69ad",
+              "f3d4d4ef-693b-4456-8eed-59c0d717dd08",
+              "0b23bd3e-876a-4af3-b920-c50a90c90b04",
+              "084837bb-53c8-4438-87c8-0321a4d09917"
+            ]
+          ],
+          "source_site": "call:method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)@94:46",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 6,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)@94:46"
+        }
+      ],
+      "noop_proofs": [
+        {
+          "model_version": "native-map-noop/1",
+          "operation": "foreach",
+          "callsite": "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders):219",
+          "iterations": 3,
+          "guards": [
+            {
+              "line": 221,
+              "key": "GaoTieOne",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            },
+            {
+              "line": 221,
+              "key": "DongCheOne",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            },
+            {
+              "line": 221,
+              "key": "GaoTieTwo",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            }
+          ],
+          "heap_roots": [],
+          "resource_writes": [],
+          "global_footprint": "none",
+          "callbacks": [],
+          "completions": [
+            "normal"
+          ]
+        }
+      ],
+      "remaining_loop": [
+        "Map iteration budget or contents remain unresolved: method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders):242"
+      ]
+    },
+    {
+      "outcome": "analysis completion budget exhausted",
+      "result": {
+        "unknown": true
+      },
+      "arguments": [
+        {
+          "method": "method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-station-service.station",
+          "operation": "findByNames",
+          "arguments": [
+            [
+              "shanghai",
+              "suzhou"
+            ]
+          ],
+          "source_site": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@105:45",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 2,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@105:45"
+        },
+        {
+          "method": "method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-train-service.train_type",
+          "operation": "findByNames",
+          "arguments": [
+            [
+              "GaoTieOne",
+              "DongCheOne",
+              "GaoTieTwo"
+            ]
+          ],
+          "source_site": "call:method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)@64:41",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 3,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)@64:41"
+        },
+        {
+          "method": "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-route-service.route",
+          "operation": "findByIds",
+          "arguments": [
+            [
+              "aefcef3f-3f42-46e8-afd7-6cb2a928bd3d",
+              "a3f256c1-0e43-4f7d-9c21-121bf258101f",
+              "92708982-77af-4318-be25-57ccb0ff69ad",
+              "f3d4d4ef-693b-4456-8eed-59c0d717dd08",
+              "0b23bd3e-876a-4af3-b920-c50a90c90b04",
+              "084837bb-53c8-4438-87c8-0321a4d09917"
+            ]
+          ],
+          "source_site": "call:method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)@94:46",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 6,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)@94:46"
+        }
+      ],
+      "noop_proofs": [
+        {
+          "model_version": "native-map-noop/1",
+          "operation": "foreach",
+          "callsite": "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders):219",
+          "iterations": 3,
+          "guards": [
+            {
+              "line": 221,
+              "key": "GaoTieOne",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            },
+            {
+              "line": 221,
+              "key": "DongCheOne",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            },
+            {
+              "line": 221,
+              "key": "GaoTieTwo",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            }
+          ],
+          "heap_roots": [],
+          "resource_writes": [],
+          "global_footprint": "none",
+          "callbacks": [],
+          "completions": [
+            "normal"
+          ]
+        }
+      ],
+      "remaining_loop": [
+        "Map iteration budget or contents remain unresolved: method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders):242"
+      ]
+    },
+    {
+      "outcome": "returned",
+      "result": {
+        "data": [],
+        "msg": {
+          "unknown": true
+        },
+        "status": 1
+      },
+      "arguments": [
+        {
+          "method": "method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-station-service.station",
+          "operation": "findByNames",
+          "arguments": [
+            [
+              "shanghai",
+              "suzhou"
+            ]
+          ],
+          "source_site": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@105:45",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 2,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@105:45"
+        },
+        {
+          "method": "method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-train-service.train_type",
+          "operation": "findByNames",
+          "arguments": [
+            [
+              "GaoTieOne",
+              "DongCheOne",
+              "GaoTieTwo"
+            ]
+          ],
+          "source_site": "call:method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)@64:41",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 3,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)@64:41"
+        },
+        {
+          "method": "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-route-service.route",
+          "operation": "findByIds",
+          "arguments": [
+            [
+              "aefcef3f-3f42-46e8-afd7-6cb2a928bd3d",
+              "a3f256c1-0e43-4f7d-9c21-121bf258101f",
+              "92708982-77af-4318-be25-57ccb0ff69ad",
+              "f3d4d4ef-693b-4456-8eed-59c0d717dd08",
+              "0b23bd3e-876a-4af3-b920-c50a90c90b04",
+              "084837bb-53c8-4438-87c8-0321a4d09917"
+            ]
+          ],
+          "source_site": "call:method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)@94:46",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 6,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)@94:46"
+        }
+      ],
+      "noop_proofs": [
+        {
+          "model_version": "native-map-noop/1",
+          "operation": "foreach",
+          "callsite": "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders):219",
+          "iterations": 3,
+          "guards": [
+            {
+              "line": 221,
+              "key": "GaoTieOne",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            },
+            {
+              "line": 221,
+              "key": "DongCheOne",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            },
+            {
+              "line": 221,
+              "key": "GaoTieTwo",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            }
+          ],
+          "heap_roots": [],
+          "resource_writes": [],
+          "global_footprint": "none",
+          "callbacks": [],
+          "completions": [
+            "normal"
+          ]
+        }
+      ],
+      "remaining_loop": [
+        "Map iteration budget or contents remain unresolved: method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders):242"
+      ]
+    },
+    {
+      "outcome": "analysis completion budget exhausted",
+      "result": {
+        "unknown": true
+      },
+      "arguments": [
+        {
+          "method": "method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-station-service.station",
+          "operation": "findByNames",
+          "arguments": [
+            [
+              "shanghai",
+              "suzhou"
+            ]
+          ],
+          "source_site": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@105:45",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 2,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@105:45"
+        },
+        {
+          "method": "method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-train-service.train_type",
+          "operation": "findByNames",
+          "arguments": [
+            [
+              "GaoTieOne",
+              "DongCheOne",
+              "GaoTieTwo"
+            ]
+          ],
+          "source_site": "call:method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)@64:41",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 3,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)@64:41"
+        },
+        {
+          "method": "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-route-service.route",
+          "operation": "findByIds",
+          "arguments": [
+            [
+              "aefcef3f-3f42-46e8-afd7-6cb2a928bd3d",
+              "a3f256c1-0e43-4f7d-9c21-121bf258101f",
+              "92708982-77af-4318-be25-57ccb0ff69ad",
+              "f3d4d4ef-693b-4456-8eed-59c0d717dd08",
+              "0b23bd3e-876a-4af3-b920-c50a90c90b04",
+              "084837bb-53c8-4438-87c8-0321a4d09917"
+            ]
+          ],
+          "source_site": "call:method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)@94:46",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 6,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)@94:46"
+        }
+      ],
+      "noop_proofs": [
+        {
+          "model_version": "native-map-noop/1",
+          "operation": "foreach",
+          "callsite": "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders):219",
+          "iterations": 3,
+          "guards": [
+            {
+              "line": 221,
+              "key": "GaoTieOne",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            },
+            {
+              "line": 221,
+              "key": "DongCheOne",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            },
+            {
+              "line": 221,
+              "key": "GaoTieTwo",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            }
+          ],
+          "heap_roots": [],
+          "resource_writes": [],
+          "global_footprint": "none",
+          "callbacks": [],
+          "completions": [
+            "normal"
+          ]
+        }
+      ],
+      "remaining_loop": [
+        "Map iteration budget or contents remain unresolved: method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders):242"
+      ]
+    },
+    {
+      "outcome": "returned",
+      "result": {
+        "data": [],
+        "msg": {
+          "unknown": true
+        },
+        "status": 1
+      },
+      "arguments": [
+        {
+          "method": "method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-station-service.station",
+          "operation": "findByNames",
+          "arguments": [
+            [
+              "shanghai",
+              "suzhou"
+            ]
+          ],
+          "source_site": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@105:45",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 2,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@105:45"
+        },
+        {
+          "method": "method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-train-service.train_type",
+          "operation": "findByNames",
+          "arguments": [
+            [
+              "GaoTieOne",
+              "DongCheOne",
+              "GaoTieTwo"
+            ]
+          ],
+          "source_site": "call:method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)@64:41",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 3,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)@64:41"
+        },
+        {
+          "method": "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-route-service.route",
+          "operation": "findByIds",
+          "arguments": [
+            [
+              "aefcef3f-3f42-46e8-afd7-6cb2a928bd3d",
+              "a3f256c1-0e43-4f7d-9c21-121bf258101f",
+              "92708982-77af-4318-be25-57ccb0ff69ad",
+              "f3d4d4ef-693b-4456-8eed-59c0d717dd08",
+              "0b23bd3e-876a-4af3-b920-c50a90c90b04",
+              "084837bb-53c8-4438-87c8-0321a4d09917"
+            ]
+          ],
+          "source_site": "call:method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)@94:46",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 6,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)@94:46"
+        }
+      ],
+      "noop_proofs": [
+        {
+          "model_version": "native-map-noop/1",
+          "operation": "foreach",
+          "callsite": "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders):219",
+          "iterations": 3,
+          "guards": [
+            {
+              "line": 221,
+              "key": "GaoTieOne",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            },
+            {
+              "line": 221,
+              "key": "DongCheOne",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            },
+            {
+              "line": 221,
+              "key": "GaoTieTwo",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            }
+          ],
+          "heap_roots": [],
+          "resource_writes": [],
+          "global_footprint": "none",
+          "callbacks": [],
+          "completions": [
+            "normal"
+          ]
+        }
+      ],
+      "remaining_loop": [
+        "Map iteration budget or contents remain unresolved: method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders):242"
+      ]
+    },
+    {
+      "outcome": "analysis completion budget exhausted",
+      "result": {
+        "unknown": true
+      },
+      "arguments": [
+        {
+          "method": "method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-station-service.station",
+          "operation": "findByNames",
+          "arguments": [
+            [
+              "shanghai",
+              "suzhou"
+            ]
+          ],
+          "source_site": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@105:45",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 2,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-station-service:fdse.microservice.service.StationServiceImpl#queryForIdBatch(java.util.List,org.springframework.http.HttpHeaders)@105:45"
+        },
+        {
+          "method": "method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-train-service.train_type",
+          "operation": "findByNames",
+          "arguments": [
+            [
+              "GaoTieOne",
+              "DongCheOne",
+              "GaoTieTwo"
+            ]
+          ],
+          "source_site": "call:method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)@64:41",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 3,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-train-service:train.service.TrainServiceImpl#retrieveByNames(java.util.List,org.springframework.http.HttpHeaders)@64:41"
+        },
+        {
+          "method": "method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)",
+          "resource": "res:table:ts-route-service.route",
+          "operation": "findByIds",
+          "arguments": [
+            [
+              "aefcef3f-3f42-46e8-afd7-6cb2a928bd3d",
+              "a3f256c1-0e43-4f7d-9c21-121bf258101f",
+              "92708982-77af-4318-be25-57ccb0ff69ad",
+              "f3d4d4ef-693b-4456-8eed-59c0d717dd08",
+              "0b23bd3e-876a-4af3-b920-c50a90c90b04",
+              "084837bb-53c8-4438-87c8-0321a4d09917"
+            ]
+          ],
+          "source_site": "call:method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)@94:46",
+          "uncertain_write": false,
+          "collection_shapes": [
+            {
+              "path": "arguments/0",
+              "size": 6,
+              "order": "unspecified"
+            }
+          ],
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:ts-route-service:route.service.RouteServiceImpl#getRouteByIds(java.util.List,org.springframework.http.HttpHeaders)@94:46"
+        }
+      ],
+      "noop_proofs": [
+        {
+          "model_version": "native-map-noop/1",
+          "operation": "foreach",
+          "callsite": "method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders):219",
+          "iterations": 3,
+          "guards": [
+            {
+              "line": 221,
+              "key": "GaoTieOne",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            },
+            {
+              "line": 221,
+              "key": "DongCheOne",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            },
+            {
+              "line": 221,
+              "key": "GaoTieTwo",
+              "condition": "(trainTypeMap.get(ttype) == null)",
+              "value": false
+            }
+          ],
+          "heap_roots": [],
+          "resource_writes": [],
+          "global_footprint": "none",
+          "callbacks": [],
+          "completions": [
+            "normal"
+          ]
+        }
+      ],
+      "remaining_loop": [
+        "Map iteration budget or contents remain unresolved: method:ts-basic-service:fdse.microservice.service.BasicServiceImpl#queryForTravels(java.util.List,org.springframework.http.HttpHeaders):242"
+      ]
+    }
+  ],
+  "next_NL_request": {
+    "deployment": "ts-travel-service",
+    "method": "POST",
+    "url": "/api/v1/travelservice/trip_detail",
+    "path": [
+      "api",
+      "v1",
+      "travelservice",
+      "trip_detail"
+    ],
+    "query": {},
+    "query_complete": true,
+    "headers": {
+      "__rest_unknown__": true,
+      "content-type": [
+        "application/json"
+      ]
+    },
+    "body": {
+      "travelDate": "2026-10-01"
+    },
+    "actor": "passenger",
+    "session": {
+      "storage": {
+        "admin_name": "fdse_microservice",
+        "admin_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmZHNlX21pY3Jvc2VydmljZSIsInJvbGVzIjpbXSwiaWQiOiI0ZDJhNDZjNy03MWNiLTRjZjEtYjViYi1iNjg0MDZkOWRhNmYiLCJpYXQiOjE3ODk0MzA0MDAsImV4cCI6MTc4OTQzNDAwMH0.46FKAFUQ26iRdMkBqVeWBqjAL3u2DSMlxc67lS6hynY"
+      },
+      "actor": "passenger"
+    },
+    "body_properties": {
+      "gtdi": {
+        "tripId": "unobserved",
+        "from": "unobserved",
+        "to": "unobserved"
+      }
+    },
+    "provenance": {
+      "travelDate": {
+        "source": "context",
+        "reference": "request_date",
+        "quote": "",
+        "resolved": true
+      },
+      "__assumptions__": [
+        "Unknown input: tripId",
+        "Unknown input: from",
+        "Unknown input: to"
+      ]
+    }
+  },
+  "classification": "At line 242 six known route groups require a key choice. This live else branch has source calls and possible removals; the all-false no-op proof does not apply. Budget widening still loses usable results.",
+  "decision": "Stop extending C2. Validate the live branch and generic consumers in a separate experiment before a worklist/memoization prototype. Do not raise the global budget or change ranking.",
+  "known_batch_cardinalities": {
+    "stations": 2,
+    "train_types": 3,
+    "route_ids": 6
+  },
+  "limits": [
+    "Returned empty data under a Map-budget warning is not accepted as proof of a truly empty search",
+    "No usable TT search producer ID reaches the following NL request; independent inventory does pass that transition"
+  ]
+}

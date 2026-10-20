@@ -1,0 +1,2707 @@
+{
+  "project": "fixture",
+  "nodes": {
+    "module:account-service": {
+      "kind": "module",
+      "name": "account-service",
+      "deployment_units": [
+        "account-service"
+      ]
+    },
+    "type:account-service:AccountApplication": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.AccountApplication",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/AccountApplication.java",
+      "annotations": [
+        {
+          "name": "SpringBootApplication",
+          "args": ""
+        },
+        {
+          "name": "EnableDiscoveryClient",
+          "args": ""
+        },
+        {
+          "name": "EnableOAuth2Client",
+          "args": ""
+        },
+        {
+          "name": "EnableFeignClients",
+          "args": ""
+        },
+        {
+          "name": "EnableCircuitBreaker",
+          "args": ""
+        },
+        {
+          "name": "EnableGlobalMethodSecurity",
+          "args": "(prePostEnabled = true)"
+        }
+      ]
+    },
+    "type:account-service:AuthServiceClient": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.client.AuthServiceClient",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/client/AuthServiceClient.java",
+      "annotations": [
+        {
+          "name": "FeignClient",
+          "args": "(name = \"auth-service\")"
+        }
+      ]
+    },
+    "type:account-service:StatisticsServiceClient": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.client.StatisticsServiceClient",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/client/StatisticsServiceClient.java",
+      "annotations": [
+        {
+          "name": "FeignClient",
+          "args": "(name = \"statistics-service\", fallback = StatisticsServiceClientFallback.class)"
+        }
+      ]
+    },
+    "type:account-service:StatisticsServiceClientFallback": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.client.StatisticsServiceClientFallback",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/client/StatisticsServiceClientFallback.java",
+      "annotations": [
+        {
+          "name": "Component",
+          "args": ""
+        }
+      ]
+    },
+    "type:account-service:ResourceServerConfig": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.config.ResourceServerConfig",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java",
+      "annotations": [
+        {
+          "name": "Configuration",
+          "args": ""
+        },
+        {
+          "name": "EnableResourceServer",
+          "args": ""
+        }
+      ]
+    },
+    "type:account-service:AccountController": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.controller.AccountController",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java",
+      "annotations": [
+        {
+          "name": "RestController",
+          "args": ""
+        }
+      ]
+    },
+    "type:account-service:ErrorHandler": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.controller.ErrorHandler",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/controller/ErrorHandler.java",
+      "annotations": [
+        {
+          "name": "ControllerAdvice",
+          "args": ""
+        }
+      ]
+    },
+    "type:account-service:Account": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.domain.Account",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "annotations": [
+        {
+          "name": "Document",
+          "args": "(collection = \"accounts\")"
+        },
+        {
+          "name": "JsonIgnoreProperties",
+          "args": "(ignoreUnknown = true)"
+        }
+      ]
+    },
+    "type:account-service:Currency": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.domain.Currency",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Currency.java",
+      "annotations": []
+    },
+    "type:account-service:Item": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.domain.Item",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Item.java",
+      "annotations": []
+    },
+    "type:account-service:Saving": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.domain.Saving",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "annotations": []
+    },
+    "type:account-service:TimePeriod": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.domain.TimePeriod",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/TimePeriod.java",
+      "annotations": []
+    },
+    "type:account-service:User": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.domain.User",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/User.java",
+      "annotations": []
+    },
+    "type:account-service:AccountRepository": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.repository.AccountRepository",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/repository/AccountRepository.java",
+      "annotations": [
+        {
+          "name": "Repository",
+          "args": ""
+        }
+      ]
+    },
+    "type:account-service:AccountService": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.service.AccountService",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountService.java",
+      "annotations": []
+    },
+    "type:account-service:AccountServiceImpl": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.service.AccountServiceImpl",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java",
+      "annotations": [
+        {
+          "name": "Service",
+          "args": ""
+        }
+      ]
+    },
+    "type:account-service:CustomUserInfoTokenServices": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.account.service.security.CustomUserInfoTokenServices",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java",
+      "annotations": []
+    },
+    "method:account-service:AccountApplication#main(String[])": {
+      "kind": "method",
+      "name": "main",
+      "owner": "type:account-service:AccountApplication",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/AccountApplication.java",
+      "line": 19,
+      "end": 21,
+      "params_as_written": [
+        "String[]"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:AuthServiceClient#createUser(User)": {
+      "kind": "method",
+      "name": "createUser",
+      "owner": "type:account-service:AuthServiceClient",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/client/AuthServiceClient.java",
+      "line": 12,
+      "end": 13,
+      "params_as_written": [
+        "User"
+      ],
+      "abstract": true,
+      "annotations": [
+        {
+          "name": "RequestMapping",
+          "args": "(method = RequestMethod.POST, value = \"/uaa/users\", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)"
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:account-service:StatisticsServiceClient#updateStatistics(String,Account)": {
+      "kind": "method",
+      "name": "updateStatistics",
+      "owner": "type:account-service:StatisticsServiceClient",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/client/StatisticsServiceClient.java",
+      "line": 13,
+      "end": 14,
+      "params_as_written": [
+        "String",
+        "Account"
+      ],
+      "abstract": true,
+      "annotations": [
+        {
+          "name": "RequestMapping",
+          "args": "(method = RequestMethod.PUT, value = \"/statistics/{accountName}\", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)"
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:account-service:StatisticsServiceClientFallback#updateStatistics(String,Account)": {
+      "kind": "method",
+      "name": "updateStatistics",
+      "owner": "type:account-service:StatisticsServiceClientFallback",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/client/StatisticsServiceClientFallback.java",
+      "line": 14,
+      "end": 17,
+      "params_as_written": [
+        "String",
+        "Account"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:account-service:ResourceServerConfig#<init>(ResourceServerProperties)": {
+      "kind": "method",
+      "name": "<init>",
+      "owner": "type:account-service:ResourceServerConfig",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java",
+      "line": 28,
+      "end": 31,
+      "params_as_written": [
+        "ResourceServerProperties"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Autowired",
+          "args": ""
+        }
+      ],
+      "return_raw": ""
+    },
+    "method:account-service:ResourceServerConfig#clientCredentialsResourceDetails()": {
+      "kind": "method",
+      "name": "clientCredentialsResourceDetails",
+      "owner": "type:account-service:ResourceServerConfig",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java",
+      "line": 33,
+      "end": 37,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Bean",
+          "args": ""
+        },
+        {
+          "name": "ConfigurationProperties",
+          "args": "(prefix = \"security.oauth2.client\")"
+        }
+      ],
+      "return_raw": "ClientCredentialsResourceDetails"
+    },
+    "method:account-service:ResourceServerConfig#oauth2FeignRequestInterceptor()": {
+      "kind": "method",
+      "name": "oauth2FeignRequestInterceptor",
+      "owner": "type:account-service:ResourceServerConfig",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java",
+      "line": 39,
+      "end": 42,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Bean",
+          "args": ""
+        }
+      ],
+      "return_raw": "RequestInterceptor"
+    },
+    "method:account-service:ResourceServerConfig#clientCredentialsRestTemplate()": {
+      "kind": "method",
+      "name": "clientCredentialsRestTemplate",
+      "owner": "type:account-service:ResourceServerConfig",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java",
+      "line": 44,
+      "end": 47,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Bean",
+          "args": ""
+        }
+      ],
+      "return_raw": "OAuth2RestTemplate"
+    },
+    "method:account-service:ResourceServerConfig#tokenServices()": {
+      "kind": "method",
+      "name": "tokenServices",
+      "owner": "type:account-service:ResourceServerConfig",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java",
+      "line": 49,
+      "end": 52,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Bean",
+          "args": ""
+        }
+      ],
+      "return_raw": "ResourceServerTokenServices"
+    },
+    "method:account-service:ResourceServerConfig#configure(HttpSecurity)": {
+      "kind": "method",
+      "name": "configure",
+      "owner": "type:account-service:ResourceServerConfig",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java",
+      "line": 54,
+      "end": 59,
+      "params_as_written": [
+        "HttpSecurity"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:account-service:AccountController#getAccountByName(String)": {
+      "kind": "method",
+      "name": "getAccountByName",
+      "owner": "type:account-service:AccountController",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java",
+      "line": 19,
+      "end": 23,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "PreAuthorize",
+          "args": "(\"#oauth2.hasScope('server') or #name.equals('demo')\")"
+        },
+        {
+          "name": "RequestMapping",
+          "args": "(path = \"/{name}\", method = RequestMethod.GET)"
+        }
+      ],
+      "return_raw": "Account"
+    },
+    "method:account-service:AccountController#getCurrentAccount(Principal)": {
+      "kind": "method",
+      "name": "getCurrentAccount",
+      "owner": "type:account-service:AccountController",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java",
+      "line": 25,
+      "end": 28,
+      "params_as_written": [
+        "Principal"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "RequestMapping",
+          "args": "(path = \"/current\", method = RequestMethod.GET)"
+        }
+      ],
+      "return_raw": "Account"
+    },
+    "method:account-service:AccountController#saveCurrentAccount(Principal,Account)": {
+      "kind": "method",
+      "name": "saveCurrentAccount",
+      "owner": "type:account-service:AccountController",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java",
+      "line": 30,
+      "end": 33,
+      "params_as_written": [
+        "Principal",
+        "Account"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "RequestMapping",
+          "args": "(path = \"/current\", method = RequestMethod.PUT)"
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:account-service:AccountController#createNewAccount(User)": {
+      "kind": "method",
+      "name": "createNewAccount",
+      "owner": "type:account-service:AccountController",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java",
+      "line": 35,
+      "end": 38,
+      "params_as_written": [
+        "User"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "RequestMapping",
+          "args": "(path = \"/\", method = RequestMethod.POST)"
+        }
+      ],
+      "return_raw": "Account"
+    },
+    "method:account-service:ErrorHandler#processValidationError(IllegalArgumentException)": {
+      "kind": "method",
+      "name": "processValidationError",
+      "owner": "type:account-service:ErrorHandler",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/controller/ErrorHandler.java",
+      "line": 17,
+      "end": 21,
+      "params_as_written": [
+        "IllegalArgumentException"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "ExceptionHandler",
+          "args": "(IllegalArgumentException.class)"
+        },
+        {
+          "name": "ResponseStatus",
+          "args": "(HttpStatus.BAD_REQUEST)"
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:account-service:Account#getName()": {
+      "kind": "method",
+      "name": "getName",
+      "owner": "type:account-service:Account",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "line": 35,
+      "end": 37,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "String"
+    },
+    "method:account-service:Account#setName(String)": {
+      "kind": "method",
+      "name": "setName",
+      "owner": "type:account-service:Account",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "line": 39,
+      "end": 41,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:Account#getLastSeen()": {
+      "kind": "method",
+      "name": "getLastSeen",
+      "owner": "type:account-service:Account",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "line": 43,
+      "end": 45,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Date"
+    },
+    "method:account-service:Account#setLastSeen(Date)": {
+      "kind": "method",
+      "name": "setLastSeen",
+      "owner": "type:account-service:Account",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "line": 47,
+      "end": 49,
+      "params_as_written": [
+        "Date"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:Account#getIncomes()": {
+      "kind": "method",
+      "name": "getIncomes",
+      "owner": "type:account-service:Account",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "line": 51,
+      "end": 53,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "List<Item>"
+    },
+    "method:account-service:Account#setIncomes(List<Item>)": {
+      "kind": "method",
+      "name": "setIncomes",
+      "owner": "type:account-service:Account",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "line": 55,
+      "end": 57,
+      "params_as_written": [
+        "List<Item>"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:Account#getExpenses()": {
+      "kind": "method",
+      "name": "getExpenses",
+      "owner": "type:account-service:Account",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "line": 59,
+      "end": 61,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "List<Item>"
+    },
+    "method:account-service:Account#setExpenses(List<Item>)": {
+      "kind": "method",
+      "name": "setExpenses",
+      "owner": "type:account-service:Account",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "line": 63,
+      "end": 65,
+      "params_as_written": [
+        "List<Item>"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:Account#getSaving()": {
+      "kind": "method",
+      "name": "getSaving",
+      "owner": "type:account-service:Account",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "line": 67,
+      "end": 69,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Saving"
+    },
+    "method:account-service:Account#setSaving(Saving)": {
+      "kind": "method",
+      "name": "setSaving",
+      "owner": "type:account-service:Account",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "line": 71,
+      "end": 73,
+      "params_as_written": [
+        "Saving"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:Account#getNote()": {
+      "kind": "method",
+      "name": "getNote",
+      "owner": "type:account-service:Account",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "line": 75,
+      "end": 77,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "String"
+    },
+    "method:account-service:Account#setNote(String)": {
+      "kind": "method",
+      "name": "setNote",
+      "owner": "type:account-service:Account",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "line": 79,
+      "end": 81,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:Item#getTitle()": {
+      "kind": "method",
+      "name": "getTitle",
+      "owner": "type:account-service:Item",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Item.java",
+      "line": 26,
+      "end": 28,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "String"
+    },
+    "method:account-service:Item#setTitle(String)": {
+      "kind": "method",
+      "name": "setTitle",
+      "owner": "type:account-service:Item",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Item.java",
+      "line": 30,
+      "end": 32,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:Item#getAmount()": {
+      "kind": "method",
+      "name": "getAmount",
+      "owner": "type:account-service:Item",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Item.java",
+      "line": 34,
+      "end": 36,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "BigDecimal"
+    },
+    "method:account-service:Item#setAmount(BigDecimal)": {
+      "kind": "method",
+      "name": "setAmount",
+      "owner": "type:account-service:Item",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Item.java",
+      "line": 38,
+      "end": 40,
+      "params_as_written": [
+        "BigDecimal"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:Item#getCurrency()": {
+      "kind": "method",
+      "name": "getCurrency",
+      "owner": "type:account-service:Item",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Item.java",
+      "line": 42,
+      "end": 44,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Currency"
+    },
+    "method:account-service:Item#setCurrency(Currency)": {
+      "kind": "method",
+      "name": "setCurrency",
+      "owner": "type:account-service:Item",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Item.java",
+      "line": 46,
+      "end": 48,
+      "params_as_written": [
+        "Currency"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:Item#getPeriod()": {
+      "kind": "method",
+      "name": "getPeriod",
+      "owner": "type:account-service:Item",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Item.java",
+      "line": 50,
+      "end": 52,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "TimePeriod"
+    },
+    "method:account-service:Item#setPeriod(TimePeriod)": {
+      "kind": "method",
+      "name": "setPeriod",
+      "owner": "type:account-service:Item",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Item.java",
+      "line": 54,
+      "end": 56,
+      "params_as_written": [
+        "TimePeriod"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:Item#getIcon()": {
+      "kind": "method",
+      "name": "getIcon",
+      "owner": "type:account-service:Item",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Item.java",
+      "line": 58,
+      "end": 60,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "String"
+    },
+    "method:account-service:Item#setIcon(String)": {
+      "kind": "method",
+      "name": "setIcon",
+      "owner": "type:account-service:Item",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Item.java",
+      "line": 62,
+      "end": 64,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:Saving#getAmount()": {
+      "kind": "method",
+      "name": "getAmount",
+      "owner": "type:account-service:Saving",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "line": 23,
+      "end": 25,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "BigDecimal"
+    },
+    "method:account-service:Saving#setAmount(BigDecimal)": {
+      "kind": "method",
+      "name": "setAmount",
+      "owner": "type:account-service:Saving",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "line": 27,
+      "end": 29,
+      "params_as_written": [
+        "BigDecimal"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:Saving#getCurrency()": {
+      "kind": "method",
+      "name": "getCurrency",
+      "owner": "type:account-service:Saving",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "line": 31,
+      "end": 33,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Currency"
+    },
+    "method:account-service:Saving#setCurrency(Currency)": {
+      "kind": "method",
+      "name": "setCurrency",
+      "owner": "type:account-service:Saving",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "line": 35,
+      "end": 37,
+      "params_as_written": [
+        "Currency"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:Saving#getInterest()": {
+      "kind": "method",
+      "name": "getInterest",
+      "owner": "type:account-service:Saving",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "line": 39,
+      "end": 41,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "BigDecimal"
+    },
+    "method:account-service:Saving#setInterest(BigDecimal)": {
+      "kind": "method",
+      "name": "setInterest",
+      "owner": "type:account-service:Saving",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "line": 43,
+      "end": 45,
+      "params_as_written": [
+        "BigDecimal"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:Saving#getDeposit()": {
+      "kind": "method",
+      "name": "getDeposit",
+      "owner": "type:account-service:Saving",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "line": 47,
+      "end": 49,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Boolean"
+    },
+    "method:account-service:Saving#setDeposit(Boolean)": {
+      "kind": "method",
+      "name": "setDeposit",
+      "owner": "type:account-service:Saving",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "line": 51,
+      "end": 53,
+      "params_as_written": [
+        "Boolean"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:Saving#getCapitalization()": {
+      "kind": "method",
+      "name": "getCapitalization",
+      "owner": "type:account-service:Saving",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "line": 55,
+      "end": 57,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Boolean"
+    },
+    "method:account-service:Saving#setCapitalization(Boolean)": {
+      "kind": "method",
+      "name": "setCapitalization",
+      "owner": "type:account-service:Saving",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "line": 59,
+      "end": 61,
+      "params_as_written": [
+        "Boolean"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:User#getUsername()": {
+      "kind": "method",
+      "name": "getUsername",
+      "owner": "type:account-service:User",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/User.java",
+      "line": 17,
+      "end": 19,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "String"
+    },
+    "method:account-service:User#setUsername(String)": {
+      "kind": "method",
+      "name": "setUsername",
+      "owner": "type:account-service:User",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/User.java",
+      "line": 21,
+      "end": 23,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:User#getPassword()": {
+      "kind": "method",
+      "name": "getPassword",
+      "owner": "type:account-service:User",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/User.java",
+      "line": 25,
+      "end": 27,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "String"
+    },
+    "method:account-service:User#setPassword(String)": {
+      "kind": "method",
+      "name": "setPassword",
+      "owner": "type:account-service:User",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/domain/User.java",
+      "line": 29,
+      "end": 31,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:AccountRepository#findByName(String)": {
+      "kind": "method",
+      "name": "findByName",
+      "owner": "type:account-service:AccountRepository",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/repository/AccountRepository.java",
+      "line": 10,
+      "end": 10,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "Account"
+    },
+    "method:account-service:AccountService#findByName(String)": {
+      "kind": "method",
+      "name": "findByName",
+      "owner": "type:account-service:AccountService",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountService.java",
+      "line": 14,
+      "end": 14,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "Account"
+    },
+    "method:account-service:AccountService#create(User)": {
+      "kind": "method",
+      "name": "create",
+      "owner": "type:account-service:AccountService",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountService.java",
+      "line": 24,
+      "end": 24,
+      "params_as_written": [
+        "User"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "Account"
+    },
+    "method:account-service:AccountService#saveChanges(String,Account)": {
+      "kind": "method",
+      "name": "saveChanges",
+      "owner": "type:account-service:AccountService",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountService.java",
+      "line": 33,
+      "end": 33,
+      "params_as_written": [
+        "String",
+        "Account"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:AccountServiceImpl#findByName(String)": {
+      "kind": "method",
+      "name": "findByName",
+      "owner": "type:account-service:AccountServiceImpl",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java",
+      "line": 36,
+      "end": 40,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "Account"
+    },
+    "method:account-service:AccountServiceImpl#create(User)": {
+      "kind": "method",
+      "name": "create",
+      "owner": "type:account-service:AccountServiceImpl",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java",
+      "line": 45,
+      "end": 70,
+      "params_as_written": [
+        "User"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "Account"
+    },
+    "method:account-service:AccountServiceImpl#saveChanges(String,Account)": {
+      "kind": "method",
+      "name": "saveChanges",
+      "owner": "type:account-service:AccountServiceImpl",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java",
+      "line": 75,
+      "end": 91,
+      "params_as_written": [
+        "String",
+        "Account"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:account-service:CustomUserInfoTokenServices#<init>(String,String)": {
+      "kind": "method",
+      "name": "<init>",
+      "owner": "type:account-service:CustomUserInfoTokenServices",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java",
+      "line": 46,
+      "end": 49,
+      "params_as_written": [
+        "String",
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": ""
+    },
+    "method:account-service:CustomUserInfoTokenServices#setTokenType(String)": {
+      "kind": "method",
+      "name": "setTokenType",
+      "owner": "type:account-service:CustomUserInfoTokenServices",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java",
+      "line": 51,
+      "end": 53,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:CustomUserInfoTokenServices#setRestTemplate(OAuth2RestOperations)": {
+      "kind": "method",
+      "name": "setRestTemplate",
+      "owner": "type:account-service:CustomUserInfoTokenServices",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java",
+      "line": 55,
+      "end": 57,
+      "params_as_written": [
+        "OAuth2RestOperations"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:CustomUserInfoTokenServices#setAuthoritiesExtractor(AuthoritiesExtractor)": {
+      "kind": "method",
+      "name": "setAuthoritiesExtractor",
+      "owner": "type:account-service:CustomUserInfoTokenServices",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java",
+      "line": 59,
+      "end": 61,
+      "params_as_written": [
+        "AuthoritiesExtractor"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:account-service:CustomUserInfoTokenServices#loadAuthentication(String)": {
+      "kind": "method",
+      "name": "loadAuthentication",
+      "owner": "type:account-service:CustomUserInfoTokenServices",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java",
+      "line": 63,
+      "end": 72,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "OAuth2Authentication"
+    },
+    "method:account-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)": {
+      "kind": "method",
+      "name": "extractAuthentication",
+      "owner": "type:account-service:CustomUserInfoTokenServices",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java",
+      "line": 74,
+      "end": 83,
+      "params_as_written": [
+        "Map<String, Object>"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "OAuth2Authentication"
+    },
+    "method:account-service:CustomUserInfoTokenServices#getPrincipal(Map<String, Object>)": {
+      "kind": "method",
+      "name": "getPrincipal",
+      "owner": "type:account-service:CustomUserInfoTokenServices",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java",
+      "line": 85,
+      "end": 92,
+      "params_as_written": [
+        "Map<String, Object>"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Object"
+    },
+    "method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)": {
+      "kind": "method",
+      "name": "getRequest",
+      "owner": "type:account-service:CustomUserInfoTokenServices",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java",
+      "line": 94,
+      "end": 104,
+      "params_as_written": [
+        "Map<String, Object>"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "SuppressWarnings",
+          "args": "({ \"unchecked\" })"
+        }
+      ],
+      "return_raw": "OAuth2Request"
+    },
+    "method:account-service:CustomUserInfoTokenServices#readAccessToken(String)": {
+      "kind": "method",
+      "name": "readAccessToken",
+      "owner": "type:account-service:CustomUserInfoTokenServices",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java",
+      "line": 106,
+      "end": 109,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "OAuth2AccessToken"
+    },
+    "method:account-service:CustomUserInfoTokenServices#getMap(String,String)": {
+      "kind": "method",
+      "name": "getMap",
+      "owner": "type:account-service:CustomUserInfoTokenServices",
+      "module": "account-service",
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java",
+      "line": 111,
+      "end": 137,
+      "params_as_written": [
+        "String",
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "SuppressWarnings",
+          "args": "({ \"unchecked\" })"
+        }
+      ],
+      "return_raw": "Map<String, Object>"
+    },
+    "call:method:account-service:AccountApplication#main(String[])@20:21": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountApplication#main(String[])",
+      "callee": "run",
+      "receiver": "SpringApplication",
+      "receiver_type": "SpringApplication",
+      "line": 20,
+      "col": 21,
+      "arg_count": 2,
+      "file": "account-service/src/main/java/com/piggymetrics/account/AccountApplication.java"
+    },
+    "call:method:account-service:StatisticsServiceClientFallback#updateStatistics(String,Account)@16:16": {
+      "kind": "call_site",
+      "method": "method:account-service:StatisticsServiceClientFallback#updateStatistics(String,Account)",
+      "callee": "error",
+      "receiver": "LOGGER",
+      "receiver_type": "Logger",
+      "line": 16,
+      "col": 16,
+      "arg_count": 2,
+      "file": "account-service/src/main/java/com/piggymetrics/account/client/StatisticsServiceClientFallback.java"
+    },
+    "call:method:account-service:ResourceServerConfig#clientCredentialsResourceDetails()@36:16": {
+      "kind": "call_site",
+      "method": "method:account-service:ResourceServerConfig#clientCredentialsResourceDetails()",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "ClientCredentialsResourceDetails",
+      "line": 36,
+      "col": 16,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java"
+    },
+    "call:method:account-service:ResourceServerConfig#oauth2FeignRequestInterceptor()@41:16": {
+      "kind": "call_site",
+      "method": "method:account-service:ResourceServerConfig#oauth2FeignRequestInterceptor()",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "OAuth2FeignRequestInterceptor",
+      "line": 41,
+      "col": 16,
+      "arg_count": 2,
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java"
+    },
+    "call:method:account-service:ResourceServerConfig#oauth2FeignRequestInterceptor()@41:50": {
+      "kind": "call_site",
+      "method": "method:account-service:ResourceServerConfig#oauth2FeignRequestInterceptor()",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "DefaultOAuth2ClientContext",
+      "line": 41,
+      "col": 50,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java"
+    },
+    "call:method:account-service:ResourceServerConfig#oauth2FeignRequestInterceptor()@41:84": {
+      "kind": "call_site",
+      "method": "method:account-service:ResourceServerConfig#oauth2FeignRequestInterceptor()",
+      "callee": "clientCredentialsResourceDetails",
+      "receiver": "",
+      "receiver_type": "ResourceServerConfig",
+      "line": 41,
+      "col": 84,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java"
+    },
+    "call:method:account-service:ResourceServerConfig#clientCredentialsRestTemplate()@46:16": {
+      "kind": "call_site",
+      "method": "method:account-service:ResourceServerConfig#clientCredentialsRestTemplate()",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "OAuth2RestTemplate",
+      "line": 46,
+      "col": 16,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java"
+    },
+    "call:method:account-service:ResourceServerConfig#clientCredentialsRestTemplate()@46:39": {
+      "kind": "call_site",
+      "method": "method:account-service:ResourceServerConfig#clientCredentialsRestTemplate()",
+      "callee": "clientCredentialsResourceDetails",
+      "receiver": "",
+      "receiver_type": "ResourceServerConfig",
+      "line": 46,
+      "col": 39,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java"
+    },
+    "call:method:account-service:ResourceServerConfig#tokenServices()@51:16": {
+      "kind": "call_site",
+      "method": "method:account-service:ResourceServerConfig#tokenServices()",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "CustomUserInfoTokenServices",
+      "line": 51,
+      "col": 16,
+      "arg_count": 2,
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java"
+    },
+    "call:method:account-service:ResourceServerConfig#tokenServices()@51:52": {
+      "kind": "call_site",
+      "method": "method:account-service:ResourceServerConfig#tokenServices()",
+      "callee": "getUserInfoUri",
+      "receiver": "sso",
+      "receiver_type": "ResourceServerProperties",
+      "line": 51,
+      "col": 52,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java"
+    },
+    "call:method:account-service:ResourceServerConfig#tokenServices()@51:74": {
+      "kind": "call_site",
+      "method": "method:account-service:ResourceServerConfig#tokenServices()",
+      "callee": "getClientId",
+      "receiver": "sso",
+      "receiver_type": "ResourceServerProperties",
+      "line": 51,
+      "col": 74,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java"
+    },
+    "call:method:account-service:ResourceServerConfig#configure(HttpSecurity)@58:31": {
+      "kind": "call_site",
+      "method": "method:account-service:ResourceServerConfig#configure(HttpSecurity)",
+      "callee": "authenticated",
+      "receiver": "http.authorizeRequests()\n                .antMatchers(\"/\" , \"/demo\").permitAll()\n                .anyRequest()",
+      "receiver_type": "http.authorizeRequests()\n                .antMatchers(\"/\" , \"/demo\").permitAll()\n                .anyRequest()",
+      "line": 58,
+      "col": 31,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java"
+    },
+    "call:method:account-service:ResourceServerConfig#configure(HttpSecurity)@58:18": {
+      "kind": "call_site",
+      "method": "method:account-service:ResourceServerConfig#configure(HttpSecurity)",
+      "callee": "anyRequest",
+      "receiver": "http.authorizeRequests()\n                .antMatchers(\"/\" , \"/demo\").permitAll()",
+      "receiver_type": "http.authorizeRequests()\n                .antMatchers(\"/\" , \"/demo\").permitAll()",
+      "line": 58,
+      "col": 18,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java"
+    },
+    "call:method:account-service:ResourceServerConfig#configure(HttpSecurity)@57:45": {
+      "kind": "call_site",
+      "method": "method:account-service:ResourceServerConfig#configure(HttpSecurity)",
+      "callee": "permitAll",
+      "receiver": "http.authorizeRequests()\n                .antMatchers(\"/\" , \"/demo\")",
+      "receiver_type": "http.authorizeRequests()\n                .antMatchers(\"/\" , \"/demo\")",
+      "line": 57,
+      "col": 45,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java"
+    },
+    "call:method:account-service:ResourceServerConfig#configure(HttpSecurity)@57:18": {
+      "kind": "call_site",
+      "method": "method:account-service:ResourceServerConfig#configure(HttpSecurity)",
+      "callee": "antMatchers",
+      "receiver": "http.authorizeRequests()",
+      "receiver_type": "http.authorizeRequests()",
+      "line": 57,
+      "col": 18,
+      "arg_count": 2,
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java"
+    },
+    "call:method:account-service:ResourceServerConfig#configure(HttpSecurity)@56:14": {
+      "kind": "call_site",
+      "method": "method:account-service:ResourceServerConfig#configure(HttpSecurity)",
+      "callee": "authorizeRequests",
+      "receiver": "http",
+      "receiver_type": "HttpSecurity",
+      "line": 56,
+      "col": 14,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java"
+    },
+    "call:method:account-service:AccountController#getAccountByName(String)@22:25": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountController#getAccountByName(String)",
+      "callee": "findByName",
+      "receiver": "accountService",
+      "receiver_type": "AccountService",
+      "line": 22,
+      "col": 25,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java"
+    },
+    "call:method:account-service:AccountController#getCurrentAccount(Principal)@27:25": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountController#getCurrentAccount(Principal)",
+      "callee": "findByName",
+      "receiver": "accountService",
+      "receiver_type": "AccountService",
+      "line": 27,
+      "col": 25,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java"
+    },
+    "call:method:account-service:AccountController#getCurrentAccount(Principal)@27:46": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountController#getCurrentAccount(Principal)",
+      "callee": "getName",
+      "receiver": "principal",
+      "receiver_type": "Principal",
+      "line": 27,
+      "col": 46,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java"
+    },
+    "call:method:account-service:AccountController#saveCurrentAccount(Principal,Account)@32:18": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountController#saveCurrentAccount(Principal,Account)",
+      "callee": "saveChanges",
+      "receiver": "accountService",
+      "receiver_type": "AccountService",
+      "line": 32,
+      "col": 18,
+      "arg_count": 2,
+      "file": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java"
+    },
+    "call:method:account-service:AccountController#saveCurrentAccount(Principal,Account)@32:40": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountController#saveCurrentAccount(Principal,Account)",
+      "callee": "getName",
+      "receiver": "principal",
+      "receiver_type": "Principal",
+      "line": 32,
+      "col": 40,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java"
+    },
+    "call:method:account-service:AccountController#createNewAccount(User)@37:25": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountController#createNewAccount(User)",
+      "callee": "create",
+      "receiver": "accountService",
+      "receiver_type": "AccountService",
+      "line": 37,
+      "col": 25,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java"
+    },
+    "call:method:account-service:ErrorHandler#processValidationError(IllegalArgumentException)@20:7": {
+      "kind": "call_site",
+      "method": "method:account-service:ErrorHandler#processValidationError(IllegalArgumentException)",
+      "callee": "info",
+      "receiver": "log",
+      "receiver_type": "Logger",
+      "line": 20,
+      "col": 7,
+      "arg_count": 2,
+      "file": "account-service/src/main/java/com/piggymetrics/account/controller/ErrorHandler.java"
+    },
+    "call:method:account-service:AccountServiceImpl#findByName(String)@38:10": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#findByName(String)",
+      "callee": "hasLength",
+      "receiver": "Assert",
+      "receiver_type": "Assert",
+      "line": 38,
+      "col": 10,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#findByName(String)@39:21": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#findByName(String)",
+      "callee": "findByName",
+      "receiver": "repository",
+      "receiver_type": "AccountRepository",
+      "line": 39,
+      "col": 21,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@48:33": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "findByName",
+      "receiver": "repository",
+      "receiver_type": "AccountRepository",
+      "line": 48,
+      "col": 33,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@48:49": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "getUsername",
+      "receiver": "user",
+      "receiver_type": "User",
+      "line": 48,
+      "col": 49,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@49:10": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "isNull",
+      "receiver": "Assert",
+      "receiver_type": "Assert",
+      "line": 49,
+      "col": 10,
+      "arg_count": 2,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@49:61": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "getUsername",
+      "receiver": "user",
+      "receiver_type": "User",
+      "line": 49,
+      "col": 61,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@51:14": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "createUser",
+      "receiver": "authClient",
+      "receiver_type": "AuthServiceClient",
+      "line": 51,
+      "col": 14,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@53:19": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "Saving",
+      "line": 53,
+      "col": 19,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@54:10": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "setAmount",
+      "receiver": "saving",
+      "receiver_type": "Saving",
+      "line": 54,
+      "col": 10,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@54:20": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "BigDecimal",
+      "line": 54,
+      "col": 20,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@55:10": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "setCurrency",
+      "receiver": "saving",
+      "receiver_type": "Saving",
+      "line": 55,
+      "col": 10,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@55:31": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "getDefault",
+      "receiver": "Currency",
+      "receiver_type": "Currency",
+      "line": 55,
+      "col": 31,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@56:10": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "setInterest",
+      "receiver": "saving",
+      "receiver_type": "Saving",
+      "line": 56,
+      "col": 10,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@56:22": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "BigDecimal",
+      "line": 56,
+      "col": 22,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@57:10": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "setDeposit",
+      "receiver": "saving",
+      "receiver_type": "Saving",
+      "line": 57,
+      "col": 10,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@58:10": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "setCapitalization",
+      "receiver": "saving",
+      "receiver_type": "Saving",
+      "line": 58,
+      "col": 10,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@60:21": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "Account",
+      "line": 60,
+      "col": 21,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@61:11": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "setName",
+      "receiver": "account",
+      "receiver_type": "Account",
+      "line": 61,
+      "col": 11,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@61:24": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "getUsername",
+      "receiver": "user",
+      "receiver_type": "User",
+      "line": 61,
+      "col": 24,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@62:11": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "setLastSeen",
+      "receiver": "account",
+      "receiver_type": "Account",
+      "line": 62,
+      "col": 11,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@62:23": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "Date",
+      "line": 62,
+      "col": 23,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@63:11": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "setSaving",
+      "receiver": "account",
+      "receiver_type": "Account",
+      "line": 63,
+      "col": 11,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@65:14": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "save",
+      "receiver": "repository",
+      "receiver_type": "AccountRepository",
+      "line": 65,
+      "col": 14,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@67:7": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "info",
+      "receiver": "log",
+      "receiver_type": "Logger",
+      "line": 67,
+      "col": 7,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#create(User)@67:55": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "callee": "getName",
+      "receiver": "account",
+      "receiver_type": "Account",
+      "line": 67,
+      "col": 55,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@78:32": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#saveChanges(String,Account)",
+      "callee": "findByName",
+      "receiver": "repository",
+      "receiver_type": "AccountRepository",
+      "line": 78,
+      "col": 32,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@79:10": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#saveChanges(String,Account)",
+      "callee": "notNull",
+      "receiver": "Assert",
+      "receiver_type": "Assert",
+      "line": 79,
+      "col": 10,
+      "arg_count": 2,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@81:11": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#saveChanges(String,Account)",
+      "callee": "setIncomes",
+      "receiver": "account",
+      "receiver_type": "Account",
+      "line": 81,
+      "col": 11,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@81:29": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#saveChanges(String,Account)",
+      "callee": "getIncomes",
+      "receiver": "update",
+      "receiver_type": "Account",
+      "line": 81,
+      "col": 29,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@82:11": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#saveChanges(String,Account)",
+      "callee": "setExpenses",
+      "receiver": "account",
+      "receiver_type": "Account",
+      "line": 82,
+      "col": 11,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@82:30": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#saveChanges(String,Account)",
+      "callee": "getExpenses",
+      "receiver": "update",
+      "receiver_type": "Account",
+      "line": 82,
+      "col": 30,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@83:11": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#saveChanges(String,Account)",
+      "callee": "setSaving",
+      "receiver": "account",
+      "receiver_type": "Account",
+      "line": 83,
+      "col": 11,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@83:28": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#saveChanges(String,Account)",
+      "callee": "getSaving",
+      "receiver": "update",
+      "receiver_type": "Account",
+      "line": 83,
+      "col": 28,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@84:11": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#saveChanges(String,Account)",
+      "callee": "setNote",
+      "receiver": "account",
+      "receiver_type": "Account",
+      "line": 84,
+      "col": 11,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@84:26": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#saveChanges(String,Account)",
+      "callee": "getNote",
+      "receiver": "update",
+      "receiver_type": "Account",
+      "line": 84,
+      "col": 26,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@85:11": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#saveChanges(String,Account)",
+      "callee": "setLastSeen",
+      "receiver": "account",
+      "receiver_type": "Account",
+      "line": 85,
+      "col": 11,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@85:23": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#saveChanges(String,Account)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "Date",
+      "line": 85,
+      "col": 23,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@86:14": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#saveChanges(String,Account)",
+      "callee": "save",
+      "receiver": "repository",
+      "receiver_type": "AccountRepository",
+      "line": 86,
+      "col": 14,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@88:7": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#saveChanges(String,Account)",
+      "callee": "debug",
+      "receiver": "log",
+      "receiver_type": "Logger",
+      "line": 88,
+      "col": 7,
+      "arg_count": 2,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@90:20": {
+      "kind": "call_site",
+      "method": "method:account-service:AccountServiceImpl#saveChanges(String,Account)",
+      "callee": "updateStatistics",
+      "receiver": "statisticsClient",
+      "receiver_type": "StatisticsServiceClient",
+      "line": 90,
+      "col": 20,
+      "arg_count": 2,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#loadAuthentication(String)@66:29": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#loadAuthentication(String)",
+      "callee": "getMap",
+      "receiver": "",
+      "receiver_type": "CustomUserInfoTokenServices",
+      "line": 66,
+      "col": 29,
+      "arg_count": 2,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#loadAuthentication(String)@67:11": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#loadAuthentication(String)",
+      "callee": "containsKey",
+      "receiver": "map",
+      "receiver_type": "Map<String, Object>",
+      "line": 67,
+      "col": 11,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#loadAuthentication(String)@68:16": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#loadAuthentication(String)",
+      "callee": "debug",
+      "receiver": "this.logger",
+      "receiver_type": "Log",
+      "line": 68,
+      "col": 16,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#loadAuthentication(String)@68:56": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#loadAuthentication(String)",
+      "callee": "get",
+      "receiver": "map",
+      "receiver_type": "Map<String, Object>",
+      "line": 68,
+      "col": 56,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#loadAuthentication(String)@69:10": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#loadAuthentication(String)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "InvalidTokenException",
+      "line": 69,
+      "col": 10,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#loadAuthentication(String)@71:10": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#loadAuthentication(String)",
+      "callee": "extractAuthentication",
+      "receiver": "",
+      "receiver_type": "CustomUserInfoTokenServices",
+      "line": 71,
+      "col": 10,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)@75:22": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)",
+      "callee": "getPrincipal",
+      "receiver": "",
+      "receiver_type": "CustomUserInfoTokenServices",
+      "line": 75,
+      "col": 22,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)@76:27": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)",
+      "callee": "getRequest",
+      "receiver": "",
+      "receiver_type": "CustomUserInfoTokenServices",
+      "line": 76,
+      "col": 27,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)@78:6": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)",
+      "callee": "extractAuthorities",
+      "receiver": "this.authoritiesExtractor",
+      "receiver_type": "AuthoritiesExtractor",
+      "line": 78,
+      "col": 6,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)@79:47": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "UsernamePasswordAuthenticationToken",
+      "line": 79,
+      "col": 47,
+      "arg_count": 3,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)@81:9": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)",
+      "callee": "setDetails",
+      "receiver": "token",
+      "receiver_type": "DefaultOAuth2AccessToken",
+      "line": 81,
+      "col": 9,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)@82:10": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "OAuth2Authentication",
+      "line": 82,
+      "col": 10,
+      "arg_count": 2,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getPrincipal(Map<String, Object>)@87:12": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getPrincipal(Map<String, Object>)",
+      "callee": "containsKey",
+      "receiver": "map",
+      "receiver_type": "Map<String, Object>",
+      "line": 87,
+      "col": 12,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getPrincipal(Map<String, Object>)@88:16": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getPrincipal(Map<String, Object>)",
+      "callee": "get",
+      "receiver": "map",
+      "receiver_type": "Map<String, Object>",
+      "line": 88,
+      "col": 16,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)@96:59": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)",
+      "callee": "get",
+      "receiver": "map",
+      "receiver_type": "Map<String, Object>",
+      "line": 96,
+      "col": 59,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)@98:38": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)",
+      "callee": "get",
+      "receiver": "request",
+      "receiver_type": "Map<String, Object>",
+      "line": 98,
+      "col": 38,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)@99:23": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "LinkedHashSet<>",
+      "line": 99,
+      "col": 23,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)@99:51": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)",
+      "callee": "containsKey",
+      "receiver": "request",
+      "receiver_type": "Map<String, Object>",
+      "line": 99,
+      "col": 51,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)@100:34": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)",
+      "callee": "get",
+      "receiver": "request",
+      "receiver_type": "Map<String, Object>",
+      "line": 100,
+      "col": 34,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)@100:69": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)",
+      "callee": "emptySet",
+      "receiver": "Collections",
+      "receiver_type": "Collections",
+      "line": 100,
+      "col": 69,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)@102:10": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "OAuth2Request",
+      "line": 102,
+      "col": 10,
+      "arg_count": 9,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)@102:56": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "HashSet<>",
+      "line": 102,
+      "col": 56,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#readAccessToken(String)@108:9": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#readAccessToken(String)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "UnsupportedOperationException",
+      "line": 108,
+      "col": 9,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@113:15": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "debug",
+      "receiver": "this.logger",
+      "receiver_type": "Log",
+      "line": 113,
+      "col": 15,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@117:51": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "BaseOAuth2ProtectedResourceDetails",
+      "line": 117,
+      "col": 51,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@118:14": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "setClientId",
+      "receiver": "resource",
+      "receiver_type": "BaseOAuth2ProtectedResourceDetails",
+      "line": 118,
+      "col": 14,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@119:20": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "OAuth2RestTemplate",
+      "line": 119,
+      "col": 20,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@122:7": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "getAccessToken",
+      "receiver": "restTemplate.getOAuth2ClientContext()",
+      "receiver_type": "restTemplate.getOAuth2ClientContext()",
+      "line": 122,
+      "col": 7,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@121:51": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "getOAuth2ClientContext",
+      "receiver": "restTemplate",
+      "receiver_type": "OAuth2RestOperations",
+      "line": 121,
+      "col": 51,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@123:46": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "equals",
+      "receiver": "accessToken",
+      "receiver_type": "String",
+      "line": 123,
+      "col": 46,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@123:67": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "getValue",
+      "receiver": "existingToken",
+      "receiver_type": "OAuth2AccessToken",
+      "line": 123,
+      "col": 67,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@124:38": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "DefaultOAuth2AccessToken",
+      "line": 124,
+      "col": 38,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@126:11": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "setTokenType",
+      "receiver": "token",
+      "receiver_type": "DefaultOAuth2AccessToken",
+      "line": 126,
+      "col": 11,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@127:43": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "setAccessToken",
+      "receiver": "restTemplate.getOAuth2ClientContext()",
+      "receiver_type": "restTemplate.getOAuth2ClientContext()",
+      "line": 127,
+      "col": 43,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@127:18": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "getOAuth2ClientContext",
+      "receiver": "restTemplate",
+      "receiver_type": "OAuth2RestOperations",
+      "line": 127,
+      "col": 18,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@129:54": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "getBody",
+      "receiver": "restTemplate.getForEntity(path, Map.class)",
+      "receiver_type": "restTemplate.getForEntity(path, Map.class)",
+      "line": 129,
+      "col": 54,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@129:24": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "getForEntity",
+      "receiver": "restTemplate",
+      "receiver_type": "OAuth2RestOperations",
+      "line": 129,
+      "col": 24,
+      "arg_count": 2,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@132:16": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "info",
+      "receiver": "this.logger",
+      "receiver_type": "Log",
+      "line": 132,
+      "col": 16,
+      "arg_count": 1,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@132:59": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "getClass",
+      "receiver": "ex",
+      "receiver_type": "ex",
+      "line": 132,
+      "col": 59,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@133:11": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "getMessage",
+      "receiver": "ex",
+      "receiver_type": "ex",
+      "line": 133,
+      "col": 11,
+      "arg_count": 0,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:account-service:CustomUserInfoTokenServices#getMap(String,String)@134:39": {
+      "kind": "call_site",
+      "method": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "singletonMap",
+      "receiver": "Collections",
+      "receiver_type": "Collections",
+      "line": 134,
+      "col": 39,
+      "arg_count": 2,
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java"
+    },
+    "res:collection:account-service.accounts": {
+      "kind": "data_resource",
+      "resource_kind": "collection",
+      "schema": "account-service",
+      "name": "accounts",
+      "origin": [
+        {
+          "file": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java"
+        }
+      ]
+    }
+  },
+  "edges": [
+    {
+      "source": "type:account-service:StatisticsServiceClientFallback",
+      "type": "implements",
+      "target": "type:account-service:StatisticsServiceClient"
+    },
+    {
+      "source": "method:account-service:StatisticsServiceClientFallback#updateStatistics(String,Account)",
+      "type": "overrides",
+      "target": "method:account-service:StatisticsServiceClient#updateStatistics(String,Account)"
+    },
+    {
+      "source": "type:account-service:AccountServiceImpl",
+      "type": "implements",
+      "target": "type:account-service:AccountService"
+    },
+    {
+      "source": "method:account-service:AccountServiceImpl#findByName(String)",
+      "type": "overrides",
+      "target": "method:account-service:AccountService#findByName(String)"
+    },
+    {
+      "source": "method:account-service:AccountServiceImpl#create(User)",
+      "type": "overrides",
+      "target": "method:account-service:AccountService#create(User)"
+    },
+    {
+      "source": "method:account-service:AccountServiceImpl#saveChanges(String,Account)",
+      "type": "overrides",
+      "target": "method:account-service:AccountService#saveChanges(String,Account)"
+    },
+    {
+      "source": "call:method:account-service:ResourceServerConfig#oauth2FeignRequestInterceptor()@41:84",
+      "type": "calls",
+      "target": "method:account-service:ResourceServerConfig#clientCredentialsResourceDetails()"
+    },
+    {
+      "source": "call:method:account-service:ResourceServerConfig#clientCredentialsRestTemplate()@46:39",
+      "type": "calls",
+      "target": "method:account-service:ResourceServerConfig#clientCredentialsResourceDetails()"
+    },
+    {
+      "source": "call:method:account-service:ResourceServerConfig#tokenServices()@51:16",
+      "type": "calls",
+      "target": "method:account-service:CustomUserInfoTokenServices#<init>(String,String)"
+    },
+    {
+      "source": "call:method:account-service:AccountController#getAccountByName(String)@22:25",
+      "type": "calls",
+      "target": "method:account-service:AccountService#findByName(String)"
+    },
+    {
+      "source": "call:method:account-service:AccountController#getCurrentAccount(Principal)@27:25",
+      "type": "calls",
+      "target": "method:account-service:AccountService#findByName(String)"
+    },
+    {
+      "source": "call:method:account-service:AccountController#saveCurrentAccount(Principal,Account)@32:18",
+      "type": "calls",
+      "target": "method:account-service:AccountService#saveChanges(String,Account)"
+    },
+    {
+      "source": "call:method:account-service:AccountController#createNewAccount(User)@37:25",
+      "type": "calls",
+      "target": "method:account-service:AccountService#create(User)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#findByName(String)@39:21",
+      "type": "calls",
+      "target": "method:account-service:AccountRepository#findByName(String)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#create(User)@48:33",
+      "type": "calls",
+      "target": "method:account-service:AccountRepository#findByName(String)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#create(User)@48:49",
+      "type": "calls",
+      "target": "method:account-service:User#getUsername()"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#create(User)@49:61",
+      "type": "calls",
+      "target": "method:account-service:User#getUsername()"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#create(User)@51:14",
+      "type": "calls",
+      "target": "method:account-service:AuthServiceClient#createUser(User)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#create(User)@54:10",
+      "type": "calls",
+      "target": "method:account-service:Saving#setAmount(BigDecimal)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#create(User)@55:10",
+      "type": "calls",
+      "target": "method:account-service:Saving#setCurrency(Currency)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#create(User)@56:10",
+      "type": "calls",
+      "target": "method:account-service:Saving#setInterest(BigDecimal)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#create(User)@57:10",
+      "type": "calls",
+      "target": "method:account-service:Saving#setDeposit(Boolean)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#create(User)@58:10",
+      "type": "calls",
+      "target": "method:account-service:Saving#setCapitalization(Boolean)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#create(User)@61:11",
+      "type": "calls",
+      "target": "method:account-service:Account#setName(String)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#create(User)@61:24",
+      "type": "calls",
+      "target": "method:account-service:User#getUsername()"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#create(User)@62:11",
+      "type": "calls",
+      "target": "method:account-service:Account#setLastSeen(Date)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#create(User)@63:11",
+      "type": "calls",
+      "target": "method:account-service:Account#setSaving(Saving)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#create(User)@67:55",
+      "type": "calls",
+      "target": "method:account-service:Account#getName()"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@78:32",
+      "type": "calls",
+      "target": "method:account-service:AccountRepository#findByName(String)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@81:11",
+      "type": "calls",
+      "target": "method:account-service:Account#setIncomes(List<Item>)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@81:29",
+      "type": "calls",
+      "target": "method:account-service:Account#getIncomes()"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@82:11",
+      "type": "calls",
+      "target": "method:account-service:Account#setExpenses(List<Item>)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@82:30",
+      "type": "calls",
+      "target": "method:account-service:Account#getExpenses()"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@83:11",
+      "type": "calls",
+      "target": "method:account-service:Account#setSaving(Saving)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@83:28",
+      "type": "calls",
+      "target": "method:account-service:Account#getSaving()"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@84:11",
+      "type": "calls",
+      "target": "method:account-service:Account#setNote(String)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@84:26",
+      "type": "calls",
+      "target": "method:account-service:Account#getNote()"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@85:11",
+      "type": "calls",
+      "target": "method:account-service:Account#setLastSeen(Date)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@90:20",
+      "type": "calls",
+      "target": "method:account-service:StatisticsServiceClient#updateStatistics(String,Account)"
+    },
+    {
+      "source": "call:method:account-service:CustomUserInfoTokenServices#loadAuthentication(String)@66:29",
+      "type": "calls",
+      "target": "method:account-service:CustomUserInfoTokenServices#getMap(String,String)"
+    },
+    {
+      "source": "call:method:account-service:CustomUserInfoTokenServices#loadAuthentication(String)@71:10",
+      "type": "calls",
+      "target": "method:account-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)"
+    },
+    {
+      "source": "call:method:account-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)@75:22",
+      "type": "calls",
+      "target": "method:account-service:CustomUserInfoTokenServices#getPrincipal(Map<String, Object>)"
+    },
+    {
+      "source": "call:method:account-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)@76:27",
+      "type": "calls",
+      "target": "method:account-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#findByName(String)@39:21",
+      "type": "data_access",
+      "target": "res:collection:account-service.accounts"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#create(User)@48:33",
+      "type": "data_access",
+      "target": "res:collection:account-service.accounts"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#create(User)@65:14",
+      "type": "data_access",
+      "target": "res:collection:account-service.accounts"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@78:32",
+      "type": "data_access",
+      "target": "res:collection:account-service.accounts"
+    },
+    {
+      "source": "call:method:account-service:AccountServiceImpl#saveChanges(String,Account)@86:14",
+      "type": "data_access",
+      "target": "res:collection:account-service.accounts"
+    }
+  ],
+  "context": {}
+}

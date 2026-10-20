@@ -1,0 +1,364 @@
+{
+  "goals": [
+    {
+      "id": "R01",
+      "title": "Source static storage and bounded initialization",
+      "status": "verified",
+      "evidence": [
+        "benchmark/implementation/R01/first-static-cells",
+        "benchmark/implementation/R01/static-controls",
+        "benchmark/implementation/R01/literal-constant-controls",
+        "benchmark/implementation/R01/initializer-Error-before",
+        "benchmark/implementation/R01/initializer-Error-after",
+        "benchmark/implementation/R01/release-integration",
+        "benchmark/implementation/R01/release-local-gate",
+        "benchmark/implementation/R01/E6-to-release-ledger"
+      ],
+      "limitations": [
+        "Nonliteral potential compile-time constant expressions stop before active initialization; null final String initializes normally.",
+        "Cyclic, unresolved joined class initialization and general classloader/concurrency behavior are boundaries.",
+        "SLF4J facade contract excludes provider startup failures."
+      ],
+      "acceptance_source": "development/inputs/solution_31_models_and_static_analysis_review.md sections 11, 12.1, 12.2",
+      "subgoals": [
+        {
+          "id": "bounded-static-state",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R01/initializer-Error-after"
+        },
+        {
+          "id": "release-integration",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R01/release-integration"
+        },
+        {
+          "id": "TT-current-stage",
+          "status": "verified",
+          "evidence": "benchmark/stages/E7-release"
+        }
+      ],
+      "scope": "bounded implementation and available local/regression integration; not full Java/Spring or independent real transfer",
+      "last_goal_specific_command_exit": 0,
+      "accepted_release_gate": {
+        "path": "benchmark/implementation/R01/release-local-gate",
+        "returncode": 0
+      }
+    },
+    {
+      "id": "R02",
+      "title": "List index return typing and consumers",
+      "status": "verified",
+      "evidence": [
+        "benchmark/implementation/R02/list-search-after"
+      ],
+      "limitations": [],
+      "acceptance_source": "development/inputs/solution_31_models_and_static_analysis_review.md sections 11, 12.1, 12.2",
+      "subgoals": [
+        {
+          "id": "typed-search-and-callbacks",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R08/final-local-gate"
+        },
+        {
+          "id": "release-integration",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R01/release-integration"
+        }
+      ],
+      "scope": "bounded implementation and available local/regression integration; not full Java/Spring or independent real transfer",
+      "last_goal_specific_command_exit": 1,
+      "accepted_release_gate": {
+        "path": "benchmark/implementation/R01/release-local-gate",
+        "returncode": 0
+      }
+    },
+    {
+      "id": "R03",
+      "title": "Stream completion, finite forEach and Optional presence",
+      "status": "verified",
+      "evidence": [
+        "benchmark/implementation/R03/stream-and-optional",
+        "benchmark/implementation/R03/full-local-gate-01",
+        "benchmark/implementation/R03/full-local-gate-02",
+        "benchmark/implementation/R03/completion-controls",
+        "benchmark/implementation/R03/completion-integration",
+        "benchmark/implementation/R03/full-local-gate-03"
+      ],
+      "limitations": [],
+      "acceptance_source": "development/inputs/solution_31_models_and_static_analysis_review.md sections 11, 12.1, 12.2",
+      "subgoals": [
+        {
+          "id": "correctness",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R01/release-local-gate"
+        },
+        {
+          "id": "finite-forEach-support",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R03/completion-controls"
+        },
+        {
+          "id": "cart-state-and-wires",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R01/release-integration/gate/cart/checks.json"
+        }
+      ],
+      "scope": "bounded implementation and available local/regression integration; not full Java/Spring or independent real transfer",
+      "last_goal_specific_command_exit": 0,
+      "accepted_release_gate": {
+        "path": "benchmark/implementation/R01/release-local-gate",
+        "returncode": 0
+      }
+    },
+    {
+      "id": "R04",
+      "title": "Bounded source/generated Set equality and hash",
+      "status": "verified",
+      "evidence": [
+        "benchmark/implementation/R04/source-keys-before",
+        "benchmark/implementation/R04/source-keys-after",
+        "benchmark/implementation/R04/source-keys-controls-02",
+        "benchmark/implementation/R04/tt-causal-probes",
+        "benchmark/implementation/R04/full-local-gate",
+        "benchmark/implementation/R04/final-TT-causal-probes"
+      ],
+      "limitations": [],
+      "acceptance_source": "development/inputs/solution_31_models_and_static_analysis_review.md sections 11, 12.1, 12.2",
+      "subgoals": [
+        {
+          "id": "source-generated-leaf-keys",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R01/release-local-gate"
+        },
+        {
+          "id": "isolated-E2",
+          "status": "verified",
+          "evidence": "benchmark/stages/E2-R04"
+        },
+        {
+          "id": "TT-frontier-witnesses",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R04/final-TT-causal-probes"
+        }
+      ],
+      "scope": "bounded implementation and available local/regression integration; not full Java/Spring or independent real transfer",
+      "last_goal_specific_command_exit": 0,
+      "accepted_release_gate": {
+        "path": "benchmark/implementation/R01/release-local-gate",
+        "returncode": 0
+      }
+    },
+    {
+      "id": "R05",
+      "title": "First-loss diagnostics and one scoped summary",
+      "status": "verified",
+      "evidence": [
+        "benchmark/implementation/R05/first-loss-probes",
+        "benchmark/implementation/R05/passive-diagnostics-local",
+        "benchmark/implementation/R05/readonly-summary-pilot",
+        "benchmark/implementation/R05/readonly-summary-pilot-02",
+        "benchmark/implementation/R05/readonly-summary-pilot-03",
+        "benchmark/implementation/R05/readonly-summary-pilot-04",
+        "benchmark/implementation/R05/integration-regression",
+        "benchmark/implementation/R05/full-local-summary-on",
+        "benchmark/implementation/R05/default-on-integration",
+        "benchmark/implementation/R05/tiny-oracle-export",
+        "benchmark/implementation/R05/tiny-oracle-export-02",
+        "benchmark/implementation/R05/stage-causal-ledger"
+      ],
+      "limitations": [],
+      "acceptance_source": "development/inputs/solution_31_models_and_static_analysis_review.md sections 11, 12.1, 12.2",
+      "subgoals": [
+        {
+          "id": "diagnostics-and-loss-ledger",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R05/stage-causal-ledger"
+        },
+        {
+          "id": "one-readonly-stop-summary",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R05/tiny-oracle-export-02"
+        },
+        {
+          "id": "default-integration",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R01/release-integration"
+        }
+      ],
+      "scope": "bounded implementation and available local/regression integration; not full Java/Spring or independent real transfer",
+      "last_goal_specific_command_exit": 0,
+      "accepted_release_gate": {
+        "path": "benchmark/implementation/R01/release-local-gate",
+        "returncode": 0
+      }
+    },
+    {
+      "id": "R06",
+      "title": "ORM encounter order and producer agreement",
+      "status": "verified",
+      "evidence": [
+        "benchmark/implementation/R06/repository-orders-before",
+        "benchmark/implementation/R06/repository-orders-before",
+        "benchmark/implementation/R06/repository-orders-after",
+        "benchmark/implementation/R06/order-history-controls",
+        "benchmark/implementation/R06/cart-agreement-before",
+        "benchmark/implementation/R06/cart-agreement-after",
+        "benchmark/implementation/R06/cart-order-profile",
+        "benchmark/implementation/R06/cart-order-check",
+        "benchmark/implementation/R06/full-local-gate",
+        "benchmark/implementation/R06/cart-order-check-v4",
+        "benchmark/implementation/R06/cart-order-profile-02",
+        "benchmark/implementation/R06/cart-order-check-v4-02",
+        "benchmark/implementation/R06/cart-order-mutations",
+        "benchmark/implementation/R06/full-local-gate-02",
+        "benchmark/implementation/R06/safety-and-local-gate",
+        "benchmark/implementation/R06/final-local-gate",
+        "benchmark/implementation/R06/accepted-local-gate",
+        "benchmark/implementation/R06/integration-gate",
+        "benchmark/implementation/R06/integration-gate-02",
+        "benchmark/implementation/R06/integration-gate-03",
+        "benchmark/implementation/R06/final-integration"
+      ],
+      "limitations": [],
+      "acceptance_source": "development/inputs/solution_31_models_and_static_analysis_review.md sections 11, 12.1, 12.2",
+      "scope": "bounded implementation and available local/regression integration; not full Java/Spring or independent real transfer",
+      "subgoals": [
+        {
+          "id": "legal-orders-and-complete-agreement",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R01/release-local-gate"
+        },
+        {
+          "id": "state-wires-and-mutations",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R01/release-integration"
+        },
+        {
+          "id": "source-oracle-deltas",
+          "status": "verified",
+          "evidence": "development/oracles/legacy-order-v3-delta.md"
+        }
+      ],
+      "last_goal_specific_command_exit": 0,
+      "accepted_release_gate": {
+        "path": "benchmark/implementation/R01/release-local-gate",
+        "returncode": 0
+      }
+    },
+    {
+      "id": "R07",
+      "title": "Frozen retrieval benchmark and Unicode lexical baseline",
+      "status": "in_progress",
+      "evidence": [
+        "benchmark/implementation/R07/freeze-source-corpus",
+        "benchmark/implementation/R07/freeze-source-corpus-02",
+        "benchmark/implementation/R07/prepare-B",
+        "benchmark/implementation/R07/historical-A-versus-B",
+        "benchmark/implementation/R07/B-on-E-cart",
+        "benchmark/implementation/R07/B-on-E-cart-check",
+        "benchmark/implementation/R07/corrected-engine-retrieval",
+        "benchmark/implementation/R07/generic-package-harness"
+      ],
+      "limitations": [],
+      "acceptance_source": "development/inputs/solution_31_models_and_static_analysis_review.md sections 11, 12.1, 12.2",
+      "subgoals": [
+        {
+          "id": "frozen-dataset-and-harness",
+          "status": "verified",
+          "evidence": "development/retrieval/frozen-v2"
+        },
+        {
+          "id": "generic-package-harness",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R07/generic-package-harness"
+        },
+        {
+          "id": "A-B-adoption",
+          "status": "experiment_rejected",
+          "evidence": "benchmark/implementation/R07/historical-A-versus-B",
+          "reason": "higher ranking metrics but more false rejections; B-on-E cart NL fails"
+        },
+        {
+          "id": "real-transfer-first",
+          "status": "not_run",
+          "reason": "no new independent real source/config/skeleton/context/chain/oracle package"
+        },
+        {
+          "id": "real-transfer-second",
+          "status": "not_run",
+          "reason": "second real application holdout absent"
+        }
+      ],
+      "last_exit_status": 0
+    },
+    {
+      "id": "R08",
+      "title": "Conditional offline embedding pilot and adoption gates",
+      "status": "in_progress",
+      "evidence": [
+        "benchmark/implementation/R08/adapter-controls",
+        "benchmark/implementation/R08/full-local-before-model",
+        "benchmark/implementation/R08/qwen-index-build",
+        "benchmark/implementation/R08/qwen-C-same-candidates",
+        "benchmark/implementation/R08/qwen-C-same-check",
+        "benchmark/implementation/R08/qwen-C-expanded",
+        "benchmark/implementation/R08/qwen-C-expanded-check",
+        "benchmark/implementation/R08/qwen-on-E-cart",
+        "benchmark/implementation/R08/qwen-on-E-cart-check",
+        "benchmark/implementation/R08/final-local-gate",
+        "benchmark/implementation/R08/qwen-on-E-retrieval",
+        "benchmark/implementation/R08/qwen-on-E-retrieval-check",
+        "benchmark/implementation/R08/qwen-on-E7-cart"
+      ],
+      "limitations": [],
+      "acceptance_source": "development/inputs/solution_31_models_and_static_analysis_review.md sections 11, 12.1, 12.2",
+      "subgoals": [
+        {
+          "id": "plan-adapter-fallback",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R08/adapter-controls"
+        },
+        {
+          "id": "permission-and-hardware-runtime",
+          "status": "verified",
+          "evidence": "development/qwen-hardware-preflight.json",
+          "authority": "Direct user: можешь запускать qwen и использовать любые ресурсы"
+        },
+        {
+          "id": "offline-Qwen-index",
+          "status": "verified",
+          "evidence": "benchmark/implementation/R08/qwen-index-build"
+        },
+        {
+          "id": "Qwen-development-evaluation",
+          "status": "experiment_rejected",
+          "evidence": "benchmark/implementation/R08/qwen-C-expanded-check",
+          "reason": "four false accepts on refusal cases; model ranking improvement alone is insufficient"
+        },
+        {
+          "id": "Qwen-downstream",
+          "status": "experiment_rejected",
+          "evidence": "benchmark/implementation/R08/qwen-on-E7-cart",
+          "reason": "cart NL selects wrong downstream handler; explicit control remains correct"
+        },
+        {
+          "id": "CodeRank-runtime",
+          "status": "not_run",
+          "reason": "custom model runtime not audited/executed; no CodeRank weights downloaded"
+        },
+        {
+          "id": "reranker-D",
+          "status": "not_run",
+          "reason": "extra model not justified before refusal/history errors are repaired and independent data supplied"
+        },
+        {
+          "id": "independent-model-transfer",
+          "status": "not_run",
+          "reason": "two independent real holdouts absent"
+        }
+      ],
+      "last_exit_status": 0
+    }
+  ],
+  "all_queues_verified": false
+}

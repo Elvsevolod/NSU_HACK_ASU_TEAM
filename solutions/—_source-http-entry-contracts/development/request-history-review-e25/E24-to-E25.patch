@@ -1,0 +1,40 @@
+--- E24-response-history-eligibility/tests/test_literal_request_choice33.py
++++ E25-response-history-package-controls/tests/test_literal_request_choice33.py
+@@ -1,17 +1,12 @@
+ """Literal path arguments constrain a refused source request, not its score."""
+ from copy import deepcopy
+-from pathlib import Path
+ import pytest
+ from builders import build
+ from analyzer.contracts import ContractIndex,ContractGrounder
+ from analyzer.frontend import Frontend
+ from analyzer.lexical_retrieval import LexicalContractIndex
+-from analyzer.project import Project
+-from analyzer.state import Database,ScenarioState
+-from analyzer.request import grounded_request,BoundParameters
+-from analyzer.engine import Engine
+-
+-V=Path(__file__).resolve().parents[2]
++from analyzer.state import ScenarioState
++from analyzer.request import grounded_request
+ 
+ 
+ class TiedIndex(LexicalContractIndex):
+@@ -103,17 +98,3 @@
+     assert not proposals and detail['unresolved']
+ 
+ 
+-def test_real_fresh_state_read_keeps_handler_wire_native_long_and_sql(tmp_path):
+-    package=V/'development/semantic-holdout-packages-v1/healthcare'
+-    p=Project(package/'skeleton.json',package/'source');db=Database(package/'initial.sql')
+-    f=Frontend(p);g=ContractGrounder(p,f,LexicalContractIndex(p,f),None,{'facts':{},'unresolved':[]})
+-    proposals,detail=g.step('Read patient with id=11',ScenarioState(db))
+-    expected=[mid for mid,m in p.methods.items() if p.nodes[m['owner']]['fqn'].endswith('.PatientController') and m['name']=='getById']
+-    assert len(proposals)==1 and proposals[0]['entry']==expected[0]
+-    proposal=proposals[0];request=grounded_request(p,proposal['entry'],proposal['params'],proposal['bindings'])
+-    e=Engine(p,proposal['state']);result=e.run(proposal['entry'],BoundParameters(proposal['params'],request))
+-    assert result['id']==11 and result['name']=='Seed Patient' and not e.approximate
+-    assert e.request_events[0]['bound_arguments'][0]['native_kind']=='Long'
+-    assert len(e.data_operations)==1 and e.data_operations[0]['operation']=='findById'
+-    assert e.data_operations[0]['arguments']==[11] and e.data_operations[0]['argument_kinds']==['Long']
+-    assert detail['retrieval_decision']['accepted'] is False

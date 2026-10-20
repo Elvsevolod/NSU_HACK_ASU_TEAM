@@ -1,0 +1,133 @@
+{
+  "source": "manually enumerated in test_document_array_journey.expected before prediction",
+  "kind": "synthetic regression, not a public application",
+  "edges": [
+    [
+      [
+        "",
+        "executes",
+        "method:docs:DocumentController#listDocuments()"
+      ],
+      [
+        "",
+        "executes",
+        "method:portal:PortalGateway#decode(String,Class<T>)"
+      ],
+      [
+        "",
+        "executes",
+        "method:portal:PortalGateway#listDocuments()"
+      ],
+      [
+        "method:docs:DocumentController#listDocuments()",
+        "data",
+        "res:table:docs.documents"
+      ],
+      [
+        "method:portal:PortalGateway#listDocuments()",
+        "calls",
+        "method:portal:PortalGateway#decode(String,Class<T>)"
+      ],
+      [
+        "method:portal:PortalGateway#listDocuments()",
+        "remote",
+        "method:docs:DocumentController#listDocuments()"
+      ]
+    ],
+    [
+      [
+        "",
+        "executes",
+        "method:audit:AuditController#accept(String)"
+      ],
+      [
+        "",
+        "executes",
+        "method:docs:DocumentController#approveDocument(String,Approval)"
+      ],
+      [
+        "",
+        "executes",
+        "method:docs:DocumentController#fallback()"
+      ],
+      [
+        "",
+        "executes",
+        "method:portal:PortalGateway#approveDocument(Approval)"
+      ],
+      [
+        "method:docs:DocumentController#approveDocument(String,Approval)",
+        "calls",
+        "method:docs:DocumentController#fallback()"
+      ],
+      [
+        "method:docs:DocumentController#approveDocument(String,Approval)",
+        "data",
+        "res:table:docs.documents"
+      ],
+      [
+        "method:docs:DocumentController#approveDocument(String,Approval)",
+        "remote",
+        "method:audit:AuditController#accept(String)"
+      ],
+      [
+        "method:portal:PortalGateway#approveDocument(Approval)",
+        "remote",
+        "method:docs:DocumentController#approveDocument(String,Approval)"
+      ]
+    ],
+    [
+      [
+        "",
+        "executes",
+        "method:docs:DocumentController#listDocuments()"
+      ],
+      [
+        "",
+        "executes",
+        "method:portal:PortalGateway#decode(String,Class<T>)"
+      ],
+      [
+        "",
+        "executes",
+        "method:portal:PortalGateway#listDocuments()"
+      ],
+      [
+        "method:docs:DocumentController#listDocuments()",
+        "data",
+        "res:table:docs.documents"
+      ],
+      [
+        "method:portal:PortalGateway#listDocuments()",
+        "calls",
+        "method:portal:PortalGateway#decode(String,Class<T>)"
+      ],
+      [
+        "method:portal:PortalGateway#listDocuments()",
+        "remote",
+        "method:docs:DocumentController#listDocuments()"
+      ]
+    ]
+  ],
+  "values": [
+    [
+      {
+        "id": "D7",
+        "revision": 7,
+        "approved": false
+      }
+    ],
+    {
+      "id": "D7",
+      "revision": 8,
+      "approved": true
+    },
+    [
+      {
+        "id": "D7",
+        "revision": 8,
+        "approved": true
+      }
+    ]
+  ]
+}

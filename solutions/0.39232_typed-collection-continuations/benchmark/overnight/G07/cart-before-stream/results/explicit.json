@@ -1,0 +1,4531 @@
+{
+  "steps": [
+    {
+      "n": 1,
+      "request": {
+        "deployment": "payment-service",
+        "method": "GET",
+        "url": "/api/payments?orderId=11",
+        "path": [
+          "api",
+          "payments"
+        ],
+        "query": {
+          "orderId": [
+            "11"
+          ]
+        },
+        "query_complete": true,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "alternatives": [
+        {
+          "result": {
+            "unknown": true
+          },
+          "outcome": "uncaught application exception",
+          "requests": [
+            {
+              "id": 1,
+              "entry": "method:payment-service:PaymentController#getByOrder(Long)",
+              "reason": "scenario request",
+              "request": {
+                "deployment": "payment-service",
+                "method": "GET",
+                "url": "/api/payments?orderId=11",
+                "path": [
+                  "api",
+                  "payments"
+                ],
+                "query": {
+                  "orderId": [
+                    "11"
+                  ]
+                },
+                "query_complete": true,
+                "headers": {},
+                "body": {
+                  "missing": true
+                },
+                "actor": {
+                  "unknown": true
+                },
+                "session": {
+                  "unknown": true
+                },
+                "body_properties": {},
+                "provenance": []
+              },
+              "entry_boundary": "application_after_authentication",
+              "security_evaluated": false,
+              "authorization_checked": false,
+              "bound_arguments": [
+                {
+                  "name": "orderId",
+                  "declared_type": "java.lang.Long",
+                  "value": 11
+                }
+              ]
+            }
+          ],
+          "responses": [
+            {
+              "request": 1,
+              "status": {
+                "unknown": true
+              },
+              "entered": true
+            }
+          ],
+          "edges": [
+            [
+              "",
+              "executes",
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentController#getByOrder(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+              "calls",
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:PaymentController#getByOrder(Long)",
+              "calls",
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+              "data",
+              "res:table:payment-service.payments"
+            ],
+            [
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+              "calls",
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+            ]
+          ],
+          "effects": [
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:18",
+              "operation": "stream",
+              "declared_receiver": "java.util.List<com.shoppingcart.payment.domain.entity.Payment>",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            }
+          ],
+          "warnings": [
+            "server exception status or custom exception resolver is not modeled: method:payment-service:PaymentController#getByOrder(Long)",
+            "uncaught Java exception: java.lang.Throwable",
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:18 stream",
+            "unsupported stream operation: call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@65:18 toList"
+          ],
+          "conditions": [],
+          "data_operations": [
+            {
+              "method": "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+              "resource": "res:table:payment-service.payments",
+              "operation": "findByOrderId",
+              "arguments": [
+                11
+              ],
+              "source_site": "call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@62:30",
+              "uncertain_write": false,
+              "sql_emitted": true,
+              "datastore_event": true,
+              "transactional": false,
+              "emitted_by": "call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@62:30"
+            }
+          ],
+          "state_after": {
+            "browser": {
+              "storage": {},
+              "form": {},
+              "dom": {},
+              "url": {},
+              "options": {},
+              "script": {}
+            },
+            "history": [],
+            "clock": "2026-10-18T00:00:00",
+            "database_rows": {
+              "order-service.order_details": 2,
+              "order-service.orders": 2,
+              "payment-service.payments": 3
+            },
+            "unknown_tables": [],
+            "analysis_assumptions": [],
+            "limitations": [],
+            "tables": {
+              "payment-service.payments": [
+                {
+                  "id": 21,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 12:00:00"
+                },
+                {
+                  "id": 23,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "REJECTED",
+                  "createdAt": "2026-10-17 11:00:00"
+                },
+                {
+                  "id": 22,
+                  "orderId": 12,
+                  "customerId": 7,
+                  "amount": 25.0,
+                  "paymentMethod": "DEBIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 13:00:00"
+                }
+              ],
+              "order-service.orders": [
+                {
+                  "id": 11,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:00:00"
+                },
+                {
+                  "id": 12,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:30:00"
+                }
+              ],
+              "order-service.order_details": [
+                {
+                  "id": 31,
+                  "orderId": 11,
+                  "productId": 51,
+                  "productName": "Notebook",
+                  "quantity": 2,
+                  "unitPrice": 6.25
+                },
+                {
+                  "id": 32,
+                  "orderId": 12,
+                  "productId": 52,
+                  "productName": "Lamp",
+                  "quantity": 1,
+                  "unitPrice": 25.0
+                }
+              ]
+            }
+          }
+        },
+        {
+          "result": {
+            "unknown": true
+          },
+          "outcome": "uncaught application exception",
+          "requests": [
+            {
+              "id": 1,
+              "entry": "method:payment-service:PaymentController#getByOrder(Long)",
+              "reason": "scenario request",
+              "request": {
+                "deployment": "payment-service",
+                "method": "GET",
+                "url": "/api/payments?orderId=11",
+                "path": [
+                  "api",
+                  "payments"
+                ],
+                "query": {
+                  "orderId": [
+                    "11"
+                  ]
+                },
+                "query_complete": true,
+                "headers": {},
+                "body": {
+                  "missing": true
+                },
+                "actor": {
+                  "unknown": true
+                },
+                "session": {
+                  "unknown": true
+                },
+                "body_properties": {},
+                "provenance": []
+              },
+              "entry_boundary": "application_after_authentication",
+              "security_evaluated": false,
+              "authorization_checked": false,
+              "bound_arguments": [
+                {
+                  "name": "orderId",
+                  "declared_type": "java.lang.Long",
+                  "value": 11
+                }
+              ]
+            }
+          ],
+          "responses": [
+            {
+              "request": 1,
+              "status": {
+                "unknown": true
+              },
+              "entered": true
+            }
+          ],
+          "edges": [
+            [
+              "",
+              "executes",
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentController#getByOrder(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+              "calls",
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:PaymentController#getByOrder(Long)",
+              "calls",
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+              "data",
+              "res:table:payment-service.payments"
+            ],
+            [
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+              "calls",
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+            ]
+          ],
+          "effects": [
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:18",
+              "operation": "stream",
+              "declared_receiver": "java.util.List<com.shoppingcart.payment.domain.entity.Payment>",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            },
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:27",
+              "operation": "map",
+              "declared_receiver": "java.util.stream.Stream<com.shoppingcart.payment.domain.entity.Payment>",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1,
+                2
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            }
+          ],
+          "warnings": [
+            "server exception status or custom exception resolver is not modeled: method:payment-service:PaymentController#getByOrder(Long)",
+            "uncaught Java exception: java.lang.Throwable",
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:18 stream",
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:27 map",
+            "unsupported stream operation: call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@65:18 toList"
+          ],
+          "conditions": [],
+          "data_operations": [
+            {
+              "method": "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+              "resource": "res:table:payment-service.payments",
+              "operation": "findByOrderId",
+              "arguments": [
+                11
+              ],
+              "source_site": "call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@62:30",
+              "uncertain_write": false,
+              "sql_emitted": true,
+              "datastore_event": true,
+              "transactional": false,
+              "emitted_by": "call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@62:30"
+            }
+          ],
+          "state_after": {
+            "browser": {
+              "storage": {},
+              "form": {},
+              "dom": {},
+              "url": {},
+              "options": {},
+              "script": {}
+            },
+            "history": [],
+            "clock": "2026-10-18T00:00:00",
+            "database_rows": {
+              "order-service.order_details": 2,
+              "order-service.orders": 2,
+              "payment-service.payments": 3
+            },
+            "unknown_tables": [],
+            "analysis_assumptions": [],
+            "limitations": [],
+            "tables": {
+              "payment-service.payments": [
+                {
+                  "id": 21,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 12:00:00"
+                },
+                {
+                  "id": 23,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "REJECTED",
+                  "createdAt": "2026-10-17 11:00:00"
+                },
+                {
+                  "id": 22,
+                  "orderId": 12,
+                  "customerId": 7,
+                  "amount": 25.0,
+                  "paymentMethod": "DEBIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 13:00:00"
+                }
+              ],
+              "order-service.orders": [
+                {
+                  "id": 11,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:00:00"
+                },
+                {
+                  "id": 12,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:30:00"
+                }
+              ],
+              "order-service.order_details": [
+                {
+                  "id": 31,
+                  "orderId": 11,
+                  "productId": 51,
+                  "productName": "Notebook",
+                  "quantity": 2,
+                  "unitPrice": 6.25
+                },
+                {
+                  "id": 32,
+                  "orderId": 12,
+                  "productId": 52,
+                  "productName": "Lamp",
+                  "quantity": 1,
+                  "unitPrice": 25.0
+                }
+              ]
+            }
+          }
+        },
+        {
+          "result": {
+            "unknown": true
+          },
+          "outcome": "returned",
+          "requests": [
+            {
+              "id": 1,
+              "entry": "method:payment-service:PaymentController#getByOrder(Long)",
+              "reason": "scenario request",
+              "request": {
+                "deployment": "payment-service",
+                "method": "GET",
+                "url": "/api/payments?orderId=11",
+                "path": [
+                  "api",
+                  "payments"
+                ],
+                "query": {
+                  "orderId": [
+                    "11"
+                  ]
+                },
+                "query_complete": true,
+                "headers": {},
+                "body": {
+                  "missing": true
+                },
+                "actor": {
+                  "unknown": true
+                },
+                "session": {
+                  "unknown": true
+                },
+                "body_properties": {},
+                "provenance": []
+              },
+              "entry_boundary": "application_after_authentication",
+              "security_evaluated": false,
+              "authorization_checked": false,
+              "bound_arguments": [
+                {
+                  "name": "orderId",
+                  "declared_type": "java.lang.Long",
+                  "value": 11
+                }
+              ]
+            }
+          ],
+          "responses": [
+            {
+              "request": 1,
+              "status": 200,
+              "entered": true,
+              "body_presence": "json",
+              "body": {
+                "unknown": true
+              }
+            }
+          ],
+          "edges": [
+            [
+              "",
+              "executes",
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentController#getByOrder(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+              "calls",
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:PaymentController#getByOrder(Long)",
+              "calls",
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+              "data",
+              "res:table:payment-service.payments"
+            ],
+            [
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+              "calls",
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+            ]
+          ],
+          "effects": [
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:18",
+              "operation": "stream",
+              "declared_receiver": "java.util.List<com.shoppingcart.payment.domain.entity.Payment>",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            },
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:27",
+              "operation": "map",
+              "declared_receiver": "java.util.stream.Stream<com.shoppingcart.payment.domain.entity.Payment>",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1,
+                2
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            },
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:62",
+              "operation": "toList",
+              "declared_receiver": "",
+              "uncertainty_class": "unknown_receiver",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            }
+          ],
+          "warnings": [
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:18 stream",
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:27 map",
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:62 toList",
+            "unsupported stream operation: call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@65:18 toList"
+          ],
+          "conditions": [],
+          "data_operations": [
+            {
+              "method": "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+              "resource": "res:table:payment-service.payments",
+              "operation": "findByOrderId",
+              "arguments": [
+                11
+              ],
+              "source_site": "call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@62:30",
+              "uncertain_write": false,
+              "sql_emitted": true,
+              "datastore_event": true,
+              "transactional": false,
+              "emitted_by": "call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@62:30"
+            }
+          ],
+          "state_after": {
+            "browser": {
+              "storage": {},
+              "form": {},
+              "dom": {},
+              "url": {},
+              "options": {},
+              "script": {}
+            },
+            "history": [],
+            "clock": "2026-10-18T00:00:00",
+            "database_rows": {
+              "order-service.order_details": 2,
+              "order-service.orders": 2,
+              "payment-service.payments": 3
+            },
+            "unknown_tables": [],
+            "analysis_assumptions": [],
+            "limitations": [],
+            "tables": {
+              "payment-service.payments": [
+                {
+                  "id": 21,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 12:00:00"
+                },
+                {
+                  "id": 23,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "REJECTED",
+                  "createdAt": "2026-10-17 11:00:00"
+                },
+                {
+                  "id": 22,
+                  "orderId": 12,
+                  "customerId": 7,
+                  "amount": 25.0,
+                  "paymentMethod": "DEBIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 13:00:00"
+                }
+              ],
+              "order-service.orders": [
+                {
+                  "id": 11,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:00:00"
+                },
+                {
+                  "id": 12,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:30:00"
+                }
+              ],
+              "order-service.order_details": [
+                {
+                  "id": 31,
+                  "orderId": 11,
+                  "productId": 51,
+                  "productName": "Notebook",
+                  "quantity": 2,
+                  "unitPrice": 6.25
+                },
+                {
+                  "id": 32,
+                  "orderId": 12,
+                  "productId": 52,
+                  "productName": "Lamp",
+                  "quantity": 1,
+                  "unitPrice": 25.0
+                }
+              ]
+            }
+          }
+        },
+        {
+          "result": {
+            "unknown": true
+          },
+          "outcome": "uncaught application exception",
+          "requests": [
+            {
+              "id": 1,
+              "entry": "method:payment-service:PaymentController#getByOrder(Long)",
+              "reason": "scenario request",
+              "request": {
+                "deployment": "payment-service",
+                "method": "GET",
+                "url": "/api/payments?orderId=11",
+                "path": [
+                  "api",
+                  "payments"
+                ],
+                "query": {
+                  "orderId": [
+                    "11"
+                  ]
+                },
+                "query_complete": true,
+                "headers": {},
+                "body": {
+                  "missing": true
+                },
+                "actor": {
+                  "unknown": true
+                },
+                "session": {
+                  "unknown": true
+                },
+                "body_properties": {},
+                "provenance": []
+              },
+              "entry_boundary": "application_after_authentication",
+              "security_evaluated": false,
+              "authorization_checked": false,
+              "bound_arguments": [
+                {
+                  "name": "orderId",
+                  "declared_type": "java.lang.Long",
+                  "value": 11
+                }
+              ]
+            }
+          ],
+          "responses": [
+            {
+              "request": 1,
+              "status": {
+                "unknown": true
+              },
+              "entered": true
+            }
+          ],
+          "edges": [
+            [
+              "",
+              "executes",
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentController#getByOrder(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+              "calls",
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:PaymentController#getByOrder(Long)",
+              "calls",
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+              "data",
+              "res:table:payment-service.payments"
+            ],
+            [
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+              "calls",
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+            ]
+          ],
+          "effects": [
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:18",
+              "operation": "stream",
+              "declared_receiver": "java.util.List<com.shoppingcart.payment.domain.entity.Payment>",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            },
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:27",
+              "operation": "map",
+              "declared_receiver": "java.util.stream.Stream<com.shoppingcart.payment.domain.entity.Payment>",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1,
+                2
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            },
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:62",
+              "operation": "toList",
+              "declared_receiver": "",
+              "uncertainty_class": "unknown_receiver",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            }
+          ],
+          "warnings": [
+            "server exception status or custom exception resolver is not modeled: method:payment-service:PaymentController#getByOrder(Long)",
+            "uncaught Java exception: java.lang.Throwable",
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:18 stream",
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:27 map",
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:62 toList",
+            "unsupported stream operation: call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@65:18 toList"
+          ],
+          "conditions": [],
+          "data_operations": [
+            {
+              "method": "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+              "resource": "res:table:payment-service.payments",
+              "operation": "findByOrderId",
+              "arguments": [
+                11
+              ],
+              "source_site": "call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@62:30",
+              "uncertain_write": false,
+              "sql_emitted": true,
+              "datastore_event": true,
+              "transactional": false,
+              "emitted_by": "call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@62:30"
+            }
+          ],
+          "state_after": {
+            "browser": {
+              "storage": {},
+              "form": {},
+              "dom": {},
+              "url": {},
+              "options": {},
+              "script": {}
+            },
+            "history": [],
+            "clock": "2026-10-18T00:00:00",
+            "database_rows": {
+              "order-service.order_details": 2,
+              "order-service.orders": 2,
+              "payment-service.payments": 3
+            },
+            "unknown_tables": [],
+            "analysis_assumptions": [],
+            "limitations": [],
+            "tables": {
+              "payment-service.payments": [
+                {
+                  "id": 21,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 12:00:00"
+                },
+                {
+                  "id": 23,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "REJECTED",
+                  "createdAt": "2026-10-17 11:00:00"
+                },
+                {
+                  "id": 22,
+                  "orderId": 12,
+                  "customerId": 7,
+                  "amount": 25.0,
+                  "paymentMethod": "DEBIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 13:00:00"
+                }
+              ],
+              "order-service.orders": [
+                {
+                  "id": 11,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:00:00"
+                },
+                {
+                  "id": 12,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:30:00"
+                }
+              ],
+              "order-service.order_details": [
+                {
+                  "id": 31,
+                  "orderId": 11,
+                  "productId": 51,
+                  "productName": "Notebook",
+                  "quantity": 2,
+                  "unitPrice": 6.25
+                },
+                {
+                  "id": 32,
+                  "orderId": 12,
+                  "productId": 52,
+                  "productName": "Lamp",
+                  "quantity": 1,
+                  "unitPrice": 25.0
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "state_before": {
+        "browser": {
+          "storage": {},
+          "form": {},
+          "dom": {},
+          "url": {},
+          "options": {},
+          "script": {}
+        },
+        "history": [],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {
+          "order-service.order_details": 2,
+          "order-service.orders": 2,
+          "payment-service.payments": 3
+        },
+        "unknown_tables": [],
+        "analysis_assumptions": [],
+        "limitations": [],
+        "tables": {
+          "payment-service.payments": [
+            {
+              "id": 21,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 12:00:00"
+            },
+            {
+              "id": 23,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "REJECTED",
+              "createdAt": "2026-10-17 11:00:00"
+            },
+            {
+              "id": 22,
+              "orderId": 12,
+              "customerId": 7,
+              "amount": 25.0,
+              "paymentMethod": "DEBIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 13:00:00"
+            }
+          ],
+          "order-service.orders": [
+            {
+              "id": 11,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:00:00"
+            },
+            {
+              "id": 12,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:30:00"
+            }
+          ],
+          "order-service.order_details": [
+            {
+              "id": 31,
+              "orderId": 11,
+              "productId": 51,
+              "productName": "Notebook",
+              "quantity": 2,
+              "unitPrice": 6.25
+            },
+            {
+              "id": 32,
+              "orderId": 12,
+              "productId": 52,
+              "productName": "Lamp",
+              "quantity": 1,
+              "unitPrice": 25.0
+            }
+          ]
+        }
+      },
+      "state_after": {
+        "browser": {
+          "dom": {},
+          "form": {},
+          "options": {},
+          "script": {},
+          "storage": {},
+          "url": {}
+        },
+        "history": [],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {
+          "order-service.order_details": 2,
+          "order-service.orders": 2,
+          "payment-service.payments": 3
+        },
+        "unknown_tables": [],
+        "analysis_assumptions": [],
+        "limitations": [
+          "state budget widening: conflicting database tables are unknown"
+        ],
+        "tables": {
+          "payment-service.payments": [
+            {
+              "id": 21,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 12:00:00"
+            },
+            {
+              "id": 23,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "REJECTED",
+              "createdAt": "2026-10-17 11:00:00"
+            },
+            {
+              "id": 22,
+              "orderId": 12,
+              "customerId": 7,
+              "amount": 25.0,
+              "paymentMethod": "DEBIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 13:00:00"
+            }
+          ],
+          "order-service.orders": [
+            {
+              "id": 11,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:00:00"
+            },
+            {
+              "id": 12,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:30:00"
+            }
+          ],
+          "order-service.order_details": [
+            {
+              "id": 31,
+              "orderId": 11,
+              "productId": 51,
+              "productName": "Notebook",
+              "quantity": 2,
+              "unitPrice": 6.25
+            },
+            {
+              "id": 32,
+              "orderId": 12,
+              "productId": 52,
+              "productName": "Lamp",
+              "quantity": 1,
+              "unitPrice": 25.0
+            }
+          ]
+        }
+      },
+      "producer": null
+    },
+    {
+      "n": 2,
+      "request": {
+        "deployment": "payment-service",
+        "method": "PATCH",
+        "url": {
+          "unknown": true
+        },
+        "path": {
+          "unknown": true
+        },
+        "query": {},
+        "query_complete": false,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "candidates": [],
+      "outcome": "unknown_request",
+      "first_loss": "producer did not supply a unique concrete identifier",
+      "state_after": {
+        "browser": {
+          "dom": {},
+          "form": {},
+          "options": {},
+          "script": {},
+          "storage": {},
+          "url": {}
+        },
+        "history": [],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {
+          "order-service.order_details": 2,
+          "order-service.orders": 2,
+          "payment-service.payments": 3
+        },
+        "unknown_tables": [],
+        "analysis_assumptions": [],
+        "limitations": [
+          "state budget widening: conflicting database tables are unknown"
+        ],
+        "tables": {
+          "payment-service.payments": [
+            {
+              "id": 21,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 12:00:00"
+            },
+            {
+              "id": 23,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "REJECTED",
+              "createdAt": "2026-10-17 11:00:00"
+            },
+            {
+              "id": 22,
+              "orderId": 12,
+              "customerId": 7,
+              "amount": 25.0,
+              "paymentMethod": "DEBIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 13:00:00"
+            }
+          ],
+          "order-service.orders": [
+            {
+              "id": 11,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:00:00"
+            },
+            {
+              "id": 12,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:30:00"
+            }
+          ],
+          "order-service.order_details": [
+            {
+              "id": 31,
+              "orderId": 11,
+              "productId": 51,
+              "productName": "Notebook",
+              "quantity": 2,
+              "unitPrice": 6.25
+            },
+            {
+              "id": 32,
+              "orderId": 12,
+              "productId": 52,
+              "productName": "Lamp",
+              "quantity": 1,
+              "unitPrice": 25.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "n": 3,
+      "request": {
+        "deployment": "payment-service",
+        "method": "GET",
+        "url": {
+          "unknown": true
+        },
+        "path": {
+          "unknown": true
+        },
+        "query": {},
+        "query_complete": false,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "candidates": [],
+      "outcome": "unknown_request",
+      "first_loss": "producer did not supply a unique concrete identifier",
+      "state_after": {
+        "browser": {
+          "dom": {},
+          "form": {},
+          "options": {},
+          "script": {},
+          "storage": {},
+          "url": {}
+        },
+        "history": [],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {
+          "order-service.order_details": 2,
+          "order-service.orders": 2,
+          "payment-service.payments": 3
+        },
+        "unknown_tables": [],
+        "analysis_assumptions": [],
+        "limitations": [
+          "state budget widening: conflicting database tables are unknown"
+        ],
+        "tables": {
+          "payment-service.payments": [
+            {
+              "id": 21,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 12:00:00"
+            },
+            {
+              "id": 23,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "REJECTED",
+              "createdAt": "2026-10-17 11:00:00"
+            },
+            {
+              "id": 22,
+              "orderId": 12,
+              "customerId": 7,
+              "amount": 25.0,
+              "paymentMethod": "DEBIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 13:00:00"
+            }
+          ],
+          "order-service.orders": [
+            {
+              "id": 11,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:00:00"
+            },
+            {
+              "id": 12,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:30:00"
+            }
+          ],
+          "order-service.order_details": [
+            {
+              "id": 31,
+              "orderId": 11,
+              "productId": 51,
+              "productName": "Notebook",
+              "quantity": 2,
+              "unitPrice": 6.25
+            },
+            {
+              "id": 32,
+              "orderId": 12,
+              "productId": 52,
+              "productName": "Lamp",
+              "quantity": 1,
+              "unitPrice": 25.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "n": 4,
+      "request": {
+        "deployment": "order-service",
+        "method": "GET",
+        "url": {
+          "unknown": true
+        },
+        "path": {
+          "unknown": true
+        },
+        "query": {},
+        "query_complete": false,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "candidates": [],
+      "outcome": "unknown_request",
+      "first_loss": "producer did not supply a unique concrete identifier",
+      "state_after": {
+        "browser": {
+          "dom": {},
+          "form": {},
+          "options": {},
+          "script": {},
+          "storage": {},
+          "url": {}
+        },
+        "history": [],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {
+          "order-service.order_details": 2,
+          "order-service.orders": 2,
+          "payment-service.payments": 3
+        },
+        "unknown_tables": [],
+        "analysis_assumptions": [],
+        "limitations": [
+          "state budget widening: conflicting database tables are unknown"
+        ],
+        "tables": {
+          "payment-service.payments": [
+            {
+              "id": 21,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 12:00:00"
+            },
+            {
+              "id": 23,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "REJECTED",
+              "createdAt": "2026-10-17 11:00:00"
+            },
+            {
+              "id": 22,
+              "orderId": 12,
+              "customerId": 7,
+              "amount": 25.0,
+              "paymentMethod": "DEBIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 13:00:00"
+            }
+          ],
+          "order-service.orders": [
+            {
+              "id": 11,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:00:00"
+            },
+            {
+              "id": 12,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:30:00"
+            }
+          ],
+          "order-service.order_details": [
+            {
+              "id": 31,
+              "orderId": 11,
+              "productId": 51,
+              "productName": "Notebook",
+              "quantity": 2,
+              "unitPrice": 6.25
+            },
+            {
+              "id": 32,
+              "orderId": 12,
+              "productId": 52,
+              "productName": "Lamp",
+              "quantity": 1,
+              "unitPrice": 25.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "n": 5,
+      "request": {
+        "deployment": "payment-service",
+        "method": "PATCH",
+        "url": {
+          "unknown": true
+        },
+        "path": {
+          "unknown": true
+        },
+        "query": {},
+        "query_complete": false,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "candidates": [],
+      "outcome": "unknown_request",
+      "first_loss": "producer did not supply a unique concrete identifier",
+      "state_after": {
+        "browser": {
+          "dom": {},
+          "form": {},
+          "options": {},
+          "script": {},
+          "storage": {},
+          "url": {}
+        },
+        "history": [],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {
+          "order-service.order_details": 2,
+          "order-service.orders": 2,
+          "payment-service.payments": 3
+        },
+        "unknown_tables": [],
+        "analysis_assumptions": [],
+        "limitations": [
+          "state budget widening: conflicting database tables are unknown"
+        ],
+        "tables": {
+          "payment-service.payments": [
+            {
+              "id": 21,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 12:00:00"
+            },
+            {
+              "id": 23,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "REJECTED",
+              "createdAt": "2026-10-17 11:00:00"
+            },
+            {
+              "id": 22,
+              "orderId": 12,
+              "customerId": 7,
+              "amount": 25.0,
+              "paymentMethod": "DEBIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 13:00:00"
+            }
+          ],
+          "order-service.orders": [
+            {
+              "id": 11,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:00:00"
+            },
+            {
+              "id": 12,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:30:00"
+            }
+          ],
+          "order-service.order_details": [
+            {
+              "id": 31,
+              "orderId": 11,
+              "productId": 51,
+              "productName": "Notebook",
+              "quantity": 2,
+              "unitPrice": 6.25
+            },
+            {
+              "id": 32,
+              "orderId": 12,
+              "productId": 52,
+              "productName": "Lamp",
+              "quantity": 1,
+              "unitPrice": 25.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "n": 6,
+      "request": {
+        "deployment": "payment-service",
+        "method": "GET",
+        "url": "/api/payments/999",
+        "path": [
+          "api",
+          "payments",
+          "999"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "alternatives": [
+        {
+          "result": {
+            "unknown": true
+          },
+          "outcome": "uncaught application exception",
+          "requests": [
+            {
+              "id": 1,
+              "entry": "method:payment-service:PaymentController#getById(Long)",
+              "reason": "scenario request",
+              "request": {
+                "deployment": "payment-service",
+                "method": "GET",
+                "url": "/api/payments/999",
+                "path": [
+                  "api",
+                  "payments",
+                  "999"
+                ],
+                "query": {},
+                "query_complete": true,
+                "headers": {},
+                "body": {
+                  "missing": true
+                },
+                "actor": {
+                  "unknown": true
+                },
+                "session": {
+                  "unknown": true
+                },
+                "body_properties": {},
+                "provenance": []
+              },
+              "entry_boundary": "application_after_authentication",
+              "security_evaluated": false,
+              "authorization_checked": false,
+              "bound_arguments": [
+                {
+                  "name": "id",
+                  "declared_type": "java.lang.Long",
+                  "value": 999
+                }
+              ]
+            }
+          ],
+          "responses": [
+            {
+              "request": 1,
+              "status": {
+                "unknown": true
+              },
+              "entered": true
+            }
+          ],
+          "edges": [
+            [
+              "",
+              "executes",
+              "method:payment-service:GetPaymentUseCase#execute(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentController#getById(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentQueryService#getById(Long)"
+            ],
+            [
+              "method:payment-service:GetPaymentUseCase#execute(Long)",
+              "calls",
+              "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+            ],
+            [
+              "method:payment-service:PaymentController#getById(Long)",
+              "calls",
+              "method:payment-service:PaymentQueryService#getById(Long)"
+            ],
+            [
+              "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+              "data",
+              "res:table:payment-service.payments"
+            ],
+            [
+              "method:payment-service:PaymentQueryService#getById(Long)",
+              "calls",
+              "method:payment-service:GetPaymentUseCase#execute(Long)"
+            ]
+          ],
+          "effects": [
+            {
+              "callsite": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@48:18",
+              "operation": "map",
+              "declared_receiver": "",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1,
+                2
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            }
+          ],
+          "warnings": [
+            "server exception status or custom exception resolver is not modeled: method:payment-service:PaymentController#getById(Long)",
+            "uncaught Java exception: java.lang.Throwable",
+            "unsupported call: call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@48:18 map"
+          ],
+          "conditions": [],
+          "data_operations": [
+            {
+              "method": "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+              "resource": "res:table:payment-service.payments",
+              "operation": "findById",
+              "arguments": [
+                999
+              ],
+              "source_site": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@47:30",
+              "uncertain_write": false,
+              "sql_emitted": true,
+              "datastore_event": true,
+              "transactional": false,
+              "emitted_by": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@47:30"
+            }
+          ],
+          "state_after": {
+            "browser": {
+              "dom": {},
+              "form": {},
+              "options": {},
+              "script": {},
+              "storage": {},
+              "url": {}
+            },
+            "history": [],
+            "clock": "2026-10-18T00:00:00",
+            "database_rows": {
+              "order-service.order_details": 2,
+              "order-service.orders": 2,
+              "payment-service.payments": 3
+            },
+            "unknown_tables": [],
+            "analysis_assumptions": [],
+            "limitations": [
+              "state budget widening: conflicting database tables are unknown"
+            ],
+            "tables": {
+              "payment-service.payments": [
+                {
+                  "id": 21,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 12:00:00"
+                },
+                {
+                  "id": 23,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "REJECTED",
+                  "createdAt": "2026-10-17 11:00:00"
+                },
+                {
+                  "id": 22,
+                  "orderId": 12,
+                  "customerId": 7,
+                  "amount": 25.0,
+                  "paymentMethod": "DEBIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 13:00:00"
+                }
+              ],
+              "order-service.orders": [
+                {
+                  "id": 11,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:00:00"
+                },
+                {
+                  "id": 12,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:30:00"
+                }
+              ],
+              "order-service.order_details": [
+                {
+                  "id": 31,
+                  "orderId": 11,
+                  "productId": 51,
+                  "productName": "Notebook",
+                  "quantity": 2,
+                  "unitPrice": 6.25
+                },
+                {
+                  "id": 32,
+                  "orderId": 12,
+                  "productId": 52,
+                  "productName": "Lamp",
+                  "quantity": 1,
+                  "unitPrice": 25.0
+                }
+              ]
+            }
+          }
+        },
+        {
+          "result": {
+            "id": null,
+            "orderId": null,
+            "customerId": null,
+            "amount": null,
+            "paymentMethod": null,
+            "status": null,
+            "createdAt": null
+          },
+          "outcome": "returned",
+          "requests": [
+            {
+              "id": 1,
+              "entry": "method:payment-service:PaymentController#getById(Long)",
+              "reason": "scenario request",
+              "request": {
+                "deployment": "payment-service",
+                "method": "GET",
+                "url": "/api/payments/999",
+                "path": [
+                  "api",
+                  "payments",
+                  "999"
+                ],
+                "query": {},
+                "query_complete": true,
+                "headers": {},
+                "body": {
+                  "missing": true
+                },
+                "actor": {
+                  "unknown": true
+                },
+                "session": {
+                  "unknown": true
+                },
+                "body_properties": {},
+                "provenance": []
+              },
+              "entry_boundary": "application_after_authentication",
+              "security_evaluated": false,
+              "authorization_checked": false,
+              "bound_arguments": [
+                {
+                  "name": "id",
+                  "declared_type": "java.lang.Long",
+                  "value": 999
+                }
+              ]
+            }
+          ],
+          "responses": [
+            {
+              "request": 1,
+              "status": 200,
+              "entered": true,
+              "body_presence": "json",
+              "body": {
+                "amount": null,
+                "createdAt": null,
+                "customerId": null,
+                "id": null,
+                "orderId": null,
+                "paymentMethod": null,
+                "status": null
+              }
+            }
+          ],
+          "edges": [
+            [
+              "",
+              "executes",
+              "method:payment-service:GetPaymentUseCase#execute(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:Payment#getAmount()"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:Payment#getCreatedAt()"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:Payment#getCustomerId()"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:Payment#getId()"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:Payment#getOrderId()"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:Payment#getPaymentMethod()"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:Payment#getStatus()"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentController#getById(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentQueryService#getById(Long)"
+            ],
+            [
+              "method:payment-service:GetPaymentUseCase#execute(Long)",
+              "calls",
+              "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+            ],
+            [
+              "method:payment-service:PaymentController#getById(Long)",
+              "calls",
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)"
+            ],
+            [
+              "method:payment-service:PaymentController#getById(Long)",
+              "calls",
+              "method:payment-service:PaymentQueryService#getById(Long)"
+            ],
+            [
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+              "calls",
+              "method:payment-service:Payment#getAmount()"
+            ],
+            [
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+              "calls",
+              "method:payment-service:Payment#getCreatedAt()"
+            ],
+            [
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+              "calls",
+              "method:payment-service:Payment#getCustomerId()"
+            ],
+            [
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+              "calls",
+              "method:payment-service:Payment#getId()"
+            ],
+            [
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+              "calls",
+              "method:payment-service:Payment#getOrderId()"
+            ],
+            [
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+              "calls",
+              "method:payment-service:Payment#getPaymentMethod()"
+            ],
+            [
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+              "calls",
+              "method:payment-service:Payment#getStatus()"
+            ],
+            [
+              "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+              "data",
+              "res:table:payment-service.payments"
+            ],
+            [
+              "method:payment-service:PaymentQueryService#getById(Long)",
+              "calls",
+              "method:payment-service:GetPaymentUseCase#execute(Long)"
+            ]
+          ],
+          "effects": [
+            {
+              "callsite": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@48:18",
+              "operation": "map",
+              "declared_receiver": "",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1,
+                2
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            },
+            {
+              "callsite": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@49:18",
+              "operation": "orElseThrow",
+              "declared_receiver": "",
+              "uncertainty_class": "unknown_receiver",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1,
+                2
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [
+                0
+              ],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            }
+          ],
+          "warnings": [
+            "unsupported call: call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@48:18 map",
+            "unsupported call: call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@49:18 orElseThrow",
+            "unsupported value operation in method:payment-service:PaymentPersistenceAdapter#findById(Long): TypeError"
+          ],
+          "conditions": [],
+          "data_operations": [
+            {
+              "method": "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+              "resource": "res:table:payment-service.payments",
+              "operation": "findById",
+              "arguments": [
+                999
+              ],
+              "source_site": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@47:30",
+              "uncertain_write": false,
+              "sql_emitted": true,
+              "datastore_event": true,
+              "transactional": false,
+              "emitted_by": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@47:30"
+            }
+          ],
+          "state_after": {
+            "browser": {
+              "dom": {},
+              "form": {},
+              "options": {},
+              "script": {},
+              "storage": {},
+              "url": {}
+            },
+            "history": [],
+            "clock": "2026-10-18T00:00:00",
+            "database_rows": {
+              "order-service.order_details": 2,
+              "order-service.orders": 2,
+              "payment-service.payments": 3
+            },
+            "unknown_tables": [],
+            "analysis_assumptions": [],
+            "limitations": [
+              "state budget widening: conflicting database tables are unknown"
+            ],
+            "tables": {
+              "payment-service.payments": [
+                {
+                  "id": 21,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 12:00:00"
+                },
+                {
+                  "id": 23,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "REJECTED",
+                  "createdAt": "2026-10-17 11:00:00"
+                },
+                {
+                  "id": 22,
+                  "orderId": 12,
+                  "customerId": 7,
+                  "amount": 25.0,
+                  "paymentMethod": "DEBIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 13:00:00"
+                }
+              ],
+              "order-service.orders": [
+                {
+                  "id": 11,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:00:00"
+                },
+                {
+                  "id": 12,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:30:00"
+                }
+              ],
+              "order-service.order_details": [
+                {
+                  "id": 31,
+                  "orderId": 11,
+                  "productId": 51,
+                  "productName": "Notebook",
+                  "quantity": 2,
+                  "unitPrice": 6.25
+                },
+                {
+                  "id": 32,
+                  "orderId": 12,
+                  "productId": 52,
+                  "productName": "Lamp",
+                  "quantity": 1,
+                  "unitPrice": 25.0
+                }
+              ]
+            }
+          }
+        },
+        {
+          "result": {
+            "id": null,
+            "orderId": null,
+            "customerId": null,
+            "amount": null,
+            "paymentMethod": null,
+            "status": null,
+            "createdAt": null
+          },
+          "outcome": "returned",
+          "requests": [
+            {
+              "id": 1,
+              "entry": "method:payment-service:PaymentController#getById(Long)",
+              "reason": "scenario request",
+              "request": {
+                "deployment": "payment-service",
+                "method": "GET",
+                "url": "/api/payments/999",
+                "path": [
+                  "api",
+                  "payments",
+                  "999"
+                ],
+                "query": {},
+                "query_complete": true,
+                "headers": {},
+                "body": {
+                  "missing": true
+                },
+                "actor": {
+                  "unknown": true
+                },
+                "session": {
+                  "unknown": true
+                },
+                "body_properties": {},
+                "provenance": []
+              },
+              "entry_boundary": "application_after_authentication",
+              "security_evaluated": false,
+              "authorization_checked": false,
+              "bound_arguments": [
+                {
+                  "name": "id",
+                  "declared_type": "java.lang.Long",
+                  "value": 999
+                }
+              ]
+            }
+          ],
+          "responses": [
+            {
+              "request": 1,
+              "status": 200,
+              "entered": true,
+              "body_presence": "json",
+              "body": {
+                "amount": null,
+                "createdAt": null,
+                "customerId": null,
+                "id": null,
+                "orderId": null,
+                "paymentMethod": null,
+                "status": null
+              }
+            }
+          ],
+          "edges": [
+            [
+              "",
+              "executes",
+              "method:payment-service:GetPaymentUseCase#execute(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:Payment#getAmount()"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:Payment#getCreatedAt()"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:Payment#getCustomerId()"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:Payment#getId()"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:Payment#getOrderId()"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:Payment#getPaymentMethod()"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:Payment#getStatus()"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentController#getById(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentQueryService#getById(Long)"
+            ],
+            [
+              "method:payment-service:GetPaymentUseCase#execute(Long)",
+              "calls",
+              "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+            ],
+            [
+              "method:payment-service:PaymentController#getById(Long)",
+              "calls",
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)"
+            ],
+            [
+              "method:payment-service:PaymentController#getById(Long)",
+              "calls",
+              "method:payment-service:PaymentQueryService#getById(Long)"
+            ],
+            [
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+              "calls",
+              "method:payment-service:Payment#getAmount()"
+            ],
+            [
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+              "calls",
+              "method:payment-service:Payment#getCreatedAt()"
+            ],
+            [
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+              "calls",
+              "method:payment-service:Payment#getCustomerId()"
+            ],
+            [
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+              "calls",
+              "method:payment-service:Payment#getId()"
+            ],
+            [
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+              "calls",
+              "method:payment-service:Payment#getOrderId()"
+            ],
+            [
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+              "calls",
+              "method:payment-service:Payment#getPaymentMethod()"
+            ],
+            [
+              "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+              "calls",
+              "method:payment-service:Payment#getStatus()"
+            ],
+            [
+              "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+              "data",
+              "res:table:payment-service.payments"
+            ],
+            [
+              "method:payment-service:PaymentQueryService#getById(Long)",
+              "calls",
+              "method:payment-service:GetPaymentUseCase#execute(Long)"
+            ]
+          ],
+          "effects": [
+            {
+              "callsite": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@48:18",
+              "operation": "map",
+              "declared_receiver": "",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1,
+                2
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            },
+            {
+              "callsite": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@49:18",
+              "operation": "orElseThrow",
+              "declared_receiver": "",
+              "uncertainty_class": "unknown_receiver",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1,
+                2
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [
+                0
+              ],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            }
+          ],
+          "warnings": [
+            "opaque callback count/arguments are unknown; zero/may-execute alternatives retained: call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@49:18",
+            "unsupported call: call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@48:18 map",
+            "unsupported call: call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@49:18 orElseThrow"
+          ],
+          "conditions": [],
+          "data_operations": [
+            {
+              "method": "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+              "resource": "res:table:payment-service.payments",
+              "operation": "findById",
+              "arguments": [
+                999
+              ],
+              "source_site": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@47:30",
+              "uncertain_write": false,
+              "sql_emitted": true,
+              "datastore_event": true,
+              "transactional": false,
+              "emitted_by": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@47:30"
+            }
+          ],
+          "state_after": {
+            "browser": {
+              "dom": {},
+              "form": {},
+              "options": {},
+              "script": {},
+              "storage": {},
+              "url": {}
+            },
+            "history": [],
+            "clock": "2026-10-18T00:00:00",
+            "database_rows": {
+              "order-service.order_details": 2,
+              "order-service.orders": 2,
+              "payment-service.payments": 3
+            },
+            "unknown_tables": [],
+            "analysis_assumptions": [],
+            "limitations": [
+              "state budget widening: conflicting database tables are unknown"
+            ],
+            "tables": {
+              "payment-service.payments": [
+                {
+                  "id": 21,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 12:00:00"
+                },
+                {
+                  "id": 23,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "REJECTED",
+                  "createdAt": "2026-10-17 11:00:00"
+                },
+                {
+                  "id": 22,
+                  "orderId": 12,
+                  "customerId": 7,
+                  "amount": 25.0,
+                  "paymentMethod": "DEBIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 13:00:00"
+                }
+              ],
+              "order-service.orders": [
+                {
+                  "id": 11,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:00:00"
+                },
+                {
+                  "id": 12,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:30:00"
+                }
+              ],
+              "order-service.order_details": [
+                {
+                  "id": 31,
+                  "orderId": 11,
+                  "productId": 51,
+                  "productName": "Notebook",
+                  "quantity": 2,
+                  "unitPrice": 6.25
+                },
+                {
+                  "id": 32,
+                  "orderId": 12,
+                  "productId": 52,
+                  "productName": "Lamp",
+                  "quantity": 1,
+                  "unitPrice": 25.0
+                }
+              ]
+            }
+          }
+        },
+        {
+          "result": {
+            "unknown": true
+          },
+          "outcome": "uncaught application exception",
+          "requests": [
+            {
+              "id": 1,
+              "entry": "method:payment-service:PaymentController#getById(Long)",
+              "reason": "scenario request",
+              "request": {
+                "deployment": "payment-service",
+                "method": "GET",
+                "url": "/api/payments/999",
+                "path": [
+                  "api",
+                  "payments",
+                  "999"
+                ],
+                "query": {},
+                "query_complete": true,
+                "headers": {},
+                "body": {
+                  "missing": true
+                },
+                "actor": {
+                  "unknown": true
+                },
+                "session": {
+                  "unknown": true
+                },
+                "body_properties": {},
+                "provenance": []
+              },
+              "entry_boundary": "application_after_authentication",
+              "security_evaluated": false,
+              "authorization_checked": false,
+              "bound_arguments": [
+                {
+                  "name": "id",
+                  "declared_type": "java.lang.Long",
+                  "value": 999
+                }
+              ]
+            }
+          ],
+          "responses": [
+            {
+              "request": 1,
+              "status": {
+                "unknown": true
+              },
+              "entered": true
+            }
+          ],
+          "edges": [
+            [
+              "",
+              "executes",
+              "method:payment-service:GetPaymentUseCase#execute(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentController#getById(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentQueryService#getById(Long)"
+            ],
+            [
+              "method:payment-service:GetPaymentUseCase#execute(Long)",
+              "calls",
+              "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+            ],
+            [
+              "method:payment-service:PaymentController#getById(Long)",
+              "calls",
+              "method:payment-service:PaymentQueryService#getById(Long)"
+            ],
+            [
+              "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+              "data",
+              "res:table:payment-service.payments"
+            ],
+            [
+              "method:payment-service:PaymentQueryService#getById(Long)",
+              "calls",
+              "method:payment-service:GetPaymentUseCase#execute(Long)"
+            ]
+          ],
+          "effects": [
+            {
+              "callsite": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@48:18",
+              "operation": "map",
+              "declared_receiver": "",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1,
+                2
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            },
+            {
+              "callsite": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@49:18",
+              "operation": "orElseThrow",
+              "declared_receiver": "",
+              "uncertainty_class": "unknown_receiver",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1,
+                2
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [
+                0
+              ],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            }
+          ],
+          "warnings": [
+            "opaque callback count/arguments are unknown; zero/may-execute alternatives retained: call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@49:18",
+            "server exception status or custom exception resolver is not modeled: method:payment-service:PaymentController#getById(Long)",
+            "uncaught Java exception: java.lang.Throwable",
+            "unsupported call: call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@48:18 map",
+            "unsupported call: call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@49:18 orElseThrow"
+          ],
+          "conditions": [],
+          "data_operations": [
+            {
+              "method": "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+              "resource": "res:table:payment-service.payments",
+              "operation": "findById",
+              "arguments": [
+                999
+              ],
+              "source_site": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@47:30",
+              "uncertain_write": false,
+              "sql_emitted": true,
+              "datastore_event": true,
+              "transactional": false,
+              "emitted_by": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@47:30"
+            }
+          ],
+          "state_after": {
+            "browser": {
+              "dom": {},
+              "form": {},
+              "options": {},
+              "script": {},
+              "storage": {},
+              "url": {}
+            },
+            "history": [],
+            "clock": "2026-10-18T00:00:00",
+            "database_rows": {
+              "order-service.order_details": 2,
+              "order-service.orders": 2,
+              "payment-service.payments": 3
+            },
+            "unknown_tables": [],
+            "analysis_assumptions": [],
+            "limitations": [
+              "state budget widening: conflicting database tables are unknown"
+            ],
+            "tables": {
+              "payment-service.payments": [
+                {
+                  "id": 21,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 12:00:00"
+                },
+                {
+                  "id": 23,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "REJECTED",
+                  "createdAt": "2026-10-17 11:00:00"
+                },
+                {
+                  "id": 22,
+                  "orderId": 12,
+                  "customerId": 7,
+                  "amount": 25.0,
+                  "paymentMethod": "DEBIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 13:00:00"
+                }
+              ],
+              "order-service.orders": [
+                {
+                  "id": 11,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:00:00"
+                },
+                {
+                  "id": 12,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:30:00"
+                }
+              ],
+              "order-service.order_details": [
+                {
+                  "id": 31,
+                  "orderId": 11,
+                  "productId": 51,
+                  "productName": "Notebook",
+                  "quantity": 2,
+                  "unitPrice": 6.25
+                },
+                {
+                  "id": 32,
+                  "orderId": 12,
+                  "productId": 52,
+                  "productName": "Lamp",
+                  "quantity": 1,
+                  "unitPrice": 25.0
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "state_before": {
+        "browser": {
+          "dom": {},
+          "form": {},
+          "options": {},
+          "script": {},
+          "storage": {},
+          "url": {}
+        },
+        "history": [],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {
+          "order-service.order_details": 2,
+          "order-service.orders": 2,
+          "payment-service.payments": 3
+        },
+        "unknown_tables": [],
+        "analysis_assumptions": [],
+        "limitations": [
+          "state budget widening: conflicting database tables are unknown"
+        ],
+        "tables": {
+          "payment-service.payments": [
+            {
+              "id": 21,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 12:00:00"
+            },
+            {
+              "id": 23,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "REJECTED",
+              "createdAt": "2026-10-17 11:00:00"
+            },
+            {
+              "id": 22,
+              "orderId": 12,
+              "customerId": 7,
+              "amount": 25.0,
+              "paymentMethod": "DEBIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 13:00:00"
+            }
+          ],
+          "order-service.orders": [
+            {
+              "id": 11,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:00:00"
+            },
+            {
+              "id": 12,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:30:00"
+            }
+          ],
+          "order-service.order_details": [
+            {
+              "id": 31,
+              "orderId": 11,
+              "productId": 51,
+              "productName": "Notebook",
+              "quantity": 2,
+              "unitPrice": 6.25
+            },
+            {
+              "id": 32,
+              "orderId": 12,
+              "productId": 52,
+              "productName": "Lamp",
+              "quantity": 1,
+              "unitPrice": 25.0
+            }
+          ]
+        }
+      },
+      "state_after": {
+        "browser": {
+          "dom": {},
+          "form": {},
+          "options": {},
+          "script": {},
+          "storage": {},
+          "url": {}
+        },
+        "history": [],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {
+          "order-service.order_details": 2,
+          "order-service.orders": 2,
+          "payment-service.payments": 3
+        },
+        "unknown_tables": [],
+        "analysis_assumptions": [],
+        "limitations": [
+          "state budget widening: conflicting database tables are unknown",
+          "state budget widening: conflicting database tables are unknown"
+        ],
+        "tables": {
+          "payment-service.payments": [
+            {
+              "id": 21,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 12:00:00"
+            },
+            {
+              "id": 23,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "REJECTED",
+              "createdAt": "2026-10-17 11:00:00"
+            },
+            {
+              "id": 22,
+              "orderId": 12,
+              "customerId": 7,
+              "amount": 25.0,
+              "paymentMethod": "DEBIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 13:00:00"
+            }
+          ],
+          "order-service.orders": [
+            {
+              "id": 11,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:00:00"
+            },
+            {
+              "id": 12,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:30:00"
+            }
+          ],
+          "order-service.order_details": [
+            {
+              "id": 31,
+              "orderId": 11,
+              "productId": 51,
+              "productName": "Notebook",
+              "quantity": 2,
+              "unitPrice": 6.25
+            },
+            {
+              "id": 32,
+              "orderId": 12,
+              "productId": 52,
+              "productName": "Lamp",
+              "quantity": 1,
+              "unitPrice": 25.0
+            }
+          ]
+        }
+      },
+      "producer": null
+    },
+    {
+      "n": 7,
+      "alternatives": [],
+      "outcome": "explicit HTTP has no meaning for an ambiguous NL action; see NL trace",
+      "not_executed": true,
+      "state_before": {
+        "browser": {
+          "dom": {},
+          "form": {},
+          "options": {},
+          "script": {},
+          "storage": {},
+          "url": {}
+        },
+        "history": [],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {
+          "order-service.order_details": 2,
+          "order-service.orders": 2,
+          "payment-service.payments": 3
+        },
+        "unknown_tables": [],
+        "analysis_assumptions": [],
+        "limitations": [
+          "state budget widening: conflicting database tables are unknown",
+          "state budget widening: conflicting database tables are unknown"
+        ],
+        "tables": {
+          "payment-service.payments": [
+            {
+              "id": 21,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 12:00:00"
+            },
+            {
+              "id": 23,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "REJECTED",
+              "createdAt": "2026-10-17 11:00:00"
+            },
+            {
+              "id": 22,
+              "orderId": 12,
+              "customerId": 7,
+              "amount": 25.0,
+              "paymentMethod": "DEBIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 13:00:00"
+            }
+          ],
+          "order-service.orders": [
+            {
+              "id": 11,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:00:00"
+            },
+            {
+              "id": 12,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:30:00"
+            }
+          ],
+          "order-service.order_details": [
+            {
+              "id": 31,
+              "orderId": 11,
+              "productId": 51,
+              "productName": "Notebook",
+              "quantity": 2,
+              "unitPrice": 6.25
+            },
+            {
+              "id": 32,
+              "orderId": 12,
+              "productId": 52,
+              "productName": "Lamp",
+              "quantity": 1,
+              "unitPrice": 25.0
+            }
+          ]
+        }
+      },
+      "state_after": {
+        "browser": {
+          "dom": {},
+          "form": {},
+          "options": {},
+          "script": {},
+          "storage": {},
+          "url": {}
+        },
+        "history": [],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {
+          "order-service.order_details": 2,
+          "order-service.orders": 2,
+          "payment-service.payments": 3
+        },
+        "unknown_tables": [],
+        "analysis_assumptions": [],
+        "limitations": [
+          "state budget widening: conflicting database tables are unknown",
+          "state budget widening: conflicting database tables are unknown"
+        ],
+        "tables": {
+          "payment-service.payments": [
+            {
+              "id": 21,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 12:00:00"
+            },
+            {
+              "id": 23,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "REJECTED",
+              "createdAt": "2026-10-17 11:00:00"
+            },
+            {
+              "id": 22,
+              "orderId": 12,
+              "customerId": 7,
+              "amount": 25.0,
+              "paymentMethod": "DEBIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 13:00:00"
+            }
+          ],
+          "order-service.orders": [
+            {
+              "id": 11,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:00:00"
+            },
+            {
+              "id": 12,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:30:00"
+            }
+          ],
+          "order-service.order_details": [
+            {
+              "id": 31,
+              "orderId": 11,
+              "productId": 51,
+              "productName": "Notebook",
+              "quantity": 2,
+              "unitPrice": 6.25
+            },
+            {
+              "id": 32,
+              "orderId": 12,
+              "productId": 52,
+              "productName": "Lamp",
+              "quantity": 1,
+              "unitPrice": 25.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "n": 8,
+      "request": {
+        "deployment": "payment-service",
+        "method": "GET",
+        "url": "/api/payments?orderId=11",
+        "path": [
+          "api",
+          "payments"
+        ],
+        "query": {
+          "orderId": [
+            "11"
+          ]
+        },
+        "query_complete": true,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "alternatives": [
+        {
+          "result": {
+            "unknown": true
+          },
+          "outcome": "uncaught application exception",
+          "requests": [
+            {
+              "id": 1,
+              "entry": "method:payment-service:PaymentController#getByOrder(Long)",
+              "reason": "scenario request",
+              "request": {
+                "deployment": "payment-service",
+                "method": "GET",
+                "url": "/api/payments?orderId=11",
+                "path": [
+                  "api",
+                  "payments"
+                ],
+                "query": {
+                  "orderId": [
+                    "11"
+                  ]
+                },
+                "query_complete": true,
+                "headers": {},
+                "body": {
+                  "missing": true
+                },
+                "actor": {
+                  "unknown": true
+                },
+                "session": {
+                  "unknown": true
+                },
+                "body_properties": {},
+                "provenance": []
+              },
+              "entry_boundary": "application_after_authentication",
+              "security_evaluated": false,
+              "authorization_checked": false,
+              "bound_arguments": [
+                {
+                  "name": "orderId",
+                  "declared_type": "java.lang.Long",
+                  "value": 11
+                }
+              ]
+            }
+          ],
+          "responses": [
+            {
+              "request": 1,
+              "status": {
+                "unknown": true
+              },
+              "entered": true
+            }
+          ],
+          "edges": [
+            [
+              "",
+              "executes",
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentController#getByOrder(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+              "calls",
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:PaymentController#getByOrder(Long)",
+              "calls",
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+              "data",
+              "res:table:payment-service.payments"
+            ],
+            [
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+              "calls",
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+            ]
+          ],
+          "effects": [
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:18",
+              "operation": "stream",
+              "declared_receiver": "java.util.List<com.shoppingcart.payment.domain.entity.Payment>",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            }
+          ],
+          "warnings": [
+            "server exception status or custom exception resolver is not modeled: method:payment-service:PaymentController#getByOrder(Long)",
+            "uncaught Java exception: java.lang.Throwable",
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:18 stream",
+            "unsupported stream operation: call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@65:18 toList"
+          ],
+          "conditions": [],
+          "data_operations": [
+            {
+              "method": "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+              "resource": "res:table:payment-service.payments",
+              "operation": "findByOrderId",
+              "arguments": [
+                11
+              ],
+              "source_site": "call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@62:30",
+              "uncertain_write": false,
+              "sql_emitted": true,
+              "datastore_event": true,
+              "transactional": false,
+              "emitted_by": "call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@62:30"
+            }
+          ],
+          "state_after": {
+            "browser": {
+              "dom": {},
+              "form": {},
+              "options": {},
+              "script": {},
+              "storage": {},
+              "url": {}
+            },
+            "history": [],
+            "clock": "2026-10-18T00:00:00",
+            "database_rows": {
+              "order-service.order_details": 2,
+              "order-service.orders": 2,
+              "payment-service.payments": 3
+            },
+            "unknown_tables": [],
+            "analysis_assumptions": [],
+            "limitations": [
+              "state budget widening: conflicting database tables are unknown",
+              "state budget widening: conflicting database tables are unknown"
+            ],
+            "tables": {
+              "payment-service.payments": [
+                {
+                  "id": 21,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 12:00:00"
+                },
+                {
+                  "id": 23,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "REJECTED",
+                  "createdAt": "2026-10-17 11:00:00"
+                },
+                {
+                  "id": 22,
+                  "orderId": 12,
+                  "customerId": 7,
+                  "amount": 25.0,
+                  "paymentMethod": "DEBIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 13:00:00"
+                }
+              ],
+              "order-service.orders": [
+                {
+                  "id": 11,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:00:00"
+                },
+                {
+                  "id": 12,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:30:00"
+                }
+              ],
+              "order-service.order_details": [
+                {
+                  "id": 31,
+                  "orderId": 11,
+                  "productId": 51,
+                  "productName": "Notebook",
+                  "quantity": 2,
+                  "unitPrice": 6.25
+                },
+                {
+                  "id": 32,
+                  "orderId": 12,
+                  "productId": 52,
+                  "productName": "Lamp",
+                  "quantity": 1,
+                  "unitPrice": 25.0
+                }
+              ]
+            }
+          }
+        },
+        {
+          "result": {
+            "unknown": true
+          },
+          "outcome": "uncaught application exception",
+          "requests": [
+            {
+              "id": 1,
+              "entry": "method:payment-service:PaymentController#getByOrder(Long)",
+              "reason": "scenario request",
+              "request": {
+                "deployment": "payment-service",
+                "method": "GET",
+                "url": "/api/payments?orderId=11",
+                "path": [
+                  "api",
+                  "payments"
+                ],
+                "query": {
+                  "orderId": [
+                    "11"
+                  ]
+                },
+                "query_complete": true,
+                "headers": {},
+                "body": {
+                  "missing": true
+                },
+                "actor": {
+                  "unknown": true
+                },
+                "session": {
+                  "unknown": true
+                },
+                "body_properties": {},
+                "provenance": []
+              },
+              "entry_boundary": "application_after_authentication",
+              "security_evaluated": false,
+              "authorization_checked": false,
+              "bound_arguments": [
+                {
+                  "name": "orderId",
+                  "declared_type": "java.lang.Long",
+                  "value": 11
+                }
+              ]
+            }
+          ],
+          "responses": [
+            {
+              "request": 1,
+              "status": {
+                "unknown": true
+              },
+              "entered": true
+            }
+          ],
+          "edges": [
+            [
+              "",
+              "executes",
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentController#getByOrder(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+              "calls",
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:PaymentController#getByOrder(Long)",
+              "calls",
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+              "data",
+              "res:table:payment-service.payments"
+            ],
+            [
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+              "calls",
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+            ]
+          ],
+          "effects": [
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:18",
+              "operation": "stream",
+              "declared_receiver": "java.util.List<com.shoppingcart.payment.domain.entity.Payment>",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            },
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:27",
+              "operation": "map",
+              "declared_receiver": "java.util.stream.Stream<com.shoppingcart.payment.domain.entity.Payment>",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1,
+                2
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            }
+          ],
+          "warnings": [
+            "server exception status or custom exception resolver is not modeled: method:payment-service:PaymentController#getByOrder(Long)",
+            "uncaught Java exception: java.lang.Throwable",
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:18 stream",
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:27 map",
+            "unsupported stream operation: call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@65:18 toList"
+          ],
+          "conditions": [],
+          "data_operations": [
+            {
+              "method": "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+              "resource": "res:table:payment-service.payments",
+              "operation": "findByOrderId",
+              "arguments": [
+                11
+              ],
+              "source_site": "call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@62:30",
+              "uncertain_write": false,
+              "sql_emitted": true,
+              "datastore_event": true,
+              "transactional": false,
+              "emitted_by": "call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@62:30"
+            }
+          ],
+          "state_after": {
+            "browser": {
+              "dom": {},
+              "form": {},
+              "options": {},
+              "script": {},
+              "storage": {},
+              "url": {}
+            },
+            "history": [],
+            "clock": "2026-10-18T00:00:00",
+            "database_rows": {
+              "order-service.order_details": 2,
+              "order-service.orders": 2,
+              "payment-service.payments": 3
+            },
+            "unknown_tables": [],
+            "analysis_assumptions": [],
+            "limitations": [
+              "state budget widening: conflicting database tables are unknown",
+              "state budget widening: conflicting database tables are unknown"
+            ],
+            "tables": {
+              "payment-service.payments": [
+                {
+                  "id": 21,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 12:00:00"
+                },
+                {
+                  "id": 23,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "REJECTED",
+                  "createdAt": "2026-10-17 11:00:00"
+                },
+                {
+                  "id": 22,
+                  "orderId": 12,
+                  "customerId": 7,
+                  "amount": 25.0,
+                  "paymentMethod": "DEBIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 13:00:00"
+                }
+              ],
+              "order-service.orders": [
+                {
+                  "id": 11,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:00:00"
+                },
+                {
+                  "id": 12,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:30:00"
+                }
+              ],
+              "order-service.order_details": [
+                {
+                  "id": 31,
+                  "orderId": 11,
+                  "productId": 51,
+                  "productName": "Notebook",
+                  "quantity": 2,
+                  "unitPrice": 6.25
+                },
+                {
+                  "id": 32,
+                  "orderId": 12,
+                  "productId": 52,
+                  "productName": "Lamp",
+                  "quantity": 1,
+                  "unitPrice": 25.0
+                }
+              ]
+            }
+          }
+        },
+        {
+          "result": {
+            "unknown": true
+          },
+          "outcome": "returned",
+          "requests": [
+            {
+              "id": 1,
+              "entry": "method:payment-service:PaymentController#getByOrder(Long)",
+              "reason": "scenario request",
+              "request": {
+                "deployment": "payment-service",
+                "method": "GET",
+                "url": "/api/payments?orderId=11",
+                "path": [
+                  "api",
+                  "payments"
+                ],
+                "query": {
+                  "orderId": [
+                    "11"
+                  ]
+                },
+                "query_complete": true,
+                "headers": {},
+                "body": {
+                  "missing": true
+                },
+                "actor": {
+                  "unknown": true
+                },
+                "session": {
+                  "unknown": true
+                },
+                "body_properties": {},
+                "provenance": []
+              },
+              "entry_boundary": "application_after_authentication",
+              "security_evaluated": false,
+              "authorization_checked": false,
+              "bound_arguments": [
+                {
+                  "name": "orderId",
+                  "declared_type": "java.lang.Long",
+                  "value": 11
+                }
+              ]
+            }
+          ],
+          "responses": [
+            {
+              "request": 1,
+              "status": 200,
+              "entered": true,
+              "body_presence": "json",
+              "body": {
+                "unknown": true
+              }
+            }
+          ],
+          "edges": [
+            [
+              "",
+              "executes",
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentController#getByOrder(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+              "calls",
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:PaymentController#getByOrder(Long)",
+              "calls",
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+              "data",
+              "res:table:payment-service.payments"
+            ],
+            [
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+              "calls",
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+            ]
+          ],
+          "effects": [
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:18",
+              "operation": "stream",
+              "declared_receiver": "java.util.List<com.shoppingcart.payment.domain.entity.Payment>",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            },
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:27",
+              "operation": "map",
+              "declared_receiver": "java.util.stream.Stream<com.shoppingcart.payment.domain.entity.Payment>",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1,
+                2
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            },
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:62",
+              "operation": "toList",
+              "declared_receiver": "",
+              "uncertainty_class": "unknown_receiver",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            }
+          ],
+          "warnings": [
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:18 stream",
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:27 map",
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:62 toList",
+            "unsupported stream operation: call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@65:18 toList"
+          ],
+          "conditions": [],
+          "data_operations": [
+            {
+              "method": "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+              "resource": "res:table:payment-service.payments",
+              "operation": "findByOrderId",
+              "arguments": [
+                11
+              ],
+              "source_site": "call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@62:30",
+              "uncertain_write": false,
+              "sql_emitted": true,
+              "datastore_event": true,
+              "transactional": false,
+              "emitted_by": "call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@62:30"
+            }
+          ],
+          "state_after": {
+            "browser": {
+              "dom": {},
+              "form": {},
+              "options": {},
+              "script": {},
+              "storage": {},
+              "url": {}
+            },
+            "history": [],
+            "clock": "2026-10-18T00:00:00",
+            "database_rows": {
+              "order-service.order_details": 2,
+              "order-service.orders": 2,
+              "payment-service.payments": 3
+            },
+            "unknown_tables": [],
+            "analysis_assumptions": [],
+            "limitations": [
+              "state budget widening: conflicting database tables are unknown",
+              "state budget widening: conflicting database tables are unknown"
+            ],
+            "tables": {
+              "payment-service.payments": [
+                {
+                  "id": 21,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 12:00:00"
+                },
+                {
+                  "id": 23,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "REJECTED",
+                  "createdAt": "2026-10-17 11:00:00"
+                },
+                {
+                  "id": 22,
+                  "orderId": 12,
+                  "customerId": 7,
+                  "amount": 25.0,
+                  "paymentMethod": "DEBIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 13:00:00"
+                }
+              ],
+              "order-service.orders": [
+                {
+                  "id": 11,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:00:00"
+                },
+                {
+                  "id": 12,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:30:00"
+                }
+              ],
+              "order-service.order_details": [
+                {
+                  "id": 31,
+                  "orderId": 11,
+                  "productId": 51,
+                  "productName": "Notebook",
+                  "quantity": 2,
+                  "unitPrice": 6.25
+                },
+                {
+                  "id": 32,
+                  "orderId": 12,
+                  "productId": 52,
+                  "productName": "Lamp",
+                  "quantity": 1,
+                  "unitPrice": 25.0
+                }
+              ]
+            }
+          }
+        },
+        {
+          "result": {
+            "unknown": true
+          },
+          "outcome": "uncaught application exception",
+          "requests": [
+            {
+              "id": 1,
+              "entry": "method:payment-service:PaymentController#getByOrder(Long)",
+              "reason": "scenario request",
+              "request": {
+                "deployment": "payment-service",
+                "method": "GET",
+                "url": "/api/payments?orderId=11",
+                "path": [
+                  "api",
+                  "payments"
+                ],
+                "query": {
+                  "orderId": [
+                    "11"
+                  ]
+                },
+                "query_complete": true,
+                "headers": {},
+                "body": {
+                  "missing": true
+                },
+                "actor": {
+                  "unknown": true
+                },
+                "session": {
+                  "unknown": true
+                },
+                "body_properties": {},
+                "provenance": []
+              },
+              "entry_boundary": "application_after_authentication",
+              "security_evaluated": false,
+              "authorization_checked": false,
+              "bound_arguments": [
+                {
+                  "name": "orderId",
+                  "declared_type": "java.lang.Long",
+                  "value": 11
+                }
+              ]
+            }
+          ],
+          "responses": [
+            {
+              "request": 1,
+              "status": {
+                "unknown": true
+              },
+              "entered": true
+            }
+          ],
+          "edges": [
+            [
+              "",
+              "executes",
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentController#getByOrder(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+            ],
+            [
+              "",
+              "executes",
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+              "calls",
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:PaymentController#getByOrder(Long)",
+              "calls",
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+            ],
+            [
+              "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+              "data",
+              "res:table:payment-service.payments"
+            ],
+            [
+              "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+              "calls",
+              "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+            ]
+          ],
+          "effects": [
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:18",
+              "operation": "stream",
+              "declared_receiver": "java.util.List<com.shoppingcart.payment.domain.entity.Payment>",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            },
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:27",
+              "operation": "map",
+              "declared_receiver": "java.util.stream.Stream<com.shoppingcart.payment.domain.entity.Payment>",
+              "uncertainty_class": "unsupported_semantics",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1,
+                2
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            },
+            {
+              "callsite": "call:method:payment-service:PaymentController#getByOrder(Long)@114:62",
+              "operation": "toList",
+              "declared_receiver": "",
+              "uncertainty_class": "unknown_receiver",
+              "model_version": "opaque-java-call/1",
+              "heap_roots": [
+                0,
+                1
+              ],
+              "resource_writes": null,
+              "global_footprint": "unresolved",
+              "callbacks": [],
+              "completions": [
+                "normal",
+                "throw"
+              ]
+            }
+          ],
+          "warnings": [
+            "server exception status or custom exception resolver is not modeled: method:payment-service:PaymentController#getByOrder(Long)",
+            "uncaught Java exception: java.lang.Throwable",
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:18 stream",
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:27 map",
+            "unsupported call: call:method:payment-service:PaymentController#getByOrder(Long)@114:62 toList",
+            "unsupported stream operation: call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@65:18 toList"
+          ],
+          "conditions": [],
+          "data_operations": [
+            {
+              "method": "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+              "resource": "res:table:payment-service.payments",
+              "operation": "findByOrderId",
+              "arguments": [
+                11
+              ],
+              "source_site": "call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@62:30",
+              "uncertain_write": false,
+              "sql_emitted": true,
+              "datastore_event": true,
+              "transactional": false,
+              "emitted_by": "call:method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)@62:30"
+            }
+          ],
+          "state_after": {
+            "browser": {
+              "dom": {},
+              "form": {},
+              "options": {},
+              "script": {},
+              "storage": {},
+              "url": {}
+            },
+            "history": [],
+            "clock": "2026-10-18T00:00:00",
+            "database_rows": {
+              "order-service.order_details": 2,
+              "order-service.orders": 2,
+              "payment-service.payments": 3
+            },
+            "unknown_tables": [],
+            "analysis_assumptions": [],
+            "limitations": [
+              "state budget widening: conflicting database tables are unknown",
+              "state budget widening: conflicting database tables are unknown"
+            ],
+            "tables": {
+              "payment-service.payments": [
+                {
+                  "id": 21,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 12:00:00"
+                },
+                {
+                  "id": 23,
+                  "orderId": 11,
+                  "customerId": 7,
+                  "amount": 12.5,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "REJECTED",
+                  "createdAt": "2026-10-17 11:00:00"
+                },
+                {
+                  "id": 22,
+                  "orderId": 12,
+                  "customerId": 7,
+                  "amount": 25.0,
+                  "paymentMethod": "DEBIT_CARD",
+                  "status": "APPROVED",
+                  "createdAt": "2026-10-17 13:00:00"
+                }
+              ],
+              "order-service.orders": [
+                {
+                  "id": 11,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:00:00"
+                },
+                {
+                  "id": 12,
+                  "customerId": 7,
+                  "customerName": "Ari",
+                  "customerEmail": "ari@example.test",
+                  "status": "PAID",
+                  "createdAt": "2026-10-17 10:30:00"
+                }
+              ],
+              "order-service.order_details": [
+                {
+                  "id": 31,
+                  "orderId": 11,
+                  "productId": 51,
+                  "productName": "Notebook",
+                  "quantity": 2,
+                  "unitPrice": 6.25
+                },
+                {
+                  "id": 32,
+                  "orderId": 12,
+                  "productId": 52,
+                  "productName": "Lamp",
+                  "quantity": 1,
+                  "unitPrice": 25.0
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "state_before": {
+        "browser": {
+          "dom": {},
+          "form": {},
+          "options": {},
+          "script": {},
+          "storage": {},
+          "url": {}
+        },
+        "history": [],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {
+          "order-service.order_details": 2,
+          "order-service.orders": 2,
+          "payment-service.payments": 3
+        },
+        "unknown_tables": [],
+        "analysis_assumptions": [],
+        "limitations": [
+          "state budget widening: conflicting database tables are unknown",
+          "state budget widening: conflicting database tables are unknown"
+        ],
+        "tables": {
+          "payment-service.payments": [
+            {
+              "id": 21,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 12:00:00"
+            },
+            {
+              "id": 23,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "REJECTED",
+              "createdAt": "2026-10-17 11:00:00"
+            },
+            {
+              "id": 22,
+              "orderId": 12,
+              "customerId": 7,
+              "amount": 25.0,
+              "paymentMethod": "DEBIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 13:00:00"
+            }
+          ],
+          "order-service.orders": [
+            {
+              "id": 11,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:00:00"
+            },
+            {
+              "id": 12,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:30:00"
+            }
+          ],
+          "order-service.order_details": [
+            {
+              "id": 31,
+              "orderId": 11,
+              "productId": 51,
+              "productName": "Notebook",
+              "quantity": 2,
+              "unitPrice": 6.25
+            },
+            {
+              "id": 32,
+              "orderId": 12,
+              "productId": 52,
+              "productName": "Lamp",
+              "quantity": 1,
+              "unitPrice": 25.0
+            }
+          ]
+        }
+      },
+      "state_after": {
+        "browser": {
+          "dom": {},
+          "form": {},
+          "options": {},
+          "script": {},
+          "storage": {},
+          "url": {}
+        },
+        "history": [],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {
+          "order-service.order_details": 2,
+          "order-service.orders": 2,
+          "payment-service.payments": 3
+        },
+        "unknown_tables": [],
+        "analysis_assumptions": [],
+        "limitations": [
+          "state budget widening: conflicting database tables are unknown",
+          "state budget widening: conflicting database tables are unknown"
+        ],
+        "tables": {
+          "payment-service.payments": [
+            {
+              "id": 21,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 12:00:00"
+            },
+            {
+              "id": 23,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "REJECTED",
+              "createdAt": "2026-10-17 11:00:00"
+            },
+            {
+              "id": 22,
+              "orderId": 12,
+              "customerId": 7,
+              "amount": 25.0,
+              "paymentMethod": "DEBIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 13:00:00"
+            }
+          ],
+          "order-service.orders": [
+            {
+              "id": 11,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:00:00"
+            },
+            {
+              "id": 12,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:30:00"
+            }
+          ],
+          "order-service.order_details": [
+            {
+              "id": 31,
+              "orderId": 11,
+              "productId": 51,
+              "productName": "Notebook",
+              "quantity": 2,
+              "unitPrice": 6.25
+            },
+            {
+              "id": 32,
+              "orderId": 12,
+              "productId": 52,
+              "productName": "Lamp",
+              "quantity": 1,
+              "unitPrice": 25.0
+            }
+          ]
+        }
+      },
+      "producer": null
+    }
+  ],
+  "oracle_loaded": false,
+  "targets_started": false,
+  "entry_boundary": "application_after_authentication",
+  "security_evaluated": false,
+  "seconds_including_index": 0.1468700830009766
+}

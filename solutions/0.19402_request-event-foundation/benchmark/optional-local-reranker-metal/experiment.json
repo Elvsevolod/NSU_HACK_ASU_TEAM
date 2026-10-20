@@ -1,0 +1,2185 @@
+{
+  "model": "Qwen3-4B-Instruct-2507-Q4_K_M",
+  "model_sha256": "8cdb57cbb880d313736a9bc4e3d3d2485f145b5e19cf33783746e753e82641fc",
+  "runtime": "llama-cpp-python/0.3.36",
+  "cpu": false,
+  "load_seconds": 10.241997875040397,
+  "elapsed_seconds": 26.894048334041145,
+  "peak_rss_bytes": 3545579520,
+  "calls": 9,
+  "generation_seconds": 15.598742499074433,
+  "traces": [
+    {
+      "input": {
+        "action": "List owners",
+        "contracts": [
+          {
+            "index": 0,
+            "method": "method:customers:OwnerResource#findAll()",
+            "parameters": [],
+            "body_fields": {},
+            "routes": [
+              [
+                "GET",
+                [
+                  "owners"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 1,
+            "method": "method:customers:OwnerResource#findOwner(int)",
+            "parameters": [
+              {
+                "name": "ownerId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "ownerId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "ownerId": "int"
+            },
+            "routes": [
+              [
+                "GET",
+                [
+                  "owners",
+                  "{ownerId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 2,
+            "method": "method:customers:PetResource#processUpdateForm(PetRequest)",
+            "parameters": [
+              {
+                "name": "petRequest",
+                "type": "PetRequest",
+                "kind": "RequestBody",
+                "wire_name": "petRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "id": "int",
+              "birthDate": "Date",
+              "name": "String",
+              "typeId": "int"
+            },
+            "routes": [
+              [
+                "PUT",
+                [
+                  "owners",
+                  "*",
+                  "pets",
+                  "{petId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 3,
+            "method": "method:customers:OwnerResource#createOwner(OwnerRequest)",
+            "parameters": [
+              {
+                "name": "ownerRequest",
+                "type": "OwnerRequest",
+                "kind": "RequestBody",
+                "wire_name": "ownerRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "firstName": "String",
+              "lastName": "String",
+              "address": "String",
+              "city": "String",
+              "telephone": "String"
+            },
+            "routes": [
+              [
+                "POST",
+                [
+                  "owners"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 4,
+            "method": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+            "parameters": [
+              {
+                "name": "ownerId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "ownerId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              },
+              {
+                "name": "ownerRequest",
+                "type": "OwnerRequest",
+                "kind": "RequestBody",
+                "wire_name": "ownerRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "ownerId": "int",
+              "firstName": "String",
+              "lastName": "String",
+              "address": "String",
+              "city": "String",
+              "telephone": "String"
+            },
+            "routes": [
+              [
+                "PUT",
+                [
+                  "owners",
+                  "{ownerId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 5,
+            "method": "method:customers:PetResource#findPet(int)",
+            "parameters": [
+              {
+                "name": "petId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "petId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "petId": "int"
+            },
+            "routes": [
+              [
+                "GET",
+                [
+                  "owners",
+                  "*",
+                  "pets",
+                  "{petId}"
+                ]
+              ]
+            ]
+          }
+        ],
+        "typed_history_references": []
+      },
+      "raw_output": "{\"index\": 0}",
+      "validated_index": 0,
+      "seconds": 1.7327942500123754,
+      "usage": {
+        "prompt_tokens": 821,
+        "completion_tokens": 6,
+        "total_tokens": 827
+      },
+      "fallback": false
+    },
+    {
+      "input": {
+        "action": "Create owner firstName \"Eva\" lastName \"Jones\" address \"Elm\" city \"York\" telephone \"67890\"",
+        "contracts": [
+          {
+            "index": 0,
+            "method": "method:customers:OwnerResource#createOwner(OwnerRequest)",
+            "parameters": [
+              {
+                "name": "ownerRequest",
+                "type": "OwnerRequest",
+                "kind": "RequestBody",
+                "wire_name": "ownerRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "firstName": "String",
+              "lastName": "String",
+              "address": "String",
+              "city": "String",
+              "telephone": "String"
+            },
+            "routes": [
+              [
+                "POST",
+                [
+                  "owners"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 1,
+            "method": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+            "parameters": [
+              {
+                "name": "ownerId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "ownerId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              },
+              {
+                "name": "ownerRequest",
+                "type": "OwnerRequest",
+                "kind": "RequestBody",
+                "wire_name": "ownerRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "ownerId": "int",
+              "firstName": "String",
+              "lastName": "String",
+              "address": "String",
+              "city": "String",
+              "telephone": "String"
+            },
+            "routes": [
+              [
+                "PUT",
+                [
+                  "owners",
+                  "{ownerId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 2,
+            "method": "method:customers:PetResource#processUpdateForm(PetRequest)",
+            "parameters": [
+              {
+                "name": "petRequest",
+                "type": "PetRequest",
+                "kind": "RequestBody",
+                "wire_name": "petRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "id": "int",
+              "birthDate": "Date",
+              "name": "String",
+              "typeId": "int"
+            },
+            "routes": [
+              [
+                "PUT",
+                [
+                  "owners",
+                  "*",
+                  "pets",
+                  "{petId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 3,
+            "method": "method:customers:PetResource#processCreationForm(PetRequest,int)",
+            "parameters": [
+              {
+                "name": "petRequest",
+                "type": "PetRequest",
+                "kind": "RequestBody",
+                "wire_name": "petRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              },
+              {
+                "name": "ownerId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "ownerId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "id": "int",
+              "birthDate": "Date",
+              "name": "String",
+              "typeId": "int",
+              "ownerId": "int"
+            },
+            "routes": [
+              [
+                "POST",
+                [
+                  "owners",
+                  "{ownerId}",
+                  "pets"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 4,
+            "method": "method:customers:OwnerResource#findOwner(int)",
+            "parameters": [
+              {
+                "name": "ownerId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "ownerId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "ownerId": "int"
+            },
+            "routes": [
+              [
+                "GET",
+                [
+                  "owners",
+                  "{ownerId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 5,
+            "method": "method:customers:OwnerResource#findAll()",
+            "parameters": [],
+            "body_fields": {},
+            "routes": [
+              [
+                "GET",
+                [
+                  "owners"
+                ]
+              ]
+            ]
+          }
+        ],
+        "typed_history_references": [
+          {
+            "objects": [
+              {
+                "deployment": "customers",
+                "qualified_type": "org.springframework.samples.petclinic.customers.model.Owner",
+                "identity": [
+                  [
+                    "id",
+                    "1"
+                  ]
+                ],
+                "producer": "1:method:customers:OwnerResource#findAll()",
+                "response_path": "history[0].result[0]",
+                "position": 0
+              }
+            ],
+            "collections": [
+              {
+                "deployment": "customers",
+                "element_types": [
+                  "org.springframework.samples.petclinic.customers.model.Owner"
+                ],
+                "producer": "1:method:customers:OwnerResource#findAll()",
+                "response_path": "history[0].result",
+                "object_paths": [
+                  "history[0].result[0]"
+                ],
+                "size": 1,
+                "complete": true
+              },
+              {
+                "deployment": "customers",
+                "element_types": [
+                  "org.springframework.samples.petclinic.customers.model.Pet"
+                ],
+                "producer": "1:method:customers:OwnerResource#findAll()",
+                "response_path": "history[0].result[0].pets",
+                "object_paths": [],
+                "size": 0,
+                "complete": true
+              }
+            ]
+          }
+        ]
+      },
+      "raw_output": "{\"index\": 0}",
+      "validated_index": 0,
+      "seconds": 1.956026500032749,
+      "usage": {
+        "prompt_tokens": 1146,
+        "completion_tokens": 6,
+        "total_tokens": 1152
+      },
+      "fallback": false
+    },
+    {
+      "input": {
+        "action": "List owners",
+        "contracts": [
+          {
+            "index": 0,
+            "method": "method:customers:OwnerResource#findAll()",
+            "parameters": [],
+            "body_fields": {},
+            "routes": [
+              [
+                "GET",
+                [
+                  "owners"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 1,
+            "method": "method:customers:OwnerResource#findOwner(int)",
+            "parameters": [
+              {
+                "name": "ownerId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "ownerId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "ownerId": "int"
+            },
+            "routes": [
+              [
+                "GET",
+                [
+                  "owners",
+                  "{ownerId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 2,
+            "method": "method:customers:PetResource#processUpdateForm(PetRequest)",
+            "parameters": [
+              {
+                "name": "petRequest",
+                "type": "PetRequest",
+                "kind": "RequestBody",
+                "wire_name": "petRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "id": "int",
+              "birthDate": "Date",
+              "name": "String",
+              "typeId": "int"
+            },
+            "routes": [
+              [
+                "PUT",
+                [
+                  "owners",
+                  "*",
+                  "pets",
+                  "{petId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 3,
+            "method": "method:customers:OwnerResource#createOwner(OwnerRequest)",
+            "parameters": [
+              {
+                "name": "ownerRequest",
+                "type": "OwnerRequest",
+                "kind": "RequestBody",
+                "wire_name": "ownerRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "firstName": "String",
+              "lastName": "String",
+              "address": "String",
+              "city": "String",
+              "telephone": "String"
+            },
+            "routes": [
+              [
+                "POST",
+                [
+                  "owners"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 4,
+            "method": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+            "parameters": [
+              {
+                "name": "ownerId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "ownerId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              },
+              {
+                "name": "ownerRequest",
+                "type": "OwnerRequest",
+                "kind": "RequestBody",
+                "wire_name": "ownerRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "ownerId": "int",
+              "firstName": "String",
+              "lastName": "String",
+              "address": "String",
+              "city": "String",
+              "telephone": "String"
+            },
+            "routes": [
+              [
+                "PUT",
+                [
+                  "owners",
+                  "{ownerId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 5,
+            "method": "method:customers:PetResource#findPet(int)",
+            "parameters": [
+              {
+                "name": "petId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "petId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "petId": "int"
+            },
+            "routes": [
+              [
+                "GET",
+                [
+                  "owners",
+                  "*",
+                  "pets",
+                  "{petId}"
+                ]
+              ]
+            ]
+          }
+        ],
+        "typed_history_references": [
+          {
+            "objects": [
+              {
+                "deployment": "customers",
+                "qualified_type": "org.springframework.samples.petclinic.customers.model.Owner",
+                "identity": [
+                  [
+                    "id",
+                    "1"
+                  ]
+                ],
+                "producer": "1:method:customers:OwnerResource#findAll()",
+                "response_path": "history[0].result[0]",
+                "position": 0
+              }
+            ],
+            "collections": [
+              {
+                "deployment": "customers",
+                "element_types": [
+                  "org.springframework.samples.petclinic.customers.model.Owner"
+                ],
+                "producer": "1:method:customers:OwnerResource#findAll()",
+                "response_path": "history[0].result",
+                "object_paths": [
+                  "history[0].result[0]"
+                ],
+                "size": 1,
+                "complete": true
+              },
+              {
+                "deployment": "customers",
+                "element_types": [
+                  "org.springframework.samples.petclinic.customers.model.Pet"
+                ],
+                "producer": "1:method:customers:OwnerResource#findAll()",
+                "response_path": "history[0].result[0].pets",
+                "object_paths": [],
+                "size": 0,
+                "complete": true
+              }
+            ]
+          },
+          {
+            "objects": [
+              {
+                "deployment": "customers",
+                "qualified_type": "org.springframework.samples.petclinic.customers.model.Owner",
+                "identity": [
+                  [
+                    "id",
+                    "{'__symbol__': 'generated-1', '__type__': 'Integer', '__constraints__': ['non_null'], '__generation__': 'ORM generated identifier', '__distinct_from__': [1], '__distinct_symbols__': []}"
+                  ]
+                ],
+                "producer": "2:method:customers:OwnerResource#createOwner(OwnerRequest)",
+                "response_path": "history[1].result",
+                "position": null
+              }
+            ],
+            "collections": [
+              {
+                "deployment": "customers",
+                "element_types": [
+                  "org.springframework.samples.petclinic.customers.model.Pet"
+                ],
+                "producer": "2:method:customers:OwnerResource#createOwner(OwnerRequest)",
+                "response_path": "history[1].result.pets",
+                "object_paths": [],
+                "size": 0,
+                "complete": true
+              }
+            ]
+          }
+        ]
+      },
+      "raw_output": "{\"index\": 0}",
+      "validated_index": 0,
+      "seconds": 2.1082252910127863,
+      "usage": {
+        "prompt_tokens": 1222,
+        "completion_tokens": 6,
+        "total_tokens": 1228
+      },
+      "fallback": false
+    },
+    {
+      "input": {
+        "action": "Update owner ownerId \"1\" firstName \"Joe\" lastName \"Smith\" address \"Oak\" city \"Leeds\" telephone \"11223\"",
+        "contracts": [
+          {
+            "index": 0,
+            "method": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+            "parameters": [
+              {
+                "name": "ownerId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "ownerId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              },
+              {
+                "name": "ownerRequest",
+                "type": "OwnerRequest",
+                "kind": "RequestBody",
+                "wire_name": "ownerRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "ownerId": "int",
+              "firstName": "String",
+              "lastName": "String",
+              "address": "String",
+              "city": "String",
+              "telephone": "String"
+            },
+            "routes": [
+              [
+                "PUT",
+                [
+                  "owners",
+                  "{ownerId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 1,
+            "method": "method:customers:PetResource#processUpdateForm(PetRequest)",
+            "parameters": [
+              {
+                "name": "petRequest",
+                "type": "PetRequest",
+                "kind": "RequestBody",
+                "wire_name": "petRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "id": "int",
+              "birthDate": "Date",
+              "name": "String",
+              "typeId": "int"
+            },
+            "routes": [
+              [
+                "PUT",
+                [
+                  "owners",
+                  "*",
+                  "pets",
+                  "{petId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 2,
+            "method": "method:customers:OwnerResource#createOwner(OwnerRequest)",
+            "parameters": [
+              {
+                "name": "ownerRequest",
+                "type": "OwnerRequest",
+                "kind": "RequestBody",
+                "wire_name": "ownerRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "firstName": "String",
+              "lastName": "String",
+              "address": "String",
+              "city": "String",
+              "telephone": "String"
+            },
+            "routes": [
+              [
+                "POST",
+                [
+                  "owners"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 3,
+            "method": "method:customers:PetResource#processCreationForm(PetRequest,int)",
+            "parameters": [
+              {
+                "name": "petRequest",
+                "type": "PetRequest",
+                "kind": "RequestBody",
+                "wire_name": "petRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              },
+              {
+                "name": "ownerId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "ownerId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "id": "int",
+              "birthDate": "Date",
+              "name": "String",
+              "typeId": "int",
+              "ownerId": "int"
+            },
+            "routes": [
+              [
+                "POST",
+                [
+                  "owners",
+                  "{ownerId}",
+                  "pets"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 4,
+            "method": "method:customers:OwnerResource#findOwner(int)",
+            "parameters": [
+              {
+                "name": "ownerId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "ownerId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "ownerId": "int"
+            },
+            "routes": [
+              [
+                "GET",
+                [
+                  "owners",
+                  "{ownerId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 5,
+            "method": "method:customers:OwnerResource#findAll()",
+            "parameters": [],
+            "body_fields": {},
+            "routes": [
+              [
+                "GET",
+                [
+                  "owners"
+                ]
+              ]
+            ]
+          }
+        ],
+        "typed_history_references": [
+          {
+            "objects": [
+              {
+                "deployment": "customers",
+                "qualified_type": "org.springframework.samples.petclinic.customers.model.Owner",
+                "identity": [
+                  [
+                    "id",
+                    "{'__symbol__': 'generated-1', '__type__': 'Integer', '__constraints__': ['non_null'], '__generation__': 'ORM generated identifier', '__distinct_from__': [1], '__distinct_symbols__': []}"
+                  ]
+                ],
+                "producer": "2:method:customers:OwnerResource#createOwner(OwnerRequest)",
+                "response_path": "history[1].result",
+                "position": null
+              }
+            ],
+            "collections": [
+              {
+                "deployment": "customers",
+                "element_types": [
+                  "org.springframework.samples.petclinic.customers.model.Pet"
+                ],
+                "producer": "2:method:customers:OwnerResource#createOwner(OwnerRequest)",
+                "response_path": "history[1].result.pets",
+                "object_paths": [],
+                "size": 0,
+                "complete": true
+              }
+            ]
+          },
+          {
+            "objects": [
+              {
+                "deployment": "customers",
+                "qualified_type": "org.springframework.samples.petclinic.customers.model.Owner",
+                "identity": [
+                  [
+                    "id",
+                    "1"
+                  ]
+                ],
+                "producer": "3:method:customers:OwnerResource#findAll()",
+                "response_path": "history[2].result[0]",
+                "position": 0
+              },
+              {
+                "deployment": "customers",
+                "qualified_type": "org.springframework.samples.petclinic.customers.model.Owner",
+                "identity": [
+                  [
+                    "id",
+                    "{'__symbol__': 'generated-1', '__type__': 'Integer', '__constraints__': ['non_null'], '__generation__': 'ORM generated identifier', '__distinct_from__': [1], '__distinct_symbols__': []}"
+                  ]
+                ],
+                "producer": "3:method:customers:OwnerResource#findAll()",
+                "response_path": "history[2].result[1]",
+                "position": 1
+              }
+            ],
+            "collections": [
+              {
+                "deployment": "customers",
+                "element_types": [
+                  "org.springframework.samples.petclinic.customers.model.Owner"
+                ],
+                "producer": "3:method:customers:OwnerResource#findAll()",
+                "response_path": "history[2].result",
+                "object_paths": [
+                  "history[2].result[0]",
+                  "history[2].result[1]"
+                ],
+                "size": 2,
+                "complete": true
+              },
+              {
+                "deployment": "customers",
+                "element_types": [
+                  "org.springframework.samples.petclinic.customers.model.Pet"
+                ],
+                "producer": "3:method:customers:OwnerResource#findAll()",
+                "response_path": "history[2].result[0].pets",
+                "object_paths": [],
+                "size": 0,
+                "complete": true
+              },
+              {
+                "deployment": "customers",
+                "element_types": [
+                  "org.springframework.samples.petclinic.customers.model.Pet"
+                ],
+                "producer": "3:method:customers:OwnerResource#findAll()",
+                "response_path": "history[2].result[1].pets",
+                "object_paths": [],
+                "size": 0,
+                "complete": true
+              }
+            ]
+          }
+        ]
+      },
+      "raw_output": "{\"index\": 0}",
+      "validated_index": 0,
+      "seconds": 2.6040845420211554,
+      "usage": {
+        "prompt_tokens": 1529,
+        "completion_tokens": 6,
+        "total_tokens": 1535
+      },
+      "fallback": false
+    },
+    {
+      "input": {
+        "action": "Read first owner",
+        "contracts": [
+          {
+            "index": 0,
+            "method": "method:customers:OwnerResource#findOwner(int)",
+            "parameters": [
+              {
+                "name": "ownerId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "ownerId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "ownerId": "int"
+            },
+            "routes": [
+              [
+                "GET",
+                [
+                  "owners",
+                  "{ownerId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 1,
+            "method": "method:customers:OwnerResource#findAll()",
+            "parameters": [],
+            "body_fields": {},
+            "routes": [
+              [
+                "GET",
+                [
+                  "owners"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 2,
+            "method": "method:customers:PetResource#processUpdateForm(PetRequest)",
+            "parameters": [
+              {
+                "name": "petRequest",
+                "type": "PetRequest",
+                "kind": "RequestBody",
+                "wire_name": "petRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "id": "int",
+              "birthDate": "Date",
+              "name": "String",
+              "typeId": "int"
+            },
+            "routes": [
+              [
+                "PUT",
+                [
+                  "owners",
+                  "*",
+                  "pets",
+                  "{petId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 3,
+            "method": "method:customers:OwnerResource#createOwner(OwnerRequest)",
+            "parameters": [
+              {
+                "name": "ownerRequest",
+                "type": "OwnerRequest",
+                "kind": "RequestBody",
+                "wire_name": "ownerRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "firstName": "String",
+              "lastName": "String",
+              "address": "String",
+              "city": "String",
+              "telephone": "String"
+            },
+            "routes": [
+              [
+                "POST",
+                [
+                  "owners"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 4,
+            "method": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+            "parameters": [
+              {
+                "name": "ownerId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "ownerId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              },
+              {
+                "name": "ownerRequest",
+                "type": "OwnerRequest",
+                "kind": "RequestBody",
+                "wire_name": "ownerRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "ownerId": "int",
+              "firstName": "String",
+              "lastName": "String",
+              "address": "String",
+              "city": "String",
+              "telephone": "String"
+            },
+            "routes": [
+              [
+                "PUT",
+                [
+                  "owners",
+                  "{ownerId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 5,
+            "method": "method:customers:PetResource#findPet(int)",
+            "parameters": [
+              {
+                "name": "petId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "petId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "petId": "int"
+            },
+            "routes": [
+              [
+                "GET",
+                [
+                  "owners",
+                  "*",
+                  "pets",
+                  "{petId}"
+                ]
+              ]
+            ]
+          }
+        ],
+        "typed_history_references": [
+          {
+            "objects": [
+              {
+                "deployment": "customers",
+                "qualified_type": "org.springframework.samples.petclinic.customers.model.Owner",
+                "identity": [
+                  [
+                    "id",
+                    "1"
+                  ]
+                ],
+                "producer": "3:method:customers:OwnerResource#findAll()",
+                "response_path": "history[2].result[0]",
+                "position": 0
+              },
+              {
+                "deployment": "customers",
+                "qualified_type": "org.springframework.samples.petclinic.customers.model.Owner",
+                "identity": [
+                  [
+                    "id",
+                    "{'__symbol__': 'generated-1', '__type__': 'Integer', '__constraints__': ['non_null'], '__generation__': 'ORM generated identifier', '__distinct_from__': [1], '__distinct_symbols__': []}"
+                  ]
+                ],
+                "producer": "3:method:customers:OwnerResource#findAll()",
+                "response_path": "history[2].result[1]",
+                "position": 1
+              }
+            ],
+            "collections": [
+              {
+                "deployment": "customers",
+                "element_types": [
+                  "org.springframework.samples.petclinic.customers.model.Owner"
+                ],
+                "producer": "3:method:customers:OwnerResource#findAll()",
+                "response_path": "history[2].result",
+                "object_paths": [
+                  "history[2].result[0]",
+                  "history[2].result[1]"
+                ],
+                "size": 2,
+                "complete": true
+              },
+              {
+                "deployment": "customers",
+                "element_types": [
+                  "org.springframework.samples.petclinic.customers.model.Pet"
+                ],
+                "producer": "3:method:customers:OwnerResource#findAll()",
+                "response_path": "history[2].result[0].pets",
+                "object_paths": [],
+                "size": 0,
+                "complete": true
+              },
+              {
+                "deployment": "customers",
+                "element_types": [
+                  "org.springframework.samples.petclinic.customers.model.Pet"
+                ],
+                "producer": "3:method:customers:OwnerResource#findAll()",
+                "response_path": "history[2].result[1].pets",
+                "object_paths": [],
+                "size": 0,
+                "complete": true
+              }
+            ]
+          },
+          {
+            "objects": [],
+            "collections": []
+          }
+        ]
+      },
+      "raw_output": "{\"index\": 0}",
+      "validated_index": 0,
+      "seconds": 2.1112762080156244,
+      "usage": {
+        "prompt_tokens": 1234,
+        "completion_tokens": 6,
+        "total_tokens": 1240
+      },
+      "fallback": false
+    },
+    {
+      "input": {
+        "action": "List owners",
+        "contracts": [
+          {
+            "index": 0,
+            "method": "method:customers:OwnerResource#findAll()",
+            "parameters": [],
+            "body_fields": {},
+            "routes": [
+              [
+                "GET",
+                [
+                  "owners"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 1,
+            "method": "method:customers:OwnerResource#findOwner(int)",
+            "parameters": [
+              {
+                "name": "ownerId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "ownerId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "ownerId": "int"
+            },
+            "routes": [
+              [
+                "GET",
+                [
+                  "owners",
+                  "{ownerId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 2,
+            "method": "method:customers:PetResource#processUpdateForm(PetRequest)",
+            "parameters": [
+              {
+                "name": "petRequest",
+                "type": "PetRequest",
+                "kind": "RequestBody",
+                "wire_name": "petRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "id": "int",
+              "birthDate": "Date",
+              "name": "String",
+              "typeId": "int"
+            },
+            "routes": [
+              [
+                "PUT",
+                [
+                  "owners",
+                  "*",
+                  "pets",
+                  "{petId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 3,
+            "method": "method:customers:OwnerResource#createOwner(OwnerRequest)",
+            "parameters": [
+              {
+                "name": "ownerRequest",
+                "type": "OwnerRequest",
+                "kind": "RequestBody",
+                "wire_name": "ownerRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "firstName": "String",
+              "lastName": "String",
+              "address": "String",
+              "city": "String",
+              "telephone": "String"
+            },
+            "routes": [
+              [
+                "POST",
+                [
+                  "owners"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 4,
+            "method": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+            "parameters": [
+              {
+                "name": "ownerId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "ownerId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              },
+              {
+                "name": "ownerRequest",
+                "type": "OwnerRequest",
+                "kind": "RequestBody",
+                "wire_name": "ownerRequest",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "ownerId": "int",
+              "firstName": "String",
+              "lastName": "String",
+              "address": "String",
+              "city": "String",
+              "telephone": "String"
+            },
+            "routes": [
+              [
+                "PUT",
+                [
+                  "owners",
+                  "{ownerId}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 5,
+            "method": "method:customers:PetResource#findPet(int)",
+            "parameters": [
+              {
+                "name": "petId",
+                "type": "int",
+                "kind": "PathVariable",
+                "wire_name": "petId",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": true,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "petId": "int"
+            },
+            "routes": [
+              [
+                "GET",
+                [
+                  "owners",
+                  "*",
+                  "pets",
+                  "{petId}"
+                ]
+              ]
+            ]
+          }
+        ],
+        "typed_history_references": [
+          {
+            "objects": [
+              {
+                "deployment": "customers",
+                "qualified_type": "org.springframework.samples.petclinic.customers.model.Owner",
+                "identity": [
+                  [
+                    "id",
+                    "1"
+                  ]
+                ],
+                "producer": "5:method:customers:OwnerResource#findOwner(int)",
+                "response_path": "history[4].result",
+                "position": null
+              }
+            ],
+            "collections": [
+              {
+                "deployment": "customers",
+                "element_types": [
+                  "org.springframework.samples.petclinic.customers.model.Pet"
+                ],
+                "producer": "5:method:customers:OwnerResource#findOwner(int)",
+                "response_path": "history[4].result.pets",
+                "object_paths": [],
+                "size": 0,
+                "complete": true
+              }
+            ]
+          },
+          {
+            "objects": [],
+            "collections": []
+          }
+        ]
+      },
+      "raw_output": "{\"index\": 0}",
+      "validated_index": 0,
+      "seconds": 1.6610283749760129,
+      "usage": {
+        "prompt_tokens": 968,
+        "completion_tokens": 6,
+        "total_tokens": 974
+      },
+      "fallback": false
+    },
+    {
+      "input": {
+        "action": "Read account by name \"demo\"",
+        "contracts": [
+          {
+            "index": 0,
+            "method": "method:account:AccountController#getAccountByName(String)",
+            "parameters": [
+              {
+                "name": "name",
+                "type": "String",
+                "kind": "PathVariable",
+                "wire_name": "name",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "name": "String"
+            },
+            "routes": [
+              [
+                "GET",
+                [
+                  "{name}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 1,
+            "method": "method:account:AccountController#getCurrentAccount(Principal)",
+            "parameters": [
+              {
+                "name": "principal",
+                "type": "Principal",
+                "kind": "",
+                "wire_name": "principal",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "principal": "Principal"
+            },
+            "routes": [
+              [
+                "GET",
+                [
+                  "current"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 2,
+            "method": "method:account:AccountController#saveCurrentAccount(Principal,Account)",
+            "parameters": [
+              {
+                "name": "principal",
+                "type": "Principal",
+                "kind": "",
+                "wire_name": "principal",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              },
+              {
+                "name": "account",
+                "type": "Account",
+                "kind": "RequestBody",
+                "wire_name": "account",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "principal": "Principal",
+              "name": "String",
+              "lastSeen": "Date",
+              "incomes": "List<Item>",
+              "expenses": "List<Item>",
+              "saving": "Saving",
+              "note": "String"
+            },
+            "routes": [
+              [
+                "PUT",
+                [
+                  "current"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 3,
+            "method": "method:account:AccountController#createNewAccount(User)",
+            "parameters": [
+              {
+                "name": "user",
+                "type": "User",
+                "kind": "RequestBody",
+                "wire_name": "user",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "username": "String",
+              "password": "String"
+            },
+            "routes": [
+              [
+                "POST",
+                []
+              ]
+            ]
+          }
+        ],
+        "typed_history_references": []
+      },
+      "raw_output": "{\"index\": 0}",
+      "validated_index": 0,
+      "seconds": 1.0457406669738702,
+      "usage": {
+        "prompt_tokens": 603,
+        "completion_tokens": 6,
+        "total_tokens": 609
+      },
+      "fallback": false
+    },
+    {
+      "input": {
+        "action": "Create new account username \"demo\" password \"valid-password\"",
+        "contracts": [
+          {
+            "index": 0,
+            "method": "method:account:AccountController#createNewAccount(User)",
+            "parameters": [
+              {
+                "name": "user",
+                "type": "User",
+                "kind": "RequestBody",
+                "wire_name": "user",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "username": "String",
+              "password": "String"
+            },
+            "routes": [
+              [
+                "POST",
+                []
+              ]
+            ]
+          },
+          {
+            "index": 1,
+            "method": "method:account:AccountController#saveCurrentAccount(Principal,Account)",
+            "parameters": [
+              {
+                "name": "principal",
+                "type": "Principal",
+                "kind": "",
+                "wire_name": "principal",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              },
+              {
+                "name": "account",
+                "type": "Account",
+                "kind": "RequestBody",
+                "wire_name": "account",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "principal": "Principal",
+              "name": "String",
+              "lastSeen": "Date",
+              "incomes": "List<Item>",
+              "expenses": "List<Item>",
+              "saving": "Saving",
+              "note": "String"
+            },
+            "routes": [
+              [
+                "PUT",
+                [
+                  "current"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 2,
+            "method": "method:account:AccountController#getAccountByName(String)",
+            "parameters": [
+              {
+                "name": "name",
+                "type": "String",
+                "kind": "PathVariable",
+                "wire_name": "name",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "name": "String"
+            },
+            "routes": [
+              [
+                "GET",
+                [
+                  "{name}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 3,
+            "method": "method:account:AccountController#getCurrentAccount(Principal)",
+            "parameters": [
+              {
+                "name": "principal",
+                "type": "Principal",
+                "kind": "",
+                "wire_name": "principal",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "principal": "Principal"
+            },
+            "routes": [
+              [
+                "GET",
+                [
+                  "current"
+                ]
+              ]
+            ]
+          }
+        ],
+        "typed_history_references": [
+          {
+            "objects": [
+              {
+                "deployment": "account",
+                "qualified_type": "com.piggymetrics.account.domain.Account",
+                "identity": [
+                  [
+                    "name",
+                    "'demo'"
+                  ]
+                ],
+                "producer": "1:method:account:AccountController#getAccountByName(String)",
+                "response_path": "history[0].result",
+                "position": null
+              }
+            ],
+            "collections": []
+          }
+        ]
+      },
+      "raw_output": "{\"index\": 0}",
+      "validated_index": 0,
+      "seconds": 1.1911536250263453,
+      "usage": {
+        "prompt_tokens": 679,
+        "completion_tokens": 6,
+        "total_tokens": 685
+      },
+      "fallback": false
+    },
+    {
+      "input": {
+        "action": "Read account by name \"demo\"",
+        "contracts": [
+          {
+            "index": 0,
+            "method": "method:account:AccountController#getAccountByName(String)",
+            "parameters": [
+              {
+                "name": "name",
+                "type": "String",
+                "kind": "PathVariable",
+                "wire_name": "name",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "name": "String"
+            },
+            "routes": [
+              [
+                "GET",
+                [
+                  "{name}"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 1,
+            "method": "method:account:AccountController#getCurrentAccount(Principal)",
+            "parameters": [
+              {
+                "name": "principal",
+                "type": "Principal",
+                "kind": "",
+                "wire_name": "principal",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "principal": "Principal"
+            },
+            "routes": [
+              [
+                "GET",
+                [
+                  "current"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 2,
+            "method": "method:account:AccountController#saveCurrentAccount(Principal,Account)",
+            "parameters": [
+              {
+                "name": "principal",
+                "type": "Principal",
+                "kind": "",
+                "wire_name": "principal",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              },
+              {
+                "name": "account",
+                "type": "Account",
+                "kind": "RequestBody",
+                "wire_name": "account",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "principal": "Principal",
+              "name": "String",
+              "lastSeen": "Date",
+              "incomes": "List<Item>",
+              "expenses": "List<Item>",
+              "saving": "Saving",
+              "note": "String"
+            },
+            "routes": [
+              [
+                "PUT",
+                [
+                  "current"
+                ]
+              ]
+            ]
+          },
+          {
+            "index": 3,
+            "method": "method:account:AccountController#createNewAccount(User)",
+            "parameters": [
+              {
+                "name": "user",
+                "type": "User",
+                "kind": "RequestBody",
+                "wire_name": "user",
+                "required": true,
+                "default": {
+                  "unknown": true
+                },
+                "explicit_name": false,
+                "custom_conversion": false,
+                "binding_metadata_unknown": false
+              }
+            ],
+            "body_fields": {
+              "username": "String",
+              "password": "String"
+            },
+            "routes": [
+              [
+                "POST",
+                []
+              ]
+            ]
+          }
+        ],
+        "typed_history_references": [
+          {
+            "objects": [
+              {
+                "deployment": "account",
+                "qualified_type": "com.piggymetrics.account.domain.Account",
+                "identity": [
+                  [
+                    "name",
+                    "'demo'"
+                  ]
+                ],
+                "producer": "1:method:account:AccountController#getAccountByName(String)",
+                "response_path": "history[0].result",
+                "position": null
+              }
+            ],
+            "collections": []
+          },
+          {
+            "objects": [],
+            "collections": []
+          }
+        ]
+      },
+      "raw_output": "{\"index\": 0}",
+      "validated_index": 0,
+      "seconds": 1.188413041003514,
+      "usage": {
+        "prompt_tokens": 683,
+        "completion_tokens": 6,
+        "total_tokens": 689
+      },
+      "fallback": false
+    }
+  ],
+  "results": [
+    {
+      "fixture": "petclinic-customers",
+      "graph_exact": true,
+      "endpoints_exact": true,
+      "states_exact": true,
+      "arguments_exact": true,
+      "statuses_exact": true,
+      "results_exact": true
+    },
+    {
+      "fixture": "piggymetrics-account",
+      "graph_exact": true,
+      "endpoints_exact": true,
+      "states_exact": true,
+      "arguments_exact": true,
+      "statuses_exact": true,
+      "results_exact": true
+    }
+  ],
+  "external_llm_api_calls": 0,
+  "deepseek_calls": 0,
+  "target_applications_started": false,
+  "acceptance": "Adopt only if full endpoint/result/state/edge errors improve at acceptable measured resources; otherwise retain lexical default."
+}

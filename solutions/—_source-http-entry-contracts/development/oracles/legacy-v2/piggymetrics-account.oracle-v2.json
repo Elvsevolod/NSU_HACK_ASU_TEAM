@@ -1,0 +1,142 @@
+{
+  "fixed_before_prediction": false,
+  "steps": [
+    {
+      "n": 1,
+      "endpoint": "method:account:AccountController#getAccountByName(String)",
+      "status": 200,
+      "result": {
+        "name": "demo",
+        "note": "seed"
+      },
+      "result_subset": true,
+      "ignore_result": false,
+      "rows": {
+        "account.accounts": 1
+      },
+      "arguments": {
+        "name": "demo"
+      }
+    },
+    {
+      "n": 2,
+      "endpoint": "method:account:AccountController#createNewAccount(User)",
+      "status": 400,
+      "result": {
+        "name": "demo",
+        "note": "seed"
+      },
+      "result_subset": true,
+      "ignore_result": true,
+      "rows": {
+        "account.accounts": 1
+      },
+      "arguments": {}
+    },
+    {
+      "n": 3,
+      "endpoint": "method:account:AccountController#getAccountByName(String)",
+      "status": 200,
+      "result": {
+        "name": "demo",
+        "note": "seed"
+      },
+      "result_subset": true,
+      "ignore_result": false,
+      "rows": {
+        "account.accounts": 1
+      },
+      "arguments": {
+        "name": "demo"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "scenario:finance-refusal",
+      "relation": "executes",
+      "target": "method:account:AccountController#getAccountByName(String)"
+    },
+    {
+      "source": "scenario:finance-refusal",
+      "relation": "executes",
+      "target": "method:account:AccountController#createNewAccount(User)"
+    },
+    {
+      "source": "scenario:finance-refusal",
+      "relation": "executes",
+      "target": "method:account:AccountServiceImpl#findByName(String)"
+    },
+    {
+      "source": "scenario:finance-refusal",
+      "relation": "executes",
+      "target": "method:account:AccountServiceImpl#create(User)"
+    },
+    {
+      "source": "scenario:finance-refusal",
+      "relation": "executes",
+      "target": "method:account:User#setUsername(String)"
+    },
+    {
+      "source": "scenario:finance-refusal",
+      "relation": "executes",
+      "target": "method:account:User#setPassword(String)"
+    },
+    {
+      "source": "scenario:finance-refusal",
+      "relation": "executes",
+      "target": "method:account:User#getUsername()"
+    },
+    {
+      "source": "method:account:AccountController#getAccountByName(String)",
+      "relation": "calls",
+      "target": "method:account:AccountServiceImpl#findByName(String)"
+    },
+    {
+      "source": "method:account:AccountController#createNewAccount(User)",
+      "relation": "calls",
+      "target": "method:account:AccountServiceImpl#create(User)"
+    },
+    {
+      "source": "method:account:AccountServiceImpl#create(User)",
+      "relation": "calls",
+      "target": "method:account:User#getUsername()"
+    },
+    {
+      "source": "method:account:AccountServiceImpl#findByName(String)",
+      "relation": "data",
+      "target": "res:collection:account.accounts"
+    },
+    {
+      "source": "method:account:AccountServiceImpl#create(User)",
+      "relation": "data",
+      "target": "res:collection:account.accounts"
+    },
+    {
+      "source": "scenario:finance-refusal",
+      "relation": "executes",
+      "target": "method:account:ErrorHandler#processValidationError(IllegalArgumentException)"
+    }
+  ],
+  "limits": [
+    "PiggyMetrics was already used in development; this is not a blind holdout",
+    "Authorized account HTTP profile and normalized supplied Mongo seed; Mongo event is not labeled SQL",
+    "Duplicate creation fails before auth-service; success creation/statistics Feign chain is outside this measured profile"
+  ],
+  "version": 2,
+  "previous_sha256": "7e678e9b8c8325b212ca3983d17b5b31209faaffe13edf7137a678240d55a000",
+  "review_basis": "Source review after legacy failure; no analyzer behavior is changed to match the oracle",
+  "scope": "legacy HTTP regression; aggregate graph plus explicit wire/actual args/scalar table fields, not a new holdout",
+  "source_evidence": [
+    {
+      "file": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java",
+      "line": 46,
+      "fact": "Assert rejects duplicate before remote auth and save"
+    },
+    {
+      "file": "account-service/src/main/java/com/piggymetrics/account/controller/ErrorHandler.java",
+      "line": 17,
+      "fact": "IllegalArgumentException maps to HTTP BAD_REQUEST 400"
+    }
+  ]
+}

@@ -1,0 +1,507 @@
+{
+  "prediction": {
+    "edges": [
+      {
+        "source": "scenario:heldout-1",
+        "relation": "executes",
+        "target": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)"
+      },
+      {
+        "source": "scenario:heldout-1",
+        "relation": "executes",
+        "target": "method:customers:ResourceNotFoundException#<init>(String)"
+      },
+      {
+        "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+        "relation": "calls",
+        "target": "method:customers:ResourceNotFoundException#<init>(String)"
+      },
+      {
+        "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+        "relation": "data",
+        "target": "res:table:customers.owners"
+      }
+    ]
+  },
+  "report": {
+    "graph_policy": "observed-union",
+    "analysis_status": "partial",
+    "certainty_scope": "relative to supplied inputs, proposed bindings and supported semantics; not a runtime trace",
+    "confirmed": [
+      {
+        "source": "scenario:heldout-1",
+        "relation": "executes",
+        "target": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)"
+      },
+      {
+        "source": "scenario:heldout-1",
+        "relation": "executes",
+        "target": "method:customers:ResourceNotFoundException#<init>(String)"
+      },
+      {
+        "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+        "relation": "calls",
+        "target": "method:customers:ResourceNotFoundException#<init>(String)"
+      },
+      {
+        "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+        "relation": "data",
+        "target": "res:table:customers.owners"
+      }
+    ],
+    "possible": [],
+    "unresolved": [
+      "System clock is unknown",
+      "request bean validation is not fully modeled: method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+      "uncaught Java exception: org.springframework.samples.petclinic.customers.web.ResourceNotFoundException",
+      "unsupported Java expression argument_list: method:customers:ResourceNotFoundException#<init>(String):10",
+      "unsupported Java expression explicit_constructor_invocation: method:customers:ResourceNotFoundException#<init>(String):10",
+      "unsupported Java expression super: method:customers:ResourceNotFoundException#<init>(String):10"
+    ],
+    "steps": [
+      {
+        "n": 1,
+        "action": "PUT /owners/999\n{\"firstName\": \"Mia\", \"lastName\": \"Doe\", \"address\": \"Birch\", \"city\": \"York\", \"telephone\": \"33333\"}",
+        "selection": {
+          "proposal": {
+            "hypotheses": []
+          },
+          "candidates": [
+            "method:customers:OwnerResource#updateOwner(int,OwnerRequest)"
+          ],
+          "unresolved": []
+        },
+        "alternatives": [
+          {
+            "entry": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+            "parameters": {
+              "ownerId": "999",
+              "firstName": "Mia",
+              "lastName": "Doe",
+              "address": "Birch",
+              "city": "York",
+              "telephone": "33333"
+            },
+            "grounding_reason": "Explicit HTTP matched against source routes",
+            "grounding_repairs": [],
+            "retrieval_candidates": [
+              "method:customers:OwnerResource#updateOwner(int,OwnerRequest)"
+            ],
+            "ui_site": null,
+            "bindings": {},
+            "result": {
+              "unknown": true
+            },
+            "request": {
+              "deployment": "customers",
+              "method": "PUT",
+              "url": "/owners/999",
+              "path": [
+                "owners",
+                "999"
+              ],
+              "query": {},
+              "query_complete": true,
+              "headers": {
+                "content-type": [
+                  "application/json"
+                ]
+              },
+              "body": {
+                "firstName": "Mia",
+                "lastName": "Doe",
+                "address": "Birch",
+                "city": "York",
+                "telephone": "33333"
+              },
+              "actor": {
+                "unknown": true
+              },
+              "session": {
+                "unknown": true
+              },
+              "body_properties": {},
+              "provenance": {
+                "source": "explicit_action",
+                "quote": "PUT /owners/999\n{\"firstName\": \"Mia\", \"lastName\": \"Doe\", \"address\": \"Birch\", \"city\": \"York\", \"telephone\": \"33333\"}"
+              }
+            },
+            "created_objects": [],
+            "path_conditions": [],
+            "decisions": {},
+            "pruned_paths": [],
+            "outcome": "uncaught application exception",
+            "unresolved": [
+              "request bean validation is not fully modeled: method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+              "uncaught Java exception: org.springframework.samples.petclinic.customers.web.ResourceNotFoundException",
+              "unsupported Java expression argument_list: method:customers:ResourceNotFoundException#<init>(String):10",
+              "unsupported Java expression explicit_constructor_invocation: method:customers:ResourceNotFoundException#<init>(String):10",
+              "unsupported Java expression super: method:customers:ResourceNotFoundException#<init>(String):10"
+            ],
+            "operation_issues": [],
+            "data_operations": [
+              {
+                "method": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+                "resource": "res:table:customers.owners",
+                "operation": "findById",
+                "arguments": [
+                  999
+                ],
+                "source_site": "call:method:customers:OwnerResource#updateOwner(int,OwnerRequest)@86:50",
+                "uncertain_write": false,
+                "sql_emitted": true,
+                "datastore_event": true,
+                "transactional": false,
+                "emitted_by": "call:method:customers:OwnerResource#updateOwner(int,OwnerRequest)@86:50"
+              }
+            ],
+            "events": [
+              {
+                "edge": {
+                  "source": "scenario:heldout-1",
+                  "relation": "executes",
+                  "target": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)"
+                },
+                "request": 1,
+                "callsite": "scenario request",
+                "method": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+                "line": null,
+                "context": "C1",
+                "values": {
+                  "version": "value-witness/1",
+                  "arguments": [
+                    {
+                      "kind": "int",
+                      "value": 999
+                    },
+                    {
+                      "kind": "object",
+                      "type": "org.springframework.samples.petclinic.customers.web.OwnerRequest",
+                      "fields": [
+                        "firstName",
+                        "lastName",
+                        "address",
+                        "city",
+                        "telephone"
+                      ]
+                    }
+                  ]
+                },
+                "cause": "source_execution"
+              },
+              {
+                "edge": {
+                  "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+                  "relation": "data",
+                  "target": "res:table:customers.owners"
+                },
+                "request": 1,
+                "callsite": "call:method:customers:OwnerResource#updateOwner(int,OwnerRequest)@86:50",
+                "method": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+                "line": 86,
+                "context": "C1",
+                "values": {
+                  "version": "value-witness/1",
+                  "arguments": [
+                    {
+                      "kind": "int",
+                      "value": 999
+                    }
+                  ]
+                },
+                "cause": "sql"
+              },
+              {
+                "edge": {
+                  "source": "scenario:heldout-1",
+                  "relation": "executes",
+                  "target": "method:customers:ResourceNotFoundException#<init>(String)"
+                },
+                "request": 1,
+                "callsite": "call:method:customers:OwnerResource#updateOwner(int,OwnerRequest)@86:86",
+                "method": "method:customers:ResourceNotFoundException#<init>(String)",
+                "line": 86,
+                "context": "C1",
+                "values": {
+                  "version": "value-witness/1",
+                  "arguments": [
+                    {
+                      "kind": "str",
+                      "value": "Owner 999 not found"
+                    }
+                  ]
+                },
+                "cause": "source_execution"
+              },
+              {
+                "edge": {
+                  "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+                  "relation": "calls",
+                  "target": "method:customers:ResourceNotFoundException#<init>(String)"
+                },
+                "request": 1,
+                "callsite": "call:method:customers:OwnerResource#updateOwner(int,OwnerRequest)@86:86",
+                "method": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+                "line": 86,
+                "context": "C1",
+                "values": {
+                  "version": "value-witness/1",
+                  "arguments": [
+                    {
+                      "kind": "str",
+                      "value": "Owner 999 not found"
+                    }
+                  ]
+                },
+                "cause": "direct_call"
+              }
+            ],
+            "assumptions": {},
+            "event_contexts": {
+              "C1": {
+                "guards": [],
+                "assumptions": []
+              }
+            },
+            "requests": [
+              {
+                "id": 1,
+                "entry": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+                "reason": "scenario request",
+                "request": {
+                  "deployment": "customers",
+                  "method": "PUT",
+                  "url": "/owners/999",
+                  "path": [
+                    "owners",
+                    "999"
+                  ],
+                  "query": {},
+                  "query_complete": true,
+                  "headers": {
+                    "content-type": [
+                      "application/json"
+                    ]
+                  },
+                  "body": {
+                    "firstName": "Mia",
+                    "lastName": "Doe",
+                    "address": "Birch",
+                    "city": "York",
+                    "telephone": "33333"
+                  },
+                  "actor": {
+                    "unknown": true
+                  },
+                  "session": {
+                    "unknown": true
+                  },
+                  "body_properties": {},
+                  "provenance": {
+                    "source": "explicit_action",
+                    "quote": "PUT /owners/999\n{\"firstName\": \"Mia\", \"lastName\": \"Doe\", \"address\": \"Birch\", \"city\": \"York\", \"telephone\": \"33333\"}"
+                  }
+                }
+              }
+            ],
+            "responses": [
+              {
+                "request": 1,
+                "status": 404,
+                "entered": true
+              }
+            ],
+            "call_effects": [],
+            "persistence": [],
+            "static_candidates": [],
+            "state_after": {
+              "browser": {
+                "storage": {},
+                "form": {},
+                "dom": {},
+                "url": {},
+                "options": {},
+                "script": {}
+              },
+              "history": [
+                {
+                  "step": 1,
+                  "entry": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+                  "action": "PUT /owners/999\n{\"firstName\": \"Mia\", \"lastName\": \"Doe\", \"address\": \"Birch\", \"city\": \"York\", \"telephone\": \"33333\"}"
+                }
+              ],
+              "clock": {
+                "unknown": true
+              },
+              "database_rows": {
+                "customers.owners": 1,
+                "customers.pets": 0,
+                "customers.types": 0
+              },
+              "unknown_tables": [],
+              "analysis_assumptions": [
+                "step 1: unresolved source/request/state assumptions"
+              ],
+              "limitations": []
+            },
+            "edges": [
+              {
+                "source": "scenario:heldout-1",
+                "relation": "executes",
+                "target": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)"
+              },
+              {
+                "source": "scenario:heldout-1",
+                "relation": "executes",
+                "target": "method:customers:ResourceNotFoundException#<init>(String)"
+              },
+              {
+                "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+                "relation": "calls",
+                "target": "method:customers:ResourceNotFoundException#<init>(String)"
+              },
+              {
+                "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+                "relation": "data",
+                "target": "res:table:customers.owners"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "evidence": [
+      {
+        "edge": {
+          "source": "scenario:heldout-1",
+          "relation": "executes",
+          "target": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)"
+        },
+        "grounds": [
+          {
+            "step": 1,
+            "entry": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+            "ui_site": null,
+            "alternative": 0,
+            "source_sites": [
+              "scenario request"
+            ],
+            "approximate": true,
+            "source_locations": [
+              {
+                "file": "spring-petclinic-customers-service/src/main/java/org/springframework/samples/petclinic/customers/web/OwnerResource.java",
+                "line": 83,
+                "method": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)"
+              }
+            ],
+            "applied_rules": [
+              "Source method invocation or scenario HTTP entry"
+            ]
+          }
+        ]
+      },
+      {
+        "edge": {
+          "source": "scenario:heldout-1",
+          "relation": "executes",
+          "target": "method:customers:ResourceNotFoundException#<init>(String)"
+        },
+        "grounds": [
+          {
+            "step": 1,
+            "entry": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+            "ui_site": null,
+            "alternative": 0,
+            "source_sites": [
+              "call:method:customers:OwnerResource#updateOwner(int,OwnerRequest)@86:86"
+            ],
+            "approximate": true,
+            "source_locations": [
+              {
+                "file": "spring-petclinic-customers-service/src/main/java/org/springframework/samples/petclinic/customers/web/OwnerResource.java",
+                "line": 86,
+                "call_site": "call:method:customers:OwnerResource#updateOwner(int,OwnerRequest)@86:86"
+              },
+              {
+                "file": "spring-petclinic-customers-service/src/main/java/org/springframework/samples/petclinic/customers/web/ResourceNotFoundException.java",
+                "line": 9,
+                "method": "method:customers:ResourceNotFoundException#<init>(String)"
+              }
+            ],
+            "applied_rules": [
+              "Source method invocation or scenario HTTP entry"
+            ]
+          }
+        ]
+      },
+      {
+        "edge": {
+          "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+          "relation": "calls",
+          "target": "method:customers:ResourceNotFoundException#<init>(String)"
+        },
+        "grounds": [
+          {
+            "step": 1,
+            "entry": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+            "ui_site": null,
+            "alternative": 0,
+            "source_sites": [
+              "call:method:customers:OwnerResource#updateOwner(int,OwnerRequest)@86:86"
+            ],
+            "approximate": true,
+            "source_locations": [
+              {
+                "file": "spring-petclinic-customers-service/src/main/java/org/springframework/samples/petclinic/customers/web/OwnerResource.java",
+                "line": 86,
+                "call_site": "call:method:customers:OwnerResource#updateOwner(int,OwnerRequest)@86:86"
+              },
+              {
+                "file": "spring-petclinic-customers-service/src/main/java/org/springframework/samples/petclinic/customers/web/OwnerResource.java",
+                "line": 83,
+                "method": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)"
+              }
+            ],
+            "applied_rules": [
+              "Source method invocation or scenario HTTP entry"
+            ]
+          }
+        ]
+      },
+      {
+        "edge": {
+          "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+          "relation": "data",
+          "target": "res:table:customers.owners"
+        },
+        "grounds": [
+          {
+            "step": 1,
+            "entry": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+            "ui_site": null,
+            "alternative": 0,
+            "source_sites": [
+              "call:method:customers:OwnerResource#updateOwner(int,OwnerRequest)@86:50"
+            ],
+            "approximate": true,
+            "source_locations": [
+              {
+                "file": "spring-petclinic-customers-service/src/main/java/org/springframework/samples/petclinic/customers/web/OwnerResource.java",
+                "line": 86,
+                "call_site": "call:method:customers:OwnerResource#updateOwner(int,OwnerRequest)@86:50"
+              },
+              {
+                "file": "spring-petclinic-customers-service/src/main/java/org/springframework/samples/petclinic/customers/web/OwnerResource.java",
+                "line": 83,
+                "method": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)"
+              }
+            ],
+            "applied_rules": [
+              "Spring Data repository operation with source entity and primary-key mapping"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

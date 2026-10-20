@@ -1,0 +1,436 @@
+{
+  "source_site_controls": [
+    {
+      "file": "ts-ui-dashboard/static/assets/js/adminlogin.js",
+      "line": 9,
+      "site": "ts-ui-dashboard/static/assets/js/adminlogin.js:9:url0",
+      "source_conditions": [],
+      "proposals": 1,
+      "selection": {
+        "candidates": [
+          "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)"
+        ],
+        "ranking": [
+          {
+            "entry": "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+            "ui_site": "ts-ui-dashboard/static/assets/js/adminlogin.js:9:url0",
+            "score": 1
+          }
+        ],
+        "proposal": {
+          "hypotheses": []
+        },
+        "unresolved": [],
+        "grounding_status": "lexical_hypothesis",
+        "certainty_note": "Graph certainty is conditional on the selected source contract and validated bindings"
+      },
+      "guard_override": false,
+      "storage_assignments": [
+        {
+          "space": "storage",
+          "key": "admin_name",
+          "expr": "data.data.username",
+          "conditions": [
+            "(data.status == 1)"
+          ]
+        },
+        {
+          "space": "storage",
+          "key": "admin_token",
+          "expr": "data.data.token",
+          "conditions": [
+            "(data.status == 1)"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "ts-ui-dashboard/static/assets/js/client_login.js",
+      "line": 45,
+      "site": "ts-ui-dashboard/static/assets/js/client_login.js:45:url0",
+      "source_conditions": [
+        "!((loginInfo.username == null || loginInfo.username == \"\"))",
+        "!((loginInfo.password == null || loginInfo.password == \"\"))",
+        "!((loginInfo.verificationCode == null || loginInfo.verificationCode == \"\"))"
+      ],
+      "proposals": 0,
+      "selection": {
+        "candidates": [
+          "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)"
+        ],
+        "ranking": [
+          {
+            "entry": "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+            "ui_site": "ts-ui-dashboard/static/assets/js/client_login.js:45:url0",
+            "score": 1
+          }
+        ],
+        "proposal": {
+          "hypotheses": []
+        },
+        "unresolved": [
+          "Selected source request blocked by known UI guard: ts-ui-dashboard/static/assets/js/client_login.js:45:url0",
+          "No request with a satisfiable source UI guard"
+        ],
+        "grounding_status": "lexical_hypothesis",
+        "certainty_note": "Graph certainty is conditional on the selected source contract and validated bindings",
+        "blocked_by_known_ui_guard": "ts-ui-dashboard/static/assets/js/client_login.js:45:url0"
+      },
+      "guard_override": false,
+      "storage_assignments": [
+        {
+          "space": "storage",
+          "key": "client_token",
+          "expr": "obj[\"data\"].token",
+          "conditions": [
+            "(obj[\"status\"] == 1)"
+          ]
+        },
+        {
+          "space": "storage",
+          "key": "client_id",
+          "expr": "obj[\"data\"].userId",
+          "conditions": [
+            "(obj[\"status\"] == 1)"
+          ]
+        },
+        {
+          "space": "storage",
+          "key": "client_name",
+          "expr": "obj[\"data\"].username",
+          "conditions": [
+            "(obj[\"status\"] == 1)"
+          ]
+        },
+        {
+          "space": "storage",
+          "key": "client_token",
+          "expr": "\"-1\"",
+          "conditions": [
+            "!((obj[\"status\"] == 1))"
+          ]
+        },
+        {
+          "space": "storage",
+          "key": "client_name",
+          "expr": "\"Not Login\"",
+          "conditions": [
+            "!((obj[\"status\"] == 1))"
+          ]
+        }
+      ]
+    }
+  ],
+  "explicit_chain": [
+    {
+      "step": "explicit login",
+      "alternatives": [
+        {
+          "result": {
+            "unknown": true
+          },
+          "outcome": "unsupported_semantics boundary",
+          "warnings": [
+            "JJWT 0.8.0 contract boundary: claim date or analysis clock is unknown",
+            "SLF4J native contract: provider transport failures are not modeled; source formatting callbacks and their caught throwables are modeled",
+            "local bean initialization is unresolved: type:ts-auth-service:auth.security.jwt.JWTProvider",
+            "native collection constructor kind or namespace is not modeled: ts-auth-service/src/main/java/auth/security/UserDetailsServiceImpl.java:39",
+            "native collection constructor kind or namespace is not modeled: ts-auth-service/src/main/java/auth/service/impl/TokenServiceImpl.java:39",
+            "unresolved modeled constructor: Date at call:method:ts-auth-service:auth.security.jwt.JWTProvider#createToken(auth.entity.User)@36:25"
+          ],
+          "unknown_tables": [],
+          "edges": [
+            [
+              "",
+              "executes",
+              "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)"
+            ],
+            [
+              "",
+              "executes",
+              "method:ts-auth-service:auth.entity.User#getAuthorities()"
+            ],
+            [
+              "",
+              "executes",
+              "method:ts-auth-service:auth.entity.User#getPassword()"
+            ],
+            [
+              "",
+              "executes",
+              "method:ts-auth-service:auth.entity.User#getUsername()"
+            ],
+            [
+              "",
+              "executes",
+              "method:ts-auth-service:auth.entity.User#isAccountNonExpired()"
+            ],
+            [
+              "",
+              "executes",
+              "method:ts-auth-service:auth.entity.User#isAccountNonLocked()"
+            ],
+            [
+              "",
+              "executes",
+              "method:ts-auth-service:auth.entity.User#isCredentialsNonExpired()"
+            ],
+            [
+              "",
+              "executes",
+              "method:ts-auth-service:auth.entity.User#isEnabled()"
+            ],
+            [
+              "",
+              "executes",
+              "method:ts-auth-service:auth.security.UserDetailsServiceImpl#loadUserByUsername(java.lang.String)"
+            ],
+            [
+              "",
+              "executes",
+              "method:ts-auth-service:auth.security.jwt.JWTProvider#createToken(auth.entity.User)"
+            ],
+            [
+              "",
+              "executes",
+              "method:ts-auth-service:auth.service.impl.TokenServiceImpl#getServiceUrl(java.lang.String)"
+            ],
+            [
+              "",
+              "executes",
+              "method:ts-auth-service:auth.service.impl.TokenServiceImpl#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)"
+            ],
+            [
+              "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+              "calls",
+              "method:ts-auth-service:auth.service.impl.TokenServiceImpl#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)"
+            ],
+            [
+              "method:ts-auth-service:auth.security.UserDetailsServiceImpl#loadUserByUsername(java.lang.String)",
+              "data",
+              "res:table:ts-auth-service.auth_user"
+            ],
+            [
+              "method:ts-auth-service:auth.security.UserDetailsServiceImpl#loadUserByUsername(java.lang.String)",
+              "data",
+              "res:table:ts-auth-service.user_roles"
+            ],
+            [
+              "method:ts-auth-service:auth.security.jwt.JWTProvider#createToken(auth.entity.User)",
+              "calls",
+              "method:ts-auth-service:auth.entity.User#getUsername()"
+            ],
+            [
+              "method:ts-auth-service:auth.service.impl.TokenServiceImpl#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+              "calls",
+              "method:ts-auth-service:auth.security.jwt.JWTProvider#createToken(auth.entity.User)"
+            ],
+            [
+              "method:ts-auth-service:auth.service.impl.TokenServiceImpl#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+              "calls",
+              "method:ts-auth-service:auth.service.impl.TokenServiceImpl#getServiceUrl(java.lang.String)"
+            ],
+            [
+              "method:ts-auth-service:auth.service.impl.TokenServiceImpl#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+              "data",
+              "res:table:ts-auth-service.auth_user"
+            ]
+          ],
+          "data_operations": [
+            {
+              "method": "method:ts-auth-service:auth.security.UserDetailsServiceImpl#loadUserByUsername(java.lang.String)",
+              "resource": "res:table:ts-auth-service.auth_user",
+              "operation": "findByUsername",
+              "arguments": [
+                "fdse_microservice"
+              ],
+              "source_site": "call:method:ts-auth-service:auth.security.UserDetailsServiceImpl#loadUserByUsername(java.lang.String)@29:31",
+              "uncertain_write": false,
+              "sql_emitted": true,
+              "datastore_event": true,
+              "transactional": false,
+              "emitted_by": "call:method:ts-auth-service:auth.security.UserDetailsServiceImpl#loadUserByUsername(java.lang.String)@29:31"
+            },
+            {
+              "method": "method:ts-auth-service:auth.security.UserDetailsServiceImpl#loadUserByUsername(java.lang.String)",
+              "resource": "res:table:ts-auth-service.user_roles",
+              "operation": "association_load",
+              "arguments": [
+                "4d2a46c7-71cb-4cf1-b5bb-b68406d9da6f"
+              ],
+              "source_site": "call:method:ts-auth-service:auth.security.UserDetailsServiceImpl#loadUserByUsername(java.lang.String)@29:31",
+              "uncertain_write": false,
+              "sql_emitted": true,
+              "datastore_event": true,
+              "transactional": false,
+              "emitted_by": "call:method:ts-auth-service:auth.entity.User#getAuthorities()@43:27"
+            },
+            {
+              "method": "method:ts-auth-service:auth.service.impl.TokenServiceImpl#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+              "resource": "res:table:ts-auth-service.auth_user",
+              "operation": "findByUsername",
+              "arguments": [
+                "fdse_microservice"
+              ],
+              "source_site": "call:method:ts-auth-service:auth.service.impl.TokenServiceImpl#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)@90:36",
+              "uncertain_write": false,
+              "sql_emitted": true,
+              "datastore_event": true,
+              "transactional": false,
+              "emitted_by": "call:method:ts-auth-service:auth.service.impl.TokenServiceImpl#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)@90:36"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "current_automatic_s0": [
+    {
+      "n": 1,
+      "action": "Log in with username and password",
+      "selection": {
+        "candidates": [
+          "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+          "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+          "method:ts-notification-service:notification.controller.NotificationController#test_send_mail()",
+          "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+          "method:ts-rebook-service:rebook.controller.RebookController#rebook(rebook.entity.RebookInfo,org.springframework.http.HttpHeaders)",
+          "method:ts-rebook-service:rebook.controller.RebookController#payDifference(rebook.entity.RebookInfo,org.springframework.http.HttpHeaders)"
+        ],
+        "ranking": [
+          {
+            "entry": "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+            "ui_site": "ts-ui-dashboard/static/assets/js/client_login.js:45:url0",
+            "score": 18.43336715200577
+          },
+          {
+            "entry": "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+            "ui_site": "ts-ui-dashboard/static/assets/js/adminlogin.js:9:url0",
+            "score": 16.878541281588497
+          },
+          {
+            "entry": "method:ts-notification-service:notification.controller.NotificationController#test_send_mail()",
+            "ui_site": null,
+            "score": 0.7143600673215323
+          },
+          {
+            "entry": "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)",
+            "ui_site": "ts-ui-dashboard/static/assets/js/client_order_list.js:287:url0",
+            "score": 0.5439577973190819
+          },
+          {
+            "entry": "method:ts-rebook-service:rebook.controller.RebookController#rebook(rebook.entity.RebookInfo,org.springframework.http.HttpHeaders)",
+            "ui_site": "ts-ui-dashboard/static/assets/js/client_order_list.js:213:url0",
+            "score": 0.35862614771089013
+          },
+          {
+            "entry": "method:ts-rebook-service:rebook.controller.RebookController#payDifference(rebook.entity.RebookInfo,org.springframework.http.HttpHeaders)",
+            "ui_site": "ts-ui-dashboard/static/js/orderRebook.js:35:url0",
+            "score": 0.3424833588385079
+          }
+        ],
+        "proposal": {
+          "hypotheses": []
+        },
+        "unresolved": [],
+        "grounding_status": "lexical_hypothesis",
+        "certainty_note": "Graph certainty is conditional on the selected source contract and validated bindings",
+        "blocked_by_known_ui_guard": "ts-ui-dashboard/static/assets/js/client_login.js:45:url0"
+      },
+      "alternatives": [
+        {
+          "entry": "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)",
+          "ui_site": "ts-ui-dashboard/static/assets/js/adminlogin.js:9:url0",
+          "outcome": "unsupported_semantics boundary",
+          "bindings": {
+            "verificationCode": {
+              "source": "ui_absence",
+              "reference": "ts-ui-dashboard/static/assets/js/adminlogin.js:9:url0:omitted-json-property",
+              "quote": "",
+              "resolved": true,
+              "consumer_equivalence": "default null and empty String satisfy Spring StringUtils.isEmpty"
+            },
+            "username": {
+              "source": "context",
+              "reference": "actor[passenger].username",
+              "quote": "fdse_microservice",
+              "resolved": true
+            },
+            "password": {
+              "observed": true,
+              "sha256": "49534cabbb1d50cb399df17fa67928f11062ca839ab9ca718fe80b17fb07f573"
+            }
+          },
+          "storage": {},
+          "warnings": null
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "action": "Open the contact book",
+      "selection": {
+        "candidates": [
+          "method:ts-contacts-service:contacts.controller.ContactsController#findContactsByAccountId(java.lang.String,?HttpHeaders)",
+          "method:ts-contacts-service:contacts.controller.ContactsController#findContactsByAccountId(java.lang.String,?HttpHeaders)",
+          "method:ts-contacts-service:contacts.controller.ContactsController#getContactsByContactsId(java.lang.String,?HttpHeaders)",
+          "method:ts-contacts-service:contacts.controller.ContactsController#getAllContacts(?HttpHeaders)",
+          "method:ts-contacts-service:contacts.controller.ContactsController#modifyContacts(contacts.entity.Contacts,?HttpHeaders)",
+          "method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#getAllContacts(org.springframework.http.HttpHeaders)"
+        ],
+        "ranking": [
+          {
+            "entry": "method:ts-contacts-service:contacts.controller.ContactsController#findContactsByAccountId(java.lang.String,?HttpHeaders)",
+            "ui_site": "ts-ui-dashboard/static/assets/js/client_ticket_book.js:56:url0",
+            "score": 60.97294343302476
+          },
+          {
+            "entry": "method:ts-contacts-service:contacts.controller.ContactsController#findContactsByAccountId(java.lang.String,?HttpHeaders)",
+            "ui_site": "ts-ui-dashboard/static/assets/js/old_index.js:335:url0",
+            "score": 48.12252008261727
+          },
+          {
+            "entry": "method:ts-contacts-service:contacts.controller.ContactsController#getContactsByContactsId(java.lang.String,?HttpHeaders)",
+            "ui_site": null,
+            "score": 44.33191784804026
+          },
+          {
+            "entry": "method:ts-contacts-service:contacts.controller.ContactsController#getAllContacts(?HttpHeaders)",
+            "ui_site": null,
+            "score": 43.80511983281092
+          },
+          {
+            "entry": "method:ts-contacts-service:contacts.controller.ContactsController#modifyContacts(contacts.entity.Contacts,?HttpHeaders)",
+            "ui_site": null,
+            "score": 2.7721319340065333
+          },
+          {
+            "entry": "method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#getAllContacts(org.springframework.http.HttpHeaders)",
+            "ui_site": null,
+            "score": 2.5914456559349164
+          }
+        ],
+        "proposal": {
+          "hypotheses": []
+        },
+        "unresolved": [],
+        "grounding_status": "lexical_hypothesis",
+        "certainty_note": "Graph certainty is conditional on the selected source contract and validated bindings"
+      },
+      "alternatives": [
+        {
+          "entry": "method:ts-contacts-service:contacts.controller.ContactsController#findContactsByAccountId(java.lang.String,?HttpHeaders)",
+          "ui_site": "ts-ui-dashboard/static/assets/js/client_ticket_book.js:56:url0",
+          "outcome": "returned",
+          "bindings": {},
+          "storage": {},
+          "warnings": null
+        }
+      ]
+    }
+  ],
+  "intermediate_values_injected": false,
+  "full_frontend_success_claimed": false,
+  "target_apps_started": false,
+  "conclusion_rule": "A successful explicit chain cannot certify a guarded browser path. Site-only controls retain the production binder and every guard."
+}

@@ -1,0 +1,1006 @@
+--- B00-parent31/analyzer/engine.py
++++ E1c-R01-R03/analyzer/engine.py
+@@ -30,7 +30,7 @@
+ from .source_generics import render as render_source_type,environment as source_environment,member_type,member_scope,call_context
+ from .source_conversions import compiled_type,declaration_erasure,consumer_type,storage_type,PRIMITIVES
+ from .boxed_values import NO_KIND,boxed_equal
+-from .native_storage import JavaFrame,JavaList,JavaListIterator,ReadOnlyList,JavaStream,ServletObject,JavaHttpClient
++from .native_storage import JavaFrame,StaticCells,JavaList,JavaListIterator,ReadOnlyList,JavaStream,ServletObject,JavaHttpClient
+ from .native_arrays import JavaArray,ArrayListView
+ from .java_lists import call as native_list_call,iteration as native_list_iteration
+ from .reference_scalars import equal as scalar_reference_equal
+@@ -79,6 +79,10 @@
+ 
+ def merge_values(a, b, active, memo):
+     if a is b:return a
++    if isinstance(a,StaticCells) or isinstance(b,StaticCells):
++        if not isinstance(a,StaticCells) or not isinstance(b,StaticCells):return U
++        return StaticCells({key:merge(a.get(key,U),b.get(key,U),active,memo) for key in a.keys()|b.keys()},
++            {key:a.kinds.get(key) if a.kinds.get(key)==b.kinds.get(key) else None for key in a.keys()|b.keys()})
+     if isinstance(a,JacksonFeature) or isinstance(b,JacksonFeature):
+         return a if isinstance(a,JacksonFeature) and isinstance(b,JacksonFeature) and a.name==b.name else U
+     if isinstance(a,JavaJsonMapper) or isinstance(b,JavaJsonMapper):
+@@ -532,7 +536,7 @@
+                 frame['response']['status']=self.server_error_status(frame['entry'],JavaThrow(
+                     {'__http_binding_status__':failure.status,'__type__':'ServletRequestBindingException'}))
+                 return
+-            frame['entered']=True
++            frame['entered']=False
+             from .security import authorize_request
+             allowed=authorize_request(self,frame['entry'],args,frame.get('immutable_request'))
+             if allowed is False:
+@@ -540,8 +544,10 @@
+                 return
+             request_event['authorization_checked']=allowed is not None
+             request_event['bound_arguments']=request_event.pop('binding_candidate_arguments')
+-            if frame['on_entry']:frame['on_entry'](frame['request_id'])
+-            frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'])
++            def entered():
++                frame['entered']=True
++                if frame['on_entry']:frame['on_entry'](frame['request_id'])
++            frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'],on_entry=entered)
+             return
+         mid = frame['filters'][position]
+         skips=self.p.methods_of(self.p.methods[mid]['owner'],'shouldNotFilter')
+@@ -689,14 +695,21 @@
+         try:yield
+         finally:self.invocation_projection=previous
+ 
+-    def invoke(self, mid, args, receiver=None, reason='source call',type_context=None,argument_kinds=None,export_method=True):
++    def invoke(self, mid, args, receiver=None, reason='source call',type_context=None,argument_kinds=None,export_method=True,on_entry=None):
+         with self.project_invocation(mid,export_method):
+-            return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+-
+-    def _invoke(self, mid, args, receiver=None, reason='source call',type_context=None,argument_kinds=None):
++            return self._invoke(mid,args,receiver,reason,type_context,argument_kinds,on_entry)
++
++    def _invoke(self, mid, args, receiver=None, reason='source call',type_context=None,argument_kinds=None,on_entry=None):
+         self.last_invoke_kind=NO_KIND
+         self.last_invoke_started=False
+         meta = self.p.methods[mid]
++        from .static_storage import ensure as initialize_static
++        try:initialize_static(self,meta['owner'])
++        finally:
++            # Initializer callbacks own their execution. They do not mean the
++            # requested method body was entered if class initialization fails.
++            self.last_invoke_started=False
++            self.last_invoke_kind=NO_KIND
+         if (receiver is None or receiver is U) and 'static' not in self.method_modifiers(mid):
+             from .bean_initialization import initialized_receiver
+             initialized=initialized_receiver(self,mid)
+@@ -770,6 +783,7 @@
+                     value,kind=self.assignment_value(value,kind,written,None)
+                     env.set_value(name,value,kind)
+                 from .event_values import witness
++                if on_entry:on_entry()
+                 self.executed(mid,reason,witness([env.get(name,U) for name,_ in self.p.parameters(mid)]));started=True
+                 pending_initializer=getattr(receiver,'_pending_initializer',None)
+                 if meta['name']=='<init>' and pending_initializer:
+@@ -805,6 +819,8 @@
+         return result
+ 
+     def fallback(self, mid):
++        if self.p.methods.get(mid,{}).get('analysis_context'):
++            raise AnalysisBoundary('unmodeled effect in static initialization: '+self.p.methods[mid]['owner'],category='unsupported_semantics')
+         self.approximate = True
+         self.assume('unsupported execution at ' + mid)
+         cache=self.p.__dict__.setdefault('_fallback_closure_cache',{})
+@@ -837,6 +853,7 @@
+         return_kinds,reference_kinds=[],[]
+         original = {'env': env, 'values': values, 'browser': before.browser,
+                     'actor_browsers':before.actor_browsers,'beans':before.bean_instances,
++                    'static_fields':before.static_fields,
+                     'history': before.history, 'params': self.params, 'opaque_heap': self.opaque_heap,
+                     'managed': {unit: frame['managed'] for unit, frame in before.transactions.items()}}
+         alternatives, states, results, controls = [], [], [], []
+@@ -906,6 +923,7 @@
+             self.state = join_states(states)
+         self.state.browser, self.state.history = original['browser'], original['history']
+         self.state.actor_browsers,self.state.bean_instances=original['actor_browsers'],original['beans']
++        self.state.static_fields=original['static_fields']
+         for unit, managed in original['managed'].items():
+             if unit in self.state.transactions:self.state.transactions[unit]['managed'] = managed
+         self.params = original['params']
+@@ -1162,11 +1180,17 @@
+         if node.type=='identifier':
+             name=text(node)
+             if name in env:return node,'local',env,name
++            from .static_storage import cell
++            found=cell(self,node,env)
++            if found:return node,'static',found[0],found[1]
+             owner = self.initializer_context[0] if self.initializer_context and self.method == self.initializer_context[1] else self.p.methods[self.method]['owner']
+             if name in self.p.type_fields.get(owner,{}):
+                 return self.field_slot(node,env.get('this',U),name)
+         if node.type=='field_access':
+             qualifier=node.child_by_field_name('object');name=text(node.child_by_field_name('field'))
++            from .static_storage import cell
++            found=cell(self,node,env)
++            if found:return node,'static',found[0],found[1]
+             obj=self.value(qualifier,env)
+             meta=self.p.methods[self.method]
+             owner=self.p.resolve_type(self.source_type(qualifier),meta['module'],meta['file'])
+@@ -1208,6 +1232,7 @@
+ 
+     def lvalue_valid(self,slot):
+         node,kind,obj,key=slot
++        if kind=='static':return True
+         if kind in ('field','array') and obj is None:raise JavaThrow({'__type__':'NullPointerException'})
+         if kind=='array' and isinstance(obj,list) and type(key) is int:
+             if not 0<=key<len(obj):raise JavaThrow({'__type__':'ArrayIndexOutOfBoundsException'})
+@@ -1220,12 +1245,17 @@
+     def lvalue_read(self,slot):
+         if not self.lvalue_valid(slot):return U
+         _,kind,obj,key=slot
++        if kind=='static':return self.state.static_fields[obj].get(key,U)
+         if kind=='array' and len(obj)>1 and not getattr(obj,'order_known',True):
+             self.approximate=True;self.warnings.add('array encounter order is unspecified: '+text(slot[0]));return U
+         return obj[key] if kind=='array' else obj.get(key,U)
+ 
+     def lvalue_write(self,slot,value,reference_kind=None,reference_type=''):
+         node,kind,obj,key=slot
++        if kind=='static':
++            from .static_storage import write
++            write(self,obj,key,value,reference_kind)
++            return
+         if not self.lvalue_valid(slot):
+             if kind=='array' and isinstance(obj,list):
+                 # An unknown index may select any component. Keep only values
+@@ -1607,6 +1637,9 @@
+             if raw in env:
+                 if isinstance(env,JavaFrame) and raw in env.kinds:self.remember_reference_kind(env.kinds[raw])
+                 return env[raw]
++            from .static_storage import read
++            handled,value=read(self,node,env)
++            if handled:return value
+             enum_owner=self.p.methods[self.method]['owner']
+             if enum_owner in self.p.enum_members:
+                 enum=self.p.enum_reference(self.p.nodes[enum_owner]['fqn']+'.'+raw,self.method)
+@@ -1758,9 +1791,9 @@
+                 return U
+             return value if target in PRIMITIVES else self.reference_check(value,actual_kind,erased_target,text(node))
+         if typ == 'field_access':
+-            if raw in self.p.constants:
+-                self.remember_reference_kind(self.p.constant_kinds.get(raw))
+-                return self.p.constants[raw]
++            from .static_storage import read
++            handled,value=read(self,node,env)
++            if handled:return value
+             constants = {'Float.MAX_VALUE': 3.4028235e38, 'Double.MAX_VALUE': 1.7976931348623157e308,
+                          'Long.MAX_VALUE': 9223372036854775807, 'Integer.MAX_VALUE': 2147483647}
+             qualifier=node.child_by_field_name('object')
+@@ -1957,7 +1990,7 @@
+             if op != '=':
+                 result=self.compound_value(old,result,target,rhs,op)
+                 reference_kind=self.declared_kind(compiled_type(self,target))
+-            elif slot[1] in ('local','field'):
++            elif slot[1] in ('local','field','static'):
+                 result,reference_kind=self.assignment_value(result,reference_kind,storage_type(self,target),rhs)
+             result=self.generic_binding(result,self.source_type(target),reference_type)
+             self.lvalue_write(slot,result,reference_kind,reference_type)
+@@ -2589,6 +2622,14 @@
+         if not targets and not args and name=='getMessage' and isinstance(obj,JavaObject) and assignable(obj.java_type,'java.lang.Throwable',self.p) is True:
+             self.remember_reference_kind('String')
+             return obj.get('message',U)
++        if not targets and name=='getLogger' and len(args)==1 and text(objnode) not in env and self.standard_type(text(objnode),'org.slf4j.LoggerFactory'):
++            if args[0] is None:raise JavaThrow({'__type__':'NullPointerException'})
++            if not isinstance(args[0],(str,JavaTypeToken)):
++                raise AnalysisBoundary('SLF4J logger name/class is unresolved: '+reason,category='unsupported_semantics')
++            self.effect_events.append({'model_version':'slf4j-facade/1','operation':'getLogger','callsite':reason,
++                'resource_writes':[],'heap_roots':[],'callbacks':[],
++                'completions':['normal'],'scope':'standard facade; provider startup failures outside model'})
++            return {'__type__':'org.slf4j.Logger','__logger_facade__':True}
+         receiver_type = cs.get('receiver_type')
+         from .feign_client import operation as feign_operation
+         handled,value=feign_operation(self,node,args,reason) if objnode is not None else (False,U)
+@@ -2599,6 +2640,8 @@
+             if native.owner=='org.slf4j.Logger':
+                 return self.slf4j_call(native,obj,args,reason,env)
+             if native.owner!='java.lang.String':
++                if obj is U and native.effects:
++                    raise AnalysisBoundary('native callback receiver is unresolved: '+reason,category='unsupported_semantics')
+                 if obj is U or obj is None:return unknown_observer(self,native,obj,reason)
+                 native=None
+         if native:
+@@ -2959,7 +3002,8 @@
+             arguments=[child for child in argnode.named_children if child.type not in ('line_comment','block_comment')]
+             handled,value=native_list_call(self,name,obj,args,argument_kinds,arguments,node,reason)
+             if handled:return value
+-        if not targets and isinstance(obj,list) and name in ('contains','indexOf') and len(args)==1:
++        if not targets and isinstance(obj,list) and name in ('contains','indexOf','lastIndexOf') and len(args)==1:
++            self.remember_reference_kind('Boolean' if name=='contains' else 'Integer')
+             return self.collection_membership(obj,args[0],name,reason,argument_kinds[0])
+         if not targets and name=='getClass' and not args and isinstance(obj,dict) and (isinstance(obj,JavaRecord) or type(obj) is dict and obj.get('__type__')):
+             if isinstance(obj,JavaRecord) and not isinstance(obj,JavaObject):
+@@ -3220,9 +3264,10 @@
+             from .repository_values import presence
+             present=presence(self,obj,reason)
+             return present if name=='isPresent' or present is U else not present
+-        if name == 'isPresent' and optional_value(obj):
++        if name in ('isPresent','isEmpty') and optional_value(obj) and not args:
+             val = member(obj, 'optional')
+-            return val is not None if val is not U else U
++            if val is U:return U
++            return val is not None if name=='isPresent' else val is None
+         if name in ('isEmpty', 'isBlank'):
+             value = args[0] if args else obj
+             if name == 'isBlank' and isinstance(value, str):
+@@ -3422,7 +3467,9 @@
+ 
+     def collection_membership(self,items,value,name,reason,value_kind=None):
+         unknown=False
+-        for index,item in enumerate(items):
++        indices=range(len(items)-1,-1,-1) if name=='lastIndexOf' else range(len(items))
++        for index in indices:
++            item=items[index]
+             equal=U
+             if isinstance(value,dict) and '__type__' in value and '__symbol__' not in value:
+                 tid=self.p.resolve_type(value.declared_type if isinstance(value,JavaRecord) else value['__type__'],self.p.methods[self.method]['module'],self.p.methods[self.method]['file'])
+@@ -3472,12 +3519,16 @@
+                 return True, {'__collector__': 'java.util.stream.Collectors.toList'}
+         if not isinstance(obj,JavaStream):
+             return False, U
++        if name=='isParallel' and not args:return True,False
++        if name=='sequential' and not args:return True,obj
++        if name=='close' and not args:
++            obj['lifecycle']['consumed']=True
++            return True,None
++        if name in ('filter','map','forEach','forEachOrdered') and len(args)==1 and args[0] is None:
++            raise JavaThrow({'__type__':'NullPointerException'})
+         if obj['lifecycle']['consumed'] or obj['linked']:
+-            self.approximate = True
+-            self.warnings.add('stream reused after consumption: ' + reason)
+-            return True, U
+-        if name in ('filter','map') and len(args)==1 and args[0] is None:
+-            raise JavaThrow({'__type__':'NullPointerException'})
++            self.warnings.add('stream reused after consumption or linking: ' + reason)
++            raise JavaThrow({'__type__':'IllegalStateException'})
+         if name in ('filter', 'map') and len(args) == 1 and isinstance(args[0], tuple) and args[0][0] in ('lambda','method_reference'):
+             obj['linked'] = True
+             incoming=obj.get('element_type','')
+@@ -3485,6 +3536,7 @@
+             return True, JavaStream({**obj, 'linked': False, 'operations': [*obj['operations'], (name, args[0],incoming)],'element_type':outgoing})
+         unmodifiable=name=='toList' and not args
+         reduction=name=='reduce' and len(args)==2
++        visiting=name in ('forEach','forEachOrdered') and len(args)==1
+         if name=='parallel' or name=='reduce' and not reduction:
+             raise AnalysisBoundary('unsupported Stream reduce overload/parallel mode: '+reason,category='unsupported_semantics')
+         if reduction:
+@@ -3492,17 +3544,15 @@
+             if accumulator_callback is None:raise JavaThrow({'__type__':'NullPointerException'})
+             if not isinstance(accumulator_callback,tuple) or accumulator_callback[0] not in ('lambda','method_reference'):
+                 raise AnalysisBoundary('Stream accumulator reference is unresolved: '+reason,category='unsupported_semantics')
+-        if not unmodifiable and not reduction and (name != 'collect' or args != [{'__collector__': 'java.util.stream.Collectors.toList'}]):
+-            self.approximate = True
+-            self.warnings.add('unsupported stream operation: ' + reason + ' ' + name)
+-            return True, U
++        if visiting and (not isinstance(args[0],tuple) or args[0][0] not in ('lambda','method_reference')):
++            raise AnalysisBoundary('Stream consumer reference is unresolved: '+reason,category='unsupported_semantics')
++        if not unmodifiable and not reduction and not visiting and (name != 'collect' or args != [{'__collector__': 'java.util.stream.Collectors.toList'}]):
++            raise AnalysisBoundary('unsupported stream operation: '+reason+' '+name,category='unsupported_semantics')
+         obj['lifecycle']['consumed'] = True
+         if getattr(obj['__stream__'],'opaque',False) or self.opaque(obj['__stream__']):
+             raise AnalysisBoundary('unknown stream source membership: '+reason,category='unsupported_semantics')
+         if len(obj['__stream__']) > 10000:
+-            self.warnings.add('stream collection budget exceeded: ' + reason)
+-            self.fallback(self.method)
+-            return True, U
++            raise AnalysisBoundary('stream collection budget exceeded: '+reason)
+         output = JavaList()
+         accumulator=args[0] if reduction else None
+         accumulator_kind=argument_kinds[0] if reduction and argument_kinds else None
+@@ -3529,14 +3579,14 @@
+                 if type(value) is not bool:
+                     value = self.choose(reason + ':stream-filter', [True, False])
+                     if value is None:
+-                        self.warnings.add('unknown stream membership: ' + reason)
+-                        self.fallback(self.method)
+-                        return True, U
++                        raise AnalysisBoundary('unknown stream membership: '+reason,category='unsupported_semantics')
+                 if not value:
+                     keep = False
+                     break
+             if keep:
+-                if reduction:
++                if visiting:
++                    self.callback_value(args[0],[item],fold_type,[kind],'void')
++                elif reduction:
+                     accumulator=self.callback_value(accumulator_callback,[accumulator,item],(fold_type,fold_type),[accumulator_kind,kind],fold_type or 'java.lang.Object')
+                     accumulator_kind=self.last_callback_kind
+                 else:output.append(item,kind)
+@@ -3547,6 +3597,7 @@
+                 self.warnings.add('stream interference before remaining callbacks is not fully modeled: '+reason)
+                 self.fallback(self.method)
+                 raise JavaThrow(U)
++        if visiting:return True,None
+         if reduction:
+             self.remember_reference_kind(accumulator_kind)
+             return True,accumulator
+@@ -3639,6 +3690,7 @@
+             body = node.child_by_field_name('body')
+             if body.type != 'block':
+                 value=self.value(body,local)
++                if return_type=='void':return None
+                 actual=self.source_reference_kind(body,self.last_reference_kind)
+                 value,returned_kind=self.assignment_value(value,actual,return_type,body)
+                 return value
+--- B00-parent31/analyzer/heap_join.py
++++ E1c-R01-R03/analyzer/heap_join.py
+@@ -1,7 +1,7 @@
+ """Join conservative Java branches without disconnecting caller-owned objects."""
+ from copy import deepcopy
+ from .java_collections import JavaMap,JavaRecord,JavaMapView,JavaMapEntry,JavaMapIterator,JavaJsonMapper
+-from .native_storage import JavaFrame,JavaList,JavaListIterator,ReadOnlyList
++from .native_storage import JavaFrame,StaticCells,JavaList,JavaListIterator,ReadOnlyList
+ from .state import U
+ 
+ 
+@@ -9,7 +9,7 @@
+     seen=set() if seen is None else seen
+     if not isinstance(value,(dict,list,tuple)) or id(value) in seen:return
+     seen.add(id(value))
+-    if isinstance(value,(JavaMap,JavaRecord,JavaMapView,JavaMapEntry,JavaMapIterator,JavaJsonMapper,JavaList,JavaListIterator)):yield value
++    if isinstance(value,(StaticCells,JavaMap,JavaRecord,JavaMapView,JavaMapEntry,JavaMapIterator,JavaJsonMapper,JavaList,JavaListIterator)):yield value
+     children=list(value.values()) if isinstance(value,dict) else list(value)
+     if isinstance(value,(JavaMapView,JavaMapEntry,ReadOnlyList)):children.append(value.backing)
+     if isinstance(value,JavaMapIterator):children.append(value.view)
+@@ -74,7 +74,7 @@
+     take the full joint-copy path, preserving the original alias contract.
+     """
+     memo={id(node):node for node in source_nodes((state.__dict__,inputs))}
+-    other_ids=mutable_ids((state.browser,state.transactions,state.context,inputs))
++    other_ids=mutable_ids((state.browser,state.transactions,state.context,state.static_fields,inputs))
+     historical_ids=mutable_ids(state.history)
+     live_ids=other_ids|historical_ids
+     historical_database_alias=False
+@@ -136,7 +136,7 @@
+     for group in origins.values():
+         if len(group)>1:
+             for value in group.values():widen(value)
+-    canonical={id(result):value for value,result in updates if isinstance(result,(JavaMap,JavaRecord,JavaMapView,JavaMapEntry,JavaMapIterator,JavaJsonMapper,JavaList,JavaListIterator)) and type(value) is type(result)}
++    canonical={id(result):value for value,result in updates if isinstance(result,(StaticCells,JavaMap,JavaRecord,JavaMapView,JavaMapEntry,JavaMapIterator,JavaJsonMapper,JavaList,JavaListIterator)) and type(value) is type(result)}
+     canonical.update((id(node),node) for node in source_nodes(joined))
+     for value,result in updates:
+         if id(result) not in canonical:
+--- B00-parent31/analyzer/java_exceptions.py
++++ E1c-R01-R03/analyzer/java_exceptions.py
+@@ -13,6 +13,7 @@
+ 
+ PARENTS = {
+     'Throwable':None,'Exception':'Throwable','Error':'Throwable','RuntimeException':'Exception',
++    'LinkageError':'Error','ExceptionInInitializerError':'LinkageError','NoClassDefFoundError':'LinkageError',
+     'IllegalArgumentException':'RuntimeException','IllegalStateException':'RuntimeException',
+     'NumberFormatException':'IllegalArgumentException','NullPointerException':'RuntimeException',
+     'NoSuchElementException':'RuntimeException','ArithmeticException':'RuntimeException',
+--- B00-parent31/analyzer/native_contracts.py
++++ E1c-R01-R03/analyzer/native_contracts.py
+@@ -30,6 +30,15 @@
+     if standard(base,'io.jsonwebtoken.Claims') and name in ('getSubject','getIssuer','getAudience','getId') and not arguments:
+         return NativeCall('io.jsonwebtoken.Claims',name,(),'java.lang.String')
+     optional=standard(base,'java.util.Optional')
++    if standard(base,'java.util.stream.Stream'):
++        if name=='isParallel' and count==0:return NativeCall(base,name,(),'boolean')
++        if name in ('forEach','forEachOrdered') and count==1:
++            return NativeCall(base,name,tuple(arguments),'void',('consumer_callbacks',),
++                ('normal','java.lang.NullPointerException','java.lang.IllegalStateException','consumer_throw'))
++    if name in ('indexOf','lastIndexOf') and count==1 and any(standard(base,'java.util.'+kind)
++            for kind in ('List','ArrayList','LinkedList')):
++        return NativeCall(base,name,tuple(arguments),'int',('element_equals_callback',),
++            ('normal','java.lang.NullPointerException','element_callback_throw'))
+     entity=any(standard(base,'org.springframework.http.'+kind) for kind in ('ResponseEntity','HttpEntity'))
+     if optional and count==0 and name in ('get','isPresent','isEmpty'):
+         return NativeCall('java.util.Optional',name,tuple(arguments),
+--- B00-parent31/analyzer/native_storage.py
++++ E1c-R01-R03/analyzer/native_storage.py
+@@ -76,6 +76,10 @@
+             dict.__setitem__(result, name, deepcopy(value, memo))
+         result.kinds = deepcopy(self.kinds, memo)
+         return result
++
++
++class StaticCells(JavaFrame):
++    """Typed static storage, separately tracked from lexical frames at joins."""
+ 
+ 
+ class JavaList(list):
+--- B00-parent31/analyzer/paths.py
++++ E1c-R01-R03/analyzer/paths.py
+@@ -16,6 +16,8 @@
+         joined.browser = merge(joined.browser, other.browser)
+         joined.actor_browsers = merge(joined.actor_browsers,other.actor_browsers)
+         joined.bean_instances = merge(joined.bean_instances,other.bean_instances)
++        joined.static_fields = merge(joined.static_fields,other.static_fields)
++        joined.class_initialization = merge(joined.class_initialization,other.class_initialization)
+         joined.input_journal=[merge(a,b) for a,b in zip(joined.input_journal,other.input_journal)]
+         joined.history = [merge(a, b) for a, b in zip(joined.history, other.history)]
+         joined.symbol_sequence = max(joined.symbol_sequence, other.symbol_sequence)
+--- B00-parent31/analyzer/source_conversions.py
++++ E1c-R01-R03/analyzer/source_conversions.py
+@@ -65,6 +65,9 @@
+     if node.type=='identifier' and text(node) in engine.variable_types:
+         return declaration_erasure(engine,engine.variable_types[text(node)])
+     if node.type in ('identifier','field_access'):
++        from .static_storage import declaration
++        static=declaration(engine,node)
++        if static:return declaration_erasure(engine,static[1],owner=static[0])
+         info=field_info(engine,node)
+         if info:return declaration_erasure(engine,info['type'],owner=info['declaring_type'])
+     if node.type=='array_access':return compiled_type(engine,node)
+--- B00-parent31/analyzer/state.py
++++ E1c-R01-R03/analyzer/state.py
+@@ -203,6 +203,8 @@
+         self.unscoped_state_assumptions = []
+         self.transactions = {}
+         self.bean_instances = {}
++        self.static_fields = {}
++        self.class_initialization = {}
+         self.actor_browsers = {}
+         self.input_journal = []
+ 
+@@ -245,5 +247,7 @@
+                 'unknown_tables':[schema+'.'+table for schema,table in sorted(self.database.unknown_tables)],
+                 'analysis_assumptions':list(self.analysis_assumptions),
+                 'limitations': list(self.limitations),
++                'class_initialization':deepcopy(self.class_initialization),
++                **({'static_fields':deepcopy(self.static_fields)} if full else {}),
+                 **({'tables':{schema+'.'+table:(U if (schema,table) in self.database.unknown_tables else deepcopy(rows))
+                               for (schema,table),rows in self.database.tables.raw_items()}} if full else {})}
+--- B00-parent31/analyzer/static_storage.py
++++ E1c-R01-R03/analyzer/static_storage.py
+@@ -0,0 +1,153 @@
++"""Scenario-owned Java static cells and bounded source initialization.
++
++Internal initializer contexts supply only a source namespace. They never enter
++the input graph, handler index or output edges. No JVM/classes are loaded.
++"""
++from .native_storage import JavaFrame,StaticCells
++from .project import text, walk, body_members, declaration_matches, keywords
++from .source_literals import literal_default
++from .java_exceptions import JavaThrow
++from .state import U
++
++
++def declaration(engine,node):
++    meta=engine.p.methods[engine.method]
++    if node.type=='identifier':
++        name=text(node)
++        if name in engine.variable_types:return None
++        return (engine.p.static_field_declaration(meta['owner'],name) or
++                engine.p.imported_static_field(meta['file'],meta['module'],name))
++    if node.type!='field_access':return None
++    obj=node.child_by_field_name('object');name=text(node.child_by_field_name('field'))
++    receiver=engine.source_type(obj)
++    root=text(obj).split('.')[0]
++    if root not in engine.variable_types and root not in engine.p.type_fields.get(meta['owner'],{}):
++        receiver=receiver or text(obj)
++    owner=engine.p.resolve_type(receiver,meta['module'],meta['file'])
++    return engine.p.static_field_declaration(owner,name)
++
++
++def context(project,owner):
++    cache=project.__dict__.setdefault('_static_source_contexts',{})
++    if owner not in cache:
++        meta=project.nodes[owner];key='source-context:static:'+owner
++        # Not a skeleton method: no node, callsite, AST method or by-name entry.
++        project.methods[key]={'owner':owner,'module':meta['module'],'file':meta['file'],
++            'name':'<source-static-initializer>','params_as_written':[],
++            'annotations':[],'return_raw':'void','analysis_context':True}
++        project.ix.module[key]=meta['module']
++        cache[owner]=key
++    return cache[owner]
++
++
++def items(project,owner):
++    cache=project.__dict__.setdefault('_static_initializer_items',{})
++    if owner not in cache:
++        meta=project.nodes[owner]
++        declarations=[n for n in walk(project.trees[meta['file']].root_node)
++            if n.type in ('class_declaration','enum_declaration') and declaration_matches(n,meta['fqn'])]
++        result=[]
++        if len(declarations)==1:
++            for field in body_members(declarations[0].child_by_field_name('body')):
++                if field.type=='static_initializer':result.append((None,field.named_children[-1],None,False))
++                elif field.type=='field_declaration' and 'static' in keywords(field):
++                    for var in field.named_children:
++                        if var.type=='variable_declarator':
++                            result.append((text(var.child_by_field_name('name')),var.child_by_field_name('value'),
++                                text(field.child_by_field_name('type')),'final' in keywords(field)))
++        cache[owner]=result
++    return cache[owner]
++
++
++def constant(project,owner,name):
++    # Only primitive/String constant variables bypass active initialization.
++    for field,node,written,final in items(project,owner):
++        if field==name and final and written in ('String','java.lang.String','boolean','byte','short','char','int','long','float','double'):
++            value,kind=literal_default(node)
++            if value is not U:return True,value,kind
++    return False,U,None
++
++
++def ensure(engine,owner):
++    if not owner or not items(engine.p,owner) and not engine.p.type_parents.get(owner):return
++    from .engine import AnalysisBoundary
++    state=engine.state;record=state.class_initialization.get(owner)
++    if record:
++        if not isinstance(record,dict):raise AnalysisBoundary('joined static initialization status is unresolved: '+owner,category='unsupported_semantics')
++        if record['status']=='initialized':return
++        if record['status']=='failed':raise JavaThrow({'__type__':'NoClassDefFoundError'})
++        if record['status']=='initializing':
++            if engine.initializer_context and engine.initializer_context[0]==owner:return
++            raise AnalysisBoundary('cyclic static initialization: '+owner,category='unsupported_semantics')
++        raise AnalysisBoundary('unresolved static initialization: '+owner,category='unsupported_semantics')
++    state.class_initialization[owner]={'status':'initializing','versions':{}}
++    cells=state.static_fields.setdefault(owner,StaticCells())
++    for name,node,written,_ in items(engine.p,owner):
++        if name is not None:
++            value=False if written=='boolean' else '\0' if written=='char' else 0 if written in ('byte','short','int','long','float','double') else None
++            cells.set_value(name,value,engine.declared_kind(written,engine.p.nodes[owner]))
++            state.class_initialization[owner]['versions'][name]=0
++    previous=(engine.method,engine.variable_types,engine.source_bindings,engine.receiver_type,engine.initializer_context)
++    try:
++        # A class initializes its source superclass, never an unrelated class.
++        for parent in sorted(engine.p.type_parents.get(owner,())):
++            if engine.p.nodes.get(parent,{}).get('kind')=='type':ensure(engine,parent)
++        engine.method=context(engine.p,owner);engine.variable_types={}
++        engine.source_bindings={};engine.receiver_type=engine.p.nodes[owner]['fqn']
++        engine.initializer_context=(owner,engine.method,True)
++        env=JavaFrame()
++        for name,node,written,_ in items(engine.p,owner):
++            if node is None:continue
++            if name is None:
++                value,control=engine.execute(node,env)
++                if control=='throw':raise JavaThrow(value)
++                if control:raise AnalysisBoundary('unsupported static initializer completion: '+owner,category='unsupported_semantics')
++            else:
++                value=engine.value(node,env)
++                kind=engine.source_reference_kind(node,engine.last_reference_kind)
++                value,kind=engine.assignment_value(value,kind,written,node)
++                engine.state.static_fields[owner].set_value(name,value,kind)
++                engine.state.class_initialization[owner]['versions'][name]+=1
++        engine.state.class_initialization[owner]['status']='initialized'
++    except JavaThrow as failure:
++        engine.state.class_initialization[owner]['status']='failed'
++        raise JavaThrow({'__type__':'ExceptionInInitializerError','cause':failure.value}) from None
++    except BaseException:
++        engine.state.class_initialization[owner]['status']='unresolved'
++        raise
++    finally:
++        engine.method,engine.variable_types,engine.source_bindings,engine.receiver_type,engine.initializer_context=previous
++
++
++def cell(engine,node,env):
++    found=declaration(engine,node)
++    if not found:return None
++    owner,written=found;name=text(node.child_by_field_name('field')) if node.type=='field_access' else text(node)
++    if node.type=='field_access':
++        obj=node.child_by_field_name('object');root=text(obj).split('.')[0]
++        if root in env or root in engine.variable_types or root in engine.p.type_fields.get(engine.p.methods[engine.method]['owner'],{}):
++            engine.value(obj,env)  # static access evaluates an expression qualifier, even null
++    # Reads/writes during this owner's initializer use its preallocated cells.
++    own=engine.initializer_context and engine.initializer_context[0]==owner
++    if not own:ensure(engine,owner)
++    return owner,name,written
++
++
++def read(engine,node,env):
++    found=declaration(engine,node)
++    if not found:return False,U
++    owner,_=found;name=text(node.child_by_field_name('field')) if node.type=='field_access' else text(node)
++    is_constant,value,kind=constant(engine.p,owner,name)
++    if is_constant:
++        engine.remember_reference_kind(kind);return True,value
++    owner,name,_=cell(engine,node,env)
++    cells=engine.state.static_fields[owner]
++    engine.remember_reference_kind(cells.kinds.get(name))
++    return True,cells.get(name,U)
++
++
++def write(engine,owner,name,value,kind):
++    engine.state.static_fields[owner].set_value(name,value,kind)
++    record=engine.state.class_initialization[owner]
++    previous=record['versions'].get(name,0)
++    record['versions'][name]=previous+1 if type(previous) is int else None
+--- B00-parent31/tests/test_foreach_remote_data32.py
++++ E1c-R01-R03/tests/test_foreach_remote_data32.py
+@@ -0,0 +1,54 @@
++"""A finite consumer owns real source remote/data effects and their prefix."""
++import json
++import pytest
++from analyzer.engine import Engine
++from analyzer.project import Project
++from analyzer.state import ScenarioState,U
++from builders import build
++
++
++def equipment(tmp_path,callback,rows=None):
++    p,db,ids=build(tmp_path,{
++      'Warehouse.java':'''import java.util.*;
++        class Warehouse{Store store;
++          @PostMapping("/reserve/{id}") String reserve(@PathVariable String id){
++            Optional<Item> found=store.findById(id);if(found.isEmpty())throw new IllegalArgumentException();
++            Item item=found.get();item.status="reserved";store.save(item);return item.status;}
++          @GetMapping("/equipment/{id}") String read(@PathVariable String id){return store.findById(id).get().status;}}
++        @Entity @Table(name="equipment") class Item{@Id String id;public String status;}
++        interface Store extends JpaRepository<Item,String>{Optional<Item> findById(String id);Item save(Item value);}''',
++      'Approval.java':'''import java.util.*;import org.springframework.web.client.RestTemplate;
++        class Approval{RestTemplate rest;Object entry(){Arrays.asList("A","B").stream().forEach(id->{'''+callback+'''});
++        return rest.getForObject("http://warehouse/equipment/A",String.class);}int after(){return 99;}}'''
++    },rows={'equipment':rows if rows is not None else [{'id':'A','status':'free'},{'id':'B','status':'free'}]})
++    graph=p.skeleton
++    for unit in ('approval','warehouse'):
++        graph['nodes']['module:'+unit]={'kind':'module','name':unit,'deployment_units':[unit]}
++    for node in graph['nodes'].values():
++        if node.get('file')=='Approval.java':node['module']='approval'
++        if node.get('file')=='Warehouse.java':node['module']='warehouse'
++    (tmp_path/'skeleton.json').write_text(json.dumps(graph))
++    return Project(tmp_path/'skeleton.json',tmp_path),db,ids
++
++
++def test_callback_remote_save_and_reread(tmp_path):
++    p,db,ids=equipment(tmp_path,'rest.postForObject("http://warehouse/reserve/"+id,null,String.class);')
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Approval.entry'],{})=='reserved'
++    assert e.state.database.tables[('service','equipment')]==[{'id':'A','status':'reserved','__type__':'Item'},{'id':'B','status':'reserved','__type__':'Item'}]
++    assert {edge for edge in e.edges if edge[1]=='remote'}=={
++        (ids['Approval.entry'],'remote',ids['Warehouse.reserve']),
++        (ids['Approval.entry'],'remote',ids['Warehouse.read'])}
++    assert {edge for edge in e.edges if edge[1]=='data'}=={
++        (ids['Warehouse.reserve'],'data','res:table:service.equipment'),
++        (ids['Warehouse.read'],'data','res:table:service.equipment')}
++    assert [x['operation'] for x in e.data_operations]==['findById','save','findById','save','findById']
++    assert not e.approximate
++
++
++def test_callback_remote_failure_keeps_first_write_and_stops_reread(tmp_path):
++    p,db,ids=equipment(tmp_path,'rest.postForObject("http://warehouse/reserve/"+id,null,String.class);',rows=[{'id':'A','status':'free'}])
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Approval.entry'],{}) is U
++    assert e.outcome=='uncaught application exception'
++    assert e.state.database.tables[('service','equipment')]==[{'id':'A','status':'reserved','__type__':'Item'}]
++    assert ('','executes',ids['Warehouse.read']) not in e.edges
++    assert [x['operation'] for x in e.data_operations]==['findById','save','findById']
+--- B00-parent31/tests/test_java_streams.py
++++ E1c-R01-R03/tests/test_java_streams.py
+@@ -61,7 +61,8 @@
+       pending.collect(Collectors.toList());return pending.collect(Collectors.toList());'''))
+     engine = Engine(project, ScenarioState(db))
+     assert engine.run(ids['Api.run'], {'rows': [4], 'lower': 0}) is U
+-    assert engine.approximate
++    assert engine.outcome=='uncaught application exception'
++    assert not engine.approximate
+ 
+ 
+ def test_old_pipeline_stage_is_unusable_after_linking_an_intermediate_operation(tmp_path):
+@@ -70,4 +71,5 @@
+       return start.collect(Collectors.toList());'''))
+     engine=Engine(project, ScenarioState(db))
+     assert engine.run(ids['Api.run'], {'rows':[1], 'lower':0}) is U
+-    assert engine.approximate
++    assert engine.outcome=='uncaught application exception'
++    assert not engine.approximate
+--- B00-parent31/tests/test_list_search_contracts.py
++++ E1c-R01-R03/tests/test_list_search_contracts.py
+@@ -0,0 +1,48 @@
++import pytest
++from analyzer.engine import Engine
++from analyzer.native_storage import JavaList
++from analyzer.state import ScenarioState, U
++from builders import build
++
++
++@pytest.mark.parametrize('operation,expected',[('indexOf',0),('lastIndexOf',2)])
++def test_search_direction_and_receiver_unchanged(tmp_path,operation,expected):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{
++      Object entry(){List<String> names=Arrays.asList("A","B","A");
++      int index=names.'''+operation+'''("A");return Arrays.asList(index,names);}}'''})
++    e=Engine(p,ScenarioState(db));result=e.run(ids['Api.entry'],{})
++    assert result==[expected,['A','B','A']] and result.kinds[0]=='Integer'
++    assert not e.approximate
++
++
++@pytest.mark.parametrize('operation,expected',[('indexOf',1),('lastIndexOf',1)])
++def test_source_equals_callback_order_and_effects(tmp_path,operation,expected):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;
++      class Key{int checks=0;public boolean equals(Object x){checks++;return x==null;}}
++      class Api{Object entry(){Key key=new Key();List<Object> values=Arrays.asList("A",null,"B");
++      int pos=values.'''+operation+'''(key);return Arrays.asList(pos,key.checks);}}'''})
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==[expected,2]
++    assert ('','executes',ids['Key.equals']) in e.edges
++
++
++def test_equality_throw_skips_suffix(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;
++      class Key{public boolean equals(Object x){throw new IllegalStateException();}}
++      class Api{int entry(){List<Object> values=Arrays.asList("A");values.indexOf(new Key());return after();}
++      int after(){return 9;}}'''})
++    e=Engine(p,ScenarioState(db));e.run(ids['Api.entry'],{})
++    assert e.outcome=='uncaught application exception'
++    assert ('','executes',ids['Api.after']) not in e.edges
++
++
++@pytest.mark.parametrize('opaque,ordered',[(True,True),(False,False)])
++def test_unproved_membership_or_order_does_not_choose_an_index(tmp_path,opaque,ordered):
++    p,db,ids=build(tmp_path,{'Api.java':'import java.util.*;class Api{int entry(List<String> names){return names.indexOf("B");}}'})
++    names=JavaList(['A','B'],['String','String']);names.opaque=opaque;names.order_known=ordered
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{'names':names}) is U
++
++
++def test_unknown_wrapper_class_does_not_invent_equality(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'import java.util.*;class Api{int entry(List<Object> values,Object key){return values.indexOf(key);}}'})
++    values=JavaList([1],[None]);e=Engine(p,ScenarioState(db))
++    assert e.run(ids['Api.entry'],{'values':values,'key':1}) is U
+--- B00-parent31/tests/test_lvalue_evaluation.py
++++ E1c-R01-R03/tests/test_lvalue_evaluation.py
+@@ -199,11 +199,12 @@
+     assert any('reference array store runtime component type' in x for x in engine.warnings)
+ 
+ 
+-def test_static_storage_is_diagnosed_instead_of_writing_an_instance_slot(tmp_path):
++def test_static_storage_updates_a_scenario_cell_instead_of_an_instance_slot(tmp_path):
+     project,db,ids=build(tmp_path,{'Api.java':'class Globals{static int count=0;}class Api{int entry(){return ++Globals.count;}}'})
+     engine=Engine(project,ScenarioState(db))
+-    assert engine.run(ids['Api.entry'],{}) is U and engine.approximate
+-    assert any('static or unresolved Java field write' in x for x in engine.warnings)
++    assert engine.run(ids['Api.entry'],{})==1 and not engine.approximate
++    assert engine.state.static_fields['type:service:Globals']['count']==1
++    assert Engine(project,ScenarioState(db)).run(ids['Api.entry'],{})==1
+ 
+ 
+ def test_array_length_keeps_its_integer_type_in_arithmetic(tmp_path):
+--- B00-parent31/tests/test_review32_regressions.py
++++ E1c-R01-R03/tests/test_review32_regressions.py
+@@ -0,0 +1,80 @@
++"""Independent source examples frozen before review-32 implementation.
++
++Expected values follow the Java API/source, not analyzer predictions or gold.
++Only our Python interpreter is run; these snippets are never compiled/launched.
++"""
++import pytest
++from analyzer.engine import Engine
++from analyzer.state import ScenarioState, U
++from builders import build
++
++
++def run(tmp_path, body, extra='', result_type='Object', arguments=None, params=''):
++    p, db, ids = build(tmp_path, {'Api.java': 'import java.util.*;'+extra+
++        'class Api{'+result_type+' entry('+params+'){'+body+'}int after(){return 99;}}'})
++    engine = Engine(p, ScenarioState(db))
++    return engine.run(ids['Api.entry'], arguments or {}), engine, ids
++
++
++def test_computed_static_initializer_and_scenario_reset(tmp_path):
++    p, db, ids = build(tmp_path, {'Material.java': '''class Material{
++      private static String encoded=java.util.Base64.getEncoder().encodeToString("ab".getBytes());
++      static String read(){return encoded;}static void change(String v){encoded=v;}}'''},
++      context={'charset':'UTF-8'})
++    state = ScenarioState(db, {'charset':'UTF-8'})
++    assert Engine(p,state).run(ids['Material.read'],{}) == 'YWI='
++    Engine(p,state).run(ids['Material.change'],{'v':'next'})
++    assert Engine(p,state).run(ids['Material.read'],{}) == 'next'
++    assert Engine(p,ScenarioState(db, {'charset':'UTF-8'})).run(ids['Material.read'],{}) == 'YWI='
++
++
++@pytest.mark.parametrize('expression', ['offsets.get(names.indexOf("South"))', 'offsets.get(pos)'])
++def test_index_of_primitive_consumer(tmp_path, expression):
++    value, engine, _ = run(tmp_path, '''List<String> names=Arrays.asList("North","South");
++      List<Integer> offsets=Arrays.asList(0,12);int pos=names.indexOf("South");return '''+expression+';', result_type='int')
++    assert value == 12
++    assert not engine.approximate
++
++
++@pytest.mark.parametrize('items,needle,wanted', [
++    ('"A","A","B"','"A"',0), ('"A","B"','"X"',-1),
++    ('null,"B"','null',0), ('1,1L,true','1L',1), ('1,1L,true','true',2)])
++def test_index_of_value_and_wrapper_identity(tmp_path, items, needle, wanted):
++    value, engine, _ = run(tmp_path, 'List<Object> items=Arrays.asList('+items+');int pos=items.indexOf('+needle+');return pos;', result_type='int')
++    assert value == wanted
++    assert not engine.approximate
++
++
++def test_missing_index_throws_at_get_and_skips_suffix(tmp_path):
++    value,engine,ids = run(tmp_path, '''List<String> names=Arrays.asList("A");
++      try{int pos=names.indexOf("B");names.get(pos);return after();}
++      catch(IndexOutOfBoundsException failure){return -1;}''', result_type='int')
++    assert value == -1
++    assert ('','executes',ids['Api.after']) not in engine.edges
++
++
++def test_source_index_of_is_not_a_native_signature(tmp_path):
++    value, engine, _ = run(tmp_path, 'return new Lookup().indexOf("A");',
++        extra='class Lookup{String indexOf(String key){return "source";}}', result_type='String')
++    assert value == 'source'
++    assert not engine.approximate
++
++
++def test_finite_foreach_runs_captured_effect(tmp_path):
++    value,engine,_ = run(tmp_path, '''List<Integer> touched=new ArrayList<>();
++      Arrays.asList(1).stream().forEach(x->touched.add(x));return touched.size();''', result_type='int')
++    assert value == 1
++    assert not engine.approximate
++
++
++def test_reused_standard_stream_cannot_run_suffix(tmp_path):
++    value,engine,ids = run(tmp_path, '''java.util.stream.Stream<Integer> stream=Arrays.asList(1).stream();
++      stream.toList();stream.toList();return after();''', result_type='int')
++    assert value is U and engine.outcome == 'uncaught application exception'
++    assert ('','executes',ids['Api.after']) not in engine.edges
++
++
++def test_empty_optional_map_presence(tmp_path):
++    value,engine,_ = run(tmp_path, 'return Optional.empty().map(x->x).isEmpty();', result_type='boolean')
++    assert value is True
++    assert not engine.approximate
+--- B00-parent31/tests/test_static_storage.py
++++ E1c-R01-R03/tests/test_static_storage.py
+@@ -0,0 +1,96 @@
++from analyzer.engine import Engine
++from analyzer.paths import run_paths,join_states
++from analyzer.state import ScenarioState,U
++from builders import build
++
++
++def test_mutable_literal_is_not_project_constant_and_local_shadows(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''class Api{static int count=2;
++      int entry(){int count=8;Api.count++;return count+Api.count;}
++      int read(){return count;}}'''})
++    state=ScenarioState(db);e=Engine(p,state)
++    assert e.run(ids['Api.entry'],{})==11
++    assert Engine(p,state).run(ids['Api.read'],{})==3
++    assert Engine(p,ScenarioState(db)).run(ids['Api.read'],{})==2
++    assert state.static_fields['type:service:Api'].kinds['count']=='Integer'
++
++
++def test_dependency_source_order_once_and_alias(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;
++      class Material{static List<String> names=new ArrayList<>();static{names.add("once");}
++      static int first=4;static int next=first+3;}
++      class Api{Object entry(){List<String> alias=Material.names;alias.add("twice");
++      return Arrays.asList(Material.next,Material.names.size(),alias==Material.names);}}'''})
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==[7,2,True]
++    assert not e.approximate
++    assert all(not part.startswith('source-context:') for edge in e.edges for part in edge)
++
++
++def test_type_and_class_literal_do_not_initialize_other_type(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''class Material{static int counter=1;}
++      class Api{Object entry(){Material other=null;return Material.class;}}'''})
++    state=ScenarioState(db);Engine(p,state).run(ids['Api.entry'],{})
++    assert not state.class_initialization and not state.static_fields
++
++
++def test_declaring_owner_inherited_static_and_hiding(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''class Base{static int shared=2;}
++      class Child extends Base{} class Hides extends Base{static int shared=7;}
++      class Api{int entry(){Child.shared=4;return Base.shared+Hides.shared;}}'''})
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==11
++    assert 'shared' not in e.state.static_fields.get('type:service:Child',{})
++
++
++def test_static_import_and_null_qualifier(tmp_path):
++    p,db,ids=build(tmp_path,{'Material.java':'class Material{static int count=3;}',
++      'Api.java':'import static Material.count;class Api{int entry(){Material m=null;m.count=4;return count;}}'})
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==4
++
++
++def test_branch_writes_and_aliases_remain_scenario_owned(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{static List<Integer> values=new ArrayList<>();
++      Object entry(boolean flag){List<Integer> alias=values;if(flag){values.add(1);}else{values.add(2);}return alias;}
++      int read(){return values.size();}}'''})
++    paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{'flag':U},limit=4)
++    assert {tuple(row['result']) for row in paths}=={(1,),(2,)}
++    assert all(Engine(p,row['state']).run(ids['Api.read'],{})==1 for row in paths)
++    assert not ScenarioState(db).static_fields
++
++
++def test_failed_initializer_keeps_prefix_and_never_runs_body(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''class Material{static int prefix=1;static{prefix=2;throw new IllegalStateException();}
++      static int read(){return 9;}}
++      class Api{int entry(){return Material.read();}}'''})
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
++    assert e.outcome=='uncaught application exception'
++    assert e.state.static_fields['type:service:Material']['prefix']==2
++    assert ('','executes',ids['Material.read']) not in e.edges
++    again=Engine(p,e.state);assert again.run(ids['Api.entry'],{}) is U
++    assert any('NoClassDefFoundError' in warning for warning in again.warnings)
++
++
++def test_cross_class_cycle_is_explicit_boundary(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''class A{static int x=B.y;}class B{static int y=A.x;}
++      class Api{int entry(){return A.x;}}'''})
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
++    assert e.outcome=='unsupported_semantics boundary' and any('cyclic static' in warning for warning in e.warnings)
++
++
++def test_initializer_callback_does_not_report_unentered_callee(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''class Material{static int value=prefix();
++      static{throw new IllegalStateException();}static int prefix(){return 1;}static int read(){return 9;}}
++      class Api{int entry(){return Material.read();}}'''})
++    e=Engine(p,ScenarioState(db));e.run(ids['Api.entry'],{})
++    assert ('','executes',ids['Material.prefix']) in e.edges
++    assert ('','executes',ids['Material.read']) not in e.edges
++    assert not any(relation=='calls' and target==ids['Material.read'] for _,relation,target in e.edges)
++
++
++def test_unresolved_handler_initialization_does_not_emit_a_remote_entry(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.web.client.RestTemplate;
++      class Receiver{static int marker=1;@GetMapping("/value")String read(){return "value";}}
++      class Caller{RestTemplate rest;String entry(){return rest.getForObject("http://service/value",String.class);}}'''})
++    state=ScenarioState(db);state.class_initialization['type:service:Receiver']=U
++    e=Engine(p,state);assert e.run(ids['Caller.entry'],{}) is U
++    assert ('','executes',ids['Receiver.read']) not in e.edges
++    assert not any(relation=='remote' and target==ids['Receiver.read'] for _,relation,target in e.edges)
+--- B00-parent31/tests/test_stream_completion32.py
++++ E1c-R01-R03/tests/test_stream_completion32.py
+@@ -0,0 +1,74 @@
++import pytest
++from analyzer.engine import Engine
++from analyzer.native_storage import JavaList
++from analyzer.state import ScenarioState,U
++from analyzer.paths import run_paths
++from builders import build
++
++
++def model(tmp_path,body,extra=''):
++    return build(tmp_path,{'Api.java':'''import java.util.*;import java.util.stream.*;
++      class Api{List<Integer> seen;Object entry(){seen=new ArrayList<>();'''+body+'''}
++      void accept(Integer value){seen.add(value);}int after(){return 99;}'''+extra+'}'})
++
++
++@pytest.mark.parametrize('terminal',['forEach','forEachOrdered'])
++@pytest.mark.parametrize('callback',['x->{if(x==2)return;seen.add(x);}','this::accept'])
++def test_consumer_void_return_capture_and_method_reference(tmp_path,terminal,callback):
++    p,db,ids=model(tmp_path,'Arrays.asList(1,2,3).stream().'+terminal+'('+callback+');return seen;')
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==([1,3] if 'return;' in callback else [1,2,3])
++    assert not e.approximate
++
++
++def test_null_consumer_on_empty_stream_throws_before_suffix(tmp_path):
++    p,db,ids=model(tmp_path,'new ArrayList<Integer>().stream().forEach(null);return after();')
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
++    assert e.outcome=='uncaught application exception' and ('','executes',ids['Api.after']) not in e.edges
++
++
++def test_throw_after_first_callback_effect_keeps_prefix_and_catch(tmp_path):
++    p,db,ids=model(tmp_path,'''try{Arrays.asList(1,2,3).stream().forEach(x->{seen.add(x);
++      if(x==2)throw new IllegalStateException();});return after();}catch(IllegalStateException ex){return seen;}''')
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==[1,2]
++    assert ('','executes',ids['Api.after']) not in e.edges
++
++
++def test_reuse_linked_alias_catch_and_independent_stream(tmp_path):
++    p,db,ids=model(tmp_path,'''Stream<Integer> first=Arrays.asList(1).stream();Stream<Integer> alias=first;
++      Stream<Integer> linked=first.filter(x->true);try{alias.toList();return after();}
++      catch(IllegalStateException ex){linked.forEach(this::accept);Arrays.asList(2).stream().forEach(this::accept);return seen;}''')
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==[1,2]
++    assert ('','executes',ids['Api.after']) not in e.edges
++
++
++def test_lifecycle_observer_is_not_a_terminal_reuse(tmp_path):
++    p,db,ids=model(tmp_path,'Stream<Integer> stream=Arrays.asList(1).stream();stream.toList();return stream.isParallel();')
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is False
++
++
++def test_unimplemented_callback_operation_stops_the_continuation(tmp_path):
++    p,db,ids=model(tmp_path,'Arrays.asList(1).stream().peek(x->seen.add(x));return after();')
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
++    assert e.outcome=='unsupported_semantics boundary' and ('','executes',ids['Api.after']) not in e.edges
++
++
++def test_unknown_empty_backing_does_not_skip_consumer(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{
++      Object entry(List<Integer> source){source.stream().forEach(x->after());return after();}int after(){return 99;}}'''})
++    source=JavaList();source.opaque=True;e=Engine(p,ScenarioState(db))
++    assert e.run(ids['Api.entry'],{'source':source}) is U and e.outcome=='unsupported_semantics boundary'
++    assert ('','executes',ids['Api.after']) not in e.edges
++
++
++@pytest.mark.parametrize('expression,expected',[
++    ('Optional.empty().isEmpty()',True),('Optional.of("x").map(x->x).isEmpty()',False),
++    ('Optional.of("x").map(x->null).isEmpty()',True)])
++def test_optional_empty_observer_uses_presence(tmp_path,expression,expected):
++    p,db,ids=model(tmp_path,'return '+expression+';');e=Engine(p,ScenarioState(db))
++    assert e.run(ids['Api.entry'],{}) is expected and not e.approximate
++
++
++def test_source_is_empty_keeps_its_own_body(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'class Bucket{boolean isEmpty(){return false;}}class Api{boolean entry(){return new Bucket().isEmpty();}}'})
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is False
++    assert ('','executes',ids['Bucket.isEmpty']) in e.edges

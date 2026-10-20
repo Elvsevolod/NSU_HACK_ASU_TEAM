@@ -1,0 +1,144 @@
+FFF.FFFFFF....                                                           [100%]
+=================================== FAILURES ===================================
+_________ test_boot_plain_mapped_class_is_not_a_registered_controller __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-47/test_boot_plain_mapped_class_i0')
+
+    def test_boot_plain_mapped_class_is_not_a_registered_controller(tmp_path):
+        project, db, ids = build(tmp_path, {
+            'App.java': 'import org.springframework.boot.autoconfigure.SpringBootApplication; @SpringBootApplication class App {void start(){}}',
+            'Active.java': 'import org.springframework.web.bind.annotation.*; @RestController class Active {@GetMapping("/records") String read(){return "active";}}',
+            'Plain.java': 'import org.springframework.web.bind.annotation.GetMapping; class Plain {@GetMapping("/records") String read(){return "plain";}}',
+        })
+        candidate = grounder(project)
+>       assert {c['entry'] for c in candidate.index.contracts.values()} == {ids['Active.read']}
+E       AssertionError: assert {'method:serv...Plain#read()'} == {'method:serv...ctive#read()'}
+E         
+E         Extra items in the left set:
+E         'method:service:Plain#read()'
+E         Use -v to get more diff
+
+code/tests/test_spring_http_entries.py:38: AssertionError
+______ test_mapping_on_a_bean_is_not_enough_without_a_handler_stereotype _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-47/test_mapping_on_a_bean_is_not_0')
+
+    def test_mapping_on_a_bean_is_not_enough_without_a_handler_stereotype(tmp_path):
+        project, db, ids = build(tmp_path, {
+            'App.java': 'import org.springframework.boot.autoconfigure.SpringBootApplication; import org.springframework.context.annotation.Bean; '
+                        '@SpringBootApplication class App {@Bean Plain bean(){return new Plain();}}',
+            'Plain.java': 'import org.springframework.web.bind.annotation.GetMapping; class Plain {@GetMapping("/records") String read(){return "plain";}}',
+        })
+        proposals, detail = grounder(project).step('GET http://service/records', ScenarioState(db))
+>       assert proposals == [] and detail['unresolved']
+E       AssertionError: assert ([{'bindings':...routes', ...}] == []
+E         
+E         Left contains one more item: {'bindings': {}, 'entry': 'method:service:Plain#read()', 'params': {}, 'reason': 'Explicit HTTP matched against source routes', ...}
+E         Use -v to get more diff)
+
+code/tests/test_spring_http_entries.py:50: AssertionError
+________ test_unknown_meta_annotation_is_not_proof_of_absent_controller ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-47/test_unknown_meta_annotation_i0')
+
+    def test_unknown_meta_annotation_is_not_proof_of_absent_controller(tmp_path):
+        project, db, ids = build(tmp_path, {
+            'App.java': 'import org.springframework.boot.autoconfigure.SpringBootApplication; @SpringBootApplication class App {void start(){}}',
+            'Api.java': 'import org.springframework.web.bind.annotation.GetMapping; @CustomWeb class Api {@GetMapping("/records") String read(){return "custom";}}',
+        })
+        assert ids['Api.read'] in {c['entry'] for c in grounder(project).index.contracts.values()}
+>       assert any('registration' in message.lower() for message in project.route_warnings)
+E       assert False
+E        +  where False = any(<generator object test_unknown_meta_annotation_is_not_proof_of_absent_controller.<locals>.<genexpr> at 0x102d09d20>)
+
+code/tests/test_spring_http_entries.py:59: AssertionError
+______ test_deployment_host_uses_input_units_instead_of_module_substring _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-47/test_deployment_host_uses_inpu0')
+
+    def test_deployment_host_uses_input_units_instead_of_module_substring(tmp_path):
+        project, db, ids = services(tmp_path)
+        proposals, _ = grounder(project).step('GET http://inventory-app/records', ScenarioState(db))
+>       assert [p['entry'] for p in proposals] == [ids['Api.read']]
+E       AssertionError: assert [] == ['method:inve...e:Api#read()']
+E         
+E         Right contains one more item: 'method:inventory-module:Api#read()'
+E         Use -v to get more diff
+
+code/tests/test_spring_http_entries.py:74: AssertionError
+_______________ test_module_substring_is_not_a_deployment_alias ________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-47/test_module_substring_is_not_a0')
+
+    def test_module_substring_is_not_a_deployment_alias(tmp_path):
+        project, db, ids = services(tmp_path)
+>       assert grounder(project).step('GET http://inventory/records', ScenarioState(db))[0] == []
+E       AssertionError: assert [{'bindings':...routes', ...}] == []
+E         
+E         Left contains one more item: {'bindings': {}, 'entry': 'method:inventory-module:Api#read()', 'params': {}, 'reason': 'Explicit HTTP matched against source routes', ...}
+E         Use -v to get more diff
+
+code/tests/test_spring_http_entries.py:80: AssertionError
+______________ test_exact_deployment_preserves_the_requested_unit ______________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-47/test_exact_deployment_preserve0')
+
+    def test_exact_deployment_preserves_the_requested_unit(tmp_path):
+        project, db, ids = services(tmp_path, ('inventory-a', 'inventory-b'))
+        proposals, _ = grounder(project).step('GET http://INVENTORY-B/records', ScenarioState(db))
+>       assert len(proposals) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+code/tests/test_spring_http_entries.py:86: AssertionError
+_____________ test_relative_request_keeps_all_declared_deployments _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-47/test_relative_request_keeps_al0')
+
+    def test_relative_request_keeps_all_declared_deployments(tmp_path):
+        project, db, ids = services(tmp_path, ('inventory-a', 'inventory-b'))
+        proposals, _ = grounder(project).step('GET /records', ScenarioState(db))
+>       assert {p['request'].deployment for p in proposals} == {'inventory-a', 'inventory-b'}
+E       AssertionError: assert {'inventory-a'} == {'inventory-a', 'inventory-b'}
+E         
+E         Extra items in the right set:
+E         'inventory-b'
+E         Use -v to get more diff
+
+code/tests/test_spring_http_entries.py:93: AssertionError
+_______ test_explicit_headers_retain_occurrences_and_native_body_values ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-47/test_explicit_headers_retain_o0')
+
+    def test_explicit_headers_retain_occurrences_and_native_body_values(tmp_path):
+        project, db, ids = services(tmp_path)
+        action = 'POST http://inventory-module/records\r\nX-Trace: first\r\nx-trace: second\r\nContent-Type: application/problem+json\r\n\r\n{"id":21,"ready":false,"value":null}'
+        proposals, _ = grounder(project).step(action, ScenarioState(db))
+>       assert len(proposals) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+code/tests/test_spring_http_entries.py:101: AssertionError
+__________________ test_header_only_request_has_missing_body ___________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-47/test_header_only_request_has_m0')
+
+    def test_header_only_request_has_missing_body(tmp_path):
+        project, db, ids = services(tmp_path)
+        proposals, _ = grounder(project).step('GET http://inventory-module/records\nX-Token: source-literal', ScenarioState(db))
+>       assert len(proposals) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+code/tests/test_spring_http_entries.py:112: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_spring_http_entries.py::test_boot_plain_mapped_class_is_not_a_registered_controller
+FAILED code/tests/test_spring_http_entries.py::test_mapping_on_a_bean_is_not_enough_without_a_handler_stereotype
+FAILED code/tests/test_spring_http_entries.py::test_unknown_meta_annotation_is_not_proof_of_absent_controller
+FAILED code/tests/test_spring_http_entries.py::test_deployment_host_uses_input_units_instead_of_module_substring
+FAILED code/tests/test_spring_http_entries.py::test_module_substring_is_not_a_deployment_alias
+FAILED code/tests/test_spring_http_entries.py::test_exact_deployment_preserves_the_requested_unit
+FAILED code/tests/test_spring_http_entries.py::test_relative_request_keeps_all_declared_deployments
+FAILED code/tests/test_spring_http_entries.py::test_explicit_headers_retain_occurrences_and_native_body_values
+FAILED code/tests/test_spring_http_entries.py::test_header_only_request_has_missing_body
+9 failed, 5 passed in 0.17s

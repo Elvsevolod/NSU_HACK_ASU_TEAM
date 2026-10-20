@@ -1,0 +1,167 @@
+FFF.FFFFFFF                                                              [100%]
+=================================== FAILURES ===================================
+____________ test_source_setter_runs_and_changes_the_decoded_value _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-120/test_source_setter_runs_and_ch0')
+
+    def test_source_setter_runs_and_changes_the_decoded_value(tmp_path):
+        e,ids=fixture(tmp_path)
+>       assert e.run(ids['Api.entry'],{})=='ALPHA' and not e.approximate
+E       AssertionError: assert ('alpha' == 'ALPHA'
+E         
+E         - ALPHA
+E         + alpha)
+
+code/tests/test_feign_decoder33.py:32: AssertionError
+_ test_source_default_constructor_precedes_the_setter_but_is_a_reflection_root _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-120/test_source_default_constructo0')
+
+    def test_source_default_constructor_precedes_the_setter_but_is_a_reflection_root(tmp_path):
+        e,ids=fixture(tmp_path,bean='''class Item{private String prefix="field:";private String name;
+          public Item(){prefix="ctor:";}public void setName(String value){name=prefix+value;}
+          public String getName(){return name;}}''')
+>       assert e.run(ids['Api.entry'],{})=='ctor:alpha' and not e.approximate
+E       AssertionError: assert ('alpha' == 'ctor:alpha'
+E         
+E         - ctor:alpha
+E         + alpha)
+
+code/tests/test_feign_decoder33.py:41: AssertionError
+_____ test_boot_unknown_property_default_is_not_a_private_field_projection _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-120/test_boot_unknown_property_def0')
+
+    def test_boot_unknown_property_default_is_not_a_private_field_projection(tmp_path):
+        e,ids=fixture(tmp_path,wire='class Wire{public String name="alpha";public String extra="ignored";}')
+>       assert e.run(ids['Api.entry'],{})=='ALPHA' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'ALPHA')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105f28b50>.run
+
+code/tests/test_feign_decoder33.py:47: AssertionError
+__ test_json_property_read_only_preserves_initial_value_and_skips_the_setter ___
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-120/test_json_property_read_only_p0')
+
+    def test_json_property_read_only_preserves_initial_value_and_skips_the_setter(tmp_path):
+        e,ids=fixture(tmp_path,bean='''class Item{@JsonProperty(access=JsonProperty.Access.READ_ONLY)
+          private String name="local";public void setName(String value){throw new IllegalStateException();}
+          public String getName(){return name;}}''')
+>       assert e.run(ids['Api.entry'],{})=='local' and not e.approximate
+E       AssertionError: assert ('alpha' == 'local'
+E         
+E         - local
+E         + alpha)
+
+code/tests/test_feign_decoder33.py:61: AssertionError
+______ test_client_construction_failure_stops_the_success_suffix[setter] _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-120/test_client_construction_failu0')
+failure = 'setter'
+
+    @pytest.mark.parametrize('failure',['setter','constructor'])
+    def test_client_construction_failure_stops_the_success_suffix(tmp_path,failure):
+        bean=('''class Item{public Item(){throw new IllegalStateException();}public String name;
+          public String getName(){return name;}}''' if failure=='constructor' else
+          '''class Item{private String name;public void setName(String value){throw new IllegalStateException();}
+          public String getName(){return name;}}''')
+        e,ids=fixture(tmp_path,bean=bean,entry='client.read();return after();')
+>       assert e.run(ids['Api.entry'],{}) is U and not executed(e,ids['Api.after'])
+E       AssertionError: assert ('after' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'after' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x106258dd0>.run
+
+code/tests/test_feign_decoder33.py:72: AssertionError
+____ test_client_construction_failure_stops_the_success_suffix[constructor] ____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-120/test_client_construction_failu1')
+failure = 'constructor'
+
+    @pytest.mark.parametrize('failure',['setter','constructor'])
+    def test_client_construction_failure_stops_the_success_suffix(tmp_path,failure):
+        bean=('''class Item{public Item(){throw new IllegalStateException();}public String name;
+          public String getName(){return name;}}''' if failure=='constructor' else
+          '''class Item{private String name;public void setName(String value){throw new IllegalStateException();}
+          public String getName(){return name;}}''')
+        e,ids=fixture(tmp_path,bean=bean,entry='client.read();return after();')
+>       assert e.run(ids['Api.entry'],{}) is U and not executed(e,ids['Api.after'])
+E       AssertionError: assert ('after' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'after' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1061f5310>.run
+
+code/tests/test_feign_decoder33.py:72: AssertionError
+__________ test_lists_decode_elements_through_the_same_source_setter ___________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-120/test_lists_decode_elements_thr0')
+
+    def test_lists_decode_elements_through_the_same_source_setter(tmp_path):
+        e,ids=fixture(tmp_path,returned='List<Item>',entry='return client.read().get(0).getName();',
+            body='return new Wire();',wire='class Wire{public String name="alpha";}')
+        # Replace only the source server return type/body before rebuilding its
+        # skeleton. A different response shape is a different explicit test input.
+        source=(tmp_path/'Api.java').read_text().replace('Wire read(){return new Wire();}',
+            'List<Wire> read(){return Arrays.asList(new Wire());}')
+        p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Api.entry'],{})=='ALPHA' and not e.approximate
+E       AssertionError: assert ('alpha' == 'ALPHA'
+E         
+E         - ALPHA
+E         + alpha)
+
+code/tests/test_feign_decoder33.py:84: AssertionError
+_____________ test_response_entity_wrapper_delegates_body_decoding _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-120/test_response_entity_wrapper_d0')
+
+    def test_response_entity_wrapper_delegates_body_decoding(tmp_path):
+        e,ids=fixture(tmp_path,returned='org.springframework.http.ResponseEntity<Item>',
+                      entry='return client.read().getBody().getName();')
+>       assert e.run(ids['Api.entry'],{})=='ALPHA' and not e.approximate
+E       AssertionError: assert (<Unknown.VALUE: 'unknown'> == 'ALPHA')
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x104e32550>.run
+
+code/tests/test_feign_decoder33.py:91: AssertionError
+_____ test_known_custom_decoder_does_not_silently_use_the_default_decoder ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-120/test_known_custom_decoder_does0')
+
+    def test_known_custom_decoder_does_not_silently_use_the_default_decoder(tmp_path):
+        extra='''class Custom implements feign.codec.Decoder{
+          public Object decode(feign.Response response,java.lang.reflect.Type type){return null;}}
+          @Configuration class Wiring{@Bean feign.codec.Decoder custom(){return new Custom();}}'''
+        e,ids=fixture(tmp_path,extra=extra,entry='client.read();return after();')
+>       assert e.run(ids['Api.entry'],{}) is U and not executed(e,ids['Api.after'])
+E       AssertionError: assert ('after' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'after' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x10626a410>.run
+
+code/tests/test_feign_decoder33.py:100: AssertionError
+_____ test_explicit_fail_on_unknown_property_preserves_the_failure_prefix ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-120/test_explicit_fail_on_unknown_0')
+
+    def test_explicit_fail_on_unknown_property_preserves_the_failure_prefix(tmp_path):
+        context={'configuration':{'service':{'propertySources':[{'name':'provided','source':{
+            'spring.jackson.deserialization.fail-on-unknown-properties':True}}]}}}
+        e,ids=fixture(tmp_path,context=context,wire='class Wire{public String name="alpha";public String extra="reject";}',
+                      entry='client.read();return after();')
+>       assert e.run(ids['Api.entry'],{}) is U and not executed(e,ids['Api.after'])
+E       AssertionError: assert ('after' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'after' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105f7e950>.run
+
+code/tests/test_feign_decoder33.py:109: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_feign_decoder33.py::test_source_setter_runs_and_changes_the_decoded_value
+FAILED code/tests/test_feign_decoder33.py::test_source_default_constructor_precedes_the_setter_but_is_a_reflection_root
+FAILED code/tests/test_feign_decoder33.py::test_boot_unknown_property_default_is_not_a_private_field_projection
+FAILED code/tests/test_feign_decoder33.py::test_json_property_read_only_preserves_initial_value_and_skips_the_setter
+FAILED code/tests/test_feign_decoder33.py::test_client_construction_failure_stops_the_success_suffix[setter]
+FAILED code/tests/test_feign_decoder33.py::test_client_construction_failure_stops_the_success_suffix[constructor]
+FAILED code/tests/test_feign_decoder33.py::test_lists_decode_elements_through_the_same_source_setter
+FAILED code/tests/test_feign_decoder33.py::test_response_entity_wrapper_delegates_body_decoding
+FAILED code/tests/test_feign_decoder33.py::test_known_custom_decoder_does_not_silently_use_the_default_decoder
+FAILED code/tests/test_feign_decoder33.py::test_explicit_fail_on_unknown_property_preserves_the_failure_prefix
+10 failed, 1 passed in 0.19s

@@ -1,0 +1,215 @@
+FFF.FFFFFFFF                                                             [100%]
+=================================== FAILURES ===================================
+________ test_class_array_survives_generic_decode_and_foreach_selection ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-172/test_class_array_survives_gene0')
+
+    def test_class_array_survives_generic_decode_and_foreach_selection(tmp_path):
+>       result, engine, ids = run(tmp_path, '''Parcel[] values=decode("[{\\"id\\":\\"P7\\"},{\\"id\\":\\"P9\\"}]",Parcel[].class);
+          List<Parcel> items=Arrays.asList(values);
+          for(Parcel item:items){if(item.getId().equals("P9")){return item.getId();}}return "missing";''')
+
+solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py:17: in run
+    value = engine.run(ids['Api.entry'], {})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_request-array-continuity/code/analyzer/engine.py:364: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_request-array-continuity/code/analyzer/engine.py:438: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+solutions/—_request-array-continuity/code/analyzer/engine.py:522: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_request-array-continuity/code/analyzer/engine.py:672: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_request-array-continuity/code/analyzer/engine.py:752: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_request-array-continuity/code/analyzer/engine.py:1252: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_request-array-continuity/code/analyzer/engine.py:1327: in execute
+    result, control = self.execute(node.child_by_field_name('body'), env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_request-array-continuity/code/analyzer/engine.py:1252: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_request-array-continuity/code/analyzer/engine.py:1278: in execute
+    decision = self.choose(self.method + ':' + str(node.start_point.row + 1), [True, False])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x106b277d0>
+label = 'method:service:Api#entry():6', choices = [True, False]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:method:service:Api#entry():6', [True, False])
+
+solutions/—_request-array-continuity/code/analyzer/engine.py:291: AlternativeRequired
+_________ test_empty_and_null_elements_keep_array_shape[[]-expected0] __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-172/test_empty_and_null_elements_k0')
+text = '[]', expected = []
+
+    @pytest.mark.parametrize('text,expected', [('[]', []), ('[null]', [None])])
+    def test_empty_and_null_elements_keep_array_shape(tmp_path, text, expected):
+        result, engine, _ = run(tmp_path, 'return decode("' + text + '",Parcel[].class);')
+>       assert isinstance(result, JavaArray) and result.component == 'Parcel'
+E       AssertionError: assert (False)
+E        +  where False = isinstance(<Unknown.VALUE: 'unknown'>, JavaArray)
+
+solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py:32: AssertionError
+_______ test_empty_and_null_elements_keep_array_shape[[null]-expected1] ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-172/test_empty_and_null_elements_k1')
+text = '[null]', expected = [None]
+
+    @pytest.mark.parametrize('text,expected', [('[]', []), ('[null]', [None])])
+    def test_empty_and_null_elements_keep_array_shape(tmp_path, text, expected):
+        result, engine, _ = run(tmp_path, 'return decode("' + text + '",Parcel[].class);')
+>       assert isinstance(result, JavaArray) and result.component == 'Parcel'
+E       AssertionError: assert (False)
+E        +  where False = isinstance(<Unknown.VALUE: 'unknown'>, JavaArray)
+
+solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py:32: AssertionError
+________________ test_nested_arrays_keep_each_runtime_component ________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-172/test_nested_arrays_keep_each_r0')
+
+    def test_nested_arrays_keep_each_runtime_component(tmp_path):
+        result, engine, _ = run(tmp_path, 'return decode("[[null],[]]",Parcel[][].class);')
+>       assert isinstance(result, JavaArray) and result.component == 'Parcel[]'
+E       AssertionError: assert (False)
+E        +  where False = isinstance(<Unknown.VALUE: 'unknown'>, JavaArray)
+
+solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py:43: AssertionError
+_ test_primitive_and_reference_elements_use_declared_conversion[int-[1,null,3]-expected0] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-172/test_primitive_and_reference_e0')
+typ = 'int', text = '[1,null,3]', expected = [1, 0, 3]
+
+    @pytest.mark.parametrize('typ,text,expected', [('int', '[1,null,3]', [1,0,3]),
+        ('boolean', '[true,false,null]', [True,False,False]), ('long', '[2147483648]', [2147483648]),
+        ('String', '["a",null]', ['a',None])])
+    def test_primitive_and_reference_elements_use_declared_conversion(tmp_path, typ, text, expected):
+        escaped = text.replace('"', '\\"')
+        result, engine, _ = run(tmp_path, 'return decode("' + escaped + '",' + typ + '[].class);')
+>       assert isinstance(result, JavaArray) and list(result) == expected and not engine.approximate
+E       AssertionError: assert (False)
+E        +  where False = isinstance(<Unknown.VALUE: 'unknown'>, JavaArray)
+
+solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py:54: AssertionError
+_ test_primitive_and_reference_elements_use_declared_conversion[boolean-[true,false,null]-expected1] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-172/test_primitive_and_reference_e1')
+typ = 'boolean', text = '[true,false,null]', expected = [True, False, False]
+
+    @pytest.mark.parametrize('typ,text,expected', [('int', '[1,null,3]', [1,0,3]),
+        ('boolean', '[true,false,null]', [True,False,False]), ('long', '[2147483648]', [2147483648]),
+        ('String', '["a",null]', ['a',None])])
+    def test_primitive_and_reference_elements_use_declared_conversion(tmp_path, typ, text, expected):
+        escaped = text.replace('"', '\\"')
+        result, engine, _ = run(tmp_path, 'return decode("' + escaped + '",' + typ + '[].class);')
+>       assert isinstance(result, JavaArray) and list(result) == expected and not engine.approximate
+E       AssertionError: assert (False)
+E        +  where False = isinstance(<Unknown.VALUE: 'unknown'>, JavaArray)
+
+solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py:54: AssertionError
+_ test_primitive_and_reference_elements_use_declared_conversion[long-[2147483648]-expected2] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-172/test_primitive_and_reference_e2')
+typ = 'long', text = '[2147483648]', expected = [2147483648]
+
+    @pytest.mark.parametrize('typ,text,expected', [('int', '[1,null,3]', [1,0,3]),
+        ('boolean', '[true,false,null]', [True,False,False]), ('long', '[2147483648]', [2147483648]),
+        ('String', '["a",null]', ['a',None])])
+    def test_primitive_and_reference_elements_use_declared_conversion(tmp_path, typ, text, expected):
+        escaped = text.replace('"', '\\"')
+        result, engine, _ = run(tmp_path, 'return decode("' + escaped + '",' + typ + '[].class);')
+>       assert isinstance(result, JavaArray) and list(result) == expected and not engine.approximate
+E       AssertionError: assert (False)
+E        +  where False = isinstance(<Unknown.VALUE: 'unknown'>, JavaArray)
+
+solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py:54: AssertionError
+_ test_primitive_and_reference_elements_use_declared_conversion[String-["a",null]-expected3] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-172/test_primitive_and_reference_e3')
+typ = 'String', text = '["a",null]', expected = ['a', None]
+
+    @pytest.mark.parametrize('typ,text,expected', [('int', '[1,null,3]', [1,0,3]),
+        ('boolean', '[true,false,null]', [True,False,False]), ('long', '[2147483648]', [2147483648]),
+        ('String', '["a",null]', ['a',None])])
+    def test_primitive_and_reference_elements_use_declared_conversion(tmp_path, typ, text, expected):
+        escaped = text.replace('"', '\\"')
+        result, engine, _ = run(tmp_path, 'return decode("' + escaped + '",' + typ + '[].class);')
+>       assert isinstance(result, JavaArray) and list(result) == expected and not engine.approximate
+E       AssertionError: assert (False)
+E        +  where False = isinstance(<Unknown.VALUE: 'unknown'>, JavaArray)
+
+solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py:54: AssertionError
+____ test_wrong_object_shape_uses_owned_codec_failure_before_following_code ____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-172/test_wrong_object_shape_uses_o0')
+
+    def test_wrong_object_shape_uses_owned_codec_failure_before_following_code(tmp_path):
+        result, engine, ids = run(tmp_path, '''try{decode("{}",Parcel[].class);return after();}
+          catch(JsonMappingException failure){return rejected();}''')
+>       assert result == 'rejected'
+E       AssertionError: assert 'wrong' == 'rejected'
+E         
+E         - rejected
+E         + wrong
+
+solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py:60: AssertionError
+______________ test_null_primitive_element_obeys_observed_policy _______________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-172/test_null_primitive_element_ob0')
+
+    def test_null_primitive_element_obeys_observed_policy(tmp_path):
+        result, _, _ = run(tmp_path, '''ObjectMapper mapper=new ObjectMapper();
+          mapper.enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES);
+          try{mapper.readValue("[null]",int[].class);return after();}catch(JsonMappingException failure){return rejected();}''')
+>       assert result == 'rejected'
+E       AssertionError: assert 'wrong' == 'rejected'
+E         
+E         - rejected
+E         + wrong
+
+solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py:68: AssertionError
+_______ test_convert_scalar_dto_to_array_cannot_alias_or_erase_the_input _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-172/test_convert_scalar_dto_to_arr0')
+
+    def test_convert_scalar_dto_to_array_cannot_alias_or_erase_the_input(tmp_path):
+        result, engine, _ = run(tmp_path, '''Parcel parcel=new Parcel();parcel.id="kept";
+          try{new ObjectMapper().convertValue(parcel,Parcel[].class);return after();}
+          catch(IllegalArgumentException failure){return parcel.id;}''')
+>       assert result == 'kept' and not engine.approximate
+E       AssertionError: assert ('wrong' == 'kept'
+E         
+E         - kept
+E         + wrong)
+
+solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py:75: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py::test_class_array_survives_generic_decode_and_foreach_selection
+FAILED solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py::test_empty_and_null_elements_keep_array_shape[[]-expected0]
+FAILED solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py::test_empty_and_null_elements_keep_array_shape[[null]-expected1]
+FAILED solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py::test_nested_arrays_keep_each_runtime_component
+FAILED solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py::test_primitive_and_reference_elements_use_declared_conversion[int-[1,null,3]-expected0]
+FAILED solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py::test_primitive_and_reference_elements_use_declared_conversion[boolean-[true,false,null]-expected1]
+FAILED solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py::test_primitive_and_reference_elements_use_declared_conversion[long-[2147483648]-expected2]
+FAILED solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py::test_primitive_and_reference_elements_use_declared_conversion[String-["a",null]-expected3]
+FAILED solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py::test_wrong_object_shape_uses_owned_codec_failure_before_following_code
+FAILED solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py::test_null_primitive_element_obeys_observed_policy
+FAILED solutions/—_request-array-continuity/code/tests/test_json_java_arrays.py::test_convert_scalar_dto_to_array_cannot_alias_or_erase_the_input
+11 failed, 1 passed in 0.40s

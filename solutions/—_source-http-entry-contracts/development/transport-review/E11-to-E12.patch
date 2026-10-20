@@ -1,0 +1,263 @@
+--- E11-http-error-values/analyzer/engine.py
++++ E12-transport-values-and-witnesses/analyzer/engine.py
+@@ -29,7 +29,7 @@
+ from .java_numbers import parse_integer
+ from .source_generics import render as render_source_type,environment as source_environment,member_type,member_scope,call_context
+ from .source_conversions import compiled_type,declaration_erasure,consumer_type,storage_type,PRIMITIVES
+-from .boxed_values import NO_KIND,boxed_equal
++from .boxed_values import NO_KIND,boxed_equal,value_kind
+ from .native_storage import JavaFrame,StaticCells,JavaList,JavaListIterator,ReadOnlyList,JavaStream,ServletObject,JavaHttpClient
+ from .native_arrays import JavaArray,ArrayListView
+ from .java_lists import call as native_list_call,iteration as native_list_iteration
+@@ -545,6 +545,7 @@
+                 node_memo={id(node):node for node in source_nodes(args)}
+                 request_event=next(event for event in self.request_events if event['id']==frame['request_id'])
+                 request_event['binding_candidate_arguments']=[{'name':name,'declared_type':render_source_type(self.p,typ,self.p.methods[frame['entry']],{},self.standard_type) or typ,
++                    'native_kind':value_kind(value,self.declared_kind(typ,self.p.methods[frame['entry']])),
+                     'value':deepcopy(value,node_memo)} for (name,typ),value in zip(self.p.parameters(frame['entry']),args)]
+                 from .java_sets import shapes
+                 for argument,value in zip(request_event['binding_candidate_arguments'],args):
+@@ -2966,7 +2967,7 @@
+                 value,_=invoke_alternative(target,env,[args,obj])
+                 result=value if index==0 else merge(result,value)
+         if wiring.get('data_access') and not any(not self.p.methods[target].get('abstract') for target in targets):
+-            return self.repository(mid, cs, args, sorted(wiring['data_access']), reason)
++            return self.repository(mid, cs, args, sorted(wiring['data_access']), reason,argument_kinds)
+         remote = sorted(wiring.get('remote_call', set()) | wiring.get('message_delivery', set()))
+         http_verb = (args[1] if name=='exchange' and len(args)>1 and isinstance(args[1],str) else
+                      'GET' if name in ('getForObject','getForEntity') else
+@@ -3992,7 +3993,7 @@
+             return value
+         finally:self.method,self.variable_types,self.source_bindings,self.receiver_type=previous
+ 
+-    def repository(self, mid, cs, args, resources, reason):
++    def repository(self, mid, cs, args, resources, reason,argument_kinds=None):
+         from . import persistence
+         result = U
+         receiver_owner=self.p.resolve_type(cs.get('receiver_type',''),self.p.methods[mid]['module'],self.p.methods[mid]['file'])
+@@ -4043,6 +4044,8 @@
+                     continue
+             operation = {'method': mid, 'resource': rid, 'operation': name,
+                          'arguments': deepcopy(args), 'source_site': reason,
++                         'argument_kinds':list(argument_kinds) if argument_kinds is not None else [None]*len(args),
++                         'request_id':self.filter_frames[-1]['request_id'] if self.filter_frames else None,
+                          'uncertain_write': bool(self.uncertain)}
+             from .java_sets import shapes
+             shape=shapes(args,'arguments')
+--- E11-http-error-values/analyzer/feign_client.py
++++ E12-transport-values-and-witnesses/analyzer/feign_client.py
+@@ -6,7 +6,7 @@
+ from .state import U
+ from .request import Request,MISSING
+ from .java_exceptions import JavaThrow
+-from .models import unwrap,http_entity
++from .models import http_entity
+ 
+ 
+ def source_interceptors(engine,unit):
+@@ -105,16 +105,10 @@
+                 {'name':key,'declared_type':render_source_type(p,typ,p.methods[callback],{},engine.standard_type) or typ,
+                  'value':deepcopy(value,memo)} for (key,typ),value in zip(p.parameters(callback),args)]}
+             return True,engine.invoke(callbacks[0],args,reason='Feign Hystrix fallback callback at '+reason)
+-        raise JavaThrow({'__type__':'FeignException','status':status})
++        from .feign_errors import default_error
++        default_error(engine,method,target,response,status,request_index,reason)
+     if p.methods[method].get('return_raw')=='void':return True,None
+-    from .feign_decoder import decode,codec
+-    codec(engine,p.ix.unit_of(target),reason,client=False)
+-    try:payload=engine.json_wire(unwrap(response),reason)
+-    except JavaThrow as failure:
+-        if isinstance(failure.value,dict) and failure.value.get('__serialization_failure__'):
+-            raise AnalysisBoundary('Feign server response serialization/error policy is unresolved: '+reason,category='unsupported_semantics') from None
+-        raise
+-    engine.request_events[request_index]['transport_response']={'request':engine.request_events[request_index]['id'],
+-        'status':status,'body':deepcopy(payload),'codec':'default source JavaBeans JSON'}
++    from .feign_decoder import decode,transport_payload
++    payload=transport_payload(engine,response,target,status,request_index,reason)
+     value=decode(engine,payload,p.methods[method].get('return_raw',''),method,status,reason)
+     return True,value
+--- E11-http-error-values/analyzer/feign_decoder.py
++++ E12-transport-values-and-witnesses/analyzer/feign_decoder.py
+@@ -87,13 +87,33 @@
+     return flags
+ 
+ 
+-def decode(engine,payload,written,method,status,reason):
++def client_codec(engine,method,reason):
+     p=engine.p;meta=p.methods[method];unit=p.ix.unit_of(engine.method)
+     owner=p.nodes[meta['owner']]
+     if any(engine.standard_type(a['name'],'org.springframework.cloud.openfeign.FeignClient',owner)
+            and re.search(r'\bconfiguration\s*=',a.get('args','')) for a in owner.get('annotations',[])):
+         boundary(reason,'has unobserved per-client configuration')
+-    flags=codec(engine,unit,reason);issues=[]
++    return codec(engine,unit,reason)
++
++
++def transport_payload(engine,response,target,status,request_index,reason):
++    from .models import unwrap
++    from copy import deepcopy
++    codec(engine,engine.p.ix.unit_of(target),reason,client=False)
++    try:payload=engine.json_wire(unwrap(response),reason)
++    except JavaThrow as failure:
++        if isinstance(failure.value,dict) and failure.value.get('__serialization_failure__'):
++            boundary(reason,'server response serialization/error policy is unresolved')
++        raise
++    event=engine.request_events[request_index]
++    event['transport_response']={'request':event['id'],'status':status,'body':deepcopy(payload),
++                                 'codec':'default source JavaBeans JSON'}
++    return payload
++
++
++def decode(engine,payload,written,method,status,reason):
++    p=engine.p;meta=p.methods[method]
++    flags=client_codec(engine,method,reason);issues=[]
+     def note(message):issues.append(message);engine.json_issue(message,reason)
+     def body(typ):
+         return decode_response(p,payload,typ,meta,engine.standard_type,note,codec=flags,
+--- E11-http-error-values/analyzer/feign_errors.py
++++ E12-transport-values-and-witnesses/analyzer/feign_errors.py
+@@ -0,0 +1,39 @@
++"""Default error decoding retains a String's origin, never guessed error bytes."""
++from copy import deepcopy
++import hashlib
++import json
++import re
++from .feign_decoder import client_codec,transport_payload,native_subtype,boundary
++from .java_collections import JavaObject
++from .java_exceptions import JavaThrow,ExceptionBound
++from .models import header_values
++from .state import U
++
++
++def default_error(engine,method,target,response,status,request_index,reason):
++    payload=transport_payload(engine,response,target,status,request_index,reason)
++    client_codec(engine,method,reason)
++    p=engine.p;unit=p.ix.unit_of(engine.method)
++    for mid,meta in p.methods.items():
++        if unit not in p.ix.units.get(meta['module'],()) or not p.enabled_type(meta['owner']):continue
++        if any(engine.standard_type(a['name'],'org.springframework.context.annotation.Bean',meta)
++               for a in meta.get('annotations',[])) and native_subtype(engine,meta.get('return_raw',''),'feign.codec.ErrorDecoder',meta):
++            boundary(reason,'custom source ErrorDecoder is unresolved')
++    for module,units in p.ix.units.items():
++        if unit not in units:continue
++        if any(re.fullmatch(r'(?:spring\.cloud\.openfeign|feign)\.client\.config\.[^.]+\.errorDecoder',row['key'])
++               for row in p.configuration.entries.get(module,())):
++            boundary(reason,'configured ErrorDecoder is unresolved')
++    headers=header_values(response.get('headers',{}))
++    if headers is U or any(key.lower()=='retry-after' for key in headers):
++        boundary(reason,'response headers/Retry-After error policy is unresolved')
++    event=engine.request_events[request_index]
++    request={key:deepcopy(event['request'][key]) for key in ('deployment','method','url','path','query','query_complete')}
++    facts={'model_version':'feign-default-error-message/1','request_id':event['id'],'status':status,
++           'client_method':method,'request':request,'response_body':deepcopy(payload),
++           'exact_text':False,'limits':['Version, reason phrase, charset and body-preview bytes are not materialized']}
++    digest=hashlib.sha256(json.dumps(facts,sort_keys=True,ensure_ascii=True,default=str).encode()).hexdigest()[:20]
++    message={'__symbol__':'feign-message-'+digest,'__type__':'String','__constraints__':['non_null'],
++             '__feign_error_message__':facts}
++    family=ExceptionBound('feign.FeignException')
++    raise JavaThrow(JavaObject(family,{'__type__':family,'message':message,'status':status}))
+--- E11-http-error-values/tests/test_feign_error_message33.py
++++ E12-transport-values-and-witnesses/tests/test_feign_error_message33.py
+@@ -0,0 +1,48 @@
++"""Feign error messages are typed String values with response provenance."""
++import pytest
++from builders import build
++from analyzer.engine import Engine
++from analyzer.state import ScenarioState,U
++
++
++def fixture(root,status=404,extra='',entry='''try{client.read();return after();}
++    catch(feign.FeignException failure){return failure.getMessage();}'''):
++    p,db,ids=build(root,{'Api.java':'''import org.springframework.cloud.openfeign.*;
++      import org.springframework.boot.autoconfigure.SpringBootApplication;
++      import org.springframework.web.bind.annotation.*;import org.springframework.http.ResponseEntity;
++      import org.springframework.context.annotation.*;
++      @SpringBootApplication @EnableFeignClients class App{}
++      @FeignClient(name="service",url="http://service:8080")interface Client{@GetMapping("/item") String read();}
++      class Api{Client client;String entry(){'''+entry+'''}String after(){return "wrong";}}
++      @RestController class Target{@GetMapping("/item")ResponseEntity<String> read(){return ResponseEntity.status('''+str(status)+''').body("source error");}}'''+extra})
++    return Engine(p,ScenarioState(db)),ids
++
++
++@pytest.mark.parametrize('status',[400,404,500,503])
++def test_default_error_message_retains_the_request_and_response_without_inventing_bytes(tmp_path,status):
++    e,ids=fixture(tmp_path,status)
++    value=e.run(ids['Api.entry'],{})
++    assert value is not U and value['__type__']=='String' and 'non_null' in value['__constraints__']
++    fact=value['__feign_error_message__']
++    assert fact['status']==status and fact['client_method']==ids['Client.read']
++    assert fact['request']['method']=='GET' and fact['request']['path']==['item']
++    assert fact['response_body']=='source error' and fact['request_id']==2
++    assert not e.approximate and not any(kind=='executes' and target==ids['Api.after'] for _,kind,target in e.edges)
++    assert e.request_events[1]['transport_response']['body']=='source error'
++
++
++def test_generic_exception_catch_receives_the_same_native_message(tmp_path):
++    e,ids=fixture(tmp_path,entry='try{client.read();return after();}catch(Exception failure){return failure.getMessage();}')
++    value=e.run(ids['Api.entry'],{})
++    assert value is not U and value['__type__']=='String' and not e.approximate
++    assert value['__feign_error_message__']['response_body']=='source error'
++
++
++def test_source_custom_error_decoder_does_not_activate_default_error_semantics(tmp_path):
++    extra='''class Custom implements feign.codec.ErrorDecoder{
++      public Exception decode(String key,feign.Response response){return new IllegalStateException();}}
++      @Configuration class Config{@Bean feign.codec.ErrorDecoder custom(){return new Custom();}}'''
++    e,ids=fixture(tmp_path,extra=extra)
++    assert e.run(ids['Api.entry'],{}) is U and e.approximate
++    assert any(kind=='executes' and target==ids['Target.read'] for _,kind,target in e.edges)
++    assert not any(kind=='executes' and target==ids['Api.after'] for _,kind,target in e.edges)
+--- E11-http-error-values/tests/test_feign_path33.py
++++ E12-transport-values-and-witnesses/tests/test_feign_path33.py
+@@ -27,7 +27,7 @@
+     request=outbound[0]
+     assert request['entry']==ids['Target.read']
+     assert request['request']['url']=='http://service/api/edition/items/7'
+-    assert request['bound_arguments']==[{'name':'id','declared_type':'java.lang.Long','value':7}]
++    assert request['bound_arguments']==[{'name':'id','declared_type':'java.lang.Long','value':7,'native_kind':'Long'}]
+ 
+ 
+ def test_client_prefix_and_interface_mapping_are_both_preserved(tmp_path):
+--- E11-http-error-values/tests/test_feign_wire33.py
++++ E12-transport-values-and-witnesses/tests/test_feign_wire33.py
+@@ -40,7 +40,7 @@
+     sent=outbound(e);assert len(sent)==1
+     assert sent[0]['request']['url']==expected
+     assert sent[0]['entry']==ids['Target.read']
+-    assert sent[0]['bound_arguments']==[{'name':'id','declared_type':'java.lang.Long','value':7}]
++    assert sent[0]['bound_arguments']==[{'name':'id','declared_type':'java.lang.Long','value':7,'native_kind':'Long'}]
+     assert (ids['Api.entry'],'remote',ids['Target.read']) not in e.edges  # Same deployment in this fixture.
+ 
+ 
+--- E11-http-error-values/tests/test_integral_http33.py
++++ E12-transport-values-and-witnesses/tests/test_integral_http33.py
+@@ -29,6 +29,7 @@
+     e=Engine(p,state);actual=e.run(ids['Api.read'],BoundParameters({'id':original},request))
+     assert actual==original and not e.approximate
+     assert e.request_events[0]['bound_arguments'][0]['value']==original
++    assert e.request_events[0]['bound_arguments'][0]['native_kind']=={'long':'Long','int':'Integer','short':'Short','byte':'Byte'}.get(typ,typ)
+ 
+ 
+ @pytest.mark.parametrize('value',[
+--- E11-http-error-values/tests/test_review10_execution.py
++++ E12-transport-values-and-witnesses/tests/test_review10_execution.py
+@@ -36,7 +36,8 @@
+ 
+ 
+ def test_http_error_status_does_not_become_a_successful_body(tmp_path):
+-    project,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.web.client.RestTemplate;import org.springframework.web.client.RestOperations;class Api {
++    project,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.web.client.RestTemplate;import org.springframework.web.client.RestOperations;
++      import org.springframework.http.*;import org.springframework.web.bind.annotation.*;class Api {
+       @GetMapping("/records") ResponseEntity<String> get(){return ResponseEntity.status(HttpStatus.NOT_FOUND).body("missing");}}
+     class Caller {RestTemplate rest;void entry(){rest.getForObject("http://service/records",String.class);after();}void after(){}}'''})
+     engine=Engine(project,ScenarioState(db));engine.run(ids['Caller.entry'],{})
+@@ -194,7 +195,8 @@
+ 
+ 
+ def test_status_only_response_entity_has_no_body(tmp_path):
+-    project,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.web.client.RestTemplate;import org.springframework.web.client.RestOperations;class Api {@GetMapping("/ping") ResponseEntity<Void> ping(){
++    project,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.web.client.RestTemplate;import org.springframework.web.client.RestOperations;
++      import org.springframework.http.*;import org.springframework.web.bind.annotation.*;class Api {@GetMapping("/ping") ResponseEntity<Void> ping(){
+       return new ResponseEntity<Void>(HttpStatus.OK);}}
+       class Caller {RestTemplate rest;String entry(){return rest.getForObject("http://service/ping",String.class);}}'''})
+     assert Engine(project,ScenarioState(db)).run(ids['Caller.entry'],{}) is None

@@ -1,0 +1,41 @@
+--- E6-final/analyzer/static_storage.py
++++ E7-release/analyzer/static_storage.py
+@@ -6,7 +6,7 @@
+ from .native_storage import JavaFrame,StaticCells
+ from .project import text, walk, body_members, declaration_matches, keywords
+ from .source_literals import literal_default
+-from .java_exceptions import JavaThrow
++from .java_exceptions import JavaThrow,ExceptionBound,assignable
+ from .state import U
+ 
+ 
+@@ -116,6 +116,13 @@
+         engine.state.class_initialization[owner]['status']='initialized'
+     except JavaThrow as failure:
+         engine.state.class_initialization[owner]['status']='failed'
++        is_error=assignable(failure.value.get('__type__',U) if isinstance(failure.value,dict) else U,'java.lang.Error',engine.p)
++        if is_error is True:raise
++        if is_error is U:
++            # The original Error or the wrapper are both Errors, but the
++            # precise subtype is not established by an opaque Throwable.
++            raise JavaThrow({'__type__':ExceptionBound('java.lang.Error'),
++                '__unresolved_initialization_failure__':failure.value}) from None
+         raise JavaThrow({'__type__':'ExceptionInInitializerError','cause':failure.value}) from None
+     except BaseException:
+         engine.state.class_initialization[owner]['status']='unresolved'
+--- E6-final/tests/test_static_storage.py
++++ E7-release/tests/test_static_storage.py
+@@ -69,6 +69,13 @@
+     assert any('NoClassDefFoundError' in warning for warning in again.warnings)
+ 
+ 
++def test_initializer_error_is_not_wrapped_in_exception_in_initializer_error(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''class Material{static{throw new Error();}static int read(){return 9;}}
++      class Api{int entry(){try{return Material.read();}catch(ExceptionInInitializerError ex){return 1;}catch(Error ex){return 2;}}}'''})
++    e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==2
++    assert ('','executes',ids['Material.read']) not in e.edges
++
++
+ def test_cross_class_cycle_is_explicit_boundary(tmp_path):
+     p,db,ids=build(tmp_path,{'Api.java':'''class A{static int x=B.y;}class B{static int y=A.x;}
+       class Api{int entry(){return A.x;}}'''})

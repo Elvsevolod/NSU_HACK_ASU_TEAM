@@ -1,0 +1,706 @@
+{
+  "request": {
+    "deployment": "payment-service",
+    "method": "GET",
+    "url": "/api/payments/999",
+    "path": [
+      "api",
+      "payments",
+      "999"
+    ],
+    "query": {},
+    "query_complete": true,
+    "headers": {},
+    "body": {
+      "missing": true
+    },
+    "actor": {
+      "unknown": true
+    },
+    "session": {
+      "unknown": true
+    },
+    "body_properties": {},
+    "provenance": []
+  },
+  "state_before": {
+    "browser": {
+      "storage": {},
+      "form": {},
+      "dom": {},
+      "url": {},
+      "options": {},
+      "script": {}
+    },
+    "history": [],
+    "clock": "2026-10-18T00:00:00",
+    "database_rows": {
+      "order-service.order_details": 2,
+      "order-service.orders": 2,
+      "payment-service.payments": 3
+    },
+    "unknown_tables": [],
+    "analysis_assumptions": [],
+    "limitations": [],
+    "tables": {
+      "payment-service.payments": [
+        {
+          "id": 21,
+          "orderId": 11,
+          "customerId": 7,
+          "amount": 12.5,
+          "paymentMethod": "CREDIT_CARD",
+          "status": "APPROVED",
+          "createdAt": "2026-10-17 12:00:00"
+        },
+        {
+          "id": 23,
+          "orderId": 11,
+          "customerId": 7,
+          "amount": 12.5,
+          "paymentMethod": "CREDIT_CARD",
+          "status": "REJECTED",
+          "createdAt": "2026-10-17 11:00:00"
+        },
+        {
+          "id": 22,
+          "orderId": 12,
+          "customerId": 7,
+          "amount": 25.0,
+          "paymentMethod": "DEBIT_CARD",
+          "status": "APPROVED",
+          "createdAt": "2026-10-17 13:00:00"
+        }
+      ],
+      "order-service.orders": [
+        {
+          "id": 11,
+          "customerId": 7,
+          "customerName": "Ari",
+          "customerEmail": "ari@example.test",
+          "status": "PAID",
+          "createdAt": "2026-10-17 10:00:00"
+        },
+        {
+          "id": 12,
+          "customerId": 7,
+          "customerName": "Ari",
+          "customerEmail": "ari@example.test",
+          "status": "PAID",
+          "createdAt": "2026-10-17 10:30:00"
+        }
+      ],
+      "order-service.order_details": [
+        {
+          "id": 31,
+          "orderId": 11,
+          "productId": 51,
+          "productName": "Notebook",
+          "quantity": 2,
+          "unitPrice": 6.25
+        },
+        {
+          "id": 32,
+          "orderId": 12,
+          "productId": 52,
+          "productName": "Lamp",
+          "quantity": 1,
+          "unitPrice": 25.0
+        }
+      ]
+    }
+  },
+  "alternatives": [
+    {
+      "result": {
+        "details": {
+          "unknown": true
+        },
+        "error": "Not Found",
+        "errorCode": "PAYMENT_NOT_FOUND",
+        "message": "Payment with ID 999 not found",
+        "path": "/api/payments/999",
+        "status": 404,
+        "timestamp": "2026-10-18T00:00:00"
+      },
+      "outcome": "HTTP error response",
+      "warnings": [],
+      "requests": [
+        {
+          "id": 1,
+          "entry": "method:payment-service:PaymentController#getById(Long)",
+          "reason": "scenario request",
+          "request": {
+            "deployment": "payment-service",
+            "method": "GET",
+            "url": "/api/payments/999",
+            "path": [
+              "api",
+              "payments",
+              "999"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {},
+            "body": {
+              "missing": true
+            },
+            "actor": {
+              "unknown": true
+            },
+            "session": {
+              "unknown": true
+            },
+            "body_properties": {},
+            "provenance": []
+          },
+          "entry_boundary": "application_after_authentication",
+          "security_evaluated": false,
+          "authorization_checked": false,
+          "bound_arguments": [
+            {
+              "name": "id",
+              "declared_type": "java.lang.Long",
+              "value": 999
+            }
+          ]
+        }
+      ],
+      "responses": [
+        {
+          "request": 1,
+          "status": 404,
+          "entered": true,
+          "exception_handler": "method:payment-service:GlobalExceptionHandler#handleNotFound(PaymentNotFoundException,HttpServletRequest)",
+          "body_presence": "json",
+          "body": {
+            "details": {
+              "unknown": true
+            },
+            "error": "Not Found",
+            "errorCode": "PAYMENT_NOT_FOUND",
+            "message": "Payment with ID 999 not found",
+            "path": "/api/payments/999",
+            "status": 404,
+            "timestamp": "2026-10-18T00:00:00"
+          }
+        }
+      ],
+      "events": [
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:payment-service:PaymentController#getById(Long)"
+          ],
+          "request": 1,
+          "callsite": "scenario request",
+          "method": "method:payment-service:PaymentController#getById(Long)",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "int",
+                "value": 999
+              }
+            ]
+          },
+          "cause": "source_execution"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:payment-service:PaymentQueryService#getById(Long)"
+          ],
+          "request": 1,
+          "callsite": "call:method:payment-service:PaymentController#getById(Long)@100:74",
+          "method": "method:payment-service:PaymentQueryService#getById(Long)",
+          "line": 100,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "int",
+                "value": 999
+              }
+            ]
+          },
+          "cause": "source_execution"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:payment-service:GetPaymentUseCase#execute(Long)"
+          ],
+          "request": 1,
+          "callsite": "call:method:payment-service:PaymentQueryService#getById(Long)@41:27",
+          "method": "method:payment-service:GetPaymentUseCase#execute(Long)",
+          "line": 41,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "int",
+                "value": 999
+              }
+            ]
+          },
+          "cause": "source_execution"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+          ],
+          "request": 1,
+          "callsite": "call:method:payment-service:GetPaymentUseCase#execute(Long)@32:27",
+          "method": "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+          "line": 32,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "int",
+                "value": 999
+              }
+            ]
+          },
+          "cause": "source_execution"
+        },
+        {
+          "edge": [
+            "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+            "data",
+            "res:table:payment-service.payments"
+          ],
+          "request": 1,
+          "callsite": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@47:30",
+          "method": "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+          "line": 47,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "int",
+                "value": 999
+              }
+            ]
+          },
+          "cause": "sql"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:payment-service:PaymentNotFoundException#<init>(Long)"
+          ],
+          "request": 1,
+          "callsite": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@49:36",
+          "method": "method:payment-service:PaymentNotFoundException#<init>(Long)",
+          "line": 49,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "int",
+                "value": 999
+              }
+            ]
+          },
+          "cause": "source_execution"
+        },
+        {
+          "edge": [
+            "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+            "calls",
+            "method:payment-service:PaymentNotFoundException#<init>(Long)"
+          ],
+          "request": 1,
+          "callsite": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@49:36",
+          "method": "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+          "line": 49,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "int",
+                "value": 999
+              }
+            ]
+          },
+          "cause": "direct_call"
+        },
+        {
+          "edge": [
+            "method:payment-service:GetPaymentUseCase#execute(Long)",
+            "calls",
+            "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+          ],
+          "request": 1,
+          "callsite": "call:method:payment-service:GetPaymentUseCase#execute(Long)@32:27",
+          "method": "method:payment-service:GetPaymentUseCase#execute(Long)",
+          "line": 32,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "int",
+                "value": 999
+              }
+            ]
+          },
+          "cause": "direct_call"
+        },
+        {
+          "edge": [
+            "method:payment-service:PaymentQueryService#getById(Long)",
+            "calls",
+            "method:payment-service:GetPaymentUseCase#execute(Long)"
+          ],
+          "request": 1,
+          "callsite": "call:method:payment-service:PaymentQueryService#getById(Long)@41:27",
+          "method": "method:payment-service:PaymentQueryService#getById(Long)",
+          "line": 41,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "int",
+                "value": 999
+              }
+            ]
+          },
+          "cause": "direct_call"
+        },
+        {
+          "edge": [
+            "method:payment-service:PaymentController#getById(Long)",
+            "calls",
+            "method:payment-service:PaymentQueryService#getById(Long)"
+          ],
+          "request": 1,
+          "callsite": "call:method:payment-service:PaymentController#getById(Long)@100:74",
+          "method": "method:payment-service:PaymentController#getById(Long)",
+          "line": 100,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "int",
+                "value": 999
+              }
+            ]
+          },
+          "cause": "direct_call"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:payment-service:GlobalExceptionHandler#handleNotFound(PaymentNotFoundException,HttpServletRequest)"
+          ],
+          "request": 1,
+          "callsite": "Spring ExceptionHandler callback",
+          "method": "method:payment-service:GlobalExceptionHandler#handleNotFound(PaymentNotFoundException,HttpServletRequest)",
+          "line": null,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "object",
+                "type": "com.shoppingcart.payment.domain.exceptions.PaymentNotFoundException",
+                "fields": [
+                  "message"
+                ]
+              },
+              {
+                "kind": "object",
+                "type": "HttpServletRequest",
+                "fields": [
+                  "headers",
+                  "method",
+                  "uri",
+                  "actor",
+                  "session"
+                ]
+              }
+            ]
+          },
+          "cause": "framework_dispatch"
+        },
+        {
+          "edge": [
+            "",
+            "executes",
+            "method:payment-service:ErrorResponseDTO#<init>(int,String,String,String,String,List<String>)"
+          ],
+          "request": 1,
+          "callsite": "call:method:payment-service:GlobalExceptionHandler#handleNotFound(PaymentNotFoundException,HttpServletRequest)@56:65",
+          "method": "method:payment-service:ErrorResponseDTO#<init>(int,String,String,String,String,List<String>)",
+          "line": 56,
+          "context": "C1",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "int",
+                "value": 404
+              },
+              {
+                "kind": "str",
+                "value": "Not Found"
+              },
+              {
+                "kind": "str",
+                "value": "PAYMENT_NOT_FOUND"
+              },
+              {
+                "kind": "str",
+                "value": "Payment with ID 999 not found"
+              },
+              {
+                "kind": "str",
+                "value": "/api/payments/999"
+              },
+              {
+                "kind": "unknown"
+              }
+            ]
+          },
+          "cause": "source_execution"
+        },
+        {
+          "edge": [
+            "method:payment-service:GlobalExceptionHandler#handleNotFound(PaymentNotFoundException,HttpServletRequest)",
+            "calls",
+            "method:payment-service:ErrorResponseDTO#<init>(int,String,String,String,String,List<String>)"
+          ],
+          "request": 1,
+          "callsite": "call:method:payment-service:GlobalExceptionHandler#handleNotFound(PaymentNotFoundException,HttpServletRequest)@56:65",
+          "method": "method:payment-service:GlobalExceptionHandler#handleNotFound(PaymentNotFoundException,HttpServletRequest)",
+          "line": 56,
+          "context": "C2",
+          "values": {
+            "version": "value-witness/1",
+            "arguments": [
+              {
+                "kind": "int",
+                "value": 404
+              },
+              {
+                "kind": "str",
+                "value": "Not Found"
+              },
+              {
+                "kind": "str",
+                "value": "PAYMENT_NOT_FOUND"
+              },
+              {
+                "kind": "str",
+                "value": "Payment with ID 999 not found"
+              },
+              {
+                "kind": "str",
+                "value": "/api/payments/999"
+              }
+            ]
+          },
+          "cause": "direct_call"
+        }
+      ],
+      "edges": [
+        [
+          "",
+          "executes",
+          "method:payment-service:ErrorResponseDTO#<init>(int,String,String,String,String,List<String>)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:GetPaymentUseCase#execute(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:GlobalExceptionHandler#handleNotFound(PaymentNotFoundException,HttpServletRequest)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentController#getById(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentNotFoundException#<init>(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentQueryService#getById(Long)"
+        ],
+        [
+          "method:payment-service:GetPaymentUseCase#execute(Long)",
+          "calls",
+          "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+        ],
+        [
+          "method:payment-service:GlobalExceptionHandler#handleNotFound(PaymentNotFoundException,HttpServletRequest)",
+          "calls",
+          "method:payment-service:ErrorResponseDTO#<init>(int,String,String,String,String,List<String>)"
+        ],
+        [
+          "method:payment-service:PaymentController#getById(Long)",
+          "calls",
+          "method:payment-service:PaymentQueryService#getById(Long)"
+        ],
+        [
+          "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+          "calls",
+          "method:payment-service:PaymentNotFoundException#<init>(Long)"
+        ],
+        [
+          "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+          "data",
+          "res:table:payment-service.payments"
+        ],
+        [
+          "method:payment-service:PaymentQueryService#getById(Long)",
+          "calls",
+          "method:payment-service:GetPaymentUseCase#execute(Long)"
+        ]
+      ],
+      "data_operations": [
+        {
+          "method": "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+          "resource": "res:table:payment-service.payments",
+          "operation": "findById",
+          "arguments": [
+            999
+          ],
+          "source_site": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@47:30",
+          "uncertain_write": false,
+          "sql_emitted": true,
+          "datastore_event": true,
+          "transactional": false,
+          "emitted_by": "call:method:payment-service:PaymentPersistenceAdapter#findById(Long)@47:30"
+        }
+      ],
+      "state_after": {
+        "browser": {
+          "storage": {},
+          "form": {},
+          "dom": {},
+          "url": {},
+          "options": {},
+          "script": {}
+        },
+        "history": [],
+        "clock": "2026-10-18T00:00:00",
+        "database_rows": {
+          "order-service.order_details": 2,
+          "order-service.orders": 2,
+          "payment-service.payments": 3
+        },
+        "unknown_tables": [],
+        "analysis_assumptions": [],
+        "limitations": [],
+        "tables": {
+          "payment-service.payments": [
+            {
+              "id": 21,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 12:00:00"
+            },
+            {
+              "id": 23,
+              "orderId": 11,
+              "customerId": 7,
+              "amount": 12.5,
+              "paymentMethod": "CREDIT_CARD",
+              "status": "REJECTED",
+              "createdAt": "2026-10-17 11:00:00"
+            },
+            {
+              "id": 22,
+              "orderId": 12,
+              "customerId": 7,
+              "amount": 25.0,
+              "paymentMethod": "DEBIT_CARD",
+              "status": "APPROVED",
+              "createdAt": "2026-10-17 13:00:00"
+            }
+          ],
+          "order-service.orders": [
+            {
+              "id": 11,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:00:00"
+            },
+            {
+              "id": 12,
+              "customerId": 7,
+              "customerName": "Ari",
+              "customerEmail": "ari@example.test",
+              "status": "PAID",
+              "createdAt": "2026-10-17 10:30:00"
+            }
+          ],
+          "order-service.order_details": [
+            {
+              "id": 31,
+              "orderId": 11,
+              "productId": 51,
+              "productName": "Notebook",
+              "quantity": 2,
+              "unitPrice": 6.25
+            },
+            {
+              "id": 32,
+              "orderId": 12,
+              "productId": 52,
+              "productName": "Lamp",
+              "quantity": 1,
+              "unitPrice": 25.0
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "offline_audit": {
+    "blocked_network": 0,
+    "blocked_processes": 0,
+    "blocked_reference_reads": 0,
+    "python_file_reads": 125
+  },
+  "entry_boundary": "application_after_authentication",
+  "security_evaluated": false
+}

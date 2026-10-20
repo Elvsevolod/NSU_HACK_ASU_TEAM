@@ -1,0 +1,202 @@
+FFFFFFFFFF                                                               [100%]
+=================================== FAILURES ===================================
+_ test_unknown_contents_keep_nonnull_optional_and_correlated_presence[False-1] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-178/test_unknown_contents_keep_non0')
+limit = 1, unknown_database = False
+
+    @pytest.mark.parametrize('limit', [1,4,8])
+    @pytest.mark.parametrize('unknown_database', [False,True])
+    def test_unknown_contents_keep_nonnull_optional_and_correlated_presence(tmp_path,limit,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':SOURCE},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{'id':U},limit=limit)
+>       assert {row['result'] for row in outcomes} == {'present','absent'}
+E       AssertionError: assert {'wrong', <Un...E: 'unknown'>} == {'absent', 'present'}
+E         
+E         Extra items in the left set:
+E         'wrong'
+E         <Unknown.VALUE: 'unknown'>
+E         Extra items in the right set:
+E         'absent'
+E         'present'
+E         Use -v to get more diff
+
+solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py:28: AssertionError
+_ test_unknown_contents_keep_nonnull_optional_and_correlated_presence[False-4] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-178/test_unknown_contents_keep_non1')
+limit = 4, unknown_database = False
+
+    @pytest.mark.parametrize('limit', [1,4,8])
+    @pytest.mark.parametrize('unknown_database', [False,True])
+    def test_unknown_contents_keep_nonnull_optional_and_correlated_presence(tmp_path,limit,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':SOURCE},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{'id':U},limit=limit)
+>       assert {row['result'] for row in outcomes} == {'present','absent'}
+E       AssertionError: assert {'absent', 'present', 'wrong'} == {'absent', 'present'}
+E         
+E         Extra items in the left set:
+E         'wrong'
+E         Use -v to get more diff
+
+solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py:28: AssertionError
+_ test_unknown_contents_keep_nonnull_optional_and_correlated_presence[False-8] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-178/test_unknown_contents_keep_non2')
+limit = 8, unknown_database = False
+
+    @pytest.mark.parametrize('limit', [1,4,8])
+    @pytest.mark.parametrize('unknown_database', [False,True])
+    def test_unknown_contents_keep_nonnull_optional_and_correlated_presence(tmp_path,limit,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':SOURCE},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{'id':U},limit=limit)
+>       assert {row['result'] for row in outcomes} == {'present','absent'}
+E       AssertionError: assert {'absent', 'present', 'wrong'} == {'absent', 'present'}
+E         
+E         Extra items in the left set:
+E         'wrong'
+E         Use -v to get more diff
+
+solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py:28: AssertionError
+_ test_unknown_contents_keep_nonnull_optional_and_correlated_presence[True-1] __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-178/test_unknown_contents_keep_non3')
+limit = 1, unknown_database = True
+
+    @pytest.mark.parametrize('limit', [1,4,8])
+    @pytest.mark.parametrize('unknown_database', [False,True])
+    def test_unknown_contents_keep_nonnull_optional_and_correlated_presence(tmp_path,limit,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':SOURCE},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{'id':U},limit=limit)
+>       assert {row['result'] for row in outcomes} == {'present','absent'}
+E       AssertionError: assert {'wrong', <Un...E: 'unknown'>} == {'absent', 'present'}
+E         
+E         Extra items in the left set:
+E         'wrong'
+E         <Unknown.VALUE: 'unknown'>
+E         Extra items in the right set:
+E         'absent'
+E         'present'
+E         Use -v to get more diff
+
+solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py:28: AssertionError
+_ test_unknown_contents_keep_nonnull_optional_and_correlated_presence[True-4] __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-178/test_unknown_contents_keep_non4')
+limit = 4, unknown_database = True
+
+    @pytest.mark.parametrize('limit', [1,4,8])
+    @pytest.mark.parametrize('unknown_database', [False,True])
+    def test_unknown_contents_keep_nonnull_optional_and_correlated_presence(tmp_path,limit,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':SOURCE},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{'id':U},limit=limit)
+>       assert {row['result'] for row in outcomes} == {'present','absent'}
+E       AssertionError: assert {'absent', 'present', 'wrong'} == {'absent', 'present'}
+E         
+E         Extra items in the left set:
+E         'wrong'
+E         Use -v to get more diff
+
+solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py:28: AssertionError
+_ test_unknown_contents_keep_nonnull_optional_and_correlated_presence[True-8] __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-178/test_unknown_contents_keep_non5')
+limit = 8, unknown_database = True
+
+    @pytest.mark.parametrize('limit', [1,4,8])
+    @pytest.mark.parametrize('unknown_database', [False,True])
+    def test_unknown_contents_keep_nonnull_optional_and_correlated_presence(tmp_path,limit,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':SOURCE},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{'id':U},limit=limit)
+>       assert {row['result'] for row in outcomes} == {'present','absent'}
+E       AssertionError: assert {'absent', 'present', 'wrong'} == {'absent', 'present'}
+E         
+E         Extra items in the left set:
+E         'wrong'
+E         Use -v to get more diff
+
+solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py:28: AssertionError
+_______________ test_unknown_list_is_not_a_nullable_receiver[1] ________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-178/test_unknown_list_is_not_a_nul0')
+limit = 1
+
+    @pytest.mark.parametrize('limit',[1,4,8])
+    def test_unknown_list_is_not_a_nullable_receiver(tmp_path,limit):
+        project,db,ids=build(tmp_path,{'Api.java':SOURCE},rows={'parcels':[{'id':'p1','label':'one'}]})
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.list'],{'label':U},limit=limit)
+>       assert {row['result'] for row in outcomes} == {'after'}
+E       AssertionError: assert {'after', 'wrong'} == {'after'}
+E         
+E         Extra items in the left set:
+E         'wrong'
+E         Use -v to get more diff
+
+solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py:36: AssertionError
+_______________ test_unknown_list_is_not_a_nullable_receiver[4] ________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-178/test_unknown_list_is_not_a_nul1')
+limit = 4
+
+    @pytest.mark.parametrize('limit',[1,4,8])
+    def test_unknown_list_is_not_a_nullable_receiver(tmp_path,limit):
+        project,db,ids=build(tmp_path,{'Api.java':SOURCE},rows={'parcels':[{'id':'p1','label':'one'}]})
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.list'],{'label':U},limit=limit)
+>       assert {row['result'] for row in outcomes} == {'after'}
+E       AssertionError: assert {'after', 'wrong'} == {'after'}
+E         
+E         Extra items in the left set:
+E         'wrong'
+E         Use -v to get more diff
+
+solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py:36: AssertionError
+_______________ test_unknown_list_is_not_a_nullable_receiver[8] ________________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-178/test_unknown_list_is_not_a_nul2')
+limit = 8
+
+    @pytest.mark.parametrize('limit',[1,4,8])
+    def test_unknown_list_is_not_a_nullable_receiver(tmp_path,limit):
+        project,db,ids=build(tmp_path,{'Api.java':SOURCE},rows={'parcels':[{'id':'p1','label':'one'}]})
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.list'],{'label':U},limit=limit)
+>       assert {row['result'] for row in outcomes} == {'after'}
+E       AssertionError: assert {'after', 'wrong'} == {'after'}
+E         
+E         Extra items in the left set:
+E         'wrong'
+E         Use -v to get more diff
+
+solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py:36: AssertionError
+____________ test_custom_repository_default_method_can_return_null _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-178/test_custom_repository_default0')
+
+    def test_custom_repository_default_method_can_return_null(tmp_path):
+        source=SOURCE.replace('List<Parcel> findByLabel(String label);',
+            'default List<Parcel> findByLabel(String label){return null;}')
+        project,db,ids=build(tmp_path,{'Api.java':source},rows={'parcels':[{'id':'p1','label':'one'}]})
+>       assert Engine(project,ScenarioState(db)).run(ids['Api.list'],{'label':'one'}) == 'wrong'
+E       AssertionError: assert 'after' == 'wrong'
+E         
+E         - wrong
+E         + after
+
+solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py:43: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py::test_unknown_contents_keep_nonnull_optional_and_correlated_presence[False-1]
+FAILED solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py::test_unknown_contents_keep_nonnull_optional_and_correlated_presence[False-4]
+FAILED solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py::test_unknown_contents_keep_nonnull_optional_and_correlated_presence[False-8]
+FAILED solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py::test_unknown_contents_keep_nonnull_optional_and_correlated_presence[True-1]
+FAILED solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py::test_unknown_contents_keep_nonnull_optional_and_correlated_presence[True-4]
+FAILED solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py::test_unknown_contents_keep_nonnull_optional_and_correlated_presence[True-8]
+FAILED solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py::test_unknown_list_is_not_a_nullable_receiver[1]
+FAILED solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py::test_unknown_list_is_not_a_nullable_receiver[4]
+FAILED solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py::test_unknown_list_is_not_a_nullable_receiver[8]
+FAILED solutions/—_request-array-continuity/code/tests/test_repository_unknown_wrappers.py::test_custom_repository_default_method_can_return_null
+10 failed in 0.22s

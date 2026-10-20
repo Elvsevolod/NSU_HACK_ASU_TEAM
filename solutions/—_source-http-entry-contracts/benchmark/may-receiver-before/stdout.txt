@@ -1,0 +1,211 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_______ test_field_receiver_does_not_call_an_unrelated_same_named_method _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-51/test_field_receiver_does_not_c0')
+
+    def test_field_receiver_does_not_call_an_unrelated_same_named_method(tmp_path):
+        project, db, ids = build(tmp_path, {'Api.java': '''
+          class Store {String read(){return "source";}}
+          class Other {String read(){return "unrelated";}}
+          class Api {Store store;String entry(){return store.read();}}
+        '''})
+        project = add_may_target(tmp_path, project, ids['Other.read'], 'read')
+        engine = Engine(project, ScenarioState(db))
+>       assert engine.run(ids['Api.entry'], {}) == 'source'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_may_receiver_constraints.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+code/analyzer/engine.py:389: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:481: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+code/analyzer/engine.py:572: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'],on_entry=entered)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:722: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds,on_entry)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:814: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1380: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1413: in execute_statement
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1380: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1418: in execute_statement
+    value = self.value(node.named_children[0], env) if node.named_children else None
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1669: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2092: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2907: in call
+    selected = self.choose(reason + ':dispatch', targets)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x104bedb10>
+label = 'call:method:service:Api#entry()@4:58:dispatch'
+choices = ['method:service:Other#read()', 'method:service:Store#read()']
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:call:method:service:Api#entry()@4:58:dispatch', ['method:service:Other#read()', 'method:service:Store#read()'])
+
+code/analyzer/engine.py:314: AlternativeRequired
+_ test_interface_receiver_preserves_its_implementation_and_rejects_other_types _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-51/test_interface_receiver_preser0')
+
+    def test_interface_receiver_preserves_its_implementation_and_rejects_other_types(tmp_path):
+        project, db, ids = build(tmp_path, {'Api.java': '''
+          interface Reader {String read();}
+          class Store implements Reader {public String read(){return "source";}}
+          class Other {String read(){return "unrelated";}}
+          class Api {Reader store;String entry(){return store.read();}}
+        '''})
+        project = add_may_target(tmp_path, project, ids['Other.read'], 'read')
+        engine = Engine(project, ScenarioState(db))
+>       assert engine.run(ids['Api.entry'], {}) == 'source'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_may_receiver_constraints.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+code/analyzer/engine.py:389: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:481: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+code/analyzer/engine.py:572: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'],on_entry=entered)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:722: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds,on_entry)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:814: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1380: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1413: in execute_statement
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1380: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1418: in execute_statement
+    value = self.value(node.named_children[0], env) if node.named_children else None
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1669: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2092: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2907: in call
+    selected = self.choose(reason + ':dispatch', targets)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x10469b810>
+label = 'call:method:service:Api#entry()@5:59:dispatch'
+choices = ['method:service:Other#read()', 'method:service:Store#read()']
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:call:method:service:Api#entry()@5:59:dispatch', ['method:service:Other#read()', 'method:service:Store#read()'])
+
+code/analyzer/engine.py:314: AlternativeRequired
+_________ test_new_expression_does_not_invoke_a_different_constructor __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-51/test_new_expression_does_not_i0')
+
+    def test_new_expression_does_not_invoke_a_different_constructor(tmp_path):
+        project, db, ids = build(tmp_path, {'Api.java': '''
+          class Store {Store(){}}
+          class Other {Other(){changed();}void changed(){}}
+          class Api {Store entry(){return new Store();}}
+        '''})
+        project = add_may_target(tmp_path, project, ids['Other.<init>'], '<init>')
+        engine = Engine(project, ScenarioState(db))
+>       engine.run(ids['Api.entry'], {})
+
+code/tests/test_may_receiver_constraints.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+code/analyzer/engine.py:389: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:481: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+code/analyzer/engine.py:572: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'],on_entry=entered)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:722: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds,on_entry)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:814: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1380: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1413: in execute_statement
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1380: in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1418: in execute_statement
+    value = self.value(node.named_children[0], env) if node.named_children else None
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1669: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2092: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2907: in call
+    selected = self.choose(reason + ':dispatch', targets)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x105700c90>
+label = 'call:method:service:Api#entry()@4:39:dispatch'
+choices = ['method:service:Other#<init>()', 'method:service:Store#<init>()']
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:call:method:service:Api#entry()@4:39:dispatch', ['method:service:Other#<init>()', 'method:service:Store#<init>()'])
+
+code/analyzer/engine.py:314: AlternativeRequired
+=========================== short test summary info ============================
+FAILED code/tests/test_may_receiver_constraints.py::test_field_receiver_does_not_call_an_unrelated_same_named_method
+FAILED code/tests/test_may_receiver_constraints.py::test_interface_receiver_preserves_its_implementation_and_rejects_other_types
+FAILED code/tests/test_may_receiver_constraints.py::test_new_expression_does_not_invoke_a_different_constructor
+3 failed in 1.09s

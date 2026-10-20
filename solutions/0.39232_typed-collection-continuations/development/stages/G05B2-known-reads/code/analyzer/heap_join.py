@@ -1,0 +1,151 @@
+"""Join conservative Java branches without disconnecting caller-owned objects."""
+from copy import deepcopy
+from .java_collections import JavaMap,JavaRecord,JavaMapView,JavaMapEntry,JavaMapIterator,JavaJsonMapper
+from .native_storage import JavaFrame,JavaList,JavaListIterator,ReadOnlyList
+from .state import U
+
+
+def owned_objects(value,seen=None):
+    seen=set() if seen is None else seen
+    if not isinstance(value,(dict,list,tuple)) or id(value) in seen:return
+    seen.add(id(value))
+    if isinstance(value,(JavaMap,JavaRecord,JavaMapView,JavaMapEntry,JavaMapIterator,JavaJsonMapper,JavaList,JavaListIterator)):yield value
+    children=list(value.values()) if isinstance(value,dict) else list(value)
+    if isinstance(value,(JavaMapView,JavaMapEntry,ReadOnlyList)):children.append(value.backing)
+    if isinstance(value,JavaMapIterator):children.append(value.view)
+    for child in children:yield from owned_objects(child,seen)
+
+
+def widen(value):
+    if isinstance(value,ReadOnlyList):widen(value.backing)
+    elif isinstance(value,JavaList):
+        for index in range(len(value)):value.set_value(index,U,None)
+        value.opaque=True;value.structural_version=None
+    elif isinstance(value,JavaListIterator):
+        widen(value['backing']);value['index']=U;value['last']=U;value['expected']=None
+    elif isinstance(value,(JavaMap,JavaJsonMapper)):value.invalidate()
+    elif isinstance(value,JavaRecord):
+        for key in value:
+            if key!='__type__':value[key]=U
+        value._native_field_kinds={}
+        value._field_reference_types={}
+    elif isinstance(value,(JavaMapView,JavaMapEntry)):value.backing.invalidate()
+    elif isinstance(value,JavaMapIterator):
+        value.view.backing.invalidate();value.remaining=U;value.last=U;value.expected=None
+
+
+def source_nodes(value,seen=None):
+    seen=set() if seen is None else seen
+    if id(value) in seen:return
+    seen.add(id(value))
+    if hasattr(value,'start_point') and hasattr(value,'type'):
+        yield value;return
+    children=list(value.values()) if isinstance(value,dict) else list(value) if isinstance(value,(list,tuple)) else []
+    if isinstance(value,(JavaMapView,JavaMapEntry,ReadOnlyList)):children.append(value.backing)
+    if isinstance(value,JavaMapIterator):children.append(value.view)
+    for child in children:
+        yield from source_nodes(child,seen)
+
+
+def clone_environment(value):
+    memo={id(node):node for node in source_nodes(value)}
+    return deepcopy(value,memo),memo
+
+
+def mutable_ids(value):
+    pending, seen, result = [value], set(), set()
+    while pending:
+        item = pending.pop()
+        if id(item) in seen:continue
+        seen.add(id(item))
+        if isinstance(item, (dict, list)):
+            result.add(id(item))
+            pending.extend(item.values() if isinstance(item, dict) else item)
+        elif isinstance(item, tuple):pending.extend(item)
+        if isinstance(item,(JavaMapView,JavaMapEntry,ReadOnlyList)):pending.append(item.backing)
+        if isinstance(item,JavaMapIterator):pending.append(item.view)
+    return result
+
+
+def clone_execution(state, *inputs):
+    """Share completed journal items only when no live mutable alias escapes.
+
+    The journal list is still owned by each path. Aliased historical objects
+    take the full joint-copy path, preserving the original alias contract.
+    """
+    memo={id(node):node for node in source_nodes((state.__dict__,inputs))}
+    other_ids=mutable_ids((state.browser,state.transactions,state.context,inputs))
+    historical_ids=mutable_ids(state.history)
+    live_ids=other_ids|historical_ids
+    historical_database_alias=False
+    for key,rows in state.database.tables.raw_items():
+        table_ids=state.database.tables.shared_identities(key,mutable_ids)
+        historical_database_alias=historical_database_alias or bool(table_ids & historical_ids)
+        if table_ids & live_ids:
+            deepcopy(rows,memo)
+    if not historical_database_alias and not historical_ids & other_ids:
+        memo[id(state.history)] = list(state.history)
+    return deepcopy((state,*inputs),memo),memo
+
+
+def adopt_execution(state,original,selected,copies,result):
+    """Rebase a selected continuation onto the caller's existing heap objects.
+
+    A singleton completion is not a join with the pre-branch environment. Its
+    frame must be copied even when all its heap objects keep their identities.
+    Copy state, inputs and result jointly so aliases survive across boundaries.
+    """
+    updates=[(value,copies[id(value)]) for value in owned_objects(original)
+             if id(value) in copies]
+    canonical={id(chosen):value for value,chosen in updates
+               if type(value) is type(chosen)}
+    canonical.update((id(node),node) for node in source_nodes((state.__dict__,selected,result)))
+    for value,chosen in updates:
+        if id(chosen) not in canonical:
+            widen(value);continue
+        fields=deepcopy(list(chosen),canonical) if isinstance(chosen,JavaList) else {
+            key:deepcopy(item,canonical) for key,item in chosen.items()}
+        attributes={key:deepcopy(item,canonical) for key,item in chosen.__dict__.items()}
+        if isinstance(value,ReadOnlyList):pass
+        elif isinstance(value,JavaList):value[:]=fields
+        else:value.clear();value.update(fields)
+        value.__dict__.clear();value.__dict__.update(attributes)
+    # TableStore normally shares rows. Materialize only rows that must be
+    # rebased onto a live caller-owned object.
+    for _,rows in state.database.tables.raw_items():
+        if mutable_ids(rows) & canonical.keys():deepcopy(rows,canonical)
+    adopted,inputs,result=deepcopy((state,selected,result),canonical)
+    original.update(inputs)
+    return adopted,result
+
+
+def join_environment(original,left,right,left_copies,right_copies,merge):
+    memo={}
+    joined=merge(left,right,memo=memo)
+    originals=list(owned_objects(original))
+    updates=[]
+    for value in originals:
+        key=id(value)
+        if key in left_copies and key in right_copies:
+            updates.append((value,merge(left_copies[key],right_copies[key],memo=memo)))
+    # One possible object joining with several others creates a conditional
+    # alias. A later mutation must not leave any overlapping view known.
+    origins={}
+    for pair,result in memo.items():
+        for side,key in enumerate(pair):origins.setdefault((side,key),{})[id(result)]=result
+    for group in origins.values():
+        if len(group)>1:
+            for value in group.values():widen(value)
+    canonical={id(result):value for value,result in updates if isinstance(result,(JavaMap,JavaRecord,JavaMapView,JavaMapEntry,JavaMapIterator,JavaJsonMapper,JavaList,JavaListIterator)) and type(value) is type(result)}
+    canonical.update((id(node),node) for node in source_nodes(joined))
+    for value,result in updates:
+        if id(result) not in canonical:
+            widen(value);continue
+        fields=deepcopy(list(result),canonical) if isinstance(result,JavaList) else {key:deepcopy(item,canonical) for key,item in result.items()}
+        attributes={key:deepcopy(item,canonical) for key,item in result.__dict__.items()}
+        if isinstance(value,ReadOnlyList):pass
+        elif isinstance(value,JavaList):value[:]=fields
+        else:value.clear();value.update(fields)
+        value.__dict__.clear();value.__dict__.update(attributes)
+    original.update(deepcopy(joined,canonical))
+    if isinstance(original,JavaFrame) and isinstance(joined,JavaFrame):original.kinds=dict(joined.kinds)

@@ -1,0 +1,48 @@
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_latest_failed_collection_is_not_replaced_with_the_old_first_row[False] __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-212/test_latest_failed_collection_0')
+saved_refs = False
+
+    @pytest.mark.parametrize('saved_refs',[False,True])
+    def test_latest_failed_collection_is_not_replaced_with_the_old_first_row(tmp_path,saved_refs):
+        p,db,ids=fixture(tmp_path);state=invoke(p,ScenarioState(db),ids['ParcelController.list'],{'fail':False},1)
+        first=history_value(p,ids['ParcelController.read'],'id','Read first parcel',state.history)
+        assert first==('history[0].result[0].id',8)
+        state=invoke(p,state,ids['ParcelController.list'],{'fail':True},2)
+        assert state.history[-1]['outcome']=='HTTP error response'
+        assert [row['id'] for row in state.history[-1]['result']]==[8,9]
+        if saved_refs:
+            for i,item in enumerate(state.history):item['response_refs']=references(p,item,i)
+>       assert history_value(p,ids['ParcelController.read'],'id','Read first parcel',state.history) is None
+E       AssertionError: assert ('history[1].result[0].id', 8) is None
+E        +  where ('history[1].result[0].id', 8) = history_value(<analyzer.project.Project object at 0x10246fb90>, 'method:service:ParcelController#read(Long)', 'id', 'Read first parcel', [{'action': 'List parcels', 'created_objects': [], 'entry': 'method:service:ParcelController#list(boolean)', 'explorat...oolean)', 'exploration': {'complete': True, 'completed': 1, 'completion_budget': 8, 'completion_splits': 0, ...}, ...}])
+E        +    where [{'action': 'List parcels', 'created_objects': [], 'entry': 'method:service:ParcelController#list(boolean)', 'explorat...oolean)', 'exploration': {'complete': True, 'completed': 1, 'completion_budget': 8, 'completion_splits': 0, ...}, ...}] = <analyzer.state.ScenarioState object at 0x102126410>.history
+
+code/tests/test_history_boundary_controls33.py:52: AssertionError
+__ test_latest_failed_collection_is_not_replaced_with_the_old_first_row[True] __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-212/test_latest_failed_collection_1')
+saved_refs = True
+
+    @pytest.mark.parametrize('saved_refs',[False,True])
+    def test_latest_failed_collection_is_not_replaced_with_the_old_first_row(tmp_path,saved_refs):
+        p,db,ids=fixture(tmp_path);state=invoke(p,ScenarioState(db),ids['ParcelController.list'],{'fail':False},1)
+        first=history_value(p,ids['ParcelController.read'],'id','Read first parcel',state.history)
+        assert first==('history[0].result[0].id',8)
+        state=invoke(p,state,ids['ParcelController.list'],{'fail':True},2)
+        assert state.history[-1]['outcome']=='HTTP error response'
+        assert [row['id'] for row in state.history[-1]['result']]==[8,9]
+        if saved_refs:
+            for i,item in enumerate(state.history):item['response_refs']=references(p,item,i)
+>       assert history_value(p,ids['ParcelController.read'],'id','Read first parcel',state.history) is None
+E       AssertionError: assert ('history[1].result[0].id', 8) is None
+E        +  where ('history[1].result[0].id', 8) = history_value(<analyzer.project.Project object at 0x10245e810>, 'method:service:ParcelController#read(Long)', 'id', 'Read first parcel', [{'action': 'List parcels', 'created_objects': [], 'entry': 'method:service:ParcelController#list(boolean)', 'explorat...oolean)', 'exploration': {'complete': True, 'completed': 1, 'completion_budget': 8, 'completion_splits': 0, ...}, ...}])
+E        +    where [{'action': 'List parcels', 'created_objects': [], 'entry': 'method:service:ParcelController#list(boolean)', 'explorat...oolean)', 'exploration': {'complete': True, 'completed': 1, 'completion_budget': 8, 'completion_splits': 0, ...}, ...}] = <analyzer.state.ScenarioState object at 0x102486dd0>.history
+
+code/tests/test_history_boundary_controls33.py:52: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_history_boundary_controls33.py::test_latest_failed_collection_is_not_replaced_with_the_old_first_row[False]
+FAILED code/tests/test_history_boundary_controls33.py::test_latest_failed_collection_is_not_replaced_with_the_old_first_row[True]
+2 failed, 1 passed, 8 deselected in 0.16s

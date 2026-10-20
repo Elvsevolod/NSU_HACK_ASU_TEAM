@@ -1,0 +1,773 @@
+.FFF.FF.......                                                           [100%]
+=================================== FAILURES ===================================
+_ test_optional_map_presence_values_and_callbacks[return Optional.of("x").map(x->mark(x)).orElseThrow();-x!] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-276/test_optional_map_presence_val1')
+body = 'return Optional.of("x").map(x->mark(x)).orElseThrow();', want = 'x!'
+
+    @pytest.mark.parametrize('body,want',[
+     ('Optional<String> s=Optional.empty();s.map(x->mark(x));return visits;',0),
+     ('return Optional.of("x").map(x->mark(x)).orElseThrow();','x!'),
+     ('return Optional.of("x").map(x->null).isPresent();',False),
+     ('return Optional.ofNullable(null).map(x->mark(x)).isPresent();',False)])
+    def test_optional_map_presence_values_and_callbacks(tmp_path,body,want):
+>       p,db,ids=model(tmp_path,body);e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==want
+                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_optional_mapping.py:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+code/analyzer/engine.py:368: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:454: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+code/analyzer/engine.py:544: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:694: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:778: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1305: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1310: in execute
+    value = self.value(node.named_children[0], env) if node.named_children else None
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1561: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1960: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2494: in call
+    obj = self.value(objnode, env) if objnode else env.get('this', U)
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1561: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1960: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2495: in call
+    receiver_kind=self.source_reference_kind(objnode,self.last_reference_kind) if objnode is not None else None
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:959: in source_reference_kind
+    written=compiled_type(self,node)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/source_conversions.py:35: in compiled_type
+    with declaration_context(engine):return engine.source_type(node)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x104421750>
+node = <Node type=method_invocation, start_point=(1, 57), end_point=(1, 73)>
+
+    def source_type(self,node):
+        """Declared expression types, including bean fields and collection elements."""
+        if node is None:return ''
+        kind,raw=node.type,text(node)
+        meta=self.p.methods[self.method]
+        if kind=='string_literal':return 'java.lang.String'
+        if kind=='class_literal':
+            written=raw.removesuffix('.class')
+            target=self.declared_type(written) or written
+            if target in PRIMITIVES or target=='void':
+                target='java.lang.'+{'boolean':'Boolean','byte':'Byte','short':'Short','char':'Character',
+                    'int':'Integer','long':'Long','float':'Float','double':'Double','void':'Void'}[target]
+            return 'java.lang.Class<'+target+'>'
+        if kind=='character_literal':return 'char'
+        if kind in ('true','false'):return 'boolean'
+        if kind in ('decimal_integer_literal','decimal_floating_point_literal'):return self.numeric_type(node)
+        if kind=='this':return self.receiver_type or self.p.nodes[meta['owner']]['fqn']
+        if kind=='identifier':
+            if raw in self.variable_types:
+                written=self.variable_types[raw]
+                qualified=self.declared_type(written)
+                return qualified if qualified or self.has_type_variables(written,meta) else written
+            info=self.p.type_fields.get(meta['owner'],{}).get(raw)
+            if not info:
+                field = (self.p.static_field_declaration(meta['owner'], raw)
+                         or self.p.imported_static_field(meta['file'], meta['module'], raw))
+                if field:
+                    declared, written = field
+                    return render_source_type(self.p, written, self.p.nodes[declared], {}, self.standard_type) or written
+                return ''
+            return self.source_member_type(self.receiver_type or self.p.nodes[meta['owner']]['fqn'],info)
+        if kind=='parenthesized_expression':return self.source_type(next(c for c in node.named_children if c.type not in ('line_comment','block_comment')))
+        if kind=='update_expression':return self.source_type(next(c for c in node.named_children if c.type not in ('line_comment','block_comment')))
+        if kind=='assignment_expression':return self.source_type(node.child_by_field_name('left'))
+        if kind in ('cast_expression','object_creation_expression'):
+            written=text(node.child_by_field_name('type'))
+            qualified=self.declared_type(written)
+            return qualified if qualified or self.has_type_variables(written,meta) or '<>' in written else written
+        if kind=='array_access':return self.source_type(node.child_by_field_name('array')).removesuffix('[]')
+        if kind=='binary_expression':
+            if text(node.child_by_field_name('operator'))=='+':
+                types=[self.source_type(node.child_by_field_name(side)) for side in ('left','right')]
+                if any(self.standard_type(t,'java.lang.String') for t in types):return 'java.lang.String'
+            return self.numeric_type(node)
+        if kind=='unary_expression':return 'boolean' if raw.startswith('!') else self.numeric_type(node)
+        if kind=='ternary_expression':
+            types=[self.source_type(node.child_by_field_name(side)) for side in ('consequence','alternative')]
+            if types[0] and types[0]==types[1]:return types[0]
+            if all(self.standard_type(t,'java.lang.String') for t in types):return 'java.lang.String'
+            return self.numeric_type(node)
+        if kind not in ('method_invocation','field_access'):return ''
+        obj=node.child_by_field_name('object')
+        receiver=self.source_type(obj) if obj is not None else self.receiver_type or self.p.nodes[meta['owner']]['fqn']
+        if kind=='field_access' and receiver.endswith('[]') and text(node.child_by_field_name('field'))=='length':return 'int'
+        owner=self.p.resolve_type(receiver,meta['module'],meta['file'])
+        if kind=='field_access':
+            name=text(node.child_by_field_name('field'))
+            qualifier=text(obj)
+            shadowed=qualifier in self.variable_types or qualifier in self.p.type_fields.get(meta['owner'],{})
+            if not shadowed and self.standard_type(qualifier,'java.util.Locale') and name in ('ROOT','ENGLISH','US'):
+                return 'java.util.Locale'
+            static_owner = owner if owner is not None else self.p.resolve_type(qualifier, meta['module'], meta['file']) if not shadowed else None
+            field = self.p.static_field_declaration(static_owner, name)
+            if field:
+                declared, written = field
+                return render_source_type(self.p, written, self.p.nodes[declared], {}, self.standard_type) or written
+            if name=='MAX_VALUE' and not shadowed:
+                for boxed,primitive in (('Integer','int'),('Long','long'),('Float','float'),('Double','double')):
+                    if self.standard_type(qualifier,'java.lang.'+boxed):return primitive
+            prefix=(self.p.nodes[owner]['fqn'].rsplit('.',1)[-1] if owner else qualifier)
+            key=prefix+'.'+name
+            if key in self.p.constant_types:return self.declared_type(self.p.constant_types[key]) or self.p.constant_types[key]
+        if kind=='method_invocation':
+            site=self.p.site(self.method,node)
+            targets=self.p.targets(self.method,site) if site else self.p.source_targets(self.method,node)
+            if not targets and owner is not None:
+                name=text(node.child_by_field_name('name'))
+                arguments=node.child_by_field_name('arguments')
+                count=len(arguments.named_children) if arguments is not None else 0
+                owners=set(self.p.type_parents.get(owner,set()))|{owner}
+                targets=[target for target in self.p.by_name.get(name,[]) if self.p.methods[target]['owner'] in owners
+                         and len(self.p.parameters(target))==count]
+            types={self.source_return_type(target,receiver,node) for target in targets}
+            if len(types)==1:return next(iter(types))
+            name=text(node.child_by_field_name('name'))
+            arguments=node.child_by_field_name('arguments')
+            count=len(arguments.named_children) if arguments is not None else 0
+>           if name in ('of','ofNullable') and count==1 and text(objnode) not in self.variable_types and self.standard_type(text(objnode),'java.util.Optional'):
+                                                                 ^^^^^^^
+E           NameError: name 'objnode' is not defined
+
+code/analyzer/engine.py:2133: NameError
+_ test_optional_map_presence_values_and_callbacks[return Optional.of("x").map(x->null).isPresent();-False] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-276/test_optional_map_presence_val2')
+body = 'return Optional.of("x").map(x->null).isPresent();', want = False
+
+    @pytest.mark.parametrize('body,want',[
+     ('Optional<String> s=Optional.empty();s.map(x->mark(x));return visits;',0),
+     ('return Optional.of("x").map(x->mark(x)).orElseThrow();','x!'),
+     ('return Optional.of("x").map(x->null).isPresent();',False),
+     ('return Optional.ofNullable(null).map(x->mark(x)).isPresent();',False)])
+    def test_optional_map_presence_values_and_callbacks(tmp_path,body,want):
+>       p,db,ids=model(tmp_path,body);e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==want
+                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_optional_mapping.py:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+code/analyzer/engine.py:368: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:454: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+code/analyzer/engine.py:544: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:694: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:778: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1305: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1310: in execute
+    value = self.value(node.named_children[0], env) if node.named_children else None
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1561: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1960: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2494: in call
+    obj = self.value(objnode, env) if objnode else env.get('this', U)
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1561: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1960: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2495: in call
+    receiver_kind=self.source_reference_kind(objnode,self.last_reference_kind) if objnode is not None else None
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:959: in source_reference_kind
+    written=compiled_type(self,node)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/source_conversions.py:35: in compiled_type
+    with declaration_context(engine):return engine.source_type(node)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x104521990>
+node = <Node type=method_invocation, start_point=(1, 57), end_point=(1, 73)>
+
+    def source_type(self,node):
+        """Declared expression types, including bean fields and collection elements."""
+        if node is None:return ''
+        kind,raw=node.type,text(node)
+        meta=self.p.methods[self.method]
+        if kind=='string_literal':return 'java.lang.String'
+        if kind=='class_literal':
+            written=raw.removesuffix('.class')
+            target=self.declared_type(written) or written
+            if target in PRIMITIVES or target=='void':
+                target='java.lang.'+{'boolean':'Boolean','byte':'Byte','short':'Short','char':'Character',
+                    'int':'Integer','long':'Long','float':'Float','double':'Double','void':'Void'}[target]
+            return 'java.lang.Class<'+target+'>'
+        if kind=='character_literal':return 'char'
+        if kind in ('true','false'):return 'boolean'
+        if kind in ('decimal_integer_literal','decimal_floating_point_literal'):return self.numeric_type(node)
+        if kind=='this':return self.receiver_type or self.p.nodes[meta['owner']]['fqn']
+        if kind=='identifier':
+            if raw in self.variable_types:
+                written=self.variable_types[raw]
+                qualified=self.declared_type(written)
+                return qualified if qualified or self.has_type_variables(written,meta) else written
+            info=self.p.type_fields.get(meta['owner'],{}).get(raw)
+            if not info:
+                field = (self.p.static_field_declaration(meta['owner'], raw)
+                         or self.p.imported_static_field(meta['file'], meta['module'], raw))
+                if field:
+                    declared, written = field
+                    return render_source_type(self.p, written, self.p.nodes[declared], {}, self.standard_type) or written
+                return ''
+            return self.source_member_type(self.receiver_type or self.p.nodes[meta['owner']]['fqn'],info)
+        if kind=='parenthesized_expression':return self.source_type(next(c for c in node.named_children if c.type not in ('line_comment','block_comment')))
+        if kind=='update_expression':return self.source_type(next(c for c in node.named_children if c.type not in ('line_comment','block_comment')))
+        if kind=='assignment_expression':return self.source_type(node.child_by_field_name('left'))
+        if kind in ('cast_expression','object_creation_expression'):
+            written=text(node.child_by_field_name('type'))
+            qualified=self.declared_type(written)
+            return qualified if qualified or self.has_type_variables(written,meta) or '<>' in written else written
+        if kind=='array_access':return self.source_type(node.child_by_field_name('array')).removesuffix('[]')
+        if kind=='binary_expression':
+            if text(node.child_by_field_name('operator'))=='+':
+                types=[self.source_type(node.child_by_field_name(side)) for side in ('left','right')]
+                if any(self.standard_type(t,'java.lang.String') for t in types):return 'java.lang.String'
+            return self.numeric_type(node)
+        if kind=='unary_expression':return 'boolean' if raw.startswith('!') else self.numeric_type(node)
+        if kind=='ternary_expression':
+            types=[self.source_type(node.child_by_field_name(side)) for side in ('consequence','alternative')]
+            if types[0] and types[0]==types[1]:return types[0]
+            if all(self.standard_type(t,'java.lang.String') for t in types):return 'java.lang.String'
+            return self.numeric_type(node)
+        if kind not in ('method_invocation','field_access'):return ''
+        obj=node.child_by_field_name('object')
+        receiver=self.source_type(obj) if obj is not None else self.receiver_type or self.p.nodes[meta['owner']]['fqn']
+        if kind=='field_access' and receiver.endswith('[]') and text(node.child_by_field_name('field'))=='length':return 'int'
+        owner=self.p.resolve_type(receiver,meta['module'],meta['file'])
+        if kind=='field_access':
+            name=text(node.child_by_field_name('field'))
+            qualifier=text(obj)
+            shadowed=qualifier in self.variable_types or qualifier in self.p.type_fields.get(meta['owner'],{})
+            if not shadowed and self.standard_type(qualifier,'java.util.Locale') and name in ('ROOT','ENGLISH','US'):
+                return 'java.util.Locale'
+            static_owner = owner if owner is not None else self.p.resolve_type(qualifier, meta['module'], meta['file']) if not shadowed else None
+            field = self.p.static_field_declaration(static_owner, name)
+            if field:
+                declared, written = field
+                return render_source_type(self.p, written, self.p.nodes[declared], {}, self.standard_type) or written
+            if name=='MAX_VALUE' and not shadowed:
+                for boxed,primitive in (('Integer','int'),('Long','long'),('Float','float'),('Double','double')):
+                    if self.standard_type(qualifier,'java.lang.'+boxed):return primitive
+            prefix=(self.p.nodes[owner]['fqn'].rsplit('.',1)[-1] if owner else qualifier)
+            key=prefix+'.'+name
+            if key in self.p.constant_types:return self.declared_type(self.p.constant_types[key]) or self.p.constant_types[key]
+        if kind=='method_invocation':
+            site=self.p.site(self.method,node)
+            targets=self.p.targets(self.method,site) if site else self.p.source_targets(self.method,node)
+            if not targets and owner is not None:
+                name=text(node.child_by_field_name('name'))
+                arguments=node.child_by_field_name('arguments')
+                count=len(arguments.named_children) if arguments is not None else 0
+                owners=set(self.p.type_parents.get(owner,set()))|{owner}
+                targets=[target for target in self.p.by_name.get(name,[]) if self.p.methods[target]['owner'] in owners
+                         and len(self.p.parameters(target))==count]
+            types={self.source_return_type(target,receiver,node) for target in targets}
+            if len(types)==1:return next(iter(types))
+            name=text(node.child_by_field_name('name'))
+            arguments=node.child_by_field_name('arguments')
+            count=len(arguments.named_children) if arguments is not None else 0
+>           if name in ('of','ofNullable') and count==1 and text(objnode) not in self.variable_types and self.standard_type(text(objnode),'java.util.Optional'):
+                                                                 ^^^^^^^
+E           NameError: name 'objnode' is not defined
+
+code/analyzer/engine.py:2133: NameError
+_ test_optional_map_presence_values_and_callbacks[return Optional.ofNullable(null).map(x->mark(x)).isPresent();-False] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-276/test_optional_map_presence_val3')
+body = 'return Optional.ofNullable(null).map(x->mark(x)).isPresent();'
+want = False
+
+    @pytest.mark.parametrize('body,want',[
+     ('Optional<String> s=Optional.empty();s.map(x->mark(x));return visits;',0),
+     ('return Optional.of("x").map(x->mark(x)).orElseThrow();','x!'),
+     ('return Optional.of("x").map(x->null).isPresent();',False),
+     ('return Optional.ofNullable(null).map(x->mark(x)).isPresent();',False)])
+    def test_optional_map_presence_values_and_callbacks(tmp_path,body,want):
+>       p,db,ids=model(tmp_path,body);e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})==want
+                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_optional_mapping.py:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+code/analyzer/engine.py:368: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:454: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+code/analyzer/engine.py:544: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:694: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:778: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1305: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1310: in execute
+    value = self.value(node.named_children[0], env) if node.named_children else None
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1561: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1960: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2494: in call
+    obj = self.value(objnode, env) if objnode else env.get('this', U)
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1561: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1960: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2495: in call
+    receiver_kind=self.source_reference_kind(objnode,self.last_reference_kind) if objnode is not None else None
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:959: in source_reference_kind
+    written=compiled_type(self,node)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/source_conversions.py:35: in compiled_type
+    with declaration_context(engine):return engine.source_type(node)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x104180b90>
+node = <Node type=method_invocation, start_point=(1, 57), end_point=(1, 82)>
+
+    def source_type(self,node):
+        """Declared expression types, including bean fields and collection elements."""
+        if node is None:return ''
+        kind,raw=node.type,text(node)
+        meta=self.p.methods[self.method]
+        if kind=='string_literal':return 'java.lang.String'
+        if kind=='class_literal':
+            written=raw.removesuffix('.class')
+            target=self.declared_type(written) or written
+            if target in PRIMITIVES or target=='void':
+                target='java.lang.'+{'boolean':'Boolean','byte':'Byte','short':'Short','char':'Character',
+                    'int':'Integer','long':'Long','float':'Float','double':'Double','void':'Void'}[target]
+            return 'java.lang.Class<'+target+'>'
+        if kind=='character_literal':return 'char'
+        if kind in ('true','false'):return 'boolean'
+        if kind in ('decimal_integer_literal','decimal_floating_point_literal'):return self.numeric_type(node)
+        if kind=='this':return self.receiver_type or self.p.nodes[meta['owner']]['fqn']
+        if kind=='identifier':
+            if raw in self.variable_types:
+                written=self.variable_types[raw]
+                qualified=self.declared_type(written)
+                return qualified if qualified or self.has_type_variables(written,meta) else written
+            info=self.p.type_fields.get(meta['owner'],{}).get(raw)
+            if not info:
+                field = (self.p.static_field_declaration(meta['owner'], raw)
+                         or self.p.imported_static_field(meta['file'], meta['module'], raw))
+                if field:
+                    declared, written = field
+                    return render_source_type(self.p, written, self.p.nodes[declared], {}, self.standard_type) or written
+                return ''
+            return self.source_member_type(self.receiver_type or self.p.nodes[meta['owner']]['fqn'],info)
+        if kind=='parenthesized_expression':return self.source_type(next(c for c in node.named_children if c.type not in ('line_comment','block_comment')))
+        if kind=='update_expression':return self.source_type(next(c for c in node.named_children if c.type not in ('line_comment','block_comment')))
+        if kind=='assignment_expression':return self.source_type(node.child_by_field_name('left'))
+        if kind in ('cast_expression','object_creation_expression'):
+            written=text(node.child_by_field_name('type'))
+            qualified=self.declared_type(written)
+            return qualified if qualified or self.has_type_variables(written,meta) or '<>' in written else written
+        if kind=='array_access':return self.source_type(node.child_by_field_name('array')).removesuffix('[]')
+        if kind=='binary_expression':
+            if text(node.child_by_field_name('operator'))=='+':
+                types=[self.source_type(node.child_by_field_name(side)) for side in ('left','right')]
+                if any(self.standard_type(t,'java.lang.String') for t in types):return 'java.lang.String'
+            return self.numeric_type(node)
+        if kind=='unary_expression':return 'boolean' if raw.startswith('!') else self.numeric_type(node)
+        if kind=='ternary_expression':
+            types=[self.source_type(node.child_by_field_name(side)) for side in ('consequence','alternative')]
+            if types[0] and types[0]==types[1]:return types[0]
+            if all(self.standard_type(t,'java.lang.String') for t in types):return 'java.lang.String'
+            return self.numeric_type(node)
+        if kind not in ('method_invocation','field_access'):return ''
+        obj=node.child_by_field_name('object')
+        receiver=self.source_type(obj) if obj is not None else self.receiver_type or self.p.nodes[meta['owner']]['fqn']
+        if kind=='field_access' and receiver.endswith('[]') and text(node.child_by_field_name('field'))=='length':return 'int'
+        owner=self.p.resolve_type(receiver,meta['module'],meta['file'])
+        if kind=='field_access':
+            name=text(node.child_by_field_name('field'))
+            qualifier=text(obj)
+            shadowed=qualifier in self.variable_types or qualifier in self.p.type_fields.get(meta['owner'],{})
+            if not shadowed and self.standard_type(qualifier,'java.util.Locale') and name in ('ROOT','ENGLISH','US'):
+                return 'java.util.Locale'
+            static_owner = owner if owner is not None else self.p.resolve_type(qualifier, meta['module'], meta['file']) if not shadowed else None
+            field = self.p.static_field_declaration(static_owner, name)
+            if field:
+                declared, written = field
+                return render_source_type(self.p, written, self.p.nodes[declared], {}, self.standard_type) or written
+            if name=='MAX_VALUE' and not shadowed:
+                for boxed,primitive in (('Integer','int'),('Long','long'),('Float','float'),('Double','double')):
+                    if self.standard_type(qualifier,'java.lang.'+boxed):return primitive
+            prefix=(self.p.nodes[owner]['fqn'].rsplit('.',1)[-1] if owner else qualifier)
+            key=prefix+'.'+name
+            if key in self.p.constant_types:return self.declared_type(self.p.constant_types[key]) or self.p.constant_types[key]
+        if kind=='method_invocation':
+            site=self.p.site(self.method,node)
+            targets=self.p.targets(self.method,site) if site else self.p.source_targets(self.method,node)
+            if not targets and owner is not None:
+                name=text(node.child_by_field_name('name'))
+                arguments=node.child_by_field_name('arguments')
+                count=len(arguments.named_children) if arguments is not None else 0
+                owners=set(self.p.type_parents.get(owner,set()))|{owner}
+                targets=[target for target in self.p.by_name.get(name,[]) if self.p.methods[target]['owner'] in owners
+                         and len(self.p.parameters(target))==count]
+            types={self.source_return_type(target,receiver,node) for target in targets}
+            if len(types)==1:return next(iter(types))
+            name=text(node.child_by_field_name('name'))
+            arguments=node.child_by_field_name('arguments')
+            count=len(arguments.named_children) if arguments is not None else 0
+>           if name in ('of','ofNullable') and count==1 and text(objnode) not in self.variable_types and self.standard_type(text(objnode),'java.util.Optional'):
+                                                                 ^^^^^^^
+E           NameError: name 'objnode' is not defined
+
+code/analyzer/engine.py:2133: NameError
+_ test_null_mapper_and_throw_never_complete_normally[return Optional.of("x").map(null);] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-276/test_null_mapper_and_throw_nev1')
+body = 'return Optional.of("x").map(null);'
+
+    @pytest.mark.parametrize('body',[
+     'return Optional.empty().map(null);','return Optional.of("x").map(null);',
+     'return Optional.of("x").map(x->{mark(x);throw new IllegalStateException();});'])
+    def test_null_mapper_and_throw_never_complete_normally(tmp_path,body):
+>       p,db,ids=model(tmp_path,body);e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
+                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_optional_mapping.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+code/analyzer/engine.py:368: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:454: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+code/analyzer/engine.py:544: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:694: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:778: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1305: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1310: in execute
+    value = self.value(node.named_children[0], env) if node.named_children else None
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1561: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1960: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2495: in call
+    receiver_kind=self.source_reference_kind(objnode,self.last_reference_kind) if objnode is not None else None
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:959: in source_reference_kind
+    written=compiled_type(self,node)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/source_conversions.py:35: in compiled_type
+    with declaration_context(engine):return engine.source_type(node)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x1045827d0>
+node = <Node type=method_invocation, start_point=(1, 57), end_point=(1, 73)>
+
+    def source_type(self,node):
+        """Declared expression types, including bean fields and collection elements."""
+        if node is None:return ''
+        kind,raw=node.type,text(node)
+        meta=self.p.methods[self.method]
+        if kind=='string_literal':return 'java.lang.String'
+        if kind=='class_literal':
+            written=raw.removesuffix('.class')
+            target=self.declared_type(written) or written
+            if target in PRIMITIVES or target=='void':
+                target='java.lang.'+{'boolean':'Boolean','byte':'Byte','short':'Short','char':'Character',
+                    'int':'Integer','long':'Long','float':'Float','double':'Double','void':'Void'}[target]
+            return 'java.lang.Class<'+target+'>'
+        if kind=='character_literal':return 'char'
+        if kind in ('true','false'):return 'boolean'
+        if kind in ('decimal_integer_literal','decimal_floating_point_literal'):return self.numeric_type(node)
+        if kind=='this':return self.receiver_type or self.p.nodes[meta['owner']]['fqn']
+        if kind=='identifier':
+            if raw in self.variable_types:
+                written=self.variable_types[raw]
+                qualified=self.declared_type(written)
+                return qualified if qualified or self.has_type_variables(written,meta) else written
+            info=self.p.type_fields.get(meta['owner'],{}).get(raw)
+            if not info:
+                field = (self.p.static_field_declaration(meta['owner'], raw)
+                         or self.p.imported_static_field(meta['file'], meta['module'], raw))
+                if field:
+                    declared, written = field
+                    return render_source_type(self.p, written, self.p.nodes[declared], {}, self.standard_type) or written
+                return ''
+            return self.source_member_type(self.receiver_type or self.p.nodes[meta['owner']]['fqn'],info)
+        if kind=='parenthesized_expression':return self.source_type(next(c for c in node.named_children if c.type not in ('line_comment','block_comment')))
+        if kind=='update_expression':return self.source_type(next(c for c in node.named_children if c.type not in ('line_comment','block_comment')))
+        if kind=='assignment_expression':return self.source_type(node.child_by_field_name('left'))
+        if kind in ('cast_expression','object_creation_expression'):
+            written=text(node.child_by_field_name('type'))
+            qualified=self.declared_type(written)
+            return qualified if qualified or self.has_type_variables(written,meta) or '<>' in written else written
+        if kind=='array_access':return self.source_type(node.child_by_field_name('array')).removesuffix('[]')
+        if kind=='binary_expression':
+            if text(node.child_by_field_name('operator'))=='+':
+                types=[self.source_type(node.child_by_field_name(side)) for side in ('left','right')]
+                if any(self.standard_type(t,'java.lang.String') for t in types):return 'java.lang.String'
+            return self.numeric_type(node)
+        if kind=='unary_expression':return 'boolean' if raw.startswith('!') else self.numeric_type(node)
+        if kind=='ternary_expression':
+            types=[self.source_type(node.child_by_field_name(side)) for side in ('consequence','alternative')]
+            if types[0] and types[0]==types[1]:return types[0]
+            if all(self.standard_type(t,'java.lang.String') for t in types):return 'java.lang.String'
+            return self.numeric_type(node)
+        if kind not in ('method_invocation','field_access'):return ''
+        obj=node.child_by_field_name('object')
+        receiver=self.source_type(obj) if obj is not None else self.receiver_type or self.p.nodes[meta['owner']]['fqn']
+        if kind=='field_access' and receiver.endswith('[]') and text(node.child_by_field_name('field'))=='length':return 'int'
+        owner=self.p.resolve_type(receiver,meta['module'],meta['file'])
+        if kind=='field_access':
+            name=text(node.child_by_field_name('field'))
+            qualifier=text(obj)
+            shadowed=qualifier in self.variable_types or qualifier in self.p.type_fields.get(meta['owner'],{})
+            if not shadowed and self.standard_type(qualifier,'java.util.Locale') and name in ('ROOT','ENGLISH','US'):
+                return 'java.util.Locale'
+            static_owner = owner if owner is not None else self.p.resolve_type(qualifier, meta['module'], meta['file']) if not shadowed else None
+            field = self.p.static_field_declaration(static_owner, name)
+            if field:
+                declared, written = field
+                return render_source_type(self.p, written, self.p.nodes[declared], {}, self.standard_type) or written
+            if name=='MAX_VALUE' and not shadowed:
+                for boxed,primitive in (('Integer','int'),('Long','long'),('Float','float'),('Double','double')):
+                    if self.standard_type(qualifier,'java.lang.'+boxed):return primitive
+            prefix=(self.p.nodes[owner]['fqn'].rsplit('.',1)[-1] if owner else qualifier)
+            key=prefix+'.'+name
+            if key in self.p.constant_types:return self.declared_type(self.p.constant_types[key]) or self.p.constant_types[key]
+        if kind=='method_invocation':
+            site=self.p.site(self.method,node)
+            targets=self.p.targets(self.method,site) if site else self.p.source_targets(self.method,node)
+            if not targets and owner is not None:
+                name=text(node.child_by_field_name('name'))
+                arguments=node.child_by_field_name('arguments')
+                count=len(arguments.named_children) if arguments is not None else 0
+                owners=set(self.p.type_parents.get(owner,set()))|{owner}
+                targets=[target for target in self.p.by_name.get(name,[]) if self.p.methods[target]['owner'] in owners
+                         and len(self.p.parameters(target))==count]
+            types={self.source_return_type(target,receiver,node) for target in targets}
+            if len(types)==1:return next(iter(types))
+            name=text(node.child_by_field_name('name'))
+            arguments=node.child_by_field_name('arguments')
+            count=len(arguments.named_children) if arguments is not None else 0
+>           if name in ('of','ofNullable') and count==1 and text(objnode) not in self.variable_types and self.standard_type(text(objnode),'java.util.Optional'):
+                                                                 ^^^^^^^
+E           NameError: name 'objnode' is not defined
+
+code/analyzer/engine.py:2133: NameError
+_ test_null_mapper_and_throw_never_complete_normally[return Optional.of("x").map(x->{mark(x);throw new IllegalStateException();});] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-276/test_null_mapper_and_throw_nev2')
+body = 'return Optional.of("x").map(x->{mark(x);throw new IllegalStateException();});'
+
+    @pytest.mark.parametrize('body',[
+     'return Optional.empty().map(null);','return Optional.of("x").map(null);',
+     'return Optional.of("x").map(x->{mark(x);throw new IllegalStateException();});'])
+    def test_null_mapper_and_throw_never_complete_normally(tmp_path,body):
+>       p,db,ids=model(tmp_path,body);e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{}) is U
+                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_optional_mapping.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+code/analyzer/engine.py:368: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:454: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+code/analyzer/engine.py:544: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:694: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:778: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1305: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1310: in execute
+    value = self.value(node.named_children[0], env) if node.named_children else None
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1561: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:1960: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:2495: in call
+    receiver_kind=self.source_reference_kind(objnode,self.last_reference_kind) if objnode is not None else None
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/engine.py:959: in source_reference_kind
+    written=compiled_type(self,node)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/source_conversions.py:35: in compiled_type
+    with declaration_context(engine):return engine.source_type(node)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x1037e1e90>
+node = <Node type=method_invocation, start_point=(1, 57), end_point=(1, 73)>
+
+    def source_type(self,node):
+        """Declared expression types, including bean fields and collection elements."""
+        if node is None:return ''
+        kind,raw=node.type,text(node)
+        meta=self.p.methods[self.method]
+        if kind=='string_literal':return 'java.lang.String'
+        if kind=='class_literal':
+            written=raw.removesuffix('.class')
+            target=self.declared_type(written) or written
+            if target in PRIMITIVES or target=='void':
+                target='java.lang.'+{'boolean':'Boolean','byte':'Byte','short':'Short','char':'Character',
+                    'int':'Integer','long':'Long','float':'Float','double':'Double','void':'Void'}[target]
+            return 'java.lang.Class<'+target+'>'
+        if kind=='character_literal':return 'char'
+        if kind in ('true','false'):return 'boolean'
+        if kind in ('decimal_integer_literal','decimal_floating_point_literal'):return self.numeric_type(node)
+        if kind=='this':return self.receiver_type or self.p.nodes[meta['owner']]['fqn']
+        if kind=='identifier':
+            if raw in self.variable_types:
+                written=self.variable_types[raw]
+                qualified=self.declared_type(written)
+                return qualified if qualified or self.has_type_variables(written,meta) else written
+            info=self.p.type_fields.get(meta['owner'],{}).get(raw)
+            if not info:
+                field = (self.p.static_field_declaration(meta['owner'], raw)
+                         or self.p.imported_static_field(meta['file'], meta['module'], raw))
+                if field:
+                    declared, written = field
+                    return render_source_type(self.p, written, self.p.nodes[declared], {}, self.standard_type) or written
+                return ''
+            return self.source_member_type(self.receiver_type or self.p.nodes[meta['owner']]['fqn'],info)
+        if kind=='parenthesized_expression':return self.source_type(next(c for c in node.named_children if c.type not in ('line_comment','block_comment')))
+        if kind=='update_expression':return self.source_type(next(c for c in node.named_children if c.type not in ('line_comment','block_comment')))
+        if kind=='assignment_expression':return self.source_type(node.child_by_field_name('left'))
+        if kind in ('cast_expression','object_creation_expression'):
+            written=text(node.child_by_field_name('type'))
+            qualified=self.declared_type(written)
+            return qualified if qualified or self.has_type_variables(written,meta) or '<>' in written else written
+        if kind=='array_access':return self.source_type(node.child_by_field_name('array')).removesuffix('[]')
+        if kind=='binary_expression':
+            if text(node.child_by_field_name('operator'))=='+':
+                types=[self.source_type(node.child_by_field_name(side)) for side in ('left','right')]
+                if any(self.standard_type(t,'java.lang.String') for t in types):return 'java.lang.String'
+            return self.numeric_type(node)
+        if kind=='unary_expression':return 'boolean' if raw.startswith('!') else self.numeric_type(node)
+        if kind=='ternary_expression':
+            types=[self.source_type(node.child_by_field_name(side)) for side in ('consequence','alternative')]
+            if types[0] and types[0]==types[1]:return types[0]
+            if all(self.standard_type(t,'java.lang.String') for t in types):return 'java.lang.String'
+            return self.numeric_type(node)
+        if kind not in ('method_invocation','field_access'):return ''
+        obj=node.child_by_field_name('object')
+        receiver=self.source_type(obj) if obj is not None else self.receiver_type or self.p.nodes[meta['owner']]['fqn']
+        if kind=='field_access' and receiver.endswith('[]') and text(node.child_by_field_name('field'))=='length':return 'int'
+        owner=self.p.resolve_type(receiver,meta['module'],meta['file'])
+        if kind=='field_access':
+            name=text(node.child_by_field_name('field'))
+            qualifier=text(obj)
+            shadowed=qualifier in self.variable_types or qualifier in self.p.type_fields.get(meta['owner'],{})
+            if not shadowed and self.standard_type(qualifier,'java.util.Locale') and name in ('ROOT','ENGLISH','US'):
+                return 'java.util.Locale'
+            static_owner = owner if owner is not None else self.p.resolve_type(qualifier, meta['module'], meta['file']) if not shadowed else None
+            field = self.p.static_field_declaration(static_owner, name)
+            if field:
+                declared, written = field
+                return render_source_type(self.p, written, self.p.nodes[declared], {}, self.standard_type) or written
+            if name=='MAX_VALUE' and not shadowed:
+                for boxed,primitive in (('Integer','int'),('Long','long'),('Float','float'),('Double','double')):
+                    if self.standard_type(qualifier,'java.lang.'+boxed):return primitive
+            prefix=(self.p.nodes[owner]['fqn'].rsplit('.',1)[-1] if owner else qualifier)
+            key=prefix+'.'+name
+            if key in self.p.constant_types:return self.declared_type(self.p.constant_types[key]) or self.p.constant_types[key]
+        if kind=='method_invocation':
+            site=self.p.site(self.method,node)
+            targets=self.p.targets(self.method,site) if site else self.p.source_targets(self.method,node)
+            if not targets and owner is not None:
+                name=text(node.child_by_field_name('name'))
+                arguments=node.child_by_field_name('arguments')
+                count=len(arguments.named_children) if arguments is not None else 0
+                owners=set(self.p.type_parents.get(owner,set()))|{owner}
+                targets=[target for target in self.p.by_name.get(name,[]) if self.p.methods[target]['owner'] in owners
+                         and len(self.p.parameters(target))==count]
+            types={self.source_return_type(target,receiver,node) for target in targets}
+            if len(types)==1:return next(iter(types))
+            name=text(node.child_by_field_name('name'))
+            arguments=node.child_by_field_name('arguments')
+            count=len(arguments.named_children) if arguments is not None else 0
+>           if name in ('of','ofNullable') and count==1 and text(objnode) not in self.variable_types and self.standard_type(text(objnode),'java.util.Optional'):
+                                                                 ^^^^^^^
+E           NameError: name 'objnode' is not defined
+
+code/analyzer/engine.py:2133: NameError
+=========================== short test summary info ============================
+FAILED code/tests/test_optional_mapping.py::test_optional_map_presence_values_and_callbacks[return Optional.of("x").map(x->mark(x)).orElseThrow();-x!]
+FAILED code/tests/test_optional_mapping.py::test_optional_map_presence_values_and_callbacks[return Optional.of("x").map(x->null).isPresent();-False]
+FAILED code/tests/test_optional_mapping.py::test_optional_map_presence_values_and_callbacks[return Optional.ofNullable(null).map(x->mark(x)).isPresent();-False]
+FAILED code/tests/test_optional_mapping.py::test_null_mapper_and_throw_never_complete_normally[return Optional.of("x").map(null);]
+FAILED code/tests/test_optional_mapping.py::test_null_mapper_and_throw_never_complete_normally[return Optional.of("x").map(x->{mark(x);throw new IllegalStateException();});]
+5 failed, 9 passed in 1.86s

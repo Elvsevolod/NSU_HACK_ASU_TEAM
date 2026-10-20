@@ -1,0 +1,663 @@
+{
+  "project": "library",
+  "cases": [
+    {
+      "id": "library-existing-order-state",
+      "steps": [
+        {
+          "explicit_action": "GET http://lms-order-service/api/orders/v1/100",
+          "nl_action": "Прочитай заказ книги с id=100 через внутренний сервис заказов.",
+          "http_request": {
+            "method": "GET",
+            "url": "http://lms-order-service/api/orders/v1/100",
+            "headers": {
+              "lms-key": "352019a6-1c73-11eb-adc1-0242ac120002"
+            }
+          },
+          "expected_entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#findById(Long)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#findById(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#findById(Long)",
+              "relation": "calls",
+              "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findById(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findById(Long)",
+              "relation": "data",
+              "target": "res:table:order.book_order"
+            }
+          ],
+          "expected_result_projection": {
+            "id": 100,
+            "userId": 7,
+            "bookId": 11,
+            "collectedAt": null
+          },
+          "expected_completion": "returned",
+          "notes": [],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        },
+        {
+          "explicit_action": "PUT http://lms-order-service/api/orders/v1/100/collect",
+          "nl_action": "Отметь получение книги по заказу 100 во внутреннем сервисе заказов.",
+          "http_request": {
+            "method": "PUT",
+            "url": "http://lms-order-service/api/orders/v1/100/collect",
+            "headers": {
+              "lms-key": "352019a6-1c73-11eb-adc1-0242ac120002"
+            }
+          },
+          "expected_entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#collectBook(Long)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#collectBook(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#collectBook(Long)",
+              "relation": "calls",
+              "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#collectBook(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#collectBook(Long)",
+              "relation": "data",
+              "target": "res:table:order.book_order"
+            }
+          ],
+          "expected_result_projection": {
+            "id": 100
+          },
+          "expected_completion": "returned",
+          "notes": [
+            "collectedAt changes from null to the declared clock; saveAndFlush occurs only on the first call."
+          ],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        },
+        {
+          "explicit_action": "GET http://lms-order-service/api/orders/v1/100",
+          "nl_action": "Прочитай заказ книги с id=100 через внутренний сервис заказов.",
+          "http_request": {
+            "method": "GET",
+            "url": "http://lms-order-service/api/orders/v1/100",
+            "headers": {
+              "lms-key": "352019a6-1c73-11eb-adc1-0242ac120002"
+            }
+          },
+          "expected_entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#findById(Long)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#findById(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#findById(Long)",
+              "relation": "calls",
+              "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findById(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findById(Long)",
+              "relation": "data",
+              "target": "res:table:order.book_order"
+            }
+          ],
+          "expected_result_projection": {
+            "id": 100,
+            "userId": 7,
+            "bookId": 11
+          },
+          "expected_completion": "returned",
+          "notes": [],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision",
+          "result_required_nonnull": [
+            "collectedAt"
+          ]
+        },
+        {
+          "explicit_action": "PUT http://lms-order-service/api/orders/v1/100/collect",
+          "nl_action": "Повтори отметку получения книги по уже полученному заказу 100.",
+          "http_request": {
+            "method": "PUT",
+            "url": "http://lms-order-service/api/orders/v1/100/collect",
+            "headers": {
+              "lms-key": "352019a6-1c73-11eb-adc1-0242ac120002"
+            }
+          },
+          "expected_entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#collectBook(Long)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#collectBook(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#collectBook(Long)",
+              "relation": "calls",
+              "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#collectBook(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#collectBook(Long)",
+              "relation": "data",
+              "target": "res:table:order.book_order"
+            }
+          ],
+          "expected_result_projection": null,
+          "expected_completion": "failure",
+          "notes": [
+            "Optional.filter rejects non-null collectedAt; OrderNotFoundException is mapped to HTTP404; no second saveAndFlush."
+          ],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        },
+        {
+          "explicit_action": "PUT http://lms-order-service/api/orders/v1/100/return",
+          "nl_action": "Верни книгу по заказу 100 через внутренний сервис заказов.",
+          "http_request": {
+            "method": "PUT",
+            "url": "http://lms-order-service/api/orders/v1/100/return",
+            "headers": {
+              "lms-key": "352019a6-1c73-11eb-adc1-0242ac120002"
+            }
+          },
+          "expected_entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#returnBook(Long)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#returnBook(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#returnBook(Long)",
+              "relation": "calls",
+              "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#returnBook(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#returnBook(Long)",
+              "relation": "calls",
+              "target": "method:order:com.dhitha.lms.order.service.InventoryServiceImpl#returnBook(Long,String)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#returnBook(Long)",
+              "relation": "calls",
+              "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#delete(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#returnBook(Long)",
+              "relation": "calls",
+              "target": "method:order:com.dhitha.lms.order.service.BookOrderHistoryServiceImpl#save(BookOrder)"
+            },
+            {
+              "source": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#returnBook(Long,String)",
+              "relation": "calls",
+              "target": "method:inventory:com.dhitha.lms.inventory.service.InventoryServiceImpl#returnBook(Long,String)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#returnBook(Long)",
+              "relation": "data",
+              "target": "res:table:order.book_order"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#delete(Long)",
+              "relation": "data",
+              "target": "res:table:order.book_order"
+            },
+            {
+              "source": "method:inventory:com.dhitha.lms.inventory.service.InventoryServiceImpl#returnBook(Long,String)",
+              "relation": "data",
+              "target": "res:table:inventory.inventory"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderHistoryServiceImpl#save(BookOrder)",
+              "relation": "data",
+              "target": "res:table:order.book_order_history"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.InventoryServiceImpl#returnBook(Long,String)",
+              "relation": "remote",
+              "target": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#returnBook(Long,String)"
+            },
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#returnBook(Long,String)"
+            }
+          ],
+          "expected_result_projection": {
+            "id": 100,
+            "lateFees": 0
+          },
+          "expected_completion": "returned",
+          "notes": [
+            "Successful inventory update happens before order deletion/history save. Before returnBy, lateFees=0. Source BookOrderHistoryServiceImpl.save is a separate history write."
+          ],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        },
+        {
+          "explicit_action": "GET http://lms-order-service/api/orders/v1/100",
+          "nl_action": "Прочитай удалённый после возврата заказ 100.",
+          "http_request": {
+            "method": "GET",
+            "url": "http://lms-order-service/api/orders/v1/100",
+            "headers": {
+              "lms-key": "352019a6-1c73-11eb-adc1-0242ac120002"
+            }
+          },
+          "expected_entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#findById(Long)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#findById(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#findById(Long)",
+              "relation": "calls",
+              "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findById(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findById(Long)",
+              "relation": "data",
+              "target": "res:table:order.book_order"
+            }
+          ],
+          "expected_result_projection": null,
+          "expected_completion": "failure",
+          "notes": [],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        }
+      ],
+      "covers": [
+        "select",
+        "update",
+        "read",
+        "repeat-refusal",
+        "remote",
+        "data",
+        "state"
+      ]
+    },
+    {
+      "id": "library-create-and-select",
+      "steps": [
+        {
+          "explicit_action": "POST http://lms-order-service/api/orders/v1\n{\"userId\": 8, \"bookId\": 21, \"bookIsbn\": \"9780134685991\", \"bookName\": \"Bench Book\"}",
+          "nl_action": "Оформи заказ книги 21 для читателя 8 через внутренний сервис заказов: userId=8, bookId=21, bookIsbn=\"9780134685991\", bookName=\"Bench Book\".",
+          "http_request": {
+            "method": "POST",
+            "url": "http://lms-order-service/api/orders/v1",
+            "headers": {
+              "lms-key": "352019a6-1c73-11eb-adc1-0242ac120002"
+            },
+            "body": {
+              "userId": 8,
+              "bookId": 21,
+              "bookIsbn": "9780134685991",
+              "bookName": "Bench Book"
+            }
+          },
+          "expected_entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#orderBook(BookOrderDTO)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#orderBook(BookOrderDTO)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#orderBook(BookOrderDTO)",
+              "relation": "calls",
+              "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)",
+              "relation": "calls",
+              "target": "method:order:com.dhitha.lms.order.service.InventoryServiceImpl#orderIfAvailable(Long)"
+            },
+            {
+              "source": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#orderIfAvailable(Long)",
+              "relation": "calls",
+              "target": "method:inventory:com.dhitha.lms.inventory.service.InventoryServiceImpl#orderBookIfAvailable(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)",
+              "relation": "data",
+              "target": "res:table:order.book_order"
+            },
+            {
+              "source": "method:inventory:com.dhitha.lms.inventory.service.InventoryServiceImpl#orderBookIfAvailable(Long)",
+              "relation": "data",
+              "target": "res:table:inventory.inventory"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.InventoryServiceImpl#orderIfAvailable(Long)",
+              "relation": "remote",
+              "target": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#orderIfAvailable(Long)"
+            },
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#orderIfAvailable(Long)"
+            }
+          ],
+          "expected_result_projection": {
+            "userId": 8,
+            "bookId": 21,
+            "bookReferenceId": "available-21"
+          },
+          "expected_completion": "returned",
+          "notes": [
+            "id is generated from the declared identity state and returned in Location/body; future request must consume that actual producer, not assume a convenient id."
+          ],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        },
+        {
+          "explicit_action": "GET http://lms-order-service/api/orders/v1/users/8",
+          "nl_action": "Найди созданный заказ книги для читателя 8.",
+          "http_request": {
+            "method": "GET",
+            "url": "http://lms-order-service/api/orders/v1/users/8",
+            "headers": {
+              "lms-key": "352019a6-1c73-11eb-adc1-0242ac120002"
+            }
+          },
+          "expected_entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#findAllByUser(Long)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#findAllByUser(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#findAllByUser(Long)",
+              "relation": "calls",
+              "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findAllByUser(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findAllByUser(Long)",
+              "relation": "data",
+              "target": "res:table:order.book_order"
+            }
+          ],
+          "expected_result_projection": null,
+          "expected_completion": "returned",
+          "notes": [],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        }
+      ],
+      "covers": [
+        "create",
+        "select",
+        "remote",
+        "data",
+        "generated-id-producer"
+      ]
+    },
+    {
+      "id": "library-remote-refusal",
+      "steps": [
+        {
+          "explicit_action": "POST http://lms-order-service/api/orders/v1\n{\"userId\": 8, \"bookId\": 999, \"bookIsbn\": \"9780134685991\", \"bookName\": \"Bench Book\"}",
+          "nl_action": "Оформи выдачу отсутствующей в наличии книги 999 для читателя 8: userId=8, bookId=999, bookIsbn=\"9780134685991\", bookName=\"Bench Book\".",
+          "http_request": {
+            "method": "POST",
+            "url": "http://lms-order-service/api/orders/v1",
+            "headers": {
+              "lms-key": "352019a6-1c73-11eb-adc1-0242ac120002"
+            },
+            "body": {
+              "userId": 8,
+              "bookId": 999,
+              "bookIsbn": "9780134685991",
+              "bookName": "Bench Book"
+            }
+          },
+          "expected_entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#orderBook(BookOrderDTO)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#orderBook(BookOrderDTO)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#orderBook(BookOrderDTO)",
+              "relation": "calls",
+              "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)",
+              "relation": "calls",
+              "target": "method:order:com.dhitha.lms.order.service.InventoryServiceImpl#orderIfAvailable(Long)"
+            },
+            {
+              "source": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#orderIfAvailable(Long)",
+              "relation": "calls",
+              "target": "method:inventory:com.dhitha.lms.inventory.service.InventoryServiceImpl#orderBookIfAvailable(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)",
+              "relation": "data",
+              "target": "res:table:order.book_order"
+            },
+            {
+              "source": "method:inventory:com.dhitha.lms.inventory.service.InventoryServiceImpl#orderBookIfAvailable(Long)",
+              "relation": "data",
+              "target": "res:table:inventory.inventory"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.InventoryServiceImpl#orderIfAvailable(Long)",
+              "relation": "remote",
+              "target": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#orderIfAvailable(Long)"
+            },
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#orderIfAvailable(Long)"
+            }
+          ],
+          "expected_result_projection": null,
+          "expected_completion": "failure",
+          "notes": [
+            "InventoryNotFoundException -> inventory HTTP404 -> Feign.NotFound -> order GenericException404; no order write. Real remote server failure response, not simulated target execution."
+          ],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        },
+        {
+          "explicit_action": "POST http://lms-order-service/api/orders/v1\n{\"userId\": 8, \"bookId\": 999, \"bookIsbn\": \"9780134685991\", \"bookName\": \"Bench Book\"}",
+          "nl_action": "Оформи выдачу отсутствующей в наличии книги 999 для читателя 8: userId=8, bookId=999, bookIsbn=\"9780134685991\", bookName=\"Bench Book\".",
+          "http_request": {
+            "method": "POST",
+            "url": "http://lms-order-service/api/orders/v1",
+            "headers": {
+              "lms-key": "352019a6-1c73-11eb-adc1-0242ac120002"
+            },
+            "body": {
+              "userId": 8,
+              "bookId": 999,
+              "bookIsbn": "9780134685991",
+              "bookName": "Bench Book"
+            }
+          },
+          "expected_entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#orderBook(BookOrderDTO)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#orderBook(BookOrderDTO)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#orderBook(BookOrderDTO)",
+              "relation": "calls",
+              "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)",
+              "relation": "calls",
+              "target": "method:order:com.dhitha.lms.order.service.InventoryServiceImpl#orderIfAvailable(Long)"
+            },
+            {
+              "source": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#orderIfAvailable(Long)",
+              "relation": "calls",
+              "target": "method:inventory:com.dhitha.lms.inventory.service.InventoryServiceImpl#orderBookIfAvailable(Long)"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#orderBook(BookOrderDTO)",
+              "relation": "data",
+              "target": "res:table:order.book_order"
+            },
+            {
+              "source": "method:inventory:com.dhitha.lms.inventory.service.InventoryServiceImpl#orderBookIfAvailable(Long)",
+              "relation": "data",
+              "target": "res:table:inventory.inventory"
+            },
+            {
+              "source": "method:order:com.dhitha.lms.order.service.InventoryServiceImpl#orderIfAvailable(Long)",
+              "relation": "remote",
+              "target": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#orderIfAvailable(Long)"
+            },
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#orderIfAvailable(Long)"
+            }
+          ],
+          "expected_result_projection": null,
+          "expected_completion": "failure",
+          "notes": [
+            "InventoryNotFoundException -> inventory HTTP404 -> Feign.NotFound -> order GenericException404; no order write. Real remote server failure response, not simulated target execution."
+          ],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        }
+      ],
+      "covers": [
+        "remote-error",
+        "repeat-refusal",
+        "no-write-after-throw"
+      ]
+    },
+    {
+      "id": "library-unordered-stock",
+      "steps": [
+        {
+          "explicit_action": "POST http://lms-inventory-service/api/inventory/v1/books/31/order",
+          "nl_action": "Выбери любую доступную копию книги 31 через внутренний сервис наличия.",
+          "http_request": {
+            "method": "POST",
+            "url": "http://lms-inventory-service/api/inventory/v1/books/31/order",
+            "headers": {
+              "lms-key": "352019a6-1c73-11eb-adc1-0242ac120002"
+            }
+          },
+          "expected_entry": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#orderIfAvailable(Long)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#orderIfAvailable(Long)"
+            },
+            {
+              "source": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#orderIfAvailable(Long)",
+              "relation": "calls",
+              "target": "method:inventory:com.dhitha.lms.inventory.service.InventoryServiceImpl#orderBookIfAvailable(Long)"
+            },
+            {
+              "source": "method:inventory:com.dhitha.lms.inventory.service.InventoryServiceImpl#orderBookIfAvailable(Long)",
+              "relation": "data",
+              "target": "res:table:inventory.inventory"
+            }
+          ],
+          "expected_result_projection": null,
+          "expected_completion": "returned",
+          "notes": [
+            "Without source ORDER BY, copy-A and copy-B are both legal. Only the returned reference becomes unavailable; do not select dump order."
+          ],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        }
+      ],
+      "covers": [
+        "legal-order-alternatives",
+        "data",
+        "state"
+      ]
+    }
+  ],
+  "inference_predictions_used": false,
+  "partial_sections": [
+    "Full anonymous security-filter/Jackson/ModelMapper and logging callbacks are not an exhaustive oracle.",
+    "Explicit HTTP headers are declared data; analyzer32 textual explicit syntax cannot encode arbitrary headers. Ignoring the lms-key requirement is a protocol failure, not a proven successful internal API call.",
+    "Generated timestamps and random reference/identity producers need relational checks, never convenient concrete values.",
+    "History and transactional effects remain explicit source obligations, not a full independent framework implementation."
+  ],
+  "reviewer": "Codex independent source engineering before first prediction",
+  "source_evidence": [
+    {
+      "entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#findById(Long)",
+      "file": "order/src/main/java/com/dhitha/lms/order/controller/BookOrderController.java",
+      "line": 38,
+      "source_sha256": "ac6a6ad97dc043a05ce6d039dad9ba857e88db21c97c1f121b26e6a65bb1e040"
+    },
+    {
+      "entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#collectBook(Long)",
+      "file": "order/src/main/java/com/dhitha/lms/order/controller/BookOrderController.java",
+      "line": 93,
+      "source_sha256": "ac6a6ad97dc043a05ce6d039dad9ba857e88db21c97c1f121b26e6a65bb1e040"
+    },
+    {
+      "entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#findById(Long)",
+      "file": "order/src/main/java/com/dhitha/lms/order/controller/BookOrderController.java",
+      "line": 38,
+      "source_sha256": "ac6a6ad97dc043a05ce6d039dad9ba857e88db21c97c1f121b26e6a65bb1e040"
+    },
+    {
+      "entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#collectBook(Long)",
+      "file": "order/src/main/java/com/dhitha/lms/order/controller/BookOrderController.java",
+      "line": 93,
+      "source_sha256": "ac6a6ad97dc043a05ce6d039dad9ba857e88db21c97c1f121b26e6a65bb1e040"
+    },
+    {
+      "entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#returnBook(Long)",
+      "file": "order/src/main/java/com/dhitha/lms/order/controller/BookOrderController.java",
+      "line": 99,
+      "source_sha256": "ac6a6ad97dc043a05ce6d039dad9ba857e88db21c97c1f121b26e6a65bb1e040"
+    },
+    {
+      "entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#findById(Long)",
+      "file": "order/src/main/java/com/dhitha/lms/order/controller/BookOrderController.java",
+      "line": 38,
+      "source_sha256": "ac6a6ad97dc043a05ce6d039dad9ba857e88db21c97c1f121b26e6a65bb1e040"
+    },
+    {
+      "entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#orderBook(BookOrderDTO)",
+      "file": "order/src/main/java/com/dhitha/lms/order/controller/BookOrderController.java",
+      "line": 79,
+      "source_sha256": "ac6a6ad97dc043a05ce6d039dad9ba857e88db21c97c1f121b26e6a65bb1e040"
+    },
+    {
+      "entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#findAllByUser(Long)",
+      "file": "order/src/main/java/com/dhitha/lms/order/controller/BookOrderController.java",
+      "line": 44,
+      "source_sha256": "ac6a6ad97dc043a05ce6d039dad9ba857e88db21c97c1f121b26e6a65bb1e040"
+    },
+    {
+      "entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#orderBook(BookOrderDTO)",
+      "file": "order/src/main/java/com/dhitha/lms/order/controller/BookOrderController.java",
+      "line": 79,
+      "source_sha256": "ac6a6ad97dc043a05ce6d039dad9ba857e88db21c97c1f121b26e6a65bb1e040"
+    },
+    {
+      "entry": "method:order:com.dhitha.lms.order.controller.BookOrderController#orderBook(BookOrderDTO)",
+      "file": "order/src/main/java/com/dhitha/lms/order/controller/BookOrderController.java",
+      "line": 79,
+      "source_sha256": "ac6a6ad97dc043a05ce6d039dad9ba857e88db21c97c1f121b26e6a65bb1e040"
+    },
+    {
+      "entry": "method:inventory:com.dhitha.lms.inventory.controller.InventoryController#orderIfAvailable(Long)",
+      "file": "inventory/src/main/java/com/dhitha/lms/inventory/controller/InventoryController.java",
+      "line": 47,
+      "source_sha256": "16ce9c9c23de67bcb0aa3f109abced821f977fb2eb913b326743a517f51f6328"
+    }
+  ]
+}

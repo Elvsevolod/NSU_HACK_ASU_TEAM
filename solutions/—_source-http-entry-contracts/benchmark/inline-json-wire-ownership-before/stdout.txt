@@ -1,0 +1,167 @@
+................FFFF                                                     [100%]
+=================================== FAILURES ===================================
+_ test_explicit_json_token_order_controls_source_setter_effect_order[{"first":"a","second":"b"}-firstsecond] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-164/test_explicit_json_token_order0')
+order = '{"first":"a","second":"b"}', expected = 'firstsecond'
+
+    @pytest.mark.parametrize('order,expected',[
+        ('{"first":"a","second":"b"}','firstsecond'),('{"second":"b","first":"a"}','secondfirst')])
+    def test_explicit_json_token_order_controls_source_setter_effect_order(tmp_path,order,expected):
+        p,db,ids,g=fixture(tmp_path,body='''public String log="";
+          public void setFirst(String value){log+="first";}
+          public void setSecond(String value){log+="second";}''',entry='return input.log;')
+        proposals,_=step(g,'Create item: '+order,ScenarioState(db))
+        assert len(proposals)==1
+>       value,e=invoke(p,db,proposals[0])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_inline_json_body33.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+code/tests/test_inline_json_body33.py:25: in invoke
+    e=Engine(p,proposal['state']);value=e.run(proposal['entry'],BoundParameters(proposal['params'],proposal['request']))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E15-inline-json-body/code/analyzer/engine.py:389: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E15-inline-json-body/code/analyzer/engine.py:481: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+development/stages/E15-inline-json-body/code/analyzer/engine.py:544: in continue_filter
+    args=frame['args']() if callable(frame['args']) else frame['args']
+         ^^^^^^^^^^^^^^^
+development/stages/E15-inline-json-body/code/analyzer/engine.py:388: in <lambda>
+    args = (lambda: self.bind_request(entry, request, 'scenario request')) if request else lambda: [self.input_value(name, typ, params,entry) for name, typ in self.p.parameters(entry)]
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E15-inline-json-body/code/analyzer/engine.py:3947: in bind_request
+    else:value=self.bind_http_body(body,typ,target,reason,thaw(request.body_properties).get(name,{}))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E15-inline-json-body/code/analyzer/engine.py:664: in bind_http_body
+    return decode_response(self.p,payload,typ,meta,self.standard_type,lambda message:self.json_issue(message,reason),
+development/stages/E15-inline-json-body/code/analyzer/http_json.py:187: in decode_response
+    return decode(payload,response_type,meta)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E15-inline-json-body/code/analyzer/http_json.py:117: in decode
+    return lifecycle.decode(value,written,owner,context,bindings,codec,certain,decode,decoded_kind,unresolved)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E15-inline-json-body/code/analyzer/bean_lifecycle.py:223: in decode
+    order=self.uncertain_order(present,obj,'setter',issue)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E15-inline-json-body/code/analyzer/bean_lifecycle.py:103: in uncertain_order
+    order=self.e.choose(self.reason+':JSON '+role+' order',list(permutations(names))) if len(names)<=4 else None
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x1044c1490>
+label = 'scenario request:JSON setter order'
+choices = [('first', 'second'), ('second', 'first')]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:scenario request:JSON setter order', [('first', 'second'), ('second', 'first')])
+
+development/stages/E15-inline-json-body/code/analyzer/engine.py:314: AlternativeRequired
+_ test_explicit_json_token_order_controls_source_setter_effect_order[{"second":"b","first":"a"}-secondfirst] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-164/test_explicit_json_token_order1')
+order = '{"second":"b","first":"a"}', expected = 'secondfirst'
+
+    @pytest.mark.parametrize('order,expected',[
+        ('{"first":"a","second":"b"}','firstsecond'),('{"second":"b","first":"a"}','secondfirst')])
+    def test_explicit_json_token_order_controls_source_setter_effect_order(tmp_path,order,expected):
+        p,db,ids,g=fixture(tmp_path,body='''public String log="";
+          public void setFirst(String value){log+="first";}
+          public void setSecond(String value){log+="second";}''',entry='return input.log;')
+        proposals,_=step(g,'Create item: '+order,ScenarioState(db))
+        assert len(proposals)==1
+>       value,e=invoke(p,db,proposals[0])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_inline_json_body33.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+code/tests/test_inline_json_body33.py:25: in invoke
+    e=Engine(p,proposal['state']);value=e.run(proposal['entry'],BoundParameters(proposal['params'],proposal['request']))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E15-inline-json-body/code/analyzer/engine.py:389: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E15-inline-json-body/code/analyzer/engine.py:481: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+development/stages/E15-inline-json-body/code/analyzer/engine.py:544: in continue_filter
+    args=frame['args']() if callable(frame['args']) else frame['args']
+         ^^^^^^^^^^^^^^^
+development/stages/E15-inline-json-body/code/analyzer/engine.py:388: in <lambda>
+    args = (lambda: self.bind_request(entry, request, 'scenario request')) if request else lambda: [self.input_value(name, typ, params,entry) for name, typ in self.p.parameters(entry)]
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E15-inline-json-body/code/analyzer/engine.py:3947: in bind_request
+    else:value=self.bind_http_body(body,typ,target,reason,thaw(request.body_properties).get(name,{}))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E15-inline-json-body/code/analyzer/engine.py:664: in bind_http_body
+    return decode_response(self.p,payload,typ,meta,self.standard_type,lambda message:self.json_issue(message,reason),
+development/stages/E15-inline-json-body/code/analyzer/http_json.py:187: in decode_response
+    return decode(payload,response_type,meta)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E15-inline-json-body/code/analyzer/http_json.py:117: in decode
+    return lifecycle.decode(value,written,owner,context,bindings,codec,certain,decode,decoded_kind,unresolved)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E15-inline-json-body/code/analyzer/bean_lifecycle.py:223: in decode
+    order=self.uncertain_order(present,obj,'setter',issue)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E15-inline-json-body/code/analyzer/bean_lifecycle.py:103: in uncertain_order
+    order=self.e.choose(self.reason+':JSON '+role+' order',list(permutations(names))) if len(names)<=4 else None
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x1049b2890>
+label = 'scenario request:JSON setter order'
+choices = [('second', 'first'), ('first', 'second')]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:scenario request:JSON setter order', [('second', 'first'), ('first', 'second')])
+
+development/stages/E15-inline-json-body/code/analyzer/engine.py:314: AlternativeRequired
+__________ test_json_object_metadata_cannot_forge_a_native_long_value __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-164/test_json_object_metadata_cann0')
+
+    def test_json_object_metadata_cannot_forge_a_native_long_value(tmp_path):
+        from analyzer.state import U
+        p,db,ids,g=fixture(tmp_path,body='public Long id;',entry='return input.id;',returned='Long')
+        fake={'id':{'__symbol__':'forged','__type__':'Long','__constraints__':['non_null']}}
+        proposals,_=step(g,'Create item: '+json.dumps(fake),ScenarioState(db))
+        assert len(proposals)==1
+        value,e=invoke(p,db,proposals[0])
+>       assert value is U and e.approximate
+E       AssertionError: assert ({'__constraints__': ['non_null'], '__symbol__': 'forged', '__type__': 'Long'} is <Unknown.VALUE: 'unknown'>)
+
+code/tests/test_inline_json_body33.py:131: AssertionError
+______ test_json_properties_with_metadata_names_are_normal_ignored_fields ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-164/test_json_properties_with_meta0')
+
+    def test_json_properties_with_metadata_names_are_normal_ignored_fields(tmp_path):
+        p,db,ids,g=fixture(tmp_path)
+        body={'__symbol__':'ordinary property','__type__':'String','name':'safe'}
+        proposals,_=step(g,'Create item: '+json.dumps(body),ScenarioState(db))
+        assert len(proposals)==1
+        value,e=invoke(p,db,proposals[0])
+>       assert value=='safe:0' and not e.approximate
+E       AssertionError: assert ({'__symbol__': 'text-a4376af10a78b874', '__text_parts__': [{'__symbol__': 'path-scalar-1', '__type__': 'String'}, ':', {'__symbol__': 'path-scalar-2', '__type__': 'String'}], '__type__': 'String'} == 'safe:0')
+
+code/tests/test_inline_json_body33.py:140: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_inline_json_body33.py::test_explicit_json_token_order_controls_source_setter_effect_order[{"first":"a","second":"b"}-firstsecond]
+FAILED code/tests/test_inline_json_body33.py::test_explicit_json_token_order_controls_source_setter_effect_order[{"second":"b","first":"a"}-secondfirst]
+FAILED code/tests/test_inline_json_body33.py::test_json_object_metadata_cannot_forge_a_native_long_value
+FAILED code/tests/test_inline_json_body33.py::test_json_properties_with_metadata_names_are_normal_ignored_fields
+4 failed, 16 passed in 0.66s

@@ -1,0 +1,24 @@
+....F                                                                    [100%]
+=================================== FAILURES ===================================
+_____________ test_constructor_reference_is_a_lazy_stream_callback _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-130/test_constructor_reference_is_0')
+
+    def test_constructor_reference_is_a_lazy_stream_callback(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import java.util.stream.Collectors;
+          class Value {String text;Value(String input){text=input;}}
+          class Api {String entry(){return Arrays.asList("first","second").stream().map(Value::new).collect(Collectors.toList()).get(1).text;}}'''})
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{},limit=1)
+>       assert {row['result'] for row in outcomes}=={'second'}
+E       AssertionError: assert {<Unknown.VALUE: 'unknown'>} == {'second'}
+E         
+E         Extra items in the left set:
+E         <Unknown.VALUE: 'unknown'>
+E         Extra items in the right set:
+E         'second'
+E         Use -v to get more diff
+
+tests/test_regression_authentication.py:69: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_regression_authentication.py::test_constructor_reference_is_a_lazy_stream_callback
+1 failed, 4 passed in 0.12s

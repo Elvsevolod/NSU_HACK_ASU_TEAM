@@ -1,0 +1,57 @@
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 10%]
+........................................................................ [ 14%]
+........................................................................ [ 17%]
+........................................................................ [ 21%]
+........................................................................ [ 24%]
+........................................................................ [ 28%]
+........................................................................ [ 31%]
+........................................................................ [ 35%]
+........................................................................ [ 38%]
+........................................................................ [ 42%]
+........................................................................ [ 45%]
+........................................................................ [ 49%]
+........................................................................ [ 52%]
+........................................................................ [ 56%]
+........................................................................ [ 59%]
+........................................................................ [ 63%]
+..F..................................................................... [ 66%]
+........................................................................ [ 70%]
+........................................................................ [ 73%]
+........................................................................ [ 77%]
+........................................................................ [ 80%]
+........................................................................ [ 84%]
+........................................................................ [ 87%]
+........................................................................ [ 91%]
+........................................................................ [ 94%]
+........................................................................ [ 98%]
+.........................................                                [100%]
+=================================== FAILURES ===================================
+_________ test_text_ordering_is_not_guessed_without_database_collation _________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-28/test_text_ordering_is_not_gues0')
+
+    def test_text_ordering_is_not_guessed_without_database_collation(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;import org.springframework.data.jpa.repository.*;class Api {@Autowired Store store;
+          List<Row> entry(){return store.visible("B");}}
+          @Entity @Table(name="rows") class Row {@Id String id;String amount;}
+          interface Store extends JpaRepository<Row,String>{
+            @Query(value="SELECT * FROM rows WHERE amount > ?1",nativeQuery=true)
+            List<Row> visible(String cutoff);}'''},rows={'rows':[{'id':'text','amount':'a'}]})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{}) is U
+E       AssertionError: assert [] is <Unknown.VALUE: 'unknown'>
+E        +  where [] = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1063cec90>.run
+
+code/tests/test_query_numeric_predicates.py:32: AssertionError
+=============================== warnings summary ===============================
+checks/tests/test_archive_support.py::test_duplicate_symlink_or_corruption[options0]
+  /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/zipfile.py:1566: UserWarning: Duplicate name: 'submission.json'
+    return self._open_to_write(zinfo, force_zip64=force_zip64)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED code/tests/test_query_numeric_predicates.py::test_text_ordering_is_not_guessed_without_database_collation
+1 failed, 2056 passed, 1 warning in 8.99s

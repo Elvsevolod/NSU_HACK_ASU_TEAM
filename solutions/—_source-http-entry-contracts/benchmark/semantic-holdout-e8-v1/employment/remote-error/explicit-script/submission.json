@@ -1,0 +1,74 @@
+{
+  "project": "holdout-employment-v1",
+  "scenarios": {
+    "employment-remote-error-explicit-script": {
+      "edges": [
+        {
+          "source": "scenario:employment-remote-error-explicit-script",
+          "relation": "executes",
+          "target": "method:companyms:com.mohit.companyms.Company.CompanyController#getCompany(Long)"
+        },
+        {
+          "source": "scenario:employment-remote-error-explicit-script",
+          "relation": "executes",
+          "target": "method:companyms:com.mohit.companyms.Company.impl.companyServiceImplement#getCompany(Long)"
+        },
+        {
+          "source": "scenario:employment-remote-error-explicit-script",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.Job#getCompany()"
+        },
+        {
+          "source": "scenario:employment-remote-error-explicit-script",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.JobController#getJob(Long)"
+        },
+        {
+          "source": "scenario:employment-remote-error-explicit-script",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#convertToDto(Job)"
+        },
+        {
+          "source": "scenario:employment-remote-error-explicit-script",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#getJobById(Long)"
+        },
+        {
+          "source": "method:companyms:com.mohit.companyms.Company.CompanyController#getCompany(Long)",
+          "relation": "calls",
+          "target": "method:companyms:com.mohit.companyms.Company.impl.companyServiceImplement#getCompany(Long)"
+        },
+        {
+          "source": "method:companyms:com.mohit.companyms.Company.impl.companyServiceImplement#getCompany(Long)",
+          "relation": "data",
+          "target": "res:table:company.company"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.JobController#getJob(Long)",
+          "relation": "calls",
+          "target": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#getJobById(Long)"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#convertToDto(Job)",
+          "relation": "calls",
+          "target": "method:jobms:com.mohit.jobms.job.Job#getCompany()"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#convertToDto(Job)",
+          "relation": "remote",
+          "target": "method:companyms:com.mohit.companyms.Company.CompanyController#getCompany(Long)"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#getJobById(Long)",
+          "relation": "calls",
+          "target": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#convertToDto(Job)"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#getJobById(Long)",
+          "relation": "data",
+          "target": "res:table:job.job"
+        }
+      ]
+    }
+  }
+}

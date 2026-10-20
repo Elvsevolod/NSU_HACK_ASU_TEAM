@@ -1,0 +1,1 @@
+B uses exact B00-parent31 language/HTTP/binding/execution files. Only ContractIndex gets tokenizer/intent hooks and two retrieval-only modules are added. The Grounder outside that class stays byte-identical. No producer, execution or budget repair is transplanted.

@@ -1,0 +1,17 @@
+.............F...................................                        [100%]
+=================================== FAILURES ===================================
+_____________ test_two_singular_source_endpoints_remain_ambiguous ______________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-172/test_two_singular_source_endpo0')
+
+    def test_two_singular_source_endpoints_remain_ambiguous(tmp_path):
+        p,ids,g,state=fixture(tmp_path,'''@GetMapping("/parcels/archived/{id}")
+          Parcel getArchivedById(@PathVariable Long id){return null;}''')
+        proposals,detail=g.step('Read the parcel just created',state)
+>       assert not proposals and detail['unresolved']
+E       AssertionError: assert (not [{'actor': <Unknown.VALUE: 'unknown'>, 'bindings': {'id': {'producer_observation': {'digest': '0f7cf696ea64373d4448245...ult.id', 'resolved': True, ...}}, 'body_omissions': {}, 'entry': 'method:service:ParcelController#getById(Long)', ...}])
+
+code/tests/test_history_request_choice33.py:84: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_history_request_choice33.py::test_two_singular_source_endpoints_remain_ambiguous
+1 failed, 48 passed in 0.28s

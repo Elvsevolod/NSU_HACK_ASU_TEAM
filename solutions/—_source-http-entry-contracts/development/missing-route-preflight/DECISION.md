@@ -1,0 +1,9 @@
+# Отсутствующий маршрут: результат source preflight
+
+Сохранены и прочитаны официальные исходники Spring Boot3.4.1 и Spring6.2.1; URL и SHA256 каждого файла — в `sources.json`. Ни Java, ни Maven, ни сервисы не запускались. Context7 использован для поиска, но его ответ смешивал закреплённую версию и main; выводы проверены по конкретным tagged files.
+
+`DispatcherServlet` сначала спрашивает HandlerMapping. Отсутствие controller method в нашем skeleton не доказывает отсутствие других mapping. `WebMvcAutoConfiguration.addResourceHandlers` регистрирует static locations, а `ResourceHttpRequestHandler` выдаёт NoResourceFoundException только после фактического поиска ресурса. Ошибка затем зависит от exception resolvers, filters и error dispatch. `ErrorMvcAutoConfiguration` устанавливает default ErrorController/ErrorAttributes условно; `BasicErrorController` содержит отдельный HTML handler и общий map response. Одной проверки annotations контроллеров для точного404/body недостаточно.
+
+В поставленном исходном пакете нет замкнутого разрешённого runtime classpath и полного inventory ресурсов зависимостей. Frozen remote-error input не отключает resource mappings. Поэтому новый default404/body не добавлен; существующая unknown_target boundary остаётся честной. Неизвестный host тем более не интерпретируется как404. Исходные input/oracle не переписывались ради прохождения проверки.
+
+Следующий конкретный шаг: отдельный ограниченный framework profile с source-proven default error policy и либо явным отключением resource mappings, либо полным проверенным resource/mapping inventory. Затем независимые controls для custom mapping/filter/advice/ErrorController, Accept и server context path. Новый явно заданный profile нельзя выдавать за исправление исторического frozen случая. Это техническая граница доступных доказательств, не необходимость нового пользовательского разрешения.

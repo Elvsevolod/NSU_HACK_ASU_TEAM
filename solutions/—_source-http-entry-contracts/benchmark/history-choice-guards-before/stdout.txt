@@ -1,0 +1,55 @@
+.............................FF                                          [100%]
+=================================== FAILURES ===================================
+_____ test_a_compound_request_cannot_be_reduced_to_reading_only_one_entity _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-189/test_a_compound_request_cannot0')
+
+    def test_a_compound_request_cannot_be_reduced_to_reading_only_one_entity(tmp_path):
+        p,ids,g,state=fixture(tmp_path,extra='''@GetMapping("/depots/{id}")
+          Depot getDepot(@PathVariable Long id){return null;}''',declarations='class Depot{public Long id;}')
+        proposals,detail=g.step('Read the parcel just created together with depot 9',state)
+>       assert not proposals and detail['unresolved']
+E       AssertionError: assert (not [{'actor': <Unknown.VALUE: 'unknown'>, 'bindings': {'id': {'producer_observation': {'digest': '0f7cf696ea64373d4448245...ult.id', 'resolved': True, ...}}, 'body_omissions': {}, 'entry': 'method:service:ParcelController#getById(Long)', ...}])
+
+code/tests/test_history_request_choice33.py:174: AssertionError
+__ test_invalid_read_body_is_reported_even_when_retrieval_first_refuses_a_tie __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-189/test_invalid_read_body_is_repo0')
+
+    def test_invalid_read_body_is_reported_even_when_retrieval_first_refuses_a_tie(tmp_path):
+        p,ids,g,state=fixture(tmp_path)
+>       proposals,detail=g.step('Read the parcel just created: {"junk":1}',state)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_history_request_choice33.py:179: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+development/stages/E20-response-only-history/code/analyzer/contracts.py:366: in step
+    constrained = self.source_history_choice(action,state) if not ranked else []
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+development/stages/E20-response-only-history/code/analyzer/contracts.py:497: in source_history_choice
+    proposal=self._bind(action,state,contract,row['score'])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.contracts.ContractGrounder object at 0x1024e4290>
+action = 'Read the parcel just created: {"junk":1}'
+state = <analyzer.state.ScenarioState object at 0x1024c9550>
+contract = {'entry': 'method:service:ParcelController#getById(Long)', 'history_result_only': True, 'inferred_result_collection': False, 'inferred_result_entities': [{'parcel'}], ...}
+score = 0.5530191178894807
+
+    def _bind(self, action, state, contract, score):
+        mid, site = contract['entry'], contract['site']
+        literal_body=inline_json_body(action)
+        parameters=self.project.http_parameters(mid)
+        named={p['name'] for p in parameters if p['kind']!='RequestBody'}
+        if literal_body is not None:
+            bodies=[p for p in parameters if p['kind']=='RequestBody']
+            if site or len(bodies)!=1:
+>               raise LiteralBodyError('Explicit JSON needs one direct source RequestBody contract; source UI wire is not inferred')
+E               analyzer.inline_json_body.LiteralBodyError: Explicit JSON needs one direct source RequestBody contract; source UI wire is not inferred
+
+development/stages/E20-response-only-history/code/analyzer/contracts.py:598: LiteralBodyError
+=========================== short test summary info ============================
+FAILED code/tests/test_history_request_choice33.py::test_a_compound_request_cannot_be_reduced_to_reading_only_one_entity
+FAILED code/tests/test_history_request_choice33.py::test_invalid_read_body_is_reported_even_when_retrieval_first_refuses_a_tie
+2 failed, 29 passed in 0.30s

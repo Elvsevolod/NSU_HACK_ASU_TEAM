@@ -1,0 +1,94 @@
+{
+  "source": "Source fixture and prefix_oracle independently written before R05 implementation",
+  "initial": [
+    {
+      "id": "A",
+      "status": "free"
+    },
+    {
+      "id": "B",
+      "status": "free"
+    }
+  ],
+  "full_prefix_edges": [
+    [
+      "",
+      "executes",
+      "method:service:Approval#entry(String,List<String>,boolean)"
+    ],
+    [
+      "",
+      "executes",
+      "method:service:Warehouse#read(String)"
+    ],
+    [
+      "method:service:Approval#entry(String,List<String>,boolean)",
+      "remote",
+      "method:service:Warehouse#read(String)"
+    ],
+    [
+      "method:service:Warehouse#read(String)",
+      "data",
+      "res:table:service.equipment"
+    ]
+  ],
+  "full_success_edges": [
+    [
+      "",
+      "executes",
+      "method:service:Approval#entry(String,List<String>,boolean)"
+    ],
+    [
+      "",
+      "executes",
+      "method:service:Warehouse#read(String)"
+    ],
+    [
+      "",
+      "executes",
+      "method:service:Warehouse#reserve(String)"
+    ],
+    [
+      "method:service:Approval#entry(String,List<String>,boolean)",
+      "remote",
+      "method:service:Warehouse#read(String)"
+    ],
+    [
+      "method:service:Approval#entry(String,List<String>,boolean)",
+      "remote",
+      "method:service:Warehouse#reserve(String)"
+    ],
+    [
+      "method:service:Warehouse#read(String)",
+      "data",
+      "res:table:service.equipment"
+    ],
+    [
+      "method:service:Warehouse#reserve(String)",
+      "data",
+      "res:table:service.equipment"
+    ]
+  ],
+  "success_rows": [
+    {
+      "id": "A",
+      "status": "reserved"
+    },
+    {
+      "id": "B",
+      "status": "free"
+    }
+  ],
+  "remote_failure_rows": [
+    {
+      "id": "A",
+      "status": "free"
+    },
+    {
+      "id": "B",
+      "status": "free"
+    }
+  ],
+  "boundary_contract": "Stop-only: prefix exact, no resumed return/throw, empty proven residual write footprint; off may over-invalidate",
+  "scope": "tiny synthetic equipment example; not a real holdout"
+}

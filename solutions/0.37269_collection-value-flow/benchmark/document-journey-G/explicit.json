@@ -1,0 +1,839 @@
+[
+  {
+    "n": 1,
+    "wire": {
+      "deployment": "portal",
+      "method": "GET",
+      "url": "/library",
+      "path": [
+        "library"
+      ],
+      "query": {},
+      "query_complete": true,
+      "headers": {},
+      "body": {
+        "missing": true
+      },
+      "actor": {
+        "unknown": true
+      },
+      "session": {
+        "unknown": true
+      },
+      "body_properties": {},
+      "provenance": []
+    },
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:portal:PortalGateway#listDocuments()",
+        "reason": "scenario request",
+        "request": {
+          "deployment": "portal",
+          "method": "GET",
+          "url": "/library",
+          "path": [
+            "library"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": {
+            "missing": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": []
+        },
+        "authorization_checked": false,
+        "bound_arguments": []
+      },
+      {
+        "id": 2,
+        "entry": "method:docs:DocumentController#listDocuments()",
+        "reason": "call:method:portal:PortalGateway#listDocuments()@8:21",
+        "request": {
+          "deployment": "docs",
+          "method": "GET",
+          "url": "http://docs/documents",
+          "path": [
+            "documents"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": null,
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:portal:PortalGateway#listDocuments()@8:21"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": []
+      }
+    ],
+    "result": [
+      {
+        "approved": false,
+        "id": "D7",
+        "revision": 7
+      }
+    ],
+    "responses": [
+      {
+        "request": 2,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json"
+      },
+      {
+        "request": 1,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json"
+      }
+    ],
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:docs:DocumentController#listDocuments()"
+      ],
+      [
+        "",
+        "executes",
+        "method:portal:PortalGateway#decode(String,Class<T>)"
+      ],
+      [
+        "",
+        "executes",
+        "method:portal:PortalGateway#listDocuments()"
+      ],
+      [
+        "method:docs:DocumentController#listDocuments()",
+        "data",
+        "res:table:docs.documents"
+      ],
+      [
+        "method:portal:PortalGateway#listDocuments()",
+        "calls",
+        "method:portal:PortalGateway#decode(String,Class<T>)"
+      ],
+      [
+        "method:portal:PortalGateway#listDocuments()",
+        "remote",
+        "method:docs:DocumentController#listDocuments()"
+      ]
+    ],
+    "outcome": "returned",
+    "diagnostics": [
+      "JSON payload projection is not proven complete for codec failures: call:method:portal:PortalGateway#decode(String,Class<T>)@6:68"
+    ],
+    "call_effects": [],
+    "data_operations": [
+      {
+        "method": "method:docs:DocumentController#listDocuments()",
+        "resource": "res:table:docs.documents",
+        "operation": "findAll",
+        "arguments": [],
+        "source_site": "call:method:docs:DocumentController#listDocuments()@7:73",
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:docs:DocumentController#listDocuments()@7:73"
+      }
+    ],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "docs.documents": 1
+      },
+      "unknown_tables": [],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "tables": {
+        "docs.documents": [
+          {
+            "id": "D7",
+            "revision": 7,
+            "approved": 0
+          }
+        ]
+      }
+    },
+    "heap_after": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "n": 2,
+    "wire": {
+      "deployment": "portal",
+      "method": "POST",
+      "url": "/library/approve",
+      "path": [
+        "library",
+        "approve"
+      ],
+      "query": {},
+      "query_complete": true,
+      "headers": {
+        "content-type": [
+          "application/json"
+        ]
+      },
+      "body": {
+        "id": "D7",
+        "revision": 7,
+        "approved": true
+      },
+      "actor": {
+        "unknown": true
+      },
+      "session": {
+        "unknown": true
+      },
+      "body_properties": {},
+      "provenance": []
+    },
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:portal:PortalGateway#approveDocument(Approval)",
+        "reason": "scenario request",
+        "request": {
+          "deployment": "portal",
+          "method": "POST",
+          "url": "/library/approve",
+          "path": [
+            "library",
+            "approve"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "body": {
+            "id": "D7",
+            "revision": 7,
+            "approved": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": []
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "input",
+            "declared_type": "Approval",
+            "value": {
+              "__type__": "Approval",
+              "__http_entity__": false,
+              "id": "D7",
+              "revision": 7,
+              "approved": true
+            }
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "entry": "method:docs:DocumentController#approveDocument(String,Approval)",
+        "reason": "call:method:portal:PortalGateway#approveDocument(Approval)@11:16",
+        "request": {
+          "deployment": "docs",
+          "method": "POST",
+          "url": "http://docs/documents/D7/approve",
+          "path": [
+            "documents",
+            "D7",
+            "approve"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "body": {
+            "approved": true,
+            "id": "D7",
+            "revision": 7
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:portal:PortalGateway#approveDocument(Approval)@11:16"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "D7"
+          },
+          {
+            "name": "input",
+            "declared_type": "Approval",
+            "value": {
+              "__type__": "Approval",
+              "__http_entity__": false,
+              "id": "D7",
+              "revision": 7,
+              "approved": true
+            }
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "entry": "method:audit:AuditController#accept(String)",
+        "reason": "call:method:docs:DocumentController#approveDocument(String,Approval)@11:13",
+        "request": {
+          "deployment": "audit",
+          "method": "POST",
+          "url": "http://audit/events",
+          "path": [
+            "events"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": "D7",
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:docs:DocumentController#approveDocument(String,Approval)@11:13"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "D7"
+          }
+        ]
+      }
+    ],
+    "result": {
+      "approved": true,
+      "id": "D7",
+      "revision": 8
+    },
+    "responses": [
+      {
+        "request": 3,
+        "status": 503,
+        "entered": true,
+        "body_presence": "json"
+      },
+      {
+        "request": 2,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json"
+      },
+      {
+        "request": 1,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json"
+      }
+    ],
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:audit:AuditController#accept(String)"
+      ],
+      [
+        "",
+        "executes",
+        "method:docs:DocumentController#approveDocument(String,Approval)"
+      ],
+      [
+        "",
+        "executes",
+        "method:docs:DocumentController#fallback()"
+      ],
+      [
+        "",
+        "executes",
+        "method:portal:PortalGateway#approveDocument(Approval)"
+      ],
+      [
+        "method:docs:DocumentController#approveDocument(String,Approval)",
+        "calls",
+        "method:docs:DocumentController#fallback()"
+      ],
+      [
+        "method:docs:DocumentController#approveDocument(String,Approval)",
+        "data",
+        "res:table:docs.documents"
+      ],
+      [
+        "method:docs:DocumentController#approveDocument(String,Approval)",
+        "remote",
+        "method:audit:AuditController#accept(String)"
+      ],
+      [
+        "method:portal:PortalGateway#approveDocument(Approval)",
+        "remote",
+        "method:docs:DocumentController#approveDocument(String,Approval)"
+      ]
+    ],
+    "outcome": "returned",
+    "diagnostics": [],
+    "call_effects": [],
+    "data_operations": [
+      {
+        "method": "method:docs:DocumentController#approveDocument(String,Approval)",
+        "resource": "res:table:docs.documents",
+        "operation": "findById",
+        "arguments": [
+          "D7"
+        ],
+        "source_site": "call:method:docs:DocumentController#approveDocument(String,Approval)@9:25",
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:docs:DocumentController#approveDocument(String,Approval)@9:25"
+      },
+      {
+        "method": "method:docs:DocumentController#approveDocument(String,Approval)",
+        "resource": "res:table:docs.documents",
+        "operation": "save",
+        "arguments": [
+          {
+            "__type__": "Document",
+            "id": "D7",
+            "revision": 8,
+            "approved": true
+          }
+        ],
+        "source_site": "call:method:docs:DocumentController#approveDocument(String,Approval)@10:57",
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:docs:DocumentController#approveDocument(String,Approval)@10:57"
+      }
+    ],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "docs.documents": 1
+      },
+      "unknown_tables": [],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "tables": {
+        "docs.documents": [
+          {
+            "id": "D7",
+            "revision": 8,
+            "approved": true,
+            "__type__": "Document"
+          }
+        ]
+      }
+    },
+    "heap_after": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "n": 3,
+    "wire": {
+      "deployment": "portal",
+      "method": "GET",
+      "url": "/library",
+      "path": [
+        "library"
+      ],
+      "query": {},
+      "query_complete": true,
+      "headers": {},
+      "body": {
+        "missing": true
+      },
+      "actor": {
+        "unknown": true
+      },
+      "session": {
+        "unknown": true
+      },
+      "body_properties": {},
+      "provenance": []
+    },
+    "requests": [
+      {
+        "id": 1,
+        "entry": "method:portal:PortalGateway#listDocuments()",
+        "reason": "scenario request",
+        "request": {
+          "deployment": "portal",
+          "method": "GET",
+          "url": "/library",
+          "path": [
+            "library"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": {
+            "missing": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": []
+        },
+        "authorization_checked": false,
+        "bound_arguments": []
+      },
+      {
+        "id": 2,
+        "entry": "method:docs:DocumentController#listDocuments()",
+        "reason": "call:method:portal:PortalGateway#listDocuments()@8:21",
+        "request": {
+          "deployment": "docs",
+          "method": "GET",
+          "url": "http://docs/documents",
+          "path": [
+            "documents"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": null,
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source_callsite": "call:method:portal:PortalGateway#listDocuments()@8:21"
+          }
+        },
+        "authorization_checked": false,
+        "bound_arguments": []
+      }
+    ],
+    "result": [
+      {
+        "approved": true,
+        "id": "D7",
+        "revision": 8
+      }
+    ],
+    "responses": [
+      {
+        "request": 2,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json"
+      },
+      {
+        "request": 1,
+        "status": 200,
+        "entered": true,
+        "body_presence": "json"
+      }
+    ],
+    "edges": [
+      [
+        "",
+        "executes",
+        "method:docs:DocumentController#listDocuments()"
+      ],
+      [
+        "",
+        "executes",
+        "method:portal:PortalGateway#decode(String,Class<T>)"
+      ],
+      [
+        "",
+        "executes",
+        "method:portal:PortalGateway#listDocuments()"
+      ],
+      [
+        "method:docs:DocumentController#listDocuments()",
+        "data",
+        "res:table:docs.documents"
+      ],
+      [
+        "method:portal:PortalGateway#listDocuments()",
+        "calls",
+        "method:portal:PortalGateway#decode(String,Class<T>)"
+      ],
+      [
+        "method:portal:PortalGateway#listDocuments()",
+        "remote",
+        "method:docs:DocumentController#listDocuments()"
+      ]
+    ],
+    "outcome": "returned",
+    "diagnostics": [
+      "JSON payload projection is not proven complete for codec failures: call:method:portal:PortalGateway#decode(String,Class<T>)@6:68"
+    ],
+    "call_effects": [],
+    "data_operations": [
+      {
+        "method": "method:docs:DocumentController#listDocuments()",
+        "resource": "res:table:docs.documents",
+        "operation": "findAll",
+        "arguments": [],
+        "source_site": "call:method:docs:DocumentController#listDocuments()@7:73",
+        "uncertain_write": false,
+        "sql_emitted": true,
+        "datastore_event": true,
+        "transactional": false,
+        "emitted_by": "call:method:docs:DocumentController#listDocuments()@7:73"
+      }
+    ],
+    "state_after": {
+      "browser": {
+        "storage": {},
+        "form": {},
+        "dom": {},
+        "url": {},
+        "options": {},
+        "script": {}
+      },
+      "history": [],
+      "clock": {
+        "unknown": true
+      },
+      "database_rows": {
+        "docs.documents": 1
+      },
+      "unknown_tables": [],
+      "analysis_assumptions": [],
+      "limitations": [],
+      "tables": {
+        "docs.documents": [
+          {
+            "id": "D7",
+            "revision": 8,
+            "approved": true,
+            "__type__": "Document"
+          }
+        ]
+      }
+    },
+    "heap_after": {
+      "$id": "h1",
+      "kind": "dict",
+      "fields": {
+        "actor_browsers": {
+          "$id": "h2",
+          "kind": "dict",
+          "fields": {}
+        },
+        "beans": {
+          "$id": "h3",
+          "kind": "dict",
+          "fields": {}
+        },
+        "browser": {
+          "$id": "h4",
+          "kind": "dict",
+          "fields": {
+            "dom": {
+              "$id": "h5",
+              "kind": "dict",
+              "fields": {}
+            },
+            "form": {
+              "$id": "h6",
+              "kind": "dict",
+              "fields": {}
+            },
+            "options": {
+              "$id": "h7",
+              "kind": "dict",
+              "fields": {}
+            },
+            "script": {
+              "$id": "h8",
+              "kind": "dict",
+              "fields": {}
+            },
+            "storage": {
+              "$id": "h9",
+              "kind": "dict",
+              "fields": {}
+            },
+            "url": {
+              "$id": "h10",
+              "kind": "dict",
+              "fields": {}
+            }
+          }
+        }
+      }
+    }
+  }
+]

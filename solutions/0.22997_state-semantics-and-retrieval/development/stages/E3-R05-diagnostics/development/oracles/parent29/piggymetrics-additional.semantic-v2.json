@@ -1,0 +1,2060 @@
+{
+  "version": 2,
+  "source_repository": "https://github.com/sqshq/piggymetrics",
+  "source_commit": "6bb2cf9ddbca980b664d3edbb6ff775d75369278",
+  "supersedes_oracle_sha256": "51fcbbb73623d8cd169138f529b5aae5c2af05446d67f5fde10a20ccf96fe000",
+  "parent_oracle_sha256": "499f635f5df70eafafc6ef0b424266949d62f5886a77b4af5c9e9f1cf82a9e8d",
+  "reviewer": "Codex independent source-only reader /root/oracle_reader, same explicit user authorization",
+  "review_independent_of_analyzer_runtime_outputs_and_tests": true,
+  "chronology": {
+    "v1_frozen_before_ambiguity_repair": "Reported by parent in source-only v1; no runtime inspection to audit chronology",
+    "reviewed_v2": "Source-only corrections prepared before parent acceptance; no claim that this correction predates all runtime repairs"
+  },
+  "scope": "Three independently reset source-profile cases complementing the eight-step business oracle. These do not prove duplicates, cross-deployment identity, full OAuth or broad portability.",
+  "source_sha256": {
+    "account-service/pom.xml": "cef70b8461714ac2b5a77f63426b001f97ff35d62f9fe7408f7deff6ddc12b4b",
+    "account-service/src/main/java/com/piggymetrics/account/AccountApplication.java": "611fd1dfe45d0418f441643884430a6eb1b3bac7c02fb8a12a7eda1abd13dc1a",
+    "account-service/src/main/java/com/piggymetrics/account/client/AuthServiceClient.java": "14ac8447a77903a09ae4622ddb486d67868d7b55a8f10867efab6f98cc0db37a",
+    "account-service/src/main/java/com/piggymetrics/account/client/StatisticsServiceClient.java": "2bb01422b9e2ad417ec25d68d7459da9ab008dca1b3727a133a108a73793ba93",
+    "account-service/src/main/java/com/piggymetrics/account/client/StatisticsServiceClientFallback.java": "454f8d0cce8dc82bcd2eecd3ec29bba4afc49977a974dd899bc5858434f829b4",
+    "account-service/src/main/java/com/piggymetrics/account/config/ResourceServerConfig.java": "76aacb7bd3d884a7aa8b58c11dabb86120bcfd38cb6f89b2595a29189e0d7955",
+    "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java": "703a1e218d8173f9d47dc85f3de5d8fd333dc8531130f6371887b4f21d2144a5",
+    "account-service/src/main/java/com/piggymetrics/account/controller/ErrorHandler.java": "d5e813101da069143dc845ab742449e2241ed5230f552169cf6f45b826d98df8",
+    "account-service/src/main/java/com/piggymetrics/account/domain/Account.java": "0459c909851d021c05a1fe157e977f5e33fabd92ef4c34042bcbb61f3306b0a1",
+    "account-service/src/main/java/com/piggymetrics/account/domain/Currency.java": "6cf7c1f098d7b668f55c5fe0d0e9b08b8b7dd2882869e3d71e18dbea7be4b03a",
+    "account-service/src/main/java/com/piggymetrics/account/domain/Item.java": "4c4e72209093b482cd637c17c1e6d1261d6c9e7eced12f8447a4b8382c3d94dd",
+    "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java": "cac85b826a9821c09c5af33639ecb11711959c7ff82a78c251bb7f791adef4cd",
+    "account-service/src/main/java/com/piggymetrics/account/domain/TimePeriod.java": "414bb8f973f971a4ef5acdf92da30d85bacf3875f0bca9a5a2ce3a062bb31e73",
+    "account-service/src/main/java/com/piggymetrics/account/domain/User.java": "6ac4518ff1938dbca077bc0c5a23356050e670713263bd9210f3181109882d45",
+    "account-service/src/main/java/com/piggymetrics/account/repository/AccountRepository.java": "96c570183450a648b8c287bf89a120e1339865af7e6d36bcb589f8b36588ec86",
+    "account-service/src/main/java/com/piggymetrics/account/service/AccountService.java": "d6fe6af641b18b8305a81620ac99c11021096a58de802fd21ff07e97d07521e2",
+    "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java": "60c25f01e6553c642f2536177f96bc8a6500be0b8a881a812b227068461ee27d",
+    "account-service/src/main/java/com/piggymetrics/account/service/security/CustomUserInfoTokenServices.java": "b8ed676aa4ac72e2ef9fd71f4574440a969bccd9b767d5d3e3384f2ab7f799db",
+    "account-service/src/test/java/com/piggymetrics/account/client/StatisticsServiceClientFallbackTest.java": "f71d2a65dde275fa5e00166edcff8f5618de1b82a9298e05b5c89fcf14ca8253",
+    "auth-service/pom.xml": "3cb1e30608f47d62dedb359e0aeddfa8e9eadc64b706ba43e0434e654a2bde75",
+    "auth-service/src/main/java/com/piggymetrics/auth/AuthApplication.java": "f3ec2b496bda416e52f62b0e5ee14fb6b6d7606babcd5dc2444a61bed570cffb",
+    "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java": "71b2afe7b3b6ebf9583f988eb74fabfe347d73b16e209aa09daaf9a785086cab",
+    "auth-service/src/main/java/com/piggymetrics/auth/config/WebSecurityConfig.java": "cf60446d5af29bc5a623238e27cbe07557446bb2201dc06a17e63143a04a2942",
+    "auth-service/src/main/java/com/piggymetrics/auth/controller/UserController.java": "4bbdb4b88ae3cb47f840fba77a8adb61b29be372ea16aac02a6f47bf26f0a6a0",
+    "auth-service/src/main/java/com/piggymetrics/auth/domain/User.java": "8667bc65b821c7a2b1661bdd810410e5021a990faf9e3fd309c767b4855819ed",
+    "auth-service/src/main/java/com/piggymetrics/auth/repository/UserRepository.java": "cdeb6c427f16da61b1d125d028147b66f4f60255a97a23265d0903ee45f4a95f",
+    "auth-service/src/main/java/com/piggymetrics/auth/service/UserService.java": "2be76323355d81c4c98ef0103beb7319cc5d8d03c3d4b81c25c8ccd811b88ea6",
+    "auth-service/src/main/java/com/piggymetrics/auth/service/UserServiceImpl.java": "3f3e2a7f8bdbe33886ed5f63faf213aae5eeaee81e7708730ff869a88160c3c6",
+    "config/src/main/resources/shared/account-service.yml": "50cb0f2fc7e48c658344423f749ee2e99a0fcf0f17e3bab4657d26a1fe6d0548",
+    "config/src/main/resources/shared/application.yml": "44d3fa56c3893c8c603b8f7b3564be8d9a99a4b013102bee83769281c399f477",
+    "config/src/main/resources/shared/auth-service.yml": "f81c1a6d73506e27e6e743d7b0fcc0e5e0efacede035dd7ba3b776e18cf7d95c",
+    "config/src/main/resources/shared/statistics-service.yml": "26ae927bd2260b1d94d05dd97c1817586d84d85911c0c59cd57f656cb20c656b",
+    "pom.xml": "9fdbb499c137e0d3091c971bbd0c8470260cd877f724b5b884793504888037f2",
+    "statistics-service/pom.xml": "3548db576b2410bb1500f00f8c46713ea7e09e2f603d815248474e1344ff60bc",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/StatisticsApplication.java": "9395b468f8b33841cdb4e24d29537194044c19e9cf748f77616aa17a83b0c7c6",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/config/ResourceServerConfig.java": "8988ca41c70c726f3eeaf0d7a660a9bfb7749fb59960df192ac9c00909508491",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/controller/StatisticsController.java": "982ce63856795fc1b4ee07037f22c95d4e6d543fd0b31ab56bde78ed566cfefb",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Account.java": "d6d939c2403ca09ee2c00f3a01d6f58023c41599ca53d75ddc98acf62468c9fd",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Currency.java": "bebb5add0907f7dd0c0bb623ce21a7855d2bea021e9bc7f3a114d65847f5acd3",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/domain/ExchangeRatesContainer.java": "6e60ac91bcf3b55d4dc5cc0891a91ce10bead6b477b4f04d2f546e7cfb1b5c2e",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Item.java": "34e6a96d719a6137093d5b968af490d938fb25f502ee48294efc31d0cda492b8",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java": "44c07ff4130b7fe667edbf02f3301c12d393b1cfa483d936d89d141e077bd91b",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/domain/TimePeriod.java": "5aac9b76df3d8494589b92466507fa7ce1e32b1390b269299be3a1a746811844",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPoint.java": "eaa73034fef2e58a993eab39aebb6fb745835a8a88768a57aa60bb389648796a",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPointId.java": "09a3b8c63713ef1e39a43ee272986ac064a5d5f218c4f16bb10c41cdd3e0ab2e",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/ItemMetric.java": "1379dee3ab4b367bfa231f1bd4277c1e9473c75d89c3f0053200dce1f1915f6d",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/StatisticMetric.java": "f5f2dd986a679efeb7a68b86c048ebc00de0198478d8434f32b96fcc135ed681",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/repository/DataPointRepository.java": "df6c93d46d3e1ecfbe68a7e0b62e868b52ae3664fbedd68e0ff3c6a0bbbad603",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/repository/converter/DataPointIdReaderConverter.java": "887b9e6c55e1a12ab7605c85f9c42a5e8c399be9c2f187565dbf238843024c18",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/repository/converter/DataPointIdWriterConverter.java": "a335ef6ab4ec6ef27da745ecd53d43cacb2eb95685c6be492f5724f6b698945a",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsService.java": "6f27c096d1dddadcf1867f7eb3d3fa2c2ec2185c1914c9752bcbef510904dbb3",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java": "57fe89bde12a2dc4baec104ef5bbc9bd8f6dab6ebafec69a30e79211d37620a3",
+    "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java": "8a8f8f8dc5d9d47e4db522767dc189382df7585576262ced1648f13501992162"
+  },
+  "method_symbols": {
+    "account.Account.getExpenses": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Account",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "declaration_line": 59,
+      "declaration": "public List<Item> getExpenses() {"
+    },
+    "account.Account.getIncomes": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Account",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "declaration_line": 51,
+      "declaration": "public List<Item> getIncomes() {"
+    },
+    "account.Account.getLastSeen": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Account",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "declaration_line": 43,
+      "declaration": "public Date getLastSeen() {"
+    },
+    "account.Account.getName": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Account",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "declaration_line": 35,
+      "declaration": "public String getName() {"
+    },
+    "account.Account.getNote": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Account",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "declaration_line": 75,
+      "declaration": "public String getNote() {"
+    },
+    "account.Account.getSaving": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Account",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "declaration_line": 67,
+      "declaration": "public Saving getSaving() {"
+    },
+    "account.Account.setExpenses": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Account",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "declaration_line": 63,
+      "declaration": "public void setExpenses(List<Item> expenses) {"
+    },
+    "account.Account.setIncomes": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Account",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "declaration_line": 55,
+      "declaration": "public void setIncomes(List<Item> incomes) {"
+    },
+    "account.Account.setLastSeen": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Account",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "declaration_line": 47,
+      "declaration": "public void setLastSeen(Date lastSeen) {"
+    },
+    "account.Account.setName": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Account",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "declaration_line": 39,
+      "declaration": "public void setName(String name) {"
+    },
+    "account.Account.setNote": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Account",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "declaration_line": 79,
+      "declaration": "public void setNote(String note) {"
+    },
+    "account.Account.setSaving": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Account",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Account.java",
+      "declaration_line": 71,
+      "declaration": "public void setSaving(Saving saving) {"
+    },
+    "account.AccountController.createNewAccount": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.controller.AccountController",
+      "source": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java",
+      "declaration_line": 36,
+      "declaration": "public Account createNewAccount(@Valid @RequestBody User user) {"
+    },
+    "account.AccountController.getAccountByName": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.controller.AccountController",
+      "source": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java",
+      "declaration_line": 21,
+      "declaration": "public Account getAccountByName(@PathVariable String name) {"
+    },
+    "account.AccountController.getCurrentAccount": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.controller.AccountController",
+      "source": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java",
+      "declaration_line": 26,
+      "declaration": "public Account getCurrentAccount(Principal principal) {"
+    },
+    "account.AccountController.saveCurrentAccount": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.controller.AccountController",
+      "source": "account-service/src/main/java/com/piggymetrics/account/controller/AccountController.java",
+      "declaration_line": 31,
+      "declaration": "public void saveCurrentAccount(Principal principal, @Valid @RequestBody Account account) {"
+    },
+    "account.AccountServiceImpl.create": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.service.AccountServiceImpl",
+      "source": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java",
+      "declaration_line": 46,
+      "declaration": "public Account create(User user) {"
+    },
+    "account.AccountServiceImpl.findByName": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.service.AccountServiceImpl",
+      "source": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java",
+      "declaration_line": 37,
+      "declaration": "public Account findByName(String accountName) {"
+    },
+    "account.AccountServiceImpl.saveChanges": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.service.AccountServiceImpl",
+      "source": "account-service/src/main/java/com/piggymetrics/account/service/AccountServiceImpl.java",
+      "declaration_line": 76,
+      "declaration": "public void saveChanges(String name, Account update) {"
+    },
+    "account.Currency.getDefault": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Currency",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Currency.java",
+      "declaration_line": 7,
+      "declaration": "public static Currency getDefault() {"
+    },
+    "account.ErrorHandler.processValidationError": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.controller.ErrorHandler",
+      "source": "account-service/src/main/java/com/piggymetrics/account/controller/ErrorHandler.java",
+      "declaration_line": 19,
+      "declaration": "public void processValidationError(IllegalArgumentException e) {"
+    },
+    "account.Item.getAmount": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Item",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Item.java",
+      "declaration_line": 34,
+      "declaration": "public BigDecimal getAmount() {"
+    },
+    "account.Item.getCurrency": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Item",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Item.java",
+      "declaration_line": 42,
+      "declaration": "public Currency getCurrency() {"
+    },
+    "account.Item.getIcon": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Item",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Item.java",
+      "declaration_line": 58,
+      "declaration": "public String getIcon() {"
+    },
+    "account.Item.getPeriod": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Item",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Item.java",
+      "declaration_line": 50,
+      "declaration": "public TimePeriod getPeriod() {"
+    },
+    "account.Item.getTitle": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Item",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Item.java",
+      "declaration_line": 26,
+      "declaration": "public String getTitle() {"
+    },
+    "account.Saving.getAmount": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Saving",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "declaration_line": 23,
+      "declaration": "public BigDecimal getAmount() {"
+    },
+    "account.Saving.getCapitalization": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Saving",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "declaration_line": 55,
+      "declaration": "public Boolean getCapitalization() {"
+    },
+    "account.Saving.getCurrency": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Saving",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "declaration_line": 31,
+      "declaration": "public Currency getCurrency() {"
+    },
+    "account.Saving.getDeposit": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Saving",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "declaration_line": 47,
+      "declaration": "public Boolean getDeposit() {"
+    },
+    "account.Saving.getInterest": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Saving",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "declaration_line": 39,
+      "declaration": "public BigDecimal getInterest() {"
+    },
+    "account.Saving.setAmount": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Saving",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "declaration_line": 27,
+      "declaration": "public void setAmount(BigDecimal amount) {"
+    },
+    "account.Saving.setCapitalization": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Saving",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "declaration_line": 59,
+      "declaration": "public void setCapitalization(Boolean capitalization) {"
+    },
+    "account.Saving.setCurrency": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Saving",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "declaration_line": 35,
+      "declaration": "public void setCurrency(Currency currency) {"
+    },
+    "account.Saving.setDeposit": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Saving",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "declaration_line": 51,
+      "declaration": "public void setDeposit(Boolean deposit) {"
+    },
+    "account.Saving.setInterest": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.Saving",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/Saving.java",
+      "declaration_line": 43,
+      "declaration": "public void setInterest(BigDecimal interest) {"
+    },
+    "account.StatisticsServiceClientFallback.updateStatistics": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.client.StatisticsServiceClientFallback",
+      "source": "account-service/src/main/java/com/piggymetrics/account/client/StatisticsServiceClientFallback.java",
+      "declaration_line": 15,
+      "declaration": "public void updateStatistics(String accountName, Account account) {"
+    },
+    "account.User.getPassword": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.User",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/User.java",
+      "declaration_line": 25,
+      "declaration": "public String getPassword() {"
+    },
+    "account.User.getUsername": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.User",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/User.java",
+      "declaration_line": 17,
+      "declaration": "public String getUsername() {"
+    },
+    "account.User.setPassword": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.User",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/User.java",
+      "declaration_line": 29,
+      "declaration": "public void setPassword(String password) {"
+    },
+    "account.User.setUsername": {
+      "module": "account-service",
+      "owner_fqn": "com.piggymetrics.account.domain.User",
+      "source": "account-service/src/main/java/com/piggymetrics/account/domain/User.java",
+      "declaration_line": 21,
+      "declaration": "public void setUsername(String username) {"
+    },
+    "auth.User.getPassword": {
+      "module": "auth-service",
+      "owner_fqn": "com.piggymetrics.auth.domain.User",
+      "source": "auth-service/src/main/java/com/piggymetrics/auth/domain/User.java",
+      "declaration_line": 19,
+      "declaration": "public String getPassword() {"
+    },
+    "auth.User.getUsername": {
+      "module": "auth-service",
+      "owner_fqn": "com.piggymetrics.auth.domain.User",
+      "source": "auth-service/src/main/java/com/piggymetrics/auth/domain/User.java",
+      "declaration_line": 24,
+      "declaration": "public String getUsername() {"
+    },
+    "auth.User.setPassword": {
+      "module": "auth-service",
+      "owner_fqn": "com.piggymetrics.auth.domain.User",
+      "source": "auth-service/src/main/java/com/piggymetrics/auth/domain/User.java",
+      "declaration_line": 37,
+      "declaration": "public void setPassword(String password) {"
+    },
+    "auth.User.setUsername": {
+      "module": "auth-service",
+      "owner_fqn": "com.piggymetrics.auth.domain.User",
+      "source": "auth-service/src/main/java/com/piggymetrics/auth/domain/User.java",
+      "declaration_line": 33,
+      "declaration": "public void setUsername(String username) {"
+    },
+    "auth.UserController.createUser": {
+      "module": "auth-service",
+      "owner_fqn": "com.piggymetrics.auth.controller.UserController",
+      "source": "auth-service/src/main/java/com/piggymetrics/auth/controller/UserController.java",
+      "declaration_line": 29,
+      "declaration": "public void createUser(@Valid @RequestBody User user) {"
+    },
+    "auth.UserServiceImpl.create": {
+      "module": "auth-service",
+      "owner_fqn": "com.piggymetrics.auth.service.UserServiceImpl",
+      "source": "auth-service/src/main/java/com/piggymetrics/auth/service/UserServiceImpl.java",
+      "declaration_line": 25,
+      "declaration": "public void create(User user) {"
+    },
+    "statistics.Account.setExpenses": {
+      "module": "statistics-service",
+      "owner_fqn": "com.piggymetrics.statistics.domain.Account",
+      "source": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Account.java",
+      "declaration_line": 38,
+      "declaration": "public void setExpenses(List<Item> expenses) {"
+    },
+    "statistics.Account.setIncomes": {
+      "module": "statistics-service",
+      "owner_fqn": "com.piggymetrics.statistics.domain.Account",
+      "source": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Account.java",
+      "declaration_line": 30,
+      "declaration": "public void setIncomes(List<Item> incomes) {"
+    },
+    "statistics.Account.setSaving": {
+      "module": "statistics-service",
+      "owner_fqn": "com.piggymetrics.statistics.domain.Account",
+      "source": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Account.java",
+      "declaration_line": 46,
+      "declaration": "public void setSaving(Saving saving) {"
+    },
+    "statistics.Saving.setAmount": {
+      "module": "statistics-service",
+      "owner_fqn": "com.piggymetrics.statistics.domain.Saving",
+      "source": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java",
+      "declaration_line": 27,
+      "declaration": "public void setAmount(BigDecimal amount) {"
+    },
+    "statistics.Saving.setCapitalization": {
+      "module": "statistics-service",
+      "owner_fqn": "com.piggymetrics.statistics.domain.Saving",
+      "source": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java",
+      "declaration_line": 59,
+      "declaration": "public void setCapitalization(Boolean capitalization) {"
+    },
+    "statistics.Saving.setCurrency": {
+      "module": "statistics-service",
+      "owner_fqn": "com.piggymetrics.statistics.domain.Saving",
+      "source": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java",
+      "declaration_line": 35,
+      "declaration": "public void setCurrency(Currency currency) {"
+    },
+    "statistics.Saving.setDeposit": {
+      "module": "statistics-service",
+      "owner_fqn": "com.piggymetrics.statistics.domain.Saving",
+      "source": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java",
+      "declaration_line": 51,
+      "declaration": "public void setDeposit(Boolean deposit) {"
+    },
+    "statistics.Saving.setInterest": {
+      "module": "statistics-service",
+      "owner_fqn": "com.piggymetrics.statistics.domain.Saving",
+      "source": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java",
+      "declaration_line": 43,
+      "declaration": "public void setInterest(BigDecimal interest) {"
+    },
+    "statistics.StatisticsController.saveAccountStatistics": {
+      "module": "statistics-service",
+      "owner_fqn": "com.piggymetrics.statistics.controller.StatisticsController",
+      "source": "statistics-service/src/main/java/com/piggymetrics/statistics/controller/StatisticsController.java",
+      "declaration_line": 33,
+      "declaration": "public void saveAccountStatistics(@PathVariable String accountName, @Valid @RequestBody Account account) {"
+    }
+  },
+  "framework_contract": {
+    "spring_boot": "2.0.3.RELEASE",
+    "spring_cloud": "Finchley.RELEASE",
+    "configuration": "Pinned repository shared configuration; no deployment overrides that disable Hystrix or alter JSON/validation/security. Hystrix is on classpath, enabled=true, statistics client fallback is a component, no per-client vanilla Feign.Builder.",
+    "json": {
+      "engine": "Spring Boot default Jackson2 bean binding, with public source setters/getters invoked",
+      "unknown_properties": "ignored by Boot default FAIL_ON_UNKNOWN_PROPERTIES=false; do not rely on the legacy org.codehaus.jackson annotation being recognized by Jackson2",
+      "null_inclusion": "Default inclusion preserves null object properties",
+      "date_normalization": "$instant means parse emitted ISO Date representation and require the exact instant, not any string, not arbitrary U. No claim of exact JSON byte formatting.",
+      "decimal_normalization": "JSON numeric values compared as exact BigDecimal numeric values; nested DTO declared types are still required",
+      "projection_order": "Property order is not specified; callback sets checked per trigger, not invented total getter order"
+    },
+    "binding_and_validation": "Deserialize source bean first; field-based @Valid constraints then reject statistics incomes=null with MethodArgumentNotValidException/400 before handler. Binding callbacks still execute. Missing required RequestBody produces HttpMessageNotReadableException/400 before handler, with no DTO instance.",
+    "feign": "POST/PUT request bodies use SpringEncoder; consumes APPLICATION_JSON_UTF8_VALUE yields application/json;charset=UTF-8. Default non-2xx error decoder throws. Hystrix statistics fallback returns normally; auth has no fallback and propagates failure (possibly wrapped).",
+    "events_and_edges": "executes contains reached source methods, including public JSON callbacks and fallback. calls contains source-to-source method invocations; framework callback roots have trigger events, not fabricated caller->getter/setter calls. remote is added at entered remote handler, not request send; no statistics remote edge on binding validation reject. data is source method->logical collection and deduplicated within step.",
+    "persistence": "Logical persistent Java fields, using declared field access. Mongo _id is Account.name or User.username. _class/internal BSON storage bytes are not the measured view. Each completed repository.save is an independent successful write; no source @Transactional spans the HTTP call."
+  },
+  "provided_boundary": {
+    "provided_contexts_are_inputs": true,
+    "scope": "The oracle starts after token verification at each incoming request boundary, including remote requests. Supplied Principal/OAuth2Request facts are checked as identity inputs. Source method-level scope decisions remain required. OAuth minting and CustomUserInfoTokenServices HTTP introspection are outside this business profile; the opaque strings below do not prove signature/token validity.",
+    "contexts": {
+      "anonymous": {
+        "authenticated": false,
+        "principal": null,
+        "authorities": [],
+        "oauth2_request": null
+      },
+      "server-reader": {
+        "authenticated": true,
+        "principal": {
+          "name": "account-service"
+        },
+        "authorities": [],
+        "oauth2_request": {
+          "clientId": "account-service",
+          "scope": [
+            "server"
+          ]
+        }
+      },
+      "aurora-user": {
+        "authenticated": true,
+        "principal": {
+          "name": "aurora"
+        },
+        "authorities": [],
+        "oauth2_request": {
+          "clientId": "browser",
+          "scope": [
+            "ui"
+          ]
+        }
+      },
+      "account-service-outbound": {
+        "authenticated": true,
+        "principal": {
+          "name": "account-service"
+        },
+        "authorities": [],
+        "oauth2_request": {
+          "clientId": "account-service",
+          "scope": [
+            "server"
+          ]
+        }
+      }
+    },
+    "opaque_supplied_tokens": {
+      "supplied-server-token": {
+        "context": "server-reader",
+        "validation": "already established input; no cryptographic verification claimed"
+      },
+      "supplied-user-token": {
+        "context": "aurora-user",
+        "available_at": "step3 supplied post-auth boundary after user creation; issuance not analyzed"
+      },
+      "service-proof": {
+        "context": "account-service-outbound",
+        "source": "cached OAuth2ClientContext supplied input for the source-defined client-credentials interceptor, not minted by analyzer"
+      }
+    }
+  },
+  "execution_environment": {
+    "mongo_operations": "successful acknowledged operations; no concurrent writers or exogenous persistence failures",
+    "http": "healthy transport and source-selected service destinations; no timeout, service discovery failure, retries or open circuit preventing a declared request",
+    "hystrix_circuits": "closed before selected requests; source server validation error is still an error and triggers the declared fallback",
+    "startup": "complete before journey; no static/bean initialization is part of edge oracle"
+  },
+  "initial_state_recipe": "Each case has its own full explicit initial_state and equal expected_state. Account seed fields come from the manually supplied additional v1 account context (20 USD and partially-known-seed), not from the final 20 EUR state of the main eight-step journey. Non-account tables use the explicit parent initial preconditions. The supplied authenticated context is a separate post-auth input, not an assertion that this fixture ran login.",
+  "cases": [
+    {
+      "id": "invalid-saving-null",
+      "independent_reset": true,
+      "initial_state": {
+        "account-service.accounts": [
+          {
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": null,
+            "expenses": [],
+            "saving": {
+              "amount": 20,
+              "currency": "USD",
+              "interest": 0,
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          }
+        ],
+        "auth-service.users": [
+          {
+            "username": "occupied",
+            "password": "initial-hash"
+          }
+        ],
+        "statistics-service.datapoints": []
+      },
+      "expected_state": {
+        "account-service.accounts": [
+          {
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": null,
+            "expenses": [],
+            "saving": {
+              "amount": 20,
+              "currency": "USD",
+              "interest": 0,
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          }
+        ],
+        "auth-service.users": [
+          {
+            "username": "occupied",
+            "password": "initial-hash"
+          }
+        ],
+        "statistics-service.datapoints": []
+      },
+      "state_comparison": {
+        "mode": "exact logical persistent fields by collection and declared ID; native value normalization only",
+        "collection_symbols": {
+          "account-service.accounts": {
+            "module": "account-service",
+            "collection": "accounts",
+            "entity_fqn": "com.piggymetrics.account.domain.Account",
+            "id_field": "name",
+            "id_type": "java.lang.String"
+          },
+          "auth-service.users": {
+            "module": "auth-service",
+            "collection": "users",
+            "entity_fqn": "com.piggymetrics.auth.domain.User",
+            "id_field": "username",
+            "id_type": "java.lang.String"
+          },
+          "statistics-service.datapoints": {
+            "module": "statistics-service",
+            "collection": "datapoints",
+            "entity_fqn": "com.piggymetrics.statistics.domain.timeseries.DataPoint",
+            "not_reached_in_journey": true
+          }
+        },
+        "unchanged": true,
+        "row_counts_alone_are_insufficient": true
+      },
+      "state_native_types": {
+        "account-service.accounts": {
+          "entity_fqn": "com.piggymetrics.account.domain.Account",
+          "fields": {
+            "name": "java.lang.String",
+            "lastSeen": "java.util.Date",
+            "incomes": "java.util.List<com.piggymetrics.account.domain.Item>",
+            "expenses": "java.util.List<com.piggymetrics.account.domain.Item>",
+            "saving": "com.piggymetrics.account.domain.Saving",
+            "note": "java.lang.String"
+          },
+          "saving": {
+            "entity_fqn": "com.piggymetrics.account.domain.Saving",
+            "fields": {
+              "amount": "java.math.BigDecimal",
+              "currency": "com.piggymetrics.account.domain.Currency",
+              "interest": "java.math.BigDecimal",
+              "deposit": "java.lang.Boolean",
+              "capitalization": "java.lang.Boolean"
+            }
+          },
+          "incomes.element": {
+            "entity_fqn": "com.piggymetrics.account.domain.Item",
+            "fields": {
+              "title": "java.lang.String",
+              "amount": "java.math.BigDecimal",
+              "currency": "com.piggymetrics.account.domain.Currency",
+              "period": "com.piggymetrics.account.domain.TimePeriod",
+              "icon": "java.lang.String"
+            }
+          }
+        },
+        "auth-service.users": {
+          "entity_fqn": "com.piggymetrics.auth.domain.User",
+          "fields": {
+            "username": "java.lang.String",
+            "password": "java.lang.String"
+          }
+        }
+      },
+      "clock": "2026-10-18T00:00:00Z",
+      "request": {
+        "method": "PUT",
+        "path": "/accounts/current",
+        "query": {},
+        "headers": {
+          "content-type": [
+            "application/json"
+          ],
+          "accept": [
+            "application/json"
+          ],
+          "authorization": [
+            "Bearer supplied-user-token"
+          ]
+        },
+        "body": {
+          "saving": null
+        }
+      },
+      "identity": {
+        "context_id": "aurora-user",
+        "context": {
+          "authenticated": true,
+          "principal": {
+            "name": "aurora"
+          },
+          "authorities": [],
+          "oauth2_request": {
+            "clientId": "browser",
+            "scope": [
+              "ui"
+            ]
+          }
+        },
+        "provenance": "provided verified post-auth boundary input; not minted or cryptographically verified by analyzer"
+      },
+      "route_candidate": "account.AccountController.saveCurrentAccount",
+      "handler": null,
+      "handler_entered": false,
+      "binding_candidate_arguments": [
+        {
+          "name": "principal",
+          "declared_type": "java.security.Principal",
+          "value": {
+            "name": "aurora"
+          },
+          "provenance": "provided aurora-user principal; resolved before body validation"
+        },
+        {
+          "name": "account",
+          "declared_type": "com.piggymetrics.account.domain.Account",
+          "value": {
+            "name": null,
+            "lastSeen": null,
+            "incomes": null,
+            "expenses": null,
+            "saving": null,
+            "note": null
+          },
+          "provenance": "Jackson deserialization of saving:null; other five reference fields missing on wire default to null",
+          "field_types": {
+            "name": "java.lang.String",
+            "lastSeen": "java.util.Date",
+            "incomes": "java.util.List<com.piggymetrics.account.domain.Item>",
+            "expenses": "java.util.List<com.piggymetrics.account.domain.Item>",
+            "saving": "com.piggymetrics.account.domain.Saving",
+            "note": "java.lang.String"
+          },
+          "wire_explicit_null_fields": [
+            "saving"
+          ],
+          "wire_missing_fields": [
+            "name",
+            "lastSeen",
+            "incomes",
+            "expenses",
+            "note"
+          ],
+          "non_null": true
+        }
+      ],
+      "bound_arguments": {
+        "applicable": false,
+        "measured": false,
+        "reason": "validation rejects the created body DTO before handler invocation; candidate values are separately required, no empty arguments counted as checked"
+      },
+      "binding_rejection": {
+        "exception": "org.springframework.web.bind.MethodArgumentNotValidException",
+        "field": "saving",
+        "constraint": "javax.validation.constraints.NotNull",
+        "actual": null,
+        "status": 400,
+        "handler_arguments_produced": false
+      },
+      "status": 400,
+      "java_return": {
+        "$not_invoked": true
+      },
+      "response_body": {
+        "$unmeasured": "framework-generated validation error payload; status/prefix/state still checked"
+      },
+      "edges": {
+        "executes": [
+          "account.Account.setSaving"
+        ],
+        "calls": [],
+        "remote": [],
+        "data": []
+      },
+      "events": [
+        {
+          "kind": "provided_identity",
+          "context_id": "aurora-user"
+        },
+        {
+          "kind": "body_deserialization",
+          "declared_type": "com.piggymetrics.account.domain.Account",
+          "candidate": {
+            "name": null,
+            "lastSeen": null,
+            "incomes": null,
+            "expenses": null,
+            "saving": null,
+            "note": null
+          },
+          "wire_explicit_null_fields": [
+            "saving"
+          ],
+          "wire_missing_fields": [
+            "name",
+            "lastSeen",
+            "incomes",
+            "expenses",
+            "note"
+          ]
+        },
+        {
+          "kind": "framework_callback",
+          "trigger": "request_body_binding",
+          "method": "account.Account.setSaving",
+          "receiver_declared_type": "com.piggymetrics.account.domain.Account",
+          "arguments": [
+            null
+          ],
+          "result": {
+            "$void": true
+          },
+          "no_synthetic_source_call": true
+        },
+        {
+          "kind": "validation_reject",
+          "exception": "org.springframework.web.bind.MethodArgumentNotValidException",
+          "constraint": "javax.validation.constraints.NotNull",
+          "field": "saving",
+          "actual": null,
+          "handler_entered": false
+        },
+        {
+          "kind": "response",
+          "status": 400,
+          "body": {
+            "$unmeasured": "framework-generated validation error payload"
+          }
+        }
+      ],
+      "forbidden_events": [
+        {
+          "kind": "handler_entry"
+        },
+        {
+          "kind": "source_call"
+        },
+        {
+          "kind": "persistence"
+        },
+        {
+          "kind": "remote_request"
+        },
+        {
+          "kind": "remote_handler_entry"
+        }
+      ],
+      "source_basis": [
+        "AccountController.java:30-32",
+        "Account.java:17-33,71-72",
+        "ResourceServerConfig.java:54-58",
+        "Spring 5.0.7 RequestResponseBodyMethodProcessor read body -> validate -> reject before invocation"
+      ]
+    },
+    {
+      "id": "partly-known-real-list",
+      "independent_reset": true,
+      "initial_state": {
+        "account-service.accounts": [
+          {
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": [
+              {
+                "title": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].title"
+                },
+                "amount": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].amount"
+                },
+                "currency": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].currency"
+                },
+                "period": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].period"
+                },
+                "icon": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].icon"
+                }
+              },
+              {
+                "title": "Rent",
+                "amount": 7,
+                "currency": "USD",
+                "period": "MONTH",
+                "icon": "home"
+              }
+            ],
+            "expenses": [],
+            "saving": {
+              "amount": 20,
+              "currency": "USD",
+              "interest": 0,
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          }
+        ],
+        "auth-service.users": [
+          {
+            "username": "occupied",
+            "password": "initial-hash"
+          }
+        ],
+        "statistics-service.datapoints": []
+      },
+      "expected_state": {
+        "account-service.accounts": [
+          {
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": [
+              {
+                "title": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].title"
+                },
+                "amount": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].amount"
+                },
+                "currency": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].currency"
+                },
+                "period": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].period"
+                },
+                "icon": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].icon"
+                }
+              },
+              {
+                "title": "Rent",
+                "amount": 7,
+                "currency": "USD",
+                "period": "MONTH",
+                "icon": "home"
+              }
+            ],
+            "expenses": [],
+            "saving": {
+              "amount": 20,
+              "currency": "USD",
+              "interest": 0,
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          }
+        ],
+        "auth-service.users": [
+          {
+            "username": "occupied",
+            "password": "initial-hash"
+          }
+        ],
+        "statistics-service.datapoints": []
+      },
+      "state_comparison": {
+        "mode": "exact logical persistent fields by collection and declared ID; native value normalization only",
+        "collection_symbols": {
+          "account-service.accounts": {
+            "module": "account-service",
+            "collection": "accounts",
+            "entity_fqn": "com.piggymetrics.account.domain.Account",
+            "id_field": "name",
+            "id_type": "java.lang.String"
+          },
+          "auth-service.users": {
+            "module": "auth-service",
+            "collection": "users",
+            "entity_fqn": "com.piggymetrics.auth.domain.User",
+            "id_field": "username",
+            "id_type": "java.lang.String"
+          },
+          "statistics-service.datapoints": {
+            "module": "statistics-service",
+            "collection": "datapoints",
+            "entity_fqn": "com.piggymetrics.statistics.domain.timeseries.DataPoint",
+            "not_reached_in_journey": true
+          }
+        },
+        "unchanged": true,
+        "row_counts_alone_are_insufficient": true
+      },
+      "state_native_types": {
+        "account-service.accounts": {
+          "entity_fqn": "com.piggymetrics.account.domain.Account",
+          "fields": {
+            "name": "java.lang.String",
+            "lastSeen": "java.util.Date",
+            "incomes": "java.util.List<com.piggymetrics.account.domain.Item>",
+            "expenses": "java.util.List<com.piggymetrics.account.domain.Item>",
+            "saving": "com.piggymetrics.account.domain.Saving",
+            "note": "java.lang.String"
+          },
+          "saving": {
+            "entity_fqn": "com.piggymetrics.account.domain.Saving",
+            "fields": {
+              "amount": "java.math.BigDecimal",
+              "currency": "com.piggymetrics.account.domain.Currency",
+              "interest": "java.math.BigDecimal",
+              "deposit": "java.lang.Boolean",
+              "capitalization": "java.lang.Boolean"
+            }
+          },
+          "incomes.element": {
+            "entity_fqn": "com.piggymetrics.account.domain.Item",
+            "fields": {
+              "title": "java.lang.String",
+              "amount": "java.math.BigDecimal",
+              "currency": "com.piggymetrics.account.domain.Currency",
+              "period": "com.piggymetrics.account.domain.TimePeriod",
+              "icon": "java.lang.String"
+            }
+          }
+        },
+        "auth-service.users": {
+          "entity_fqn": "com.piggymetrics.auth.domain.User",
+          "fields": {
+            "username": "java.lang.String",
+            "password": "java.lang.String"
+          }
+        }
+      },
+      "clock": "2026-10-18T00:00:00Z",
+      "request": {
+        "method": "GET",
+        "path": "/accounts/aurora",
+        "query": {},
+        "headers": {
+          "accept": [
+            "application/json"
+          ],
+          "authorization": [
+            "Bearer supplied-server-token"
+          ]
+        },
+        "body": {
+          "$missing": true
+        }
+      },
+      "identity": {
+        "context_id": "server-reader",
+        "context": {
+          "authenticated": true,
+          "principal": {
+            "name": "account-service"
+          },
+          "authorities": [],
+          "oauth2_request": {
+            "clientId": "account-service",
+            "scope": [
+              "server"
+            ]
+          }
+        },
+        "provenance": "provided verified post-auth boundary input; not minted or cryptographically verified by analyzer"
+      },
+      "abstract_input_contract": {
+        "non_null_source_records": [
+          {
+            "path": "initial_state.account-service.accounts[name=aurora]",
+            "runtime_type": "com.piggymetrics.account.domain.Account"
+          },
+          {
+            "path": "initial_state.account-service.accounts[name=aurora].saving",
+            "runtime_type": "com.piggymetrics.account.domain.Saving"
+          },
+          {
+            "path": "initial_state.account-service.accounts[name=aurora].incomes[0]",
+            "runtime_type": "com.piggymetrics.account.domain.Item",
+            "arbitrary_receiver_or_subtype": false
+          },
+          {
+            "path": "initial_state.account-service.accounts[name=aurora].incomes[1]",
+            "runtime_type": "com.piggymetrics.account.domain.Item",
+            "arbitrary_receiver_or_subtype": false
+          }
+        ],
+        "unknown_fields": [
+          {
+            "symbol_id": "seed.aurora.incomes[0].title",
+            "path": "initial_state.account-service.accounts[name=aurora].incomes[0].title",
+            "declared_type": "java.lang.String",
+            "nullable": true,
+            "domain": "native values of exactly the declared Java type or null; no arbitrary foreign receiver/class or serialization callback",
+            "origin": "provided abstract initial-state field; not unknown external call semantics"
+          },
+          {
+            "symbol_id": "seed.aurora.incomes[0].amount",
+            "path": "initial_state.account-service.accounts[name=aurora].incomes[0].amount",
+            "declared_type": "java.math.BigDecimal",
+            "nullable": true,
+            "domain": "native values of exactly the declared Java type or null; no arbitrary foreign receiver/class or serialization callback",
+            "origin": "provided abstract initial-state field; not unknown external call semantics"
+          },
+          {
+            "symbol_id": "seed.aurora.incomes[0].currency",
+            "path": "initial_state.account-service.accounts[name=aurora].incomes[0].currency",
+            "declared_type": "com.piggymetrics.account.domain.Currency",
+            "nullable": true,
+            "domain": "native values of exactly the declared Java type or null; no arbitrary foreign receiver/class or serialization callback",
+            "origin": "provided abstract initial-state field; not unknown external call semantics"
+          },
+          {
+            "symbol_id": "seed.aurora.incomes[0].period",
+            "path": "initial_state.account-service.accounts[name=aurora].incomes[0].period",
+            "declared_type": "com.piggymetrics.account.domain.TimePeriod",
+            "nullable": true,
+            "domain": "native values of exactly the declared Java type or null; no arbitrary foreign receiver/class or serialization callback",
+            "origin": "provided abstract initial-state field; not unknown external call semantics"
+          },
+          {
+            "symbol_id": "seed.aurora.incomes[0].icon",
+            "path": "initial_state.account-service.accounts[name=aurora].incomes[0].icon",
+            "declared_type": "java.lang.String",
+            "nullable": true,
+            "domain": "native values of exactly the declared Java type or null; no arbitrary foreign receiver/class or serialization callback",
+            "origin": "provided abstract initial-state field; not unknown external call semantics"
+          }
+        ],
+        "no_output_bean_validation": "GET has no @Valid result validation. Field constraints do not infer unknown values or nullability facts from the initial DB snapshot. Source getters are pure field reads, ordinary native scalar serialization succeeds.",
+        "unknown_output": "Markers describe semantic unknown field values and provenance; they are not literal JSON objects sent by the real service.",
+        "required_collection_shape": {
+          "length": 2,
+          "slot0": {
+            "non_null": true,
+            "runtime_type": "com.piggymetrics.account.domain.Item",
+            "field_names": [
+              "title",
+              "amount",
+              "currency",
+              "period",
+              "icon"
+            ],
+            "field_values": {
+              "title": {
+                "$unknown": true,
+                "symbol_id": "seed.aurora.incomes[0].title"
+              },
+              "amount": {
+                "$unknown": true,
+                "symbol_id": "seed.aurora.incomes[0].amount"
+              },
+              "currency": {
+                "$unknown": true,
+                "symbol_id": "seed.aurora.incomes[0].currency"
+              },
+              "period": {
+                "$unknown": true,
+                "symbol_id": "seed.aurora.incomes[0].period"
+              },
+              "icon": {
+                "$unknown": true,
+                "symbol_id": "seed.aurora.incomes[0].icon"
+              }
+            }
+          },
+          "slot1": {
+            "title": "Rent",
+            "amount": 7,
+            "currency": "USD",
+            "period": "MONTH",
+            "icon": "home"
+          },
+          "positions_and_field_symbols_preserved": true,
+          "no_compaction_or_value_invention": true
+        }
+      },
+      "handler": "account.AccountController.getAccountByName",
+      "handler_entered": true,
+      "bound_arguments": [
+        {
+          "name": "name",
+          "declared_type": "java.lang.String",
+          "value": "aurora",
+          "provenance": "explicit path segment supplied by the scenario, not inferred from DB rows"
+        }
+      ],
+      "status": 200,
+      "java_return": {
+        "name": "aurora",
+        "lastSeen": {
+          "$instant": "2026-10-18T00:00:00Z"
+        },
+        "incomes": [
+          {
+            "title": {
+              "$unknown": true,
+              "symbol_id": "seed.aurora.incomes[0].title"
+            },
+            "amount": {
+              "$unknown": true,
+              "symbol_id": "seed.aurora.incomes[0].amount"
+            },
+            "currency": {
+              "$unknown": true,
+              "symbol_id": "seed.aurora.incomes[0].currency"
+            },
+            "period": {
+              "$unknown": true,
+              "symbol_id": "seed.aurora.incomes[0].period"
+            },
+            "icon": {
+              "$unknown": true,
+              "symbol_id": "seed.aurora.incomes[0].icon"
+            }
+          },
+          {
+            "title": "Rent",
+            "amount": 7,
+            "currency": "USD",
+            "period": "MONTH",
+            "icon": "home"
+          }
+        ],
+        "expenses": [],
+        "saving": {
+          "amount": 20,
+          "currency": "USD",
+          "interest": 0,
+          "deposit": false,
+          "capitalization": false
+        },
+        "note": "partially-known-seed"
+      },
+      "response_body": {
+        "name": "aurora",
+        "lastSeen": {
+          "$instant": "2026-10-18T00:00:00Z"
+        },
+        "incomes": [
+          {
+            "title": {
+              "$unknown": true,
+              "symbol_id": "seed.aurora.incomes[0].title"
+            },
+            "amount": {
+              "$unknown": true,
+              "symbol_id": "seed.aurora.incomes[0].amount"
+            },
+            "currency": {
+              "$unknown": true,
+              "symbol_id": "seed.aurora.incomes[0].currency"
+            },
+            "period": {
+              "$unknown": true,
+              "symbol_id": "seed.aurora.incomes[0].period"
+            },
+            "icon": {
+              "$unknown": true,
+              "symbol_id": "seed.aurora.incomes[0].icon"
+            }
+          },
+          {
+            "title": "Rent",
+            "amount": 7,
+            "currency": "USD",
+            "period": "MONTH",
+            "icon": "home"
+          }
+        ],
+        "expenses": [],
+        "saving": {
+          "amount": 20,
+          "currency": "USD",
+          "interest": 0,
+          "deposit": false,
+          "capitalization": false
+        },
+        "note": "partially-known-seed"
+      },
+      "edges": {
+        "executes": [
+          "account.Account.getExpenses",
+          "account.Account.getIncomes",
+          "account.Account.getLastSeen",
+          "account.Account.getName",
+          "account.Account.getNote",
+          "account.Account.getSaving",
+          "account.AccountController.getAccountByName",
+          "account.AccountServiceImpl.findByName",
+          "account.Item.getAmount",
+          "account.Item.getCurrency",
+          "account.Item.getIcon",
+          "account.Item.getPeriod",
+          "account.Item.getTitle",
+          "account.Saving.getAmount",
+          "account.Saving.getCapitalization",
+          "account.Saving.getCurrency",
+          "account.Saving.getDeposit",
+          "account.Saving.getInterest"
+        ],
+        "calls": [
+          [
+            "account.AccountController.getAccountByName",
+            "account.AccountServiceImpl.findByName"
+          ]
+        ],
+        "remote": [],
+        "data": [
+          [
+            "account.AccountServiceImpl.findByName",
+            "account-service.accounts"
+          ]
+        ]
+      },
+      "events": [
+        {
+          "kind": "provided_identity",
+          "context_id": "server-reader"
+        },
+        {
+          "kind": "request_binding",
+          "handler": "account.AccountController.getAccountByName",
+          "arguments": [
+            {
+              "name": "name",
+              "declared_type": "java.lang.String",
+              "value": "aurora",
+              "provenance": "explicit path segment supplied by the scenario, not inferred from DB rows"
+            }
+          ]
+        },
+        {
+          "kind": "method_security",
+          "required_scope": "server",
+          "provided_scope": [
+            "server"
+          ],
+          "decision": "allow"
+        },
+        {
+          "kind": "handler_entry",
+          "method": "account.AccountController.getAccountByName"
+        },
+        {
+          "kind": "source_call",
+          "from": "account.AccountController.getAccountByName",
+          "to": "account.AccountServiceImpl.findByName",
+          "arguments": [
+            "aurora"
+          ]
+        },
+        {
+          "kind": "persistence",
+          "source_method": "account.AccountServiceImpl.findByName",
+          "collection": "account-service.accounts",
+          "operation": "findByName",
+          "key": "aurora",
+          "result": {
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": [
+              {
+                "title": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].title"
+                },
+                "amount": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].amount"
+                },
+                "currency": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].currency"
+                },
+                "period": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].period"
+                },
+                "icon": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].icon"
+                }
+              },
+              {
+                "title": "Rent",
+                "amount": 7,
+                "currency": "USD",
+                "period": "MONTH",
+                "icon": "home"
+              }
+            ],
+            "expenses": [],
+            "saving": {
+              "amount": 20,
+              "currency": "USD",
+              "interest": 0,
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          }
+        },
+        {
+          "kind": "serialization_phase",
+          "trigger": "response_json_serialization",
+          "callbacks": [
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Account.getName",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora]",
+              "field": "name",
+              "result": "aurora",
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Account.getLastSeen",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora]",
+              "field": "lastSeen",
+              "result": {
+                "$instant": "2026-10-18T00:00:00Z"
+              },
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Account.getIncomes",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora]",
+              "field": "incomes",
+              "result": [
+                {
+                  "title": {
+                    "$unknown": true,
+                    "symbol_id": "seed.aurora.incomes[0].title"
+                  },
+                  "amount": {
+                    "$unknown": true,
+                    "symbol_id": "seed.aurora.incomes[0].amount"
+                  },
+                  "currency": {
+                    "$unknown": true,
+                    "symbol_id": "seed.aurora.incomes[0].currency"
+                  },
+                  "period": {
+                    "$unknown": true,
+                    "symbol_id": "seed.aurora.incomes[0].period"
+                  },
+                  "icon": {
+                    "$unknown": true,
+                    "symbol_id": "seed.aurora.incomes[0].icon"
+                  }
+                },
+                {
+                  "title": "Rent",
+                  "amount": 7,
+                  "currency": "USD",
+                  "period": "MONTH",
+                  "icon": "home"
+                }
+              ],
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Account.getExpenses",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora]",
+              "field": "expenses",
+              "result": [],
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Account.getSaving",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora]",
+              "field": "saving",
+              "result": {
+                "amount": 20,
+                "currency": "USD",
+                "interest": 0,
+                "deposit": false,
+                "capitalization": false
+              },
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Account.getNote",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora]",
+              "field": "note",
+              "result": "partially-known-seed",
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Saving.getAmount",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora].saving",
+              "field": "amount",
+              "result": 20,
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Saving.getCurrency",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora].saving",
+              "field": "currency",
+              "result": "USD",
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Saving.getInterest",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora].saving",
+              "field": "interest",
+              "result": 0,
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Saving.getDeposit",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora].saving",
+              "field": "deposit",
+              "result": false,
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Saving.getCapitalization",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora].saving",
+              "field": "capitalization",
+              "result": false,
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Item.getTitle",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora].incomes[0]",
+              "field": "title",
+              "result": {
+                "$unknown": true,
+                "symbol_id": "seed.aurora.incomes[0].title"
+              },
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Item.getAmount",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora].incomes[0]",
+              "field": "amount",
+              "result": {
+                "$unknown": true,
+                "symbol_id": "seed.aurora.incomes[0].amount"
+              },
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Item.getCurrency",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora].incomes[0]",
+              "field": "currency",
+              "result": {
+                "$unknown": true,
+                "symbol_id": "seed.aurora.incomes[0].currency"
+              },
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Item.getPeriod",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora].incomes[0]",
+              "field": "period",
+              "result": {
+                "$unknown": true,
+                "symbol_id": "seed.aurora.incomes[0].period"
+              },
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Item.getIcon",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora].incomes[0]",
+              "field": "icon",
+              "result": {
+                "$unknown": true,
+                "symbol_id": "seed.aurora.incomes[0].icon"
+              },
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Item.getTitle",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora].incomes[1]",
+              "field": "title",
+              "result": "Rent",
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Item.getAmount",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora].incomes[1]",
+              "field": "amount",
+              "result": 7,
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Item.getCurrency",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora].incomes[1]",
+              "field": "currency",
+              "result": "USD",
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Item.getPeriod",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora].incomes[1]",
+              "field": "period",
+              "result": "MONTH",
+              "no_synthetic_source_call": true
+            },
+            {
+              "kind": "framework_callback",
+              "trigger": "response_json_serialization",
+              "method": "account.Item.getIcon",
+              "receiver_path": "initial_state.account-service.accounts[name=aurora].incomes[1]",
+              "field": "icon",
+              "result": "home",
+              "no_synthetic_source_call": true
+            }
+          ]
+        },
+        {
+          "kind": "response",
+          "status": 200,
+          "body": {
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": [
+              {
+                "title": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].title"
+                },
+                "amount": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].amount"
+                },
+                "currency": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].currency"
+                },
+                "period": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].period"
+                },
+                "icon": {
+                  "$unknown": true,
+                  "symbol_id": "seed.aurora.incomes[0].icon"
+                }
+              },
+              {
+                "title": "Rent",
+                "amount": 7,
+                "currency": "USD",
+                "period": "MONTH",
+                "icon": "home"
+              }
+            ],
+            "expenses": [],
+            "saving": {
+              "amount": 20,
+              "currency": "USD",
+              "interest": 0,
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          }
+        }
+      ],
+      "event_ordering": {
+        "phases": "events array is required ordered source subsequence",
+        "within_serialization": "do not impose property traversal order; require every listed callback with its source receiver path and result; getter results precede serialization of nested values",
+        "Item_callbacks": "exactly five source Item getters for each of two non-null exact source Items; graph executes deduplicates them"
+      },
+      "forbidden_events": [
+        {
+          "kind": "persistence",
+          "operation": "save"
+        },
+        {
+          "kind": "remote_request"
+        },
+        {
+          "kind": "framework_callback",
+          "method_prefix": "account.Item.set"
+        }
+      ],
+      "source_basis": [
+        "AccountController.java:19-22",
+        "AccountServiceImpl.java:37-39",
+        "Account.java:35-80",
+        "Saving.java:23-60",
+        "Item.java:10-64",
+        "TimePeriod.java:5"
+      ]
+    },
+    {
+      "id": "ambiguous-account-read",
+      "independent_reset": true,
+      "initial_state": {
+        "account-service.accounts": [
+          {
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": null,
+            "expenses": [],
+            "saving": {
+              "amount": 20,
+              "currency": "USD",
+              "interest": 0,
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          }
+        ],
+        "auth-service.users": [
+          {
+            "username": "occupied",
+            "password": "initial-hash"
+          }
+        ],
+        "statistics-service.datapoints": []
+      },
+      "expected_state": {
+        "account-service.accounts": [
+          {
+            "name": "aurora",
+            "lastSeen": {
+              "$instant": "2026-10-18T00:00:00Z"
+            },
+            "incomes": null,
+            "expenses": [],
+            "saving": {
+              "amount": 20,
+              "currency": "USD",
+              "interest": 0,
+              "deposit": false,
+              "capitalization": false
+            },
+            "note": "partially-known-seed"
+          }
+        ],
+        "auth-service.users": [
+          {
+            "username": "occupied",
+            "password": "initial-hash"
+          }
+        ],
+        "statistics-service.datapoints": []
+      },
+      "state_comparison": {
+        "mode": "exact logical persistent fields by collection and declared ID; native value normalization only",
+        "collection_symbols": {
+          "account-service.accounts": {
+            "module": "account-service",
+            "collection": "accounts",
+            "entity_fqn": "com.piggymetrics.account.domain.Account",
+            "id_field": "name",
+            "id_type": "java.lang.String"
+          },
+          "auth-service.users": {
+            "module": "auth-service",
+            "collection": "users",
+            "entity_fqn": "com.piggymetrics.auth.domain.User",
+            "id_field": "username",
+            "id_type": "java.lang.String"
+          },
+          "statistics-service.datapoints": {
+            "module": "statistics-service",
+            "collection": "datapoints",
+            "entity_fqn": "com.piggymetrics.statistics.domain.timeseries.DataPoint",
+            "not_reached_in_journey": true
+          }
+        },
+        "unchanged": true,
+        "row_counts_alone_are_insufficient": true
+      },
+      "state_native_types": {
+        "account-service.accounts": {
+          "entity_fqn": "com.piggymetrics.account.domain.Account",
+          "fields": {
+            "name": "java.lang.String",
+            "lastSeen": "java.util.Date",
+            "incomes": "java.util.List<com.piggymetrics.account.domain.Item>",
+            "expenses": "java.util.List<com.piggymetrics.account.domain.Item>",
+            "saving": "com.piggymetrics.account.domain.Saving",
+            "note": "java.lang.String"
+          },
+          "saving": {
+            "entity_fqn": "com.piggymetrics.account.domain.Saving",
+            "fields": {
+              "amount": "java.math.BigDecimal",
+              "currency": "com.piggymetrics.account.domain.Currency",
+              "interest": "java.math.BigDecimal",
+              "deposit": "java.lang.Boolean",
+              "capitalization": "java.lang.Boolean"
+            }
+          },
+          "incomes.element": {
+            "entity_fqn": "com.piggymetrics.account.domain.Item",
+            "fields": {
+              "title": "java.lang.String",
+              "amount": "java.math.BigDecimal",
+              "currency": "com.piggymetrics.account.domain.Currency",
+              "period": "com.piggymetrics.account.domain.TimePeriod",
+              "icon": "java.lang.String"
+            }
+          }
+        },
+        "auth-service.users": {
+          "entity_fqn": "com.piggymetrics.auth.domain.User",
+          "fields": {
+            "username": "java.lang.String",
+            "password": "java.lang.String"
+          }
+        }
+      },
+      "clock": "2026-10-18T00:00:00Z",
+      "action": "Read account",
+      "identity": {
+        "context_id": "server-reader",
+        "context": {
+          "authenticated": true,
+          "principal": {
+            "name": "account-service"
+          },
+          "authorities": [],
+          "oauth2_request": {
+            "clientId": "account-service",
+            "scope": [
+              "server"
+            ]
+          }
+        },
+        "provenance": "provided verified post-auth boundary input; not minted or cryptographically verified by analyzer"
+      },
+      "grounding_context": {
+        "history": [],
+        "object_refs": [],
+        "collection_refs": [],
+        "ui": null,
+        "request": null,
+        "supplied_name": {
+          "$missing": true
+        },
+        "supplied_route": {
+          "$missing": true
+        },
+        "name_current_by_identity_qualifiers": [],
+        "domain_rows_are_not_user_intent": "The seeded Account row aurora is available to execution state only. Its name must not become a missing scenario argument or select a route.",
+        "profile_candidate_scope": "The two source Account-returning GET controller contracts; no statistics list/User Principal endpoint is asserted to be the same result contract."
+      },
+      "source_candidates": [
+        {
+          "handler": "account.AccountController.getAccountByName",
+          "contract": {
+            "method": "GET",
+            "path": "/accounts/{name}"
+          },
+          "required_arguments": [
+            {
+              "name": "name",
+              "declared_type": "java.lang.String",
+              "value": {
+                "$missing": true
+              }
+            }
+          ],
+          "method_security": {
+            "server_scope_present": true,
+            "eligible_after_name_is_supplied": true
+          },
+          "runnable_without_clarification": false,
+          "reason": "Named lookup is a possible intent but no account name or name-producing history/UI input is supplied."
+        },
+        {
+          "handler": "account.AccountController.getCurrentAccount",
+          "contract": {
+            "method": "GET",
+            "path": "/accounts/current"
+          },
+          "required_arguments": [
+            {
+              "name": "principal",
+              "declared_type": "java.security.Principal",
+              "provided_value": {
+                "name": "account-service"
+              },
+              "origin": "provided server-reader context"
+            }
+          ],
+          "method_security": {
+            "authenticated": true,
+            "eligible": true
+          },
+          "runnable_without_clarification": true,
+          "reason": "Current-principal lookup is another possible intent; broad action does not uniquely choose it over a named account lookup."
+        }
+      ],
+      "expected_decision": {
+        "status": "unresolved_ambiguity",
+        "candidate_set": [
+          "account.AccountController.getAccountByName",
+          "account.AccountController.getCurrentAccount"
+        ],
+        "selected_handler": null,
+        "selected_request": null,
+        "invented_name": false,
+        "candidate_union_is_not_execution": true
+      },
+      "request": null,
+      "handler": null,
+      "handler_entered": false,
+      "bound_arguments": {
+        "applicable": false,
+        "measured": false,
+        "reason": "No unique Request is selected; candidate contracts are grounding hypotheses, not invoked Java arguments"
+      },
+      "status": {
+        "$unmeasured": "No HTTP execution selected"
+      },
+      "java_return": {
+        "$not_invoked": true
+      },
+      "response_body": {
+        "$unmeasured": "No HTTP execution selected"
+      },
+      "edges": {
+        "executes": [],
+        "calls": [],
+        "remote": [],
+        "data": []
+      },
+      "events": [
+        {
+          "kind": "provided_identity",
+          "context_id": "server-reader"
+        },
+        {
+          "kind": "grounding_candidates",
+          "candidate_set": [
+            "account.AccountController.getAccountByName",
+            "account.AccountController.getCurrentAccount"
+          ]
+        },
+        {
+          "kind": "grounding_unresolved",
+          "reason": "No name/current/by-identity intent qualifier; named lookup slot missing and current lookup is also plausible",
+          "selected_request": null,
+          "selected_handler": null
+        }
+      ],
+      "forbidden_events": [
+        {
+          "kind": "handler_entry"
+        },
+        {
+          "kind": "source_call"
+        },
+        {
+          "kind": "persistence"
+        },
+        {
+          "kind": "remote_request"
+        },
+        {
+          "kind": "remote_handler_entry"
+        },
+        {
+          "kind": "response",
+          "status": 200
+        }
+      ],
+      "source_basis": [
+        "AccountController.java:19-27",
+        "ResourceServerConfig.java:54-58"
+      ],
+      "assertion_kind": "A specified handling policy for deliberately underspecified NL intent, grounded in two distinct source lookup contracts. The Java source does not itself define the meaning of English Read account."
+    }
+  ],
+  "not_counted_as_measured": [
+    {
+      "field": "invalid-saving-null handler bound arguments",
+      "reason": "Created DTO candidate is checked; validation prevents handler invocation"
+    },
+    {
+      "field": "invalid-saving-null framework error body",
+      "reason": "No source-owned payload contract; exact status, callback prefix and full state remain mandatory"
+    },
+    {
+      "field": "ambiguous-account-read actual Java args/status/result",
+      "reason": "No Request selected; candidates are not executed. Full initial state must remain unchanged and graph/events must show no execution"
+    },
+    {
+      "field": "OAuth issuance/introspection or cryptographic token checks",
+      "reason": "Supplied post-auth boundary inherited from parent v2; opaque token strings only"
+    },
+    {
+      "field": "exact BSON metadata / JSON byte or property order",
+      "reason": "Exact logical fields, native type semantics, collection positions, source callback events and values are required instead"
+    }
+  ],
+  "independent_review_decision": "accepted source-only oracle for the three explicitly bounded cases after the source corrections; analyzer acceptance and parent final JSON consumption/freeze remain separate"
+}

@@ -1,0 +1,129 @@
+{
+  "project": "fixture",
+  "scenarios": {
+    "clinic-journey": {
+      "edges": [
+        {
+          "source": "scenario:clinic-journey",
+          "relation": "executes",
+          "target": "method:customers:Owner#setAddress(String)"
+        },
+        {
+          "source": "scenario:clinic-journey",
+          "relation": "executes",
+          "target": "method:customers:Owner#setCity(String)"
+        },
+        {
+          "source": "scenario:clinic-journey",
+          "relation": "executes",
+          "target": "method:customers:Owner#setFirstName(String)"
+        },
+        {
+          "source": "scenario:clinic-journey",
+          "relation": "executes",
+          "target": "method:customers:Owner#setLastName(String)"
+        },
+        {
+          "source": "scenario:clinic-journey",
+          "relation": "executes",
+          "target": "method:customers:Owner#setTelephone(String)"
+        },
+        {
+          "source": "scenario:clinic-journey",
+          "relation": "executes",
+          "target": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)"
+        },
+        {
+          "source": "scenario:clinic-journey",
+          "relation": "executes",
+          "target": "method:customers:OwnerResource#createOwner(OwnerRequest)"
+        },
+        {
+          "source": "scenario:clinic-journey",
+          "relation": "executes",
+          "target": "method:customers:OwnerResource#findAll()"
+        },
+        {
+          "source": "scenario:clinic-journey",
+          "relation": "executes",
+          "target": "method:customers:OwnerResource#findOwner(int)"
+        },
+        {
+          "source": "scenario:clinic-journey",
+          "relation": "executes",
+          "target": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)"
+        },
+        {
+          "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+          "relation": "calls",
+          "target": "method:customers:Owner#setAddress(String)"
+        },
+        {
+          "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+          "relation": "calls",
+          "target": "method:customers:Owner#setCity(String)"
+        },
+        {
+          "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+          "relation": "calls",
+          "target": "method:customers:Owner#setFirstName(String)"
+        },
+        {
+          "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+          "relation": "calls",
+          "target": "method:customers:Owner#setLastName(String)"
+        },
+        {
+          "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+          "relation": "calls",
+          "target": "method:customers:Owner#setTelephone(String)"
+        },
+        {
+          "source": "method:customers:OwnerResource#createOwner(OwnerRequest)",
+          "relation": "calls",
+          "target": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)"
+        },
+        {
+          "source": "method:customers:OwnerResource#createOwner(OwnerRequest)",
+          "relation": "data",
+          "target": "res:table:customers.owners"
+        },
+        {
+          "source": "method:customers:OwnerResource#findAll()",
+          "relation": "data",
+          "target": "res:table:customers.owners"
+        },
+        {
+          "source": "method:customers:OwnerResource#findAll()",
+          "relation": "data",
+          "target": "res:table:customers.pets"
+        },
+        {
+          "source": "method:customers:OwnerResource#findOwner(int)",
+          "relation": "data",
+          "target": "res:table:customers.owners"
+        },
+        {
+          "source": "method:customers:OwnerResource#findOwner(int)",
+          "relation": "data",
+          "target": "res:table:customers.pets"
+        },
+        {
+          "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+          "relation": "calls",
+          "target": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)"
+        },
+        {
+          "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+          "relation": "data",
+          "target": "res:table:customers.owners"
+        },
+        {
+          "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+          "relation": "data",
+          "target": "res:table:customers.pets"
+        }
+      ]
+    }
+  }
+}

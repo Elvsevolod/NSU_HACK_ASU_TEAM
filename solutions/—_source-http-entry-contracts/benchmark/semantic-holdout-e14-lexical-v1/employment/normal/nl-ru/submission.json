@@ -1,0 +1,168 @@
+{
+  "project": "holdout-employment-v1",
+  "scenarios": {
+    "employment-ambiguous-ru": {
+      "edges": []
+    },
+    "employment-fresh-state-nl-ru": {
+      "edges": []
+    },
+    "employment-no-handler-ru": {
+      "edges": []
+    },
+    "employment-state-chain-nl-ru": {
+      "edges": [
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.Job#getDescription()"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.Job#getLocation()"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.Job#getMaxSalary()"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.Job#getMinSalary()"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.Job#getTitle()"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.Job#setCompany(Long)"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.Job#setDescription(String)"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.Job#setId(Long)"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.Job#setLocation(String)"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.Job#setMaxSalary(String)"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.Job#setMinSalary(String)"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.Job#setTitle(String)"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.JobController#createJob(Job)"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.JobController#updateJob(Long,Job)"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#createJob(Job)"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#updateJob(Long,Job)"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.JobController#createJob(Job)",
+          "relation": "calls",
+          "target": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#createJob(Job)"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.JobController#updateJob(Long,Job)",
+          "relation": "calls",
+          "target": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#updateJob(Long,Job)"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#createJob(Job)",
+          "relation": "data",
+          "target": "res:table:job.job"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#updateJob(Long,Job)",
+          "relation": "calls",
+          "target": "method:jobms:com.mohit.jobms.job.Job#getDescription()"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#updateJob(Long,Job)",
+          "relation": "calls",
+          "target": "method:jobms:com.mohit.jobms.job.Job#getLocation()"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#updateJob(Long,Job)",
+          "relation": "calls",
+          "target": "method:jobms:com.mohit.jobms.job.Job#getMaxSalary()"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#updateJob(Long,Job)",
+          "relation": "calls",
+          "target": "method:jobms:com.mohit.jobms.job.Job#getMinSalary()"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#updateJob(Long,Job)",
+          "relation": "calls",
+          "target": "method:jobms:com.mohit.jobms.job.Job#getTitle()"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#updateJob(Long,Job)",
+          "relation": "calls",
+          "target": "method:jobms:com.mohit.jobms.job.Job#setDescription(String)"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#updateJob(Long,Job)",
+          "relation": "calls",
+          "target": "method:jobms:com.mohit.jobms.job.Job#setLocation(String)"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#updateJob(Long,Job)",
+          "relation": "calls",
+          "target": "method:jobms:com.mohit.jobms.job.Job#setMaxSalary(String)"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#updateJob(Long,Job)",
+          "relation": "calls",
+          "target": "method:jobms:com.mohit.jobms.job.Job#setMinSalary(String)"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#updateJob(Long,Job)",
+          "relation": "calls",
+          "target": "method:jobms:com.mohit.jobms.job.Job#setTitle(String)"
+        },
+        {
+          "source": "method:jobms:com.mohit.jobms.job.impl.JobServiceImplement#updateJob(Long,Job)",
+          "relation": "data",
+          "target": "res:table:job.job"
+        }
+      ]
+    }
+  }
+}

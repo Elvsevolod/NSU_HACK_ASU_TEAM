@@ -1,0 +1,230 @@
+{
+  "id": "healthcare-state-chain-explicit-script",
+  "project": "holdout-healthcare-v1",
+  "steps": [
+    {
+      "n": 1,
+      "action": "@http-script:healthcare-state-chain-explicit-script:1"
+    },
+    {
+      "n": 2,
+      "action": "@http-script:healthcare-state-chain-explicit-script:2"
+    },
+    {
+      "n": 3,
+      "action": "@http-script:healthcare-state-chain-explicit-script:3"
+    },
+    {
+      "n": 4,
+      "action": "@http-script:healthcare-state-chain-explicit-script:4"
+    },
+    {
+      "n": 5,
+      "action": "@http-script:healthcare-state-chain-explicit-script:5"
+    },
+    {
+      "n": 6,
+      "action": "@http-script:healthcare-state-chain-explicit-script:6"
+    },
+    {
+      "n": 7,
+      "action": "@http-script:healthcare-state-chain-explicit-script:7"
+    },
+    {
+      "n": 8,
+      "action": "@http-script:healthcare-state-chain-explicit-script:8"
+    },
+    {
+      "n": 9,
+      "action": "@http-script:healthcare-state-chain-explicit-script:9"
+    },
+    {
+      "n": 10,
+      "action": "@http-script:healthcare-state-chain-explicit-script:10"
+    }
+  ],
+  "request_scripts": {
+    "healthcare-state-chain-explicit-script:1": {
+      "deployment": "patient-service",
+      "method": "POST",
+      "route_template": "/patients",
+      "parameters": {},
+      "headers": {
+        "content-type": [
+          "application/json"
+        ]
+      },
+      "body": {
+        "name": "Mira Bell",
+        "age": 29,
+        "gender": "F",
+        "department": "Cardiology",
+        "phone": "703"
+      }
+    },
+    "healthcare-state-chain-explicit-script:2": {
+      "deployment": "patient-service",
+      "method": "GET",
+      "route_template": "/patients/{id}",
+      "parameters": {
+        "id": {
+          "$response": 1,
+          "path": [
+            "id"
+          ],
+          "native_kind": "Long"
+        }
+      },
+      "headers": {}
+    },
+    "healthcare-state-chain-explicit-script:3": {
+      "deployment": "patient-service",
+      "method": "PUT",
+      "route_template": "/patients/{id}",
+      "parameters": {
+        "id": {
+          "$response": 1,
+          "path": [
+            "id"
+          ],
+          "native_kind": "Long"
+        }
+      },
+      "headers": {
+        "content-type": [
+          "application/json"
+        ]
+      },
+      "body": {
+        "name": "Mira Bell",
+        "age": 30,
+        "gender": "F",
+        "department": "Rehabilitation",
+        "phone": "704"
+      }
+    },
+    "healthcare-state-chain-explicit-script:4": {
+      "deployment": "patient-service",
+      "method": "GET",
+      "route_template": "/patients/{id}",
+      "parameters": {
+        "id": {
+          "$response": 1,
+          "path": [
+            "id"
+          ],
+          "native_kind": "Long"
+        }
+      },
+      "headers": {}
+    },
+    "healthcare-state-chain-explicit-script:5": {
+      "deployment": "doctor-service",
+      "method": "GET",
+      "route_template": "/doctors/{doctorId}/patient/{patientId}",
+      "parameters": {
+        "doctorId": 7,
+        "patientId": {
+          "$response": 1,
+          "path": [
+            "id"
+          ],
+          "native_kind": "Long"
+        }
+      },
+      "headers": {}
+    },
+    "healthcare-state-chain-explicit-script:6": {
+      "deployment": "patient-service",
+      "method": "DELETE",
+      "route_template": "/patients/{id}",
+      "parameters": {
+        "id": {
+          "$response": 1,
+          "path": [
+            "id"
+          ],
+          "native_kind": "Long"
+        }
+      },
+      "headers": {}
+    },
+    "healthcare-state-chain-explicit-script:7": {
+      "deployment": "patient-service",
+      "method": "PUT",
+      "route_template": "/patients/{id}",
+      "parameters": {
+        "id": {
+          "$response": 1,
+          "path": [
+            "id"
+          ],
+          "native_kind": "Long"
+        }
+      },
+      "headers": {
+        "content-type": [
+          "application/json"
+        ]
+      },
+      "body": {
+        "name": "Mira Bell",
+        "age": 30,
+        "gender": "F",
+        "department": "Rehabilitation",
+        "phone": "704"
+      }
+    },
+    "healthcare-state-chain-explicit-script:8": {
+      "deployment": "patient-service",
+      "method": "PUT",
+      "route_template": "/patients/{id}",
+      "parameters": {
+        "id": {
+          "$response": 1,
+          "path": [
+            "id"
+          ],
+          "native_kind": "Long"
+        }
+      },
+      "headers": {
+        "content-type": [
+          "application/json"
+        ]
+      },
+      "body": {
+        "name": "Mira Bell",
+        "age": 30,
+        "gender": "F",
+        "department": "Rehabilitation",
+        "phone": "704"
+      }
+    },
+    "healthcare-state-chain-explicit-script:9": {
+      "deployment": "doctor-service",
+      "method": "GET",
+      "route_template": "/doctors/{doctorId}/patient/{patientId}",
+      "parameters": {
+        "doctorId": 7,
+        "patientId": {
+          "$response": 1,
+          "path": [
+            "id"
+          ],
+          "native_kind": "Long"
+        }
+      },
+      "headers": {}
+    },
+    "healthcare-state-chain-explicit-script:10": {
+      "deployment": "patient-service",
+      "method": "GET",
+      "route_template": "/patients/{id}",
+      "parameters": {
+        "id": 11
+      },
+      "headers": {}
+    }
+  }
+}

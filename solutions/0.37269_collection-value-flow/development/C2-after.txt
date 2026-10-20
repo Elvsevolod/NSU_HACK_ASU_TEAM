@@ -1,0 +1,110 @@
+FFF......F                                                               [100%]
+=================================== FAILURES ===================================
+_______ test_pure_false_guards_keep_membership_without_order_choices[1] ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-216/test_pure_false_guards_keep_me0')
+limit = 1
+
+    @pytest.mark.parametrize('limit',[1,4,8])
+    def test_pure_false_guards_keep_membership_without_order_choices(tmp_path,limit):
+        p,db,ids=build(tmp_path,{'Api.java':SOURCE})
+        paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=limit)
+>       assert len(paths)==1 and paths[0]['result']=='SKU8'
+E       AssertionError: assert (1 == 1 and <Unknown.VALUE: 'unknown'> == 'SKU8')
+E        +  where 1 = len([{'approximate': True, 'decisions': {}, 'engine': <analyzer.engine.Engine object at 0x102e1c910>, 'pruned_paths': [], ...}])
+
+solutions/—_collection-value-flow/code/tests/test_map_noop_filter.py:22: AssertionError
+_______ test_pure_false_guards_keep_membership_without_order_choices[4] ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-216/test_pure_false_guards_keep_me1')
+limit = 4
+
+    @pytest.mark.parametrize('limit',[1,4,8])
+    def test_pure_false_guards_keep_membership_without_order_choices(tmp_path,limit):
+        p,db,ids=build(tmp_path,{'Api.java':SOURCE})
+        paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=limit)
+>       assert len(paths)==1 and paths[0]['result']=='SKU8'
+E       AssertionError: assert (4 == 1)
+E        +  where 4 = len([{'approximate': True, 'decisions': {'1:method:service:Api#entry():6:unordered-map-next': 1}, 'engine': <analyzer.engi...#entry():6:unordered-map-next': 1}, 'engine': <analyzer.engine.Engine object at 0x102843450>, 'pruned_paths': [], ...}])
+
+solutions/—_collection-value-flow/code/tests/test_map_noop_filter.py:22: AssertionError
+_______ test_pure_false_guards_keep_membership_without_order_choices[8] ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-216/test_pure_false_guards_keep_me2')
+limit = 8
+
+    @pytest.mark.parametrize('limit',[1,4,8])
+    def test_pure_false_guards_keep_membership_without_order_choices(tmp_path,limit):
+        p,db,ids=build(tmp_path,{'Api.java':SOURCE})
+        paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=limit)
+>       assert len(paths)==1 and paths[0]['result']=='SKU8'
+E       AssertionError: assert (6 == 1)
+E        +  where 6 = len([{'approximate': True, 'decisions': {'1:method:service:Api#entry():6:unordered-map-next': 0, '2:method:service:Api#ent...#entry():6:unordered-map-next': 1}, 'engine': <analyzer.engine.Engine object at 0x102cca2d0>, 'pruned_paths': [], ...}])
+
+solutions/—_collection-value-flow/code/tests/test_map_noop_filter.py:22: AssertionError
+____________ test_unknown_predicate_does_not_get_false_guard_proof _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-216/test_unknown_predicate_does_no0')
+
+    def test_unknown_predicate_does_not_get_false_guard_proof(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{int entry(String missing){
+          Map<String,String> values=new HashMap<>();values.put("A",missing);values.put("B",missing);int count=2;
+          for(String key:values.keySet()){if(values.get(key)==null){count--;}}return count;}}'''})
+>       e=Engine(p,ScenarioState(db));e.run(ids['Api.entry'],{'missing':U})
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_collection-value-flow/code/tests/test_map_noop_filter.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_collection-value-flow/code/analyzer/engine.py:368: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_collection-value-flow/code/analyzer/engine.py:445: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+solutions/—_collection-value-flow/code/analyzer/engine.py:533: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_collection-value-flow/code/analyzer/engine.py:683: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_collection-value-flow/code/analyzer/engine.py:767: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_collection-value-flow/code/analyzer/engine.py:1281: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_collection-value-flow/code/analyzer/engine.py:1347: in execute
+    for index,item in enumerate(items):
+solutions/—_collection-value-flow/code/analyzer/engine.py:3218: in view_items
+    value=iterator_next(iterator,lambda label,options:self.choose_map_order(reason+':'+label,options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_collection-value-flow/code/analyzer/map_views.py:32: in iterator_next
+    selected=choose('unordered-map-next',list(range(len(iterator.remaining)))) if choose else None
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_collection-value-flow/code/analyzer/engine.py:3218: in <lambda>
+    value=iterator_next(iterator,lambda label,options:self.choose_map_order(reason+':'+label,options))
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_collection-value-flow/code/analyzer/engine.py:3203: in choose_map_order
+    return self.choose(reason,options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x102ccba10>
+label = 'method:service:Api#entry(String):3:unordered-map-next'
+choices = [0, 1]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:method:service:Api#entry(String):3:unordered-map-next', [0, 1])
+
+solutions/—_collection-value-flow/code/analyzer/engine.py:293: AlternativeRequired
+=========================== short test summary info ============================
+FAILED solutions/—_collection-value-flow/code/tests/test_map_noop_filter.py::test_pure_false_guards_keep_membership_without_order_choices[1]
+FAILED solutions/—_collection-value-flow/code/tests/test_map_noop_filter.py::test_pure_false_guards_keep_membership_without_order_choices[4]
+FAILED solutions/—_collection-value-flow/code/tests/test_map_noop_filter.py::test_pure_false_guards_keep_membership_without_order_choices[8]
+FAILED solutions/—_collection-value-flow/code/tests/test_map_noop_filter.py::test_unknown_predicate_does_not_get_false_guard_proof
+4 failed, 6 passed in 0.52s

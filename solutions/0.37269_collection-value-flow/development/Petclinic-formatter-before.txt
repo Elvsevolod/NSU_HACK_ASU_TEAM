@@ -1,0 +1,70 @@
+.FFF.                                                                    [100%]
+=================================== FAILURES ===================================
+_________ test_native_formatter_keeps_owner_id_and_source_getter[True] _________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-225/test_native_formatter_keeps_ow1')
+formatting = True
+
+    @pytest.mark.parametrize('formatting',[False,True])
+    def test_native_formatter_keeps_owner_id_and_source_getter(tmp_path,formatting):
+        project,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.core.style.ToStringCreator;
+          import org.slf4j.Logger;
+          class Owner {int id=7;int getId(){return id;}
+            public String toString(){return new ToStringCreator(this).append("id",getId()).toString();}}
+          class Api {Logger log;int entry(){Owner owner=new Owner();'''+
+          ('log.info("{}",owner);' if formatting else '')+'''return owner.id;}}'''})
+        state=ScenarioState(db);state.context['logging']={'enabled':True}
+        outcomes=run_paths(project,state,ids['Api.entry'],{},limit=1)
+>       assert {row['result'] for row in outcomes}=={7}
+E       AssertionError: assert {<Unknown.VALUE: 'unknown'>} == {7}
+E         
+E         Extra items in the left set:
+E         <Unknown.VALUE: 'unknown'>
+E         Extra items in the right set:
+E         7
+E         Use -v to get more diff
+
+solutions/—_collection-value-flow/code/tests/test_spring_formatter_effects.py:18: AssertionError
+________ test_appended_source_to_string_keeps_mutation_and_throw[False] ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-225/test_appended_source_to_string0')
+throws = False
+
+    @pytest.mark.parametrize('throws',[False,True])
+    def test_appended_source_to_string_keeps_mutation_and_throw(tmp_path,throws):
+        project,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.core.style.ToStringCreator;
+          class Value {int count;public String toString(){count++;'''+
+          ('throw new IllegalStateException();' if throws else 'return "value";')+'''}}
+          class Api {int entry(){Value value=new Value();try{new ToStringCreator(this).append("v",value);}
+            catch(IllegalStateException failure){return value.count+10;}return value.count;}}'''})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})==(11 if throws else 1)
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 1
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105a13350>.run
+
+solutions/—_collection-value-flow/code/tests/test_spring_formatter_effects.py:32: AssertionError
+________ test_appended_source_to_string_keeps_mutation_and_throw[True] _________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-225/test_appended_source_to_string1')
+throws = True
+
+    @pytest.mark.parametrize('throws',[False,True])
+    def test_appended_source_to_string_keeps_mutation_and_throw(tmp_path,throws):
+        project,db,ids=build(tmp_path,{'Api.java':'''import org.springframework.core.style.ToStringCreator;
+          class Value {int count;public String toString(){count++;'''+
+          ('throw new IllegalStateException();' if throws else 'return "value";')+'''}}
+          class Api {int entry(){Value value=new Value();try{new ToStringCreator(this).append("v",value);}
+            catch(IllegalStateException failure){return value.count+10;}return value.count;}}'''})
+        engine=Engine(project,ScenarioState(db))
+>       assert engine.run(ids['Api.entry'],{})==(11 if throws else 1)
+E       AssertionError: assert <Unknown.VALUE: 'unknown'> == 11
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105a39850>.run
+
+solutions/—_collection-value-flow/code/tests/test_spring_formatter_effects.py:32: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_collection-value-flow/code/tests/test_spring_formatter_effects.py::test_native_formatter_keeps_owner_id_and_source_getter[True]
+FAILED solutions/—_collection-value-flow/code/tests/test_spring_formatter_effects.py::test_appended_source_to_string_keeps_mutation_and_throw[False]
+FAILED solutions/—_collection-value-flow/code/tests/test_spring_formatter_effects.py::test_appended_source_to_string_keeps_mutation_and_throw[True]
+3 failed, 2 passed in 0.14s

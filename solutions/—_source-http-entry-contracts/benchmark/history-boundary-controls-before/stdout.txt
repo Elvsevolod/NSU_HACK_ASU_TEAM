@@ -1,0 +1,58 @@
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_latest_failed_collection_is_not_replaced_with_the_old_first_row[False] __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-210/test_latest_failed_collection_0')
+saved_refs = False
+
+    @pytest.mark.parametrize('saved_refs',[False,True])
+    def test_latest_failed_collection_is_not_replaced_with_the_old_first_row(tmp_path,saved_refs):
+>       p,db,ids=fixture(tmp_path);state=invoke(p,ScenarioState(db),ids['ParcelController.list'],{'fail':False},1)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_history_boundary_controls33.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <analyzer.project.Project object at 0x1068c5490>
+state = <analyzer.state.ScenarioState object at 0x1065411d0>
+entry = 'method:service:ParcelController#list(boolean)'
+params = {'fail': False}, step = 1
+
+    def invoke(p,state,entry,params,step):
+        request=grounded_request(p,entry,params,{})
+        paths=run_paths(p,state,entry,BoundParameters(params,request),limit=4)
+>       assert len(paths)==1
+E       AssertionError: assert 2 == 1
+E        +  where 2 = len([{'approximate': True, 'decisions': {'1:call:method:service:ParcelController#list(boolean)@10:62:opaque-completion': '...884b10>, 'exploration': {'complete': False, 'completed': 2, 'completion_budget': 8, 'completion_splits': 0, ...}, ...}])
+
+code/tests/test_history_boundary_controls33.py:32: AssertionError
+__ test_latest_failed_collection_is_not_replaced_with_the_old_first_row[True] __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-210/test_latest_failed_collection_1')
+saved_refs = True
+
+    @pytest.mark.parametrize('saved_refs',[False,True])
+    def test_latest_failed_collection_is_not_replaced_with_the_old_first_row(tmp_path,saved_refs):
+>       p,db,ids=fixture(tmp_path);state=invoke(p,ScenarioState(db),ids['ParcelController.list'],{'fail':False},1)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_history_boundary_controls33.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <analyzer.project.Project object at 0x1068c51d0>
+state = <analyzer.state.ScenarioState object at 0x1062052d0>
+entry = 'method:service:ParcelController#list(boolean)'
+params = {'fail': False}, step = 1
+
+    def invoke(p,state,entry,params,step):
+        request=grounded_request(p,entry,params,{})
+        paths=run_paths(p,state,entry,BoundParameters(params,request),limit=4)
+>       assert len(paths)==1
+E       AssertionError: assert 2 == 1
+E        +  where 2 = len([{'approximate': True, 'decisions': {'1:call:method:service:ParcelController#list(boolean)@10:62:opaque-completion': '...acbbd0>, 'exploration': {'complete': False, 'completed': 2, 'completion_budget': 8, 'completion_splits': 0, ...}, ...}])
+
+code/tests/test_history_boundary_controls33.py:32: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_history_boundary_controls33.py::test_latest_failed_collection_is_not_replaced_with_the_old_first_row[False]
+FAILED code/tests/test_history_boundary_controls33.py::test_latest_failed_collection_is_not_replaced_with_the_old_first_row[True]
+2 failed, 1 passed, 8 deselected in 0.14s

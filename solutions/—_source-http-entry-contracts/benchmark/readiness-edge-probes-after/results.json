@@ -1,0 +1,642 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "case": "nonempty-null-consumer",
+      "source_sha256": "0c0e4407804acf664f5188ce1cfc78bf99f190c4911526bc6fce3014d4968f24",
+      "result": "Unknown.VALUE",
+      "outcome": "uncaught application exception",
+      "edges": [
+        [
+          "",
+          "executes",
+          "method:service:Api#entry()"
+        ]
+      ],
+      "requests": [
+        {
+          "id": 1,
+          "entry": "method:service:Api#entry()",
+          "reason": "scenario request",
+          "request": null,
+          "authorization_checked": false,
+          "bound_arguments": []
+        }
+      ],
+      "responses": [
+        {
+          "request": 1,
+          "status": 500,
+          "entered": true
+        }
+      ],
+      "data_operations": [],
+      "effects": [],
+      "losses": [
+        {
+          "sequence": 1,
+          "phase": "application_exception",
+          "cause": "java.lang.NullPointerException",
+          "location": {
+            "file": null,
+            "line": null,
+            "end_line": null,
+            "method": null
+          },
+          "callsite": null,
+          "source_sha256": null,
+          "declared_type": null,
+          "runtime_kind": null,
+          "before": {
+            "knowledge": "unknown"
+          },
+          "after": {
+            "knowledge": "unknown"
+          },
+          "completion": "throw",
+          "guards": [],
+          "assumptions": [],
+          "prefix_event_count": 1,
+          "prefix_edges": [
+            [
+              "",
+              "executes",
+              "method:service:Api#entry()"
+            ]
+          ],
+          "actual_effect_count": 0,
+          "actual_effects": [],
+          "read_locations": [],
+          "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+          "possible_write_footprint": [],
+          "widened_locations": [],
+          "request_id": null,
+          "producer_lineage": {
+            "entry": null,
+            "request_event_reference": null,
+            "bound_arguments_reference": null,
+            "provenance": null,
+            "history_length": 0
+          }
+        }
+      ],
+      "warnings": [
+        "uncaught Java exception: java.lang.NullPointerException"
+      ],
+      "unknown_tables": []
+    },
+    {
+      "case": "unknown-optional-presence",
+      "source_sha256": "41dede869ffb1a4f22830b0e1194d475c8b83e561f3715280b7b3c796a176e77",
+      "result": "Unknown.VALUE",
+      "outcome": "returned",
+      "edges": [
+        [
+          "",
+          "executes",
+          "method:service:Api#entry(String)"
+        ]
+      ],
+      "requests": [
+        {
+          "id": 1,
+          "entry": "method:service:Api#entry(String)",
+          "reason": "scenario request",
+          "request": null,
+          "authorization_checked": false,
+          "bound_arguments": [
+            {
+              "name": "input",
+              "declared_type": "java.lang.String",
+              "native_kind": "String",
+              "value": "Unknown.VALUE"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        {
+          "request": 1,
+          "status": 200,
+          "entered": true,
+          "body_presence": "json",
+          "body": "Unknown.VALUE"
+        }
+      ],
+      "data_operations": [],
+      "effects": [],
+      "losses": [
+        {
+          "sequence": 1,
+          "phase": "input_or_value",
+          "cause": "unresolved identifier",
+          "location": {
+            "file": "Api.java",
+            "line": 1,
+            "end_line": 1,
+            "method": "method:service:Api#entry(String)"
+          },
+          "callsite": "call:method:service:Api#entry(String)@1:74",
+          "source_sha256": "41dede869ffb1a4f22830b0e1194d475c8b83e561f3715280b7b3c796a176e77",
+          "declared_type": "java.lang.String",
+          "runtime_kind": "String",
+          "before": {
+            "knowledge": "unknown"
+          },
+          "after": {
+            "knowledge": "unknown"
+          },
+          "completion": "unresolved",
+          "guards": [],
+          "assumptions": [],
+          "prefix_event_count": 1,
+          "prefix_edges": [
+            [
+              "",
+              "executes",
+              "method:service:Api#entry(String)"
+            ]
+          ],
+          "actual_effect_count": 0,
+          "actual_effects": [],
+          "read_locations": [],
+          "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+          "possible_write_footprint": [],
+          "widened_locations": [],
+          "request_id": 1,
+          "producer_lineage": {
+            "entry": "method:service:Api#entry(String)",
+            "request_event_reference": "requests[0]",
+            "bound_arguments_reference": "requests[0].bound_arguments",
+            "provenance": null,
+            "history_length": 0
+          }
+        },
+        {
+          "sequence": 2,
+          "phase": "unsupported_value",
+          "cause": "unresolved method_invocation",
+          "location": {
+            "file": "Api.java",
+            "line": 1,
+            "end_line": 1,
+            "method": "method:service:Api#entry(String)"
+          },
+          "callsite": "call:method:service:Api#entry(String)@1:92",
+          "source_sha256": "41dede869ffb1a4f22830b0e1194d475c8b83e561f3715280b7b3c796a176e77",
+          "declared_type": "boolean",
+          "runtime_kind": null,
+          "before": {
+            "knowledge": "unknown"
+          },
+          "after": {
+            "knowledge": "unknown"
+          },
+          "completion": "unresolved",
+          "guards": [],
+          "assumptions": [],
+          "prefix_event_count": 1,
+          "prefix_edges": [
+            [
+              "",
+              "executes",
+              "method:service:Api#entry(String)"
+            ]
+          ],
+          "actual_effect_count": 0,
+          "actual_effects": [],
+          "read_locations": [],
+          "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+          "possible_write_footprint": [],
+          "widened_locations": [],
+          "request_id": 1,
+          "producer_lineage": {
+            "entry": "method:service:Api#entry(String)",
+            "request_event_reference": "requests[0]",
+            "bound_arguments_reference": "requests[0].bound_arguments",
+            "provenance": null,
+            "history_length": 0
+          }
+        }
+      ],
+      "warnings": [],
+      "unknown_tables": []
+    },
+    {
+      "case": "joined-static-not-first-branch",
+      "source_sha256": "df15408d039f6b62ff5d62096bf63975d9120ae251e16b40cd6c72b0f39ddf94",
+      "result": "Unknown.VALUE",
+      "outcome": "returned",
+      "edges": [
+        [
+          "",
+          "executes",
+          "method:service:Api#read()"
+        ]
+      ],
+      "requests": [
+        {
+          "id": 1,
+          "entry": "method:service:Api#read()",
+          "reason": "scenario request",
+          "request": null,
+          "authorization_checked": false,
+          "bound_arguments": []
+        }
+      ],
+      "responses": [
+        {
+          "request": 1,
+          "status": 200,
+          "entered": true,
+          "body_presence": "json",
+          "body": "Unknown.VALUE"
+        }
+      ],
+      "data_operations": [],
+      "effects": [],
+      "losses": [],
+      "warnings": [
+        "unsupported value operation in method:service:Api#read(): AttributeError"
+      ],
+      "unknown_tables": []
+    },
+    {
+      "case": "unknown-filter-alias-write-summary-False",
+      "source_sha256": "c08cba7ed31308ce0fcb3f4f9323bbc69d2589f4c6c4954db74c497da0b7ab3c",
+      "result": "Unknown.VALUE",
+      "outcome": "unsupported_semantics boundary",
+      "edges": [
+        [
+          "",
+          "executes",
+          "method:service:Api#entry(List<String>)"
+        ]
+      ],
+      "requests": [
+        {
+          "id": 1,
+          "entry": "method:service:Api#entry(List<String>)",
+          "reason": "scenario request",
+          "request": null,
+          "authorization_checked": false,
+          "bound_arguments": [
+            {
+              "name": "input",
+              "declared_type": "java.util.List<java.lang.String>",
+              "native_kind": null,
+              "value": []
+            }
+          ]
+        }
+      ],
+      "responses": [],
+      "data_operations": [],
+      "effects": [],
+      "losses": [
+        {
+          "sequence": 1,
+          "phase": "unsupported",
+          "cause": "unknown stream source membership: call:method:service:Api#entry(List<String>)@6:83",
+          "location": {
+            "file": "Api.java",
+            "line": 5,
+            "end_line": 6,
+            "method": "method:service:Api#entry(List<String>)"
+          },
+          "callsite": "call:method:service:Api#entry(List<String>)@6:83",
+          "source_sha256": "c08cba7ed31308ce0fcb3f4f9323bbc69d2589f4c6c4954db74c497da0b7ab3c",
+          "declared_type": null,
+          "runtime_kind": null,
+          "before": {
+            "knowledge": "unknown"
+          },
+          "after": {
+            "knowledge": "unknown"
+          },
+          "completion": "boundary",
+          "guards": [],
+          "assumptions": [],
+          "prefix_event_count": 1,
+          "prefix_edges": [
+            [
+              "",
+              "executes",
+              "method:service:Api#entry(List<String>)"
+            ]
+          ],
+          "actual_effect_count": 0,
+          "actual_effects": [],
+          "read_locations": [],
+          "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+          "possible_write_footprint": [],
+          "widened_locations": [],
+          "request_id": 1,
+          "producer_lineage": {
+            "entry": "method:service:Api#entry(List<String>)",
+            "request_event_reference": "requests[0]",
+            "bound_arguments_reference": "requests[0].bound_arguments",
+            "provenance": null,
+            "history_length": 0
+          }
+        },
+        {
+          "sequence": 2,
+          "phase": "unsupported",
+          "cause": "unknown stream source membership: call:method:service:Api#entry(List<String>)@6:83",
+          "location": {
+            "file": "Api.java",
+            "line": 4,
+            "end_line": 6,
+            "method": "method:service:Api#entry(List<String>)"
+          },
+          "callsite": null,
+          "source_sha256": "c08cba7ed31308ce0fcb3f4f9323bbc69d2589f4c6c4954db74c497da0b7ab3c",
+          "declared_type": null,
+          "runtime_kind": null,
+          "before": {
+            "knowledge": "unknown"
+          },
+          "after": {
+            "knowledge": "unknown"
+          },
+          "completion": "boundary",
+          "guards": [],
+          "assumptions": [],
+          "prefix_event_count": 1,
+          "prefix_edges": [
+            [
+              "",
+              "executes",
+              "method:service:Api#entry(List<String>)"
+            ]
+          ],
+          "actual_effect_count": 0,
+          "actual_effects": [],
+          "read_locations": [],
+          "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+          "possible_write_footprint": [],
+          "widened_locations": [],
+          "request_id": 1,
+          "producer_lineage": {
+            "entry": "method:service:Api#entry(List<String>)",
+            "request_event_reference": "requests[0]",
+            "bound_arguments_reference": "requests[0].bound_arguments",
+            "provenance": null,
+            "history_length": 0
+          }
+        },
+        {
+          "sequence": 3,
+          "phase": "fallback",
+          "cause": "entry/method writable closure widened; not an executed SQL write",
+          "location": {
+            "file": "Api.java",
+            "line": 5,
+            "end_line": 6,
+            "method": "method:service:Api#entry(List<String>)"
+          },
+          "callsite": null,
+          "source_sha256": "c08cba7ed31308ce0fcb3f4f9323bbc69d2589f4c6c4954db74c497da0b7ab3c",
+          "declared_type": null,
+          "runtime_kind": null,
+          "before": {
+            "knowledge": "unknown"
+          },
+          "after": {
+            "knowledge": "unknown"
+          },
+          "completion": "boundary_or_approximation",
+          "guards": [],
+          "assumptions": [
+            "unsupported execution at method:service:Api#entry(List<String>)"
+          ],
+          "prefix_event_count": 1,
+          "prefix_edges": [
+            [
+              "",
+              "executes",
+              "method:service:Api#entry(List<String>)"
+            ]
+          ],
+          "actual_effect_count": 0,
+          "actual_effects": [],
+          "read_locations": [],
+          "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+          "possible_write_footprint": [
+            "res:table:service.items"
+          ],
+          "widened_locations": [
+            "res:table:service.items"
+          ],
+          "request_id": 1,
+          "producer_lineage": {
+            "entry": "method:service:Api#entry(List<String>)",
+            "request_event_reference": "requests[0]",
+            "bound_arguments_reference": "requests[0].bound_arguments",
+            "provenance": null,
+            "history_length": 0
+          }
+        }
+      ],
+      "warnings": [
+        "unknown stream source membership: call:method:service:Api#entry(List<String>)@6:83"
+      ],
+      "unknown_tables": [
+        [
+          "service",
+          "items"
+        ]
+      ]
+    },
+    {
+      "case": "unknown-filter-alias-write-summary-True",
+      "source_sha256": "c08cba7ed31308ce0fcb3f4f9323bbc69d2589f4c6c4954db74c497da0b7ab3c",
+      "result": "Unknown.VALUE",
+      "outcome": "unsupported_semantics boundary",
+      "edges": [
+        [
+          "",
+          "executes",
+          "method:service:Api#entry(List<String>)"
+        ]
+      ],
+      "requests": [
+        {
+          "id": 1,
+          "entry": "method:service:Api#entry(List<String>)",
+          "reason": "scenario request",
+          "request": null,
+          "authorization_checked": false,
+          "bound_arguments": [
+            {
+              "name": "input",
+              "declared_type": "java.util.List<java.lang.String>",
+              "native_kind": null,
+              "value": []
+            }
+          ]
+        }
+      ],
+      "responses": [],
+      "data_operations": [],
+      "effects": [],
+      "losses": [
+        {
+          "sequence": 1,
+          "phase": "unsupported",
+          "cause": "unknown stream source membership: call:method:service:Api#entry(List<String>)@6:83",
+          "location": {
+            "file": "Api.java",
+            "line": 5,
+            "end_line": 6,
+            "method": "method:service:Api#entry(List<String>)"
+          },
+          "callsite": "call:method:service:Api#entry(List<String>)@6:83",
+          "source_sha256": "c08cba7ed31308ce0fcb3f4f9323bbc69d2589f4c6c4954db74c497da0b7ab3c",
+          "declared_type": null,
+          "runtime_kind": null,
+          "before": {
+            "knowledge": "unknown"
+          },
+          "after": {
+            "knowledge": "unknown"
+          },
+          "completion": "boundary",
+          "guards": [],
+          "assumptions": [],
+          "prefix_event_count": 1,
+          "prefix_edges": [
+            [
+              "",
+              "executes",
+              "method:service:Api#entry(List<String>)"
+            ]
+          ],
+          "actual_effect_count": 0,
+          "actual_effects": [],
+          "read_locations": [],
+          "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+          "possible_write_footprint": [],
+          "widened_locations": [],
+          "request_id": 1,
+          "producer_lineage": {
+            "entry": "method:service:Api#entry(List<String>)",
+            "request_event_reference": "requests[0]",
+            "bound_arguments_reference": "requests[0].bound_arguments",
+            "provenance": null,
+            "history_length": 0
+          }
+        },
+        {
+          "sequence": 2,
+          "phase": "unsupported",
+          "cause": "unknown stream source membership: call:method:service:Api#entry(List<String>)@6:83",
+          "location": {
+            "file": "Api.java",
+            "line": 4,
+            "end_line": 6,
+            "method": "method:service:Api#entry(List<String>)"
+          },
+          "callsite": null,
+          "source_sha256": "c08cba7ed31308ce0fcb3f4f9323bbc69d2589f4c6c4954db74c497da0b7ab3c",
+          "declared_type": null,
+          "runtime_kind": null,
+          "before": {
+            "knowledge": "unknown"
+          },
+          "after": {
+            "knowledge": "unknown"
+          },
+          "completion": "boundary",
+          "guards": [],
+          "assumptions": [],
+          "prefix_event_count": 1,
+          "prefix_edges": [
+            [
+              "",
+              "executes",
+              "method:service:Api#entry(List<String>)"
+            ]
+          ],
+          "actual_effect_count": 0,
+          "actual_effects": [],
+          "read_locations": [],
+          "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+          "possible_write_footprint": [],
+          "widened_locations": [],
+          "request_id": 1,
+          "producer_lineage": {
+            "entry": "method:service:Api#entry(List<String>)",
+            "request_event_reference": "requests[0]",
+            "bound_arguments_reference": "requests[0].bound_arguments",
+            "provenance": null,
+            "history_length": 0
+          }
+        },
+        {
+          "sequence": 3,
+          "phase": "fallback",
+          "cause": "entry/method writable closure widened; not an executed SQL write",
+          "location": {
+            "file": "Api.java",
+            "line": 5,
+            "end_line": 6,
+            "method": "method:service:Api#entry(List<String>)"
+          },
+          "callsite": null,
+          "source_sha256": "c08cba7ed31308ce0fcb3f4f9323bbc69d2589f4c6c4954db74c497da0b7ab3c",
+          "declared_type": null,
+          "runtime_kind": null,
+          "before": {
+            "knowledge": "unknown"
+          },
+          "after": {
+            "knowledge": "unknown"
+          },
+          "completion": "boundary_or_approximation",
+          "guards": [],
+          "assumptions": [
+            "unsupported execution at method:service:Api#entry(List<String>)"
+          ],
+          "prefix_event_count": 1,
+          "prefix_edges": [
+            [
+              "",
+              "executes",
+              "method:service:Api#entry(List<String>)"
+            ]
+          ],
+          "actual_effect_count": 0,
+          "actual_effects": [],
+          "read_locations": [],
+          "read_locations_scope": "source-proven repository reads in executed SQL prefix; all accesses remain in data_operations",
+          "possible_write_footprint": [
+            "res:table:service.items"
+          ],
+          "widened_locations": [
+            "res:table:service.items"
+          ],
+          "request_id": 1,
+          "producer_lineage": {
+            "entry": "method:service:Api#entry(List<String>)",
+            "request_event_reference": "requests[0]",
+            "bound_arguments_reference": "requests[0].bound_arguments",
+            "provenance": null,
+            "history_length": 0
+          }
+        }
+      ],
+      "warnings": [
+        "unknown stream source membership: call:method:service:Api#entry(List<String>)@6:83"
+      ],
+      "unknown_tables": [
+        [
+          "service",
+          "items"
+        ]
+      ]
+    }
+  ],
+  "targets_started": false
+}

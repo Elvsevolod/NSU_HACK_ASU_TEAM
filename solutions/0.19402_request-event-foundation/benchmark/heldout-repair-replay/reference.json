@@ -1,0 +1,68 @@
+{
+  "fixed_before_prediction": true,
+  "sealed_cases_sha256": "2ac70a6738c0851e9c3662353f44e97840f32052a349b67e0e5a336f596c8cc4",
+  "cases": [
+    {
+      "id": "heldout-1",
+      "fixture": "petclinic-customers",
+      "action": "PUT /owners/999\n{\"firstName\": \"Mia\", \"lastName\": \"Doe\", \"address\": \"Birch\", \"city\": \"York\", \"telephone\": \"33333\"}",
+      "endpoint": "OwnerResource.updateOwner",
+      "status": 404,
+      "initial_context": "fresh supplied seed, before any generated identity",
+      "entry": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+      "edges": [
+        [
+          "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+          "calls",
+          "method:customers:ResourceNotFoundException#<init>(String)"
+        ],
+        [
+          "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+          "data",
+          "res:table:customers.owners"
+        ],
+        [
+          "scenario:heldout-1",
+          "executes",
+          "method:customers:OwnerResource#updateOwner(int,OwnerRequest)"
+        ],
+        [
+          "scenario:heldout-1",
+          "executes",
+          "method:customers:ResourceNotFoundException#<init>(String)"
+        ]
+      ]
+    },
+    {
+      "id": "heldout-2",
+      "fixture": "piggymetrics-account",
+      "action": "GET /absent",
+      "endpoint": "AccountController.getAccountByName",
+      "status": 200,
+      "result": null,
+      "entry": "method:account:AccountController#getAccountByName(String)",
+      "edges": [
+        [
+          "method:account:AccountController#getAccountByName(String)",
+          "calls",
+          "method:account:AccountServiceImpl#findByName(String)"
+        ],
+        [
+          "method:account:AccountServiceImpl#findByName(String)",
+          "data",
+          "res:collection:account.accounts"
+        ],
+        [
+          "scenario:heldout-2",
+          "executes",
+          "method:account:AccountController#getAccountByName(String)"
+        ],
+        [
+          "scenario:heldout-2",
+          "executes",
+          "method:account:AccountServiceImpl#findByName(String)"
+        ]
+      ]
+    }
+  ]
+}

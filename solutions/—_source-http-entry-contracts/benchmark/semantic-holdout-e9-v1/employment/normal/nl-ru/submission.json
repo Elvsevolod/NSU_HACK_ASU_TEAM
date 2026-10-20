@@ -1,0 +1,88 @@
+{
+  "project": "holdout-employment-v1",
+  "scenarios": {
+    "employment-ambiguous-ru": {
+      "edges": []
+    },
+    "employment-fresh-state-nl-ru": {
+      "edges": []
+    },
+    "employment-no-handler-ru": {
+      "edges": []
+    },
+    "employment-state-chain-nl-ru": {
+      "edges": [
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:companyms:com.mohit.companyms.Company.Company#getDescription()"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:companyms:com.mohit.companyms.Company.Company#getName()"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:companyms:com.mohit.companyms.Company.Company#setDescription(String)"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:companyms:com.mohit.companyms.Company.Company#setId(Long)"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:companyms:com.mohit.companyms.Company.Company#setName(String)"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:companyms:com.mohit.companyms.Company.Company#setRating(Double)"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:companyms:com.mohit.companyms.Company.CompanyController#updateCompany(Long,Company)"
+        },
+        {
+          "source": "scenario:employment-state-chain-nl-ru",
+          "relation": "executes",
+          "target": "method:companyms:com.mohit.companyms.Company.impl.companyServiceImplement#updateCompany(Long,Company)"
+        },
+        {
+          "source": "method:companyms:com.mohit.companyms.Company.CompanyController#updateCompany(Long,Company)",
+          "relation": "calls",
+          "target": "method:companyms:com.mohit.companyms.Company.impl.companyServiceImplement#updateCompany(Long,Company)"
+        },
+        {
+          "source": "method:companyms:com.mohit.companyms.Company.impl.companyServiceImplement#updateCompany(Long,Company)",
+          "relation": "calls",
+          "target": "method:companyms:com.mohit.companyms.Company.Company#getDescription()"
+        },
+        {
+          "source": "method:companyms:com.mohit.companyms.Company.impl.companyServiceImplement#updateCompany(Long,Company)",
+          "relation": "calls",
+          "target": "method:companyms:com.mohit.companyms.Company.Company#getName()"
+        },
+        {
+          "source": "method:companyms:com.mohit.companyms.Company.impl.companyServiceImplement#updateCompany(Long,Company)",
+          "relation": "calls",
+          "target": "method:companyms:com.mohit.companyms.Company.Company#setDescription(String)"
+        },
+        {
+          "source": "method:companyms:com.mohit.companyms.Company.impl.companyServiceImplement#updateCompany(Long,Company)",
+          "relation": "calls",
+          "target": "method:companyms:com.mohit.companyms.Company.Company#setName(String)"
+        },
+        {
+          "source": "method:companyms:com.mohit.companyms.Company.impl.companyServiceImplement#updateCompany(Long,Company)",
+          "relation": "data",
+          "target": "res:table:company.company"
+        }
+      ]
+    }
+  }
+}

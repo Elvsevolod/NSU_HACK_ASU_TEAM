@@ -1,0 +1,3030 @@
+{
+  "project": "holdout-healthcare-v1",
+  "nodes": {
+    "module:doctor-service": {
+      "kind": "module",
+      "name": "doctor-service",
+      "deployment_units": [
+        "doctor-service"
+      ]
+    },
+    "type:doctor-service:com.hospital.doctorservice.DoctorServiceApplication": {
+      "kind": "type",
+      "fqn": "com.hospital.doctorservice.DoctorServiceApplication",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/DoctorServiceApplication.java",
+      "line": 8,
+      "annotations": [
+        {
+          "name": "SpringBootApplication",
+          "args": ""
+        },
+        {
+          "name": "EnableFeignClients",
+          "args": ""
+        }
+      ]
+    },
+    "type:doctor-service:com.hospital.doctorservice.config.WebConfig": {
+      "kind": "type",
+      "fqn": "com.hospital.doctorservice.config.WebConfig",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/config/WebConfig.java",
+      "line": 10,
+      "annotations": [
+        {
+          "name": "Configuration",
+          "args": ""
+        }
+      ]
+    },
+    "type:doctor-service:com.hospital.doctorservice.controller.DoctorController": {
+      "kind": "type",
+      "fqn": "com.hospital.doctorservice.controller.DoctorController",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java",
+      "line": 14,
+      "annotations": [
+        {
+          "name": "RestController",
+          "args": ""
+        },
+        {
+          "name": "RequestMapping",
+          "args": "(\"/doctors\")"
+        },
+        {
+          "name": "RequiredArgsConstructor",
+          "args": ""
+        }
+      ]
+    },
+    "type:doctor-service:com.hospital.doctorservice.dto.DoctorPatientResponse": {
+      "kind": "type",
+      "fqn": "com.hospital.doctorservice.dto.DoctorPatientResponse",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/dto/DoctorPatientResponse.java",
+      "line": 6,
+      "annotations": [
+        {
+          "name": "Getter",
+          "args": ""
+        },
+        {
+          "name": "Setter",
+          "args": ""
+        },
+        {
+          "name": "NoArgsConstructor",
+          "args": ""
+        },
+        {
+          "name": "AllArgsConstructor",
+          "args": ""
+        },
+        {
+          "name": "Builder",
+          "args": ""
+        }
+      ]
+    },
+    "type:doctor-service:com.hospital.doctorservice.dto.PatientDto": {
+      "kind": "type",
+      "fqn": "com.hospital.doctorservice.dto.PatientDto",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/dto/PatientDto.java",
+      "line": 5,
+      "annotations": [
+        {
+          "name": "Getter",
+          "args": ""
+        },
+        {
+          "name": "Setter",
+          "args": ""
+        },
+        {
+          "name": "NoArgsConstructor",
+          "args": ""
+        },
+        {
+          "name": "AllArgsConstructor",
+          "args": ""
+        },
+        {
+          "name": "Builder",
+          "args": ""
+        }
+      ]
+    },
+    "type:doctor-service:com.hospital.doctorservice.entity.Doctor": {
+      "kind": "type",
+      "fqn": "com.hospital.doctorservice.entity.Doctor",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/entity/Doctor.java",
+      "line": 6,
+      "annotations": [
+        {
+          "name": "Entity",
+          "args": ""
+        },
+        {
+          "name": "Table",
+          "args": "(name = \"doctors\")"
+        },
+        {
+          "name": "Getter",
+          "args": ""
+        },
+        {
+          "name": "Setter",
+          "args": ""
+        },
+        {
+          "name": "NoArgsConstructor",
+          "args": ""
+        },
+        {
+          "name": "AllArgsConstructor",
+          "args": ""
+        },
+        {
+          "name": "Builder",
+          "args": ""
+        }
+      ]
+    },
+    "type:doctor-service:com.hospital.doctorservice.exception.DoctorNotFoundException": {
+      "kind": "type",
+      "fqn": "com.hospital.doctorservice.exception.DoctorNotFoundException",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/DoctorNotFoundException.java",
+      "line": 3,
+      "annotations": []
+    },
+    "type:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler": {
+      "kind": "type",
+      "fqn": "com.hospital.doctorservice.exception.GlobalExceptionHandler",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 12,
+      "annotations": [
+        {
+          "name": "RestControllerAdvice",
+          "args": ""
+        }
+      ]
+    },
+    "type:doctor-service:com.hospital.doctorservice.feign.PatientFeignClient": {
+      "kind": "type",
+      "fqn": "com.hospital.doctorservice.feign.PatientFeignClient",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/feign/PatientFeignClient.java",
+      "line": 8,
+      "annotations": [
+        {
+          "name": "FeignClient",
+          "args": "(name = \"patient-service\", url = \"http://patient-service:8081\")"
+        }
+      ]
+    },
+    "type:doctor-service:com.hospital.doctorservice.repository.DoctorRepository": {
+      "kind": "type",
+      "fqn": "com.hospital.doctorservice.repository.DoctorRepository",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/repository/DoctorRepository.java",
+      "line": 6,
+      "annotations": []
+    },
+    "type:doctor-service:com.hospital.doctorservice.service.DoctorService": {
+      "kind": "type",
+      "fqn": "com.hospital.doctorservice.service.DoctorService",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorService.java",
+      "line": 10,
+      "annotations": []
+    },
+    "type:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl": {
+      "kind": "type",
+      "fqn": "com.hospital.doctorservice.service.DoctorServiceImpl",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 18,
+      "annotations": [
+        {
+          "name": "Service",
+          "args": ""
+        },
+        {
+          "name": "RequiredArgsConstructor",
+          "args": ""
+        }
+      ]
+    },
+    "module:patient-service": {
+      "kind": "module",
+      "name": "patient-service",
+      "deployment_units": [
+        "patient-service"
+      ]
+    },
+    "type:patient-service:com.hospital.patientservice.PatientServiceApplication": {
+      "kind": "type",
+      "fqn": "com.hospital.patientservice.PatientServiceApplication",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/PatientServiceApplication.java",
+      "line": 6,
+      "annotations": [
+        {
+          "name": "SpringBootApplication",
+          "args": ""
+        }
+      ]
+    },
+    "type:patient-service:com.hospital.patientservice.config.WebConfig": {
+      "kind": "type",
+      "fqn": "com.hospital.patientservice.config.WebConfig",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/config/WebConfig.java",
+      "line": 10,
+      "annotations": [
+        {
+          "name": "Configuration",
+          "args": ""
+        }
+      ]
+    },
+    "type:patient-service:com.hospital.patientservice.controller.PatientController": {
+      "kind": "type",
+      "fqn": "com.hospital.patientservice.controller.PatientController",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 13,
+      "annotations": [
+        {
+          "name": "RestController",
+          "args": ""
+        },
+        {
+          "name": "RequestMapping",
+          "args": "(\"/patients\")"
+        },
+        {
+          "name": "RequiredArgsConstructor",
+          "args": ""
+        }
+      ]
+    },
+    "type:patient-service:com.hospital.patientservice.entity.Patient": {
+      "kind": "type",
+      "fqn": "com.hospital.patientservice.entity.Patient",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/entity/Patient.java",
+      "line": 6,
+      "annotations": [
+        {
+          "name": "Entity",
+          "args": ""
+        },
+        {
+          "name": "Table",
+          "args": "(name = \"patients\")"
+        },
+        {
+          "name": "Getter",
+          "args": ""
+        },
+        {
+          "name": "Setter",
+          "args": ""
+        },
+        {
+          "name": "NoArgsConstructor",
+          "args": ""
+        },
+        {
+          "name": "AllArgsConstructor",
+          "args": ""
+        },
+        {
+          "name": "Builder",
+          "args": ""
+        }
+      ]
+    },
+    "type:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler": {
+      "kind": "type",
+      "fqn": "com.hospital.patientservice.exception.GlobalExceptionHandler",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 12,
+      "annotations": [
+        {
+          "name": "RestControllerAdvice",
+          "args": ""
+        }
+      ]
+    },
+    "type:patient-service:com.hospital.patientservice.exception.PatientNotFoundException": {
+      "kind": "type",
+      "fqn": "com.hospital.patientservice.exception.PatientNotFoundException",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/PatientNotFoundException.java",
+      "line": 3,
+      "annotations": []
+    },
+    "type:patient-service:com.hospital.patientservice.repository.PatientRepository": {
+      "kind": "type",
+      "fqn": "com.hospital.patientservice.repository.PatientRepository",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/repository/PatientRepository.java",
+      "line": 10,
+      "annotations": []
+    },
+    "type:patient-service:com.hospital.patientservice.service.PatientService": {
+      "kind": "type",
+      "fqn": "com.hospital.patientservice.service.PatientService",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientService.java",
+      "line": 9,
+      "annotations": []
+    },
+    "type:patient-service:com.hospital.patientservice.service.PatientServiceImpl": {
+      "kind": "type",
+      "fqn": "com.hospital.patientservice.service.PatientServiceImpl",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 13,
+      "annotations": [
+        {
+          "name": "Service",
+          "args": ""
+        },
+        {
+          "name": "RequiredArgsConstructor",
+          "args": ""
+        }
+      ]
+    },
+    "method:doctor-service:com.hospital.doctorservice.DoctorServiceApplication#main(String[])": {
+      "kind": "method",
+      "name": "main",
+      "owner": "type:doctor-service:com.hospital.doctorservice.DoctorServiceApplication",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/DoctorServiceApplication.java",
+      "line": 12,
+      "end": 14,
+      "params_as_written": [
+        "String[]"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:doctor-service:com.hospital.doctorservice.config.WebConfig#addCorsMappings(CorsRegistry)": {
+      "kind": "method",
+      "name": "addCorsMappings",
+      "owner": "type:doctor-service:com.hospital.doctorservice.config.WebConfig",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/config/WebConfig.java",
+      "line": 13,
+      "end": 19,
+      "params_as_written": [
+        "CorsRegistry"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#create(Doctor)": {
+      "kind": "method",
+      "name": "create",
+      "owner": "type:doctor-service:com.hospital.doctorservice.controller.DoctorController",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java",
+      "line": 21,
+      "end": 24,
+      "params_as_written": [
+        "Doctor"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "PostMapping",
+          "args": ""
+        }
+      ],
+      "return_raw": "Doctor"
+    },
+    "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getAll(Pageable)": {
+      "kind": "method",
+      "name": "getAll",
+      "owner": "type:doctor-service:com.hospital.doctorservice.controller.DoctorController",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java",
+      "line": 27,
+      "end": 30,
+      "params_as_written": [
+        "Pageable"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": ""
+        }
+      ],
+      "return_raw": "Page<Doctor>"
+    },
+    "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getById(Long)": {
+      "kind": "method",
+      "name": "getById",
+      "owner": "type:doctor-service:com.hospital.doctorservice.controller.DoctorController",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java",
+      "line": 32,
+      "end": 35,
+      "params_as_written": [
+        "Long"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": "(\"/{id}\")"
+        }
+      ],
+      "return_raw": "Doctor"
+    },
+    "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#update(Long,Doctor)": {
+      "kind": "method",
+      "name": "update",
+      "owner": "type:doctor-service:com.hospital.doctorservice.controller.DoctorController",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java",
+      "line": 37,
+      "end": 41,
+      "params_as_written": [
+        "Long",
+        "Doctor"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "PutMapping",
+          "args": "(\"/{id}\")"
+        }
+      ],
+      "return_raw": "Doctor"
+    },
+    "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#delete(Long)": {
+      "kind": "method",
+      "name": "delete",
+      "owner": "type:doctor-service:com.hospital.doctorservice.controller.DoctorController",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java",
+      "line": 43,
+      "end": 46,
+      "params_as_written": [
+        "Long"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "DeleteMapping",
+          "args": "(\"/{id}\")"
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)": {
+      "kind": "method",
+      "name": "getDoctorWithPatient",
+      "owner": "type:doctor-service:com.hospital.doctorservice.controller.DoctorController",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java",
+      "line": 49,
+      "end": 55,
+      "params_as_written": [
+        "Long",
+        "Long"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": "(\"/{doctorId}/patient/{patientId}\")"
+        }
+      ],
+      "return_raw": "DoctorPatientResponse"
+    },
+    "method:doctor-service:com.hospital.doctorservice.exception.DoctorNotFoundException#<init>(String)": {
+      "kind": "method",
+      "name": "<init>",
+      "owner": "type:doctor-service:com.hospital.doctorservice.exception.DoctorNotFoundException",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/DoctorNotFoundException.java",
+      "line": 5,
+      "end": 7,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": ""
+    },
+    "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleDoctorNotFoundException(DoctorNotFoundException)": {
+      "kind": "method",
+      "name": "handleDoctorNotFoundException",
+      "owner": "type:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 15,
+      "end": 30,
+      "params_as_written": [
+        "DoctorNotFoundException"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "ExceptionHandler",
+          "args": "(DoctorNotFoundException.class)"
+        }
+      ],
+      "return_raw": "ResponseEntity<Map<String, Object>>"
+    },
+    "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleGenericException(Exception)": {
+      "kind": "method",
+      "name": "handleGenericException",
+      "owner": "type:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 32,
+      "end": 49,
+      "params_as_written": [
+        "Exception"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "ExceptionHandler",
+          "args": "(Exception.class)"
+        }
+      ],
+      "return_raw": "ResponseEntity<Map<String, Object>>"
+    },
+    "method:doctor-service:com.hospital.doctorservice.feign.PatientFeignClient#getPatientById(Long)": {
+      "kind": "method",
+      "name": "getPatientById",
+      "owner": "type:doctor-service:com.hospital.doctorservice.feign.PatientFeignClient",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/feign/PatientFeignClient.java",
+      "line": 11,
+      "end": 12,
+      "params_as_written": [
+        "Long"
+      ],
+      "abstract": true,
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": "(\"/patients/{id}\")"
+        }
+      ],
+      "return_raw": "PatientDto"
+    },
+    "method:doctor-service:com.hospital.doctorservice.service.DoctorService#createDoctor(Doctor)": {
+      "kind": "method",
+      "name": "createDoctor",
+      "owner": "type:doctor-service:com.hospital.doctorservice.service.DoctorService",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorService.java",
+      "line": 12,
+      "end": 12,
+      "params_as_written": [
+        "Doctor"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "Doctor"
+    },
+    "method:doctor-service:com.hospital.doctorservice.service.DoctorService#getAllDoctors(Pageable)": {
+      "kind": "method",
+      "name": "getAllDoctors",
+      "owner": "type:doctor-service:com.hospital.doctorservice.service.DoctorService",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorService.java",
+      "line": 14,
+      "end": 14,
+      "params_as_written": [
+        "Pageable"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "Page<Doctor>"
+    },
+    "method:doctor-service:com.hospital.doctorservice.service.DoctorService#getDoctorById(Long)": {
+      "kind": "method",
+      "name": "getDoctorById",
+      "owner": "type:doctor-service:com.hospital.doctorservice.service.DoctorService",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorService.java",
+      "line": 16,
+      "end": 16,
+      "params_as_written": [
+        "Long"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "Doctor"
+    },
+    "method:doctor-service:com.hospital.doctorservice.service.DoctorService#updateDoctor(Long,Doctor)": {
+      "kind": "method",
+      "name": "updateDoctor",
+      "owner": "type:doctor-service:com.hospital.doctorservice.service.DoctorService",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorService.java",
+      "line": 18,
+      "end": 18,
+      "params_as_written": [
+        "Long",
+        "Doctor"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "Doctor"
+    },
+    "method:doctor-service:com.hospital.doctorservice.service.DoctorService#getDoctorWithPatient(Long,Long)": {
+      "kind": "method",
+      "name": "getDoctorWithPatient",
+      "owner": "type:doctor-service:com.hospital.doctorservice.service.DoctorService",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorService.java",
+      "line": 20,
+      "end": 23,
+      "params_as_written": [
+        "Long",
+        "Long"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "DoctorPatientResponse"
+    },
+    "method:doctor-service:com.hospital.doctorservice.service.DoctorService#deleteDoctor(Long)": {
+      "kind": "method",
+      "name": "deleteDoctor",
+      "owner": "type:doctor-service:com.hospital.doctorservice.service.DoctorService",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorService.java",
+      "line": 25,
+      "end": 25,
+      "params_as_written": [
+        "Long"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#createDoctor(Doctor)": {
+      "kind": "method",
+      "name": "createDoctor",
+      "owner": "type:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 25,
+      "end": 28,
+      "params_as_written": [
+        "Doctor"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "Doctor"
+    },
+    "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getAllDoctors(Pageable)": {
+      "kind": "method",
+      "name": "getAllDoctors",
+      "owner": "type:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 30,
+      "end": 33,
+      "params_as_written": [
+        "Pageable"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "Page<Doctor>"
+    },
+    "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)": {
+      "kind": "method",
+      "name": "getDoctorById",
+      "owner": "type:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 35,
+      "end": 43,
+      "params_as_written": [
+        "Long"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "Doctor"
+    },
+    "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#updateDoctor(Long,Doctor)": {
+      "kind": "method",
+      "name": "updateDoctor",
+      "owner": "type:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 45,
+      "end": 56,
+      "params_as_written": [
+        "Long",
+        "Doctor"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "Doctor"
+    },
+    "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)": {
+      "kind": "method",
+      "name": "getDoctorWithPatient",
+      "owner": "type:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 58,
+      "end": 77,
+      "params_as_written": [
+        "Long",
+        "Long"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        },
+        {
+          "name": "CircuitBreaker",
+          "args": "(\n            name = \"patientService\",\n            fallbackMethod = \"patientServiceFallback\"\n    )"
+        }
+      ],
+      "return_raw": "DoctorPatientResponse"
+    },
+    "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#patientServiceFallback(Long,Long,Exception)": {
+      "kind": "method",
+      "name": "patientServiceFallback",
+      "owner": "type:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 79,
+      "end": 100,
+      "params_as_written": [
+        "Long",
+        "Long",
+        "Exception"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "DoctorPatientResponse"
+    },
+    "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#deleteDoctor(Long)": {
+      "kind": "method",
+      "name": "deleteDoctor",
+      "owner": "type:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 102,
+      "end": 105,
+      "params_as_written": [
+        "Long"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:patient-service:com.hospital.patientservice.PatientServiceApplication#main(String[])": {
+      "kind": "method",
+      "name": "main",
+      "owner": "type:patient-service:com.hospital.patientservice.PatientServiceApplication",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/PatientServiceApplication.java",
+      "line": 9,
+      "end": 11,
+      "params_as_written": [
+        "String[]"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:patient-service:com.hospital.patientservice.config.WebConfig#addCorsMappings(CorsRegistry)": {
+      "kind": "method",
+      "name": "addCorsMappings",
+      "owner": "type:patient-service:com.hospital.patientservice.config.WebConfig",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/config/WebConfig.java",
+      "line": 13,
+      "end": 19,
+      "params_as_written": [
+        "CorsRegistry"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)": {
+      "kind": "method",
+      "name": "create",
+      "owner": "type:patient-service:com.hospital.patientservice.controller.PatientController",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 20,
+      "end": 23,
+      "params_as_written": [
+        "Patient"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "PostMapping",
+          "args": ""
+        }
+      ],
+      "return_raw": "Patient"
+    },
+    "method:patient-service:com.hospital.patientservice.controller.PatientController#getAll(Pageable)": {
+      "kind": "method",
+      "name": "getAll",
+      "owner": "type:patient-service:com.hospital.patientservice.controller.PatientController",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 26,
+      "end": 29,
+      "params_as_written": [
+        "Pageable"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": ""
+        }
+      ],
+      "return_raw": "Page<Patient>"
+    },
+    "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)": {
+      "kind": "method",
+      "name": "getById",
+      "owner": "type:patient-service:com.hospital.patientservice.controller.PatientController",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 31,
+      "end": 34,
+      "params_as_written": [
+        "Long"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": "(\"/{id}\")"
+        }
+      ],
+      "return_raw": "Patient"
+    },
+    "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)": {
+      "kind": "method",
+      "name": "update",
+      "owner": "type:patient-service:com.hospital.patientservice.controller.PatientController",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 36,
+      "end": 40,
+      "params_as_written": [
+        "Long",
+        "Patient"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "PutMapping",
+          "args": "(\"/{id}\")"
+        }
+      ],
+      "return_raw": "Patient"
+    },
+    "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)": {
+      "kind": "method",
+      "name": "delete",
+      "owner": "type:patient-service:com.hospital.patientservice.controller.PatientController",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 42,
+      "end": 45,
+      "params_as_written": [
+        "Long"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "DeleteMapping",
+          "args": "(\"/{id}\")"
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:patient-service:com.hospital.patientservice.controller.PatientController#searchPatients(String,Integer,String)": {
+      "kind": "method",
+      "name": "searchPatients",
+      "owner": "type:patient-service:com.hospital.patientservice.controller.PatientController",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 47,
+      "end": 54,
+      "params_as_written": [
+        "String",
+        "Integer",
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "GetMapping",
+          "args": "(\"/search\")"
+        }
+      ],
+      "return_raw": "List<Patient>"
+    },
+    "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)": {
+      "kind": "method",
+      "name": "handlePatientNotFound",
+      "owner": "type:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 15,
+      "end": 25,
+      "params_as_written": [
+        "PatientNotFoundException"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "ExceptionHandler",
+          "args": "(PatientNotFoundException.class)"
+        }
+      ],
+      "return_raw": "ResponseEntity<Map<String, Object>>"
+    },
+    "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handleGeneric(Exception)": {
+      "kind": "method",
+      "name": "handleGeneric",
+      "owner": "type:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 27,
+      "end": 37,
+      "params_as_written": [
+        "Exception"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "ExceptionHandler",
+          "args": "(Exception.class)"
+        }
+      ],
+      "return_raw": "ResponseEntity<Map<String, Object>>"
+    },
+    "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)": {
+      "kind": "method",
+      "name": "<init>",
+      "owner": "type:patient-service:com.hospital.patientservice.exception.PatientNotFoundException",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/PatientNotFoundException.java",
+      "line": 5,
+      "end": 7,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": ""
+    },
+    "method:patient-service:com.hospital.patientservice.repository.PatientRepository#searchPatients(String,Integer,String)": {
+      "kind": "method",
+      "name": "searchPatients",
+      "owner": "type:patient-service:com.hospital.patientservice.repository.PatientRepository",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/repository/PatientRepository.java",
+      "line": 11,
+      "end": 19,
+      "params_as_written": [
+        "String",
+        "Integer",
+        "String"
+      ],
+      "abstract": true,
+      "annotations": [
+        {
+          "name": "Query",
+          "args": "(\"SELECT p FROM Patient p WHERE \" +\n            \"(:name IS NULL OR p.name = :name) AND \" +\n            \"(:age IS NULL OR p.age = :age) AND \" +\n            \"(:department IS NULL OR p.department = :department)\")"
+        }
+      ],
+      "return_raw": "List<Patient>"
+    },
+    "method:patient-service:com.hospital.patientservice.service.PatientService#createPatient(Patient)": {
+      "kind": "method",
+      "name": "createPatient",
+      "owner": "type:patient-service:com.hospital.patientservice.service.PatientService",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientService.java",
+      "line": 11,
+      "end": 11,
+      "params_as_written": [
+        "Patient"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "Patient"
+    },
+    "method:patient-service:com.hospital.patientservice.service.PatientService#getAllPatients(Pageable)": {
+      "kind": "method",
+      "name": "getAllPatients",
+      "owner": "type:patient-service:com.hospital.patientservice.service.PatientService",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientService.java",
+      "line": 13,
+      "end": 13,
+      "params_as_written": [
+        "Pageable"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "Page<Patient>"
+    },
+    "method:patient-service:com.hospital.patientservice.service.PatientService#getPatientById(Long)": {
+      "kind": "method",
+      "name": "getPatientById",
+      "owner": "type:patient-service:com.hospital.patientservice.service.PatientService",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientService.java",
+      "line": 15,
+      "end": 15,
+      "params_as_written": [
+        "Long"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "Patient"
+    },
+    "method:patient-service:com.hospital.patientservice.service.PatientService#updatePatient(Long,Patient)": {
+      "kind": "method",
+      "name": "updatePatient",
+      "owner": "type:patient-service:com.hospital.patientservice.service.PatientService",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientService.java",
+      "line": 17,
+      "end": 17,
+      "params_as_written": [
+        "Long",
+        "Patient"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "Patient"
+    },
+    "method:patient-service:com.hospital.patientservice.service.PatientService#deletePatient(Long)": {
+      "kind": "method",
+      "name": "deletePatient",
+      "owner": "type:patient-service:com.hospital.patientservice.service.PatientService",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientService.java",
+      "line": 19,
+      "end": 19,
+      "params_as_written": [
+        "Long"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:patient-service:com.hospital.patientservice.service.PatientService#searchPatients(String,Integer,String)": {
+      "kind": "method",
+      "name": "searchPatients",
+      "owner": "type:patient-service:com.hospital.patientservice.service.PatientService",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientService.java",
+      "line": 20,
+      "end": 20,
+      "params_as_written": [
+        "String",
+        "Integer",
+        "String"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "List<Patient>"
+    },
+    "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)": {
+      "kind": "method",
+      "name": "createPatient",
+      "owner": "type:patient-service:com.hospital.patientservice.service.PatientServiceImpl",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 19,
+      "end": 22,
+      "params_as_written": [
+        "Patient"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "Patient"
+    },
+    "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getAllPatients(Pageable)": {
+      "kind": "method",
+      "name": "getAllPatients",
+      "owner": "type:patient-service:com.hospital.patientservice.service.PatientServiceImpl",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 24,
+      "end": 27,
+      "params_as_written": [
+        "Pageable"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "Page<Patient>"
+    },
+    "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)": {
+      "kind": "method",
+      "name": "getPatientById",
+      "owner": "type:patient-service:com.hospital.patientservice.service.PatientServiceImpl",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 29,
+      "end": 37,
+      "params_as_written": [
+        "Long"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "Patient"
+    },
+    "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)": {
+      "kind": "method",
+      "name": "updatePatient",
+      "owner": "type:patient-service:com.hospital.patientservice.service.PatientServiceImpl",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 39,
+      "end": 51,
+      "params_as_written": [
+        "Long",
+        "Patient"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "Patient"
+    },
+    "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)": {
+      "kind": "method",
+      "name": "deletePatient",
+      "owner": "type:patient-service:com.hospital.patientservice.service.PatientServiceImpl",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 53,
+      "end": 56,
+      "params_as_written": [
+        "Long"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#searchPatients(String,Integer,String)": {
+      "kind": "method",
+      "name": "searchPatients",
+      "owner": "type:patient-service:com.hospital.patientservice.service.PatientServiceImpl",
+      "module": "patient-service",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 58,
+      "end": 61,
+      "params_as_written": [
+        "String",
+        "Integer",
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "List<Patient>"
+    },
+    "res:table:hospital_db.doctors": {
+      "kind": "data_resource",
+      "resource_kind": "table",
+      "schema": "hospital_db",
+      "name": "doctors",
+      "origin": [
+        {
+          "file": "doctor-service/src/main/java/com/hospital/doctorservice/entity/Doctor.java",
+          "line": 6
+        }
+      ]
+    },
+    "res:table:hospital_db.patients": {
+      "kind": "data_resource",
+      "resource_kind": "table",
+      "schema": "hospital_db",
+      "name": "patients",
+      "origin": [
+        {
+          "file": "patient-service/src/main/java/com/hospital/patientservice/entity/Patient.java",
+          "line": 6
+        }
+      ]
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/DoctorServiceApplication.java:13:21:run": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.DoctorServiceApplication#main(String[])",
+      "callee": "run",
+      "receiver": "SpringApplication",
+      "receiver_type": "SpringApplication",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/DoctorServiceApplication.java",
+      "line": 13,
+      "col": 21,
+      "arg_count": 2
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/config/WebConfig.java:18:18:allowedHeaders": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.config.WebConfig#addCorsMappings(CorsRegistry)",
+      "callee": "allowedHeaders",
+      "receiver": "registry.addMapping(\"/**\")\n                .allowedOrigins(\"*\")\n                .allowedMethods(\"GET\", \"POST\", \"PUT\", \"DELETE\", \"OPTIONS\")",
+      "receiver_type": "registry.addMapping(\"/**\")\n                .allowedOrigins(\"*\")\n                .allowedMethods(\"GET\", \"POST\", \"PUT\", \"DELETE\", \"OPTIONS\")",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/config/WebConfig.java",
+      "line": 18,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/config/WebConfig.java:17:18:allowedMethods": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.config.WebConfig#addCorsMappings(CorsRegistry)",
+      "callee": "allowedMethods",
+      "receiver": "registry.addMapping(\"/**\")\n                .allowedOrigins(\"*\")",
+      "receiver_type": "registry.addMapping(\"/**\")\n                .allowedOrigins(\"*\")",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/config/WebConfig.java",
+      "line": 17,
+      "col": 18,
+      "arg_count": 5
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/config/WebConfig.java:16:18:allowedOrigins": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.config.WebConfig#addCorsMappings(CorsRegistry)",
+      "callee": "allowedOrigins",
+      "receiver": "registry.addMapping(\"/**\")",
+      "receiver_type": "registry.addMapping(\"/**\")",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/config/WebConfig.java",
+      "line": 16,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/config/WebConfig.java:15:18:addMapping": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.config.WebConfig#addCorsMappings(CorsRegistry)",
+      "callee": "addMapping",
+      "receiver": "registry",
+      "receiver_type": "CorsRegistry",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/config/WebConfig.java",
+      "line": 15,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java:23:24:createDoctor": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#create(Doctor)",
+      "callee": "createDoctor",
+      "receiver": "service",
+      "receiver_type": "DoctorService",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java",
+      "line": 23,
+      "col": 24,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java:29:24:getAllDoctors": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getAll(Pageable)",
+      "callee": "getAllDoctors",
+      "receiver": "service",
+      "receiver_type": "DoctorService",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java",
+      "line": 29,
+      "col": 24,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java:34:24:getDoctorById": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getById(Long)",
+      "callee": "getDoctorById",
+      "receiver": "service",
+      "receiver_type": "DoctorService",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java",
+      "line": 34,
+      "col": 24,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java:40:24:updateDoctor": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#update(Long,Doctor)",
+      "callee": "updateDoctor",
+      "receiver": "service",
+      "receiver_type": "DoctorService",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java",
+      "line": 40,
+      "col": 24,
+      "arg_count": 2
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java:45:17:deleteDoctor": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#delete(Long)",
+      "callee": "deleteDoctor",
+      "receiver": "service",
+      "receiver_type": "DoctorService",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java",
+      "line": 45,
+      "col": 17,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java:54:24:getDoctorWithPatient": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+      "callee": "getDoctorWithPatient",
+      "receiver": "service",
+      "receiver_type": "DoctorService",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java",
+      "line": 54,
+      "col": 24,
+      "arg_count": 2
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java:20:37:<init>": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleDoctorNotFoundException(DoctorNotFoundException)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "HashMap<>",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 20,
+      "col": 37,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java:22:15:put": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleDoctorNotFoundException(DoctorNotFoundException)",
+      "callee": "put",
+      "receiver": "error",
+      "receiver_type": "Map<String, Object>",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 22,
+      "col": 15,
+      "arg_count": 2
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java:22:46:now": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleDoctorNotFoundException(DoctorNotFoundException)",
+      "callee": "now",
+      "receiver": "LocalDateTime",
+      "receiver_type": "LocalDateTime",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 22,
+      "col": 46,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java:23:15:put": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleDoctorNotFoundException(DoctorNotFoundException)",
+      "callee": "put",
+      "receiver": "error",
+      "receiver_type": "Map<String, Object>",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 23,
+      "col": 15,
+      "arg_count": 2
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java:23:33:getMessage": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleDoctorNotFoundException(DoctorNotFoundException)",
+      "callee": "getMessage",
+      "receiver": "ex",
+      "receiver_type": "DoctorNotFoundException",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 23,
+      "col": 33,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java:24:15:put": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleDoctorNotFoundException(DoctorNotFoundException)",
+      "callee": "put",
+      "receiver": "error",
+      "receiver_type": "Map<String, Object>",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 24,
+      "col": 15,
+      "arg_count": 2
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java:24:50:value": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleDoctorNotFoundException(DoctorNotFoundException)",
+      "callee": "value",
+      "receiver": "HttpStatus.NOT_FOUND",
+      "receiver_type": "HttpStatus.NOT_FOUND",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 24,
+      "col": 50,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java:26:16:<init>": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleDoctorNotFoundException(DoctorNotFoundException)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "ResponseEntity<>",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 26,
+      "col": 16,
+      "arg_count": 2
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java:36:37:<init>": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleGenericException(Exception)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "HashMap<>",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 36,
+      "col": 37,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java:38:15:put": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleGenericException(Exception)",
+      "callee": "put",
+      "receiver": "error",
+      "receiver_type": "Map<String, Object>",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 38,
+      "col": 15,
+      "arg_count": 2
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java:38:46:now": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleGenericException(Exception)",
+      "callee": "now",
+      "receiver": "LocalDateTime",
+      "receiver_type": "LocalDateTime",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 38,
+      "col": 46,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java:39:15:put": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleGenericException(Exception)",
+      "callee": "put",
+      "receiver": "error",
+      "receiver_type": "Map<String, Object>",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 39,
+      "col": 15,
+      "arg_count": 2
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java:39:33:getMessage": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleGenericException(Exception)",
+      "callee": "getMessage",
+      "receiver": "ex",
+      "receiver_type": "Exception",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 39,
+      "col": 33,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java:40:15:put": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleGenericException(Exception)",
+      "callee": "put",
+      "receiver": "error",
+      "receiver_type": "Map<String, Object>",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 40,
+      "col": 15,
+      "arg_count": 2
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java:42:50:value": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleGenericException(Exception)",
+      "callee": "value",
+      "receiver": "HttpStatus.INTERNAL_SERVER_ERROR",
+      "receiver_type": "HttpStatus.INTERNAL_SERVER_ERROR",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 42,
+      "col": 50,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java:45:16:<init>": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleGenericException(Exception)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "ResponseEntity<>",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 45,
+      "col": 16,
+      "arg_count": 2
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:27:27:save": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#createDoctor(Doctor)",
+      "callee": "save",
+      "receiver": "repository",
+      "receiver_type": "DoctorRepository",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 27,
+      "col": 27,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:32:27:findAll": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getAllDoctors(Pageable)",
+      "callee": "findAll",
+      "receiver": "repository",
+      "receiver_type": "DoctorRepository",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 32,
+      "col": 27,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:38:18:orElseThrow": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+      "callee": "orElseThrow",
+      "receiver": "repository.findById(id)",
+      "receiver_type": "repository.findById(id)",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 38,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:37:27:findById": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+      "callee": "findById",
+      "receiver": "repository",
+      "receiver_type": "DoctorRepository",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 37,
+      "col": 27,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:39:25:<init>": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "DoctorNotFoundException",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 39,
+      "col": 25,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:48:27:getDoctorById": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#updateDoctor(Long,Doctor)",
+      "callee": "getDoctorById",
+      "receiver": "",
+      "receiver_type": "",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 48,
+      "col": 27,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:50:18:setName": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#updateDoctor(Long,Doctor)",
+      "callee": "setName",
+      "receiver": "existing",
+      "receiver_type": "Doctor",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 50,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:50:33:getName": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#updateDoctor(Long,Doctor)",
+      "callee": "getName",
+      "receiver": "doctor",
+      "receiver_type": "Doctor",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 50,
+      "col": 33,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:51:18:setSpecialization": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#updateDoctor(Long,Doctor)",
+      "callee": "setSpecialization",
+      "receiver": "existing",
+      "receiver_type": "Doctor",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 51,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:51:43:getSpecialization": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#updateDoctor(Long,Doctor)",
+      "callee": "getSpecialization",
+      "receiver": "doctor",
+      "receiver_type": "Doctor",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 51,
+      "col": 43,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:52:18:setExperience": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#updateDoctor(Long,Doctor)",
+      "callee": "setExperience",
+      "receiver": "existing",
+      "receiver_type": "Doctor",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 52,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:52:39:getExperience": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#updateDoctor(Long,Doctor)",
+      "callee": "getExperience",
+      "receiver": "doctor",
+      "receiver_type": "Doctor",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 52,
+      "col": 39,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:53:18:setPhone": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#updateDoctor(Long,Doctor)",
+      "callee": "setPhone",
+      "receiver": "existing",
+      "receiver_type": "Doctor",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 53,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:53:34:getPhone": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#updateDoctor(Long,Doctor)",
+      "callee": "getPhone",
+      "receiver": "doctor",
+      "receiver_type": "Doctor",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 53,
+      "col": 34,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:55:27:save": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#updateDoctor(Long,Doctor)",
+      "callee": "save",
+      "receiver": "repository",
+      "receiver_type": "DoctorRepository",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 55,
+      "col": 27,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:68:25:getDoctorById": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+      "callee": "getDoctorById",
+      "receiver": "",
+      "receiver_type": "",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 68,
+      "col": 25,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:71:36:getPatientById": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+      "callee": "getPatientById",
+      "receiver": "patientFeignClient",
+      "receiver_type": "PatientFeignClient",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 71,
+      "col": 36,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:76:18:build": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+      "callee": "build",
+      "receiver": "DoctorPatientResponse.builder()\n                .doctor(doctor)\n                .patient(patient)",
+      "receiver_type": "DoctorPatientResponse.builder()\n                .doctor(doctor)\n                .patient(patient)",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 76,
+      "col": 18,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:75:18:patient": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+      "callee": "patient",
+      "receiver": "DoctorPatientResponse.builder()\n                .doctor(doctor)",
+      "receiver_type": "DoctorPatientResponse.builder()\n                .doctor(doctor)",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 75,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:74:18:doctor": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+      "callee": "doctor",
+      "receiver": "DoctorPatientResponse.builder()",
+      "receiver_type": "DoctorPatientResponse.builder()",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 74,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:73:38:builder": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+      "callee": "builder",
+      "receiver": "DoctorPatientResponse",
+      "receiver_type": "DoctorPatientResponse",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 73,
+      "col": 38,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:85:25:getDoctorById": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#patientServiceFallback(Long,Long,Exception)",
+      "callee": "getDoctorById",
+      "receiver": "",
+      "receiver_type": "",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 85,
+      "col": 25,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:94:18:build": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#patientServiceFallback(Long,Long,Exception)",
+      "callee": "build",
+      "receiver": "PatientDto.builder()\n                .id(patientId)\n                .name(\"Patient Service Unavailable\")\n                .age(0)\n                .gender(\"N/A\")\n                .department(\"N/A\")\n                .phone(\"N/A\")",
+      "receiver_type": "PatientDto.builder()\n                .id(patientId)\n                .name(\"Patient Service Unavailable\")\n                .age(0)\n                .gender(\"N/A\")\n                .department(\"N/A\")\n                .phone(\"N/A\")",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 94,
+      "col": 18,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:93:18:phone": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#patientServiceFallback(Long,Long,Exception)",
+      "callee": "phone",
+      "receiver": "PatientDto.builder()\n                .id(patientId)\n                .name(\"Patient Service Unavailable\")\n                .age(0)\n                .gender(\"N/A\")\n                .department(\"N/A\")",
+      "receiver_type": "PatientDto.builder()\n                .id(patientId)\n                .name(\"Patient Service Unavailable\")\n                .age(0)\n                .gender(\"N/A\")\n                .department(\"N/A\")",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 93,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:92:18:department": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#patientServiceFallback(Long,Long,Exception)",
+      "callee": "department",
+      "receiver": "PatientDto.builder()\n                .id(patientId)\n                .name(\"Patient Service Unavailable\")\n                .age(0)\n                .gender(\"N/A\")",
+      "receiver_type": "PatientDto.builder()\n                .id(patientId)\n                .name(\"Patient Service Unavailable\")\n                .age(0)\n                .gender(\"N/A\")",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 92,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:91:18:gender": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#patientServiceFallback(Long,Long,Exception)",
+      "callee": "gender",
+      "receiver": "PatientDto.builder()\n                .id(patientId)\n                .name(\"Patient Service Unavailable\")\n                .age(0)",
+      "receiver_type": "PatientDto.builder()\n                .id(patientId)\n                .name(\"Patient Service Unavailable\")\n                .age(0)",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 91,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:90:18:age": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#patientServiceFallback(Long,Long,Exception)",
+      "callee": "age",
+      "receiver": "PatientDto.builder()\n                .id(patientId)\n                .name(\"Patient Service Unavailable\")",
+      "receiver_type": "PatientDto.builder()\n                .id(patientId)\n                .name(\"Patient Service Unavailable\")",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 90,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:89:18:name": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#patientServiceFallback(Long,Long,Exception)",
+      "callee": "name",
+      "receiver": "PatientDto.builder()\n                .id(patientId)",
+      "receiver_type": "PatientDto.builder()\n                .id(patientId)",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 89,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:88:18:id": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#patientServiceFallback(Long,Long,Exception)",
+      "callee": "id",
+      "receiver": "PatientDto.builder()",
+      "receiver_type": "PatientDto.builder()",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 88,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:87:49:builder": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#patientServiceFallback(Long,Long,Exception)",
+      "callee": "builder",
+      "receiver": "PatientDto",
+      "receiver_type": "PatientDto",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 87,
+      "col": 49,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:99:18:build": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#patientServiceFallback(Long,Long,Exception)",
+      "callee": "build",
+      "receiver": "DoctorPatientResponse.builder()\n                .doctor(doctor)\n                .patient(fallbackPatient)",
+      "receiver_type": "DoctorPatientResponse.builder()\n                .doctor(doctor)\n                .patient(fallbackPatient)",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 99,
+      "col": 18,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:98:18:patient": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#patientServiceFallback(Long,Long,Exception)",
+      "callee": "patient",
+      "receiver": "DoctorPatientResponse.builder()\n                .doctor(doctor)",
+      "receiver_type": "DoctorPatientResponse.builder()\n                .doctor(doctor)",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 98,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:97:18:doctor": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#patientServiceFallback(Long,Long,Exception)",
+      "callee": "doctor",
+      "receiver": "DoctorPatientResponse.builder()",
+      "receiver_type": "DoctorPatientResponse.builder()",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 97,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:96:38:builder": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#patientServiceFallback(Long,Long,Exception)",
+      "callee": "builder",
+      "receiver": "DoctorPatientResponse",
+      "receiver_type": "DoctorPatientResponse",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 96,
+      "col": 38,
+      "arg_count": 0
+    },
+    "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:104:20:deleteById": {
+      "kind": "call_site",
+      "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#deleteDoctor(Long)",
+      "callee": "deleteById",
+      "receiver": "repository",
+      "receiver_type": "DoctorRepository",
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 104,
+      "col": 20,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/PatientServiceApplication.java:10:21:run": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.PatientServiceApplication#main(String[])",
+      "callee": "run",
+      "receiver": "SpringApplication",
+      "receiver_type": "SpringApplication",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/PatientServiceApplication.java",
+      "line": 10,
+      "col": 21,
+      "arg_count": 2
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/config/WebConfig.java:18:18:allowedHeaders": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.config.WebConfig#addCorsMappings(CorsRegistry)",
+      "callee": "allowedHeaders",
+      "receiver": "registry.addMapping(\"/**\")\n                .allowedOrigins(\"*\")\n                .allowedMethods(\"GET\", \"POST\", \"PUT\", \"DELETE\", \"OPTIONS\")",
+      "receiver_type": "registry.addMapping(\"/**\")\n                .allowedOrigins(\"*\")\n                .allowedMethods(\"GET\", \"POST\", \"PUT\", \"DELETE\", \"OPTIONS\")",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/config/WebConfig.java",
+      "line": 18,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/config/WebConfig.java:17:18:allowedMethods": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.config.WebConfig#addCorsMappings(CorsRegistry)",
+      "callee": "allowedMethods",
+      "receiver": "registry.addMapping(\"/**\")\n                .allowedOrigins(\"*\")",
+      "receiver_type": "registry.addMapping(\"/**\")\n                .allowedOrigins(\"*\")",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/config/WebConfig.java",
+      "line": 17,
+      "col": 18,
+      "arg_count": 5
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/config/WebConfig.java:16:18:allowedOrigins": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.config.WebConfig#addCorsMappings(CorsRegistry)",
+      "callee": "allowedOrigins",
+      "receiver": "registry.addMapping(\"/**\")",
+      "receiver_type": "registry.addMapping(\"/**\")",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/config/WebConfig.java",
+      "line": 16,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/config/WebConfig.java:15:18:addMapping": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.config.WebConfig#addCorsMappings(CorsRegistry)",
+      "callee": "addMapping",
+      "receiver": "registry",
+      "receiver_type": "CorsRegistry",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/config/WebConfig.java",
+      "line": 15,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java:22:24:createPatient": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+      "callee": "createPatient",
+      "receiver": "service",
+      "receiver_type": "PatientService",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 22,
+      "col": 24,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java:28:24:getAllPatients": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.controller.PatientController#getAll(Pageable)",
+      "callee": "getAllPatients",
+      "receiver": "service",
+      "receiver_type": "PatientService",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 28,
+      "col": 24,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java:33:24:getPatientById": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+      "callee": "getPatientById",
+      "receiver": "service",
+      "receiver_type": "PatientService",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 33,
+      "col": 24,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java:39:24:updatePatient": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+      "callee": "updatePatient",
+      "receiver": "service",
+      "receiver_type": "PatientService",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 39,
+      "col": 24,
+      "arg_count": 2
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java:44:17:deletePatient": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)",
+      "callee": "deletePatient",
+      "receiver": "service",
+      "receiver_type": "PatientService",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 44,
+      "col": 17,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java:53:24:searchPatients": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.controller.PatientController#searchPatients(String,Integer,String)",
+      "callee": "searchPatients",
+      "receiver": "service",
+      "receiver_type": "PatientService",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 53,
+      "col": 24,
+      "arg_count": 3
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java:18:37:<init>": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "HashMap<>",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 18,
+      "col": 37,
+      "arg_count": 0
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java:20:15:put": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)",
+      "callee": "put",
+      "receiver": "error",
+      "receiver_type": "Map<String, Object>",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 20,
+      "col": 15,
+      "arg_count": 2
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java:20:46:now": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)",
+      "callee": "now",
+      "receiver": "LocalDateTime",
+      "receiver_type": "LocalDateTime",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 20,
+      "col": 46,
+      "arg_count": 0
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java:21:15:put": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)",
+      "callee": "put",
+      "receiver": "error",
+      "receiver_type": "Map<String, Object>",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 21,
+      "col": 15,
+      "arg_count": 2
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java:21:33:getMessage": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)",
+      "callee": "getMessage",
+      "receiver": "ex",
+      "receiver_type": "PatientNotFoundException",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 21,
+      "col": 33,
+      "arg_count": 0
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java:22:15:put": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)",
+      "callee": "put",
+      "receiver": "error",
+      "receiver_type": "Map<String, Object>",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 22,
+      "col": 15,
+      "arg_count": 2
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java:22:50:value": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)",
+      "callee": "value",
+      "receiver": "HttpStatus.NOT_FOUND",
+      "receiver_type": "HttpStatus.NOT_FOUND",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 22,
+      "col": 50,
+      "arg_count": 0
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java:24:16:<init>": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "ResponseEntity<>",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 24,
+      "col": 16,
+      "arg_count": 2
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java:30:37:<init>": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handleGeneric(Exception)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "HashMap<>",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 30,
+      "col": 37,
+      "arg_count": 0
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java:32:15:put": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handleGeneric(Exception)",
+      "callee": "put",
+      "receiver": "error",
+      "receiver_type": "Map<String, Object>",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 32,
+      "col": 15,
+      "arg_count": 2
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java:32:46:now": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handleGeneric(Exception)",
+      "callee": "now",
+      "receiver": "LocalDateTime",
+      "receiver_type": "LocalDateTime",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 32,
+      "col": 46,
+      "arg_count": 0
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java:33:15:put": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handleGeneric(Exception)",
+      "callee": "put",
+      "receiver": "error",
+      "receiver_type": "Map<String, Object>",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 33,
+      "col": 15,
+      "arg_count": 2
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java:33:33:getMessage": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handleGeneric(Exception)",
+      "callee": "getMessage",
+      "receiver": "ex",
+      "receiver_type": "Exception",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 33,
+      "col": 33,
+      "arg_count": 0
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java:34:15:put": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handleGeneric(Exception)",
+      "callee": "put",
+      "receiver": "error",
+      "receiver_type": "Map<String, Object>",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 34,
+      "col": 15,
+      "arg_count": 2
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java:34:62:value": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handleGeneric(Exception)",
+      "callee": "value",
+      "receiver": "HttpStatus.INTERNAL_SERVER_ERROR",
+      "receiver_type": "HttpStatus.INTERNAL_SERVER_ERROR",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 34,
+      "col": 62,
+      "arg_count": 0
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java:36:16:<init>": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handleGeneric(Exception)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "ResponseEntity<>",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 36,
+      "col": 16,
+      "arg_count": 2
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:21:27:save": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)",
+      "callee": "save",
+      "receiver": "repository",
+      "receiver_type": "PatientRepository",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 21,
+      "col": 27,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:26:27:findAll": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getAllPatients(Pageable)",
+      "callee": "findAll",
+      "receiver": "repository",
+      "receiver_type": "PatientRepository",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 26,
+      "col": 27,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:32:18:orElseThrow": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+      "callee": "orElseThrow",
+      "receiver": "repository.findById(id)",
+      "receiver_type": "repository.findById(id)",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 32,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:31:27:findById": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+      "callee": "findById",
+      "receiver": "repository",
+      "receiver_type": "PatientRepository",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 31,
+      "col": 27,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:33:25:<init>": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "PatientNotFoundException",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 33,
+      "col": 25,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:42:28:getPatientById": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+      "callee": "getPatientById",
+      "receiver": "",
+      "receiver_type": "",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 42,
+      "col": 28,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:44:18:setName": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+      "callee": "setName",
+      "receiver": "existing",
+      "receiver_type": "Patient",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 44,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:44:34:getName": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+      "callee": "getName",
+      "receiver": "patient",
+      "receiver_type": "Patient",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 44,
+      "col": 34,
+      "arg_count": 0
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:45:18:setAge": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+      "callee": "setAge",
+      "receiver": "existing",
+      "receiver_type": "Patient",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 45,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:45:33:getAge": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+      "callee": "getAge",
+      "receiver": "patient",
+      "receiver_type": "Patient",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 45,
+      "col": 33,
+      "arg_count": 0
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:46:18:setGender": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+      "callee": "setGender",
+      "receiver": "existing",
+      "receiver_type": "Patient",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 46,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:46:36:getGender": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+      "callee": "getGender",
+      "receiver": "patient",
+      "receiver_type": "Patient",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 46,
+      "col": 36,
+      "arg_count": 0
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:47:18:setDepartment": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+      "callee": "setDepartment",
+      "receiver": "existing",
+      "receiver_type": "Patient",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 47,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:47:40:getDepartment": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+      "callee": "getDepartment",
+      "receiver": "patient",
+      "receiver_type": "Patient",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 47,
+      "col": 40,
+      "arg_count": 0
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:48:18:setPhone": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+      "callee": "setPhone",
+      "receiver": "existing",
+      "receiver_type": "Patient",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 48,
+      "col": 18,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:48:35:getPhone": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+      "callee": "getPhone",
+      "receiver": "patient",
+      "receiver_type": "Patient",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 48,
+      "col": 35,
+      "arg_count": 0
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:50:27:save": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+      "callee": "save",
+      "receiver": "repository",
+      "receiver_type": "PatientRepository",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 50,
+      "col": 27,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:55:20:deleteById": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)",
+      "callee": "deleteById",
+      "receiver": "repository",
+      "receiver_type": "PatientRepository",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 55,
+      "col": 20,
+      "arg_count": 1
+    },
+    "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:60:27:searchPatients": {
+      "kind": "call_site",
+      "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#searchPatients(String,Integer,String)",
+      "callee": "searchPatients",
+      "receiver": "repository",
+      "receiver_type": "PatientRepository",
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 60,
+      "col": 27,
+      "arg_count": 3
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:1": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 1,
+      "key": "server.port",
+      "value": 8083
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:3": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 3,
+      "key": "spring.application.name",
+      "value": "doctor-service"
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:5": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 5,
+      "key": "spring.datasource.url",
+      "value": "jdbc:mysql://mysql:3306/hospital_db"
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:6": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 6,
+      "key": "spring.datasource.username",
+      "value": "root"
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:7": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 7,
+      "key": "spring.datasource.password",
+      "value": "root"
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:8": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 8,
+      "key": "spring.datasource.driver-class-name",
+      "value": "com.mysql.cj.jdbc.Driver"
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:10": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 10,
+      "key": "spring.jpa.hibernate.ddl-auto",
+      "value": "update"
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:11": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 11,
+      "key": "spring.jpa.database-platform",
+      "value": "org.hibernate.dialect.MySQLDialect"
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:13": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 13,
+      "key": "spring.jpa.show-sql",
+      "value": true
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:14": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 14,
+      "key": "spring.jpa.open-in-view",
+      "value": false
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:20": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 20,
+      "key": "resilience4j.circuitbreaker.instances.patientService.register-health-indicator",
+      "value": true
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:21": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 21,
+      "key": "resilience4j.circuitbreaker.instances.patientService.sliding-window-type",
+      "value": "COUNT_BASED"
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:22": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 22,
+      "key": "resilience4j.circuitbreaker.instances.patientService.sliding-window-size",
+      "value": 10
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:23": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 23,
+      "key": "resilience4j.circuitbreaker.instances.patientService.minimum-number-of-calls",
+      "value": 5
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:24": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 24,
+      "key": "resilience4j.circuitbreaker.instances.patientService.failure-rate-threshold",
+      "value": 50
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:25": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 25,
+      "key": "resilience4j.circuitbreaker.instances.patientService.wait-duration-in-open-state",
+      "value": "10s"
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:26": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 26,
+      "key": "resilience4j.circuitbreaker.instances.patientService.permitted-number-of-calls-in-half-open-state",
+      "value": 3
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:27": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 27,
+      "key": "resilience4j.circuitbreaker.instances.patientService.automatic-transition-from-open-to-half-open-enabled",
+      "value": true
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:30": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 30,
+      "key": "management.endpoints.web.exposure.include",
+      "value": "health,info,circuitbreakers"
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:31": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 31,
+      "key": "management.endpoint.health.show-details",
+      "value": "always"
+    },
+    "config:doctor-service:doctor-service/src/main/resources/application.properties:32": {
+      "kind": "config_entry",
+      "module": "doctor-service",
+      "file": "doctor-service/src/main/resources/application.properties",
+      "line": 32,
+      "key": "management.health.circuitbreakers.enabled",
+      "value": true
+    },
+    "config:patient-service:patient-service/src/main/resources/application.properties:1": {
+      "kind": "config_entry",
+      "module": "patient-service",
+      "file": "patient-service/src/main/resources/application.properties",
+      "line": 1,
+      "key": "server.port",
+      "value": 8081
+    },
+    "config:patient-service:patient-service/src/main/resources/application.properties:3": {
+      "kind": "config_entry",
+      "module": "patient-service",
+      "file": "patient-service/src/main/resources/application.properties",
+      "line": 3,
+      "key": "spring.datasource.url",
+      "value": "jdbc:mysql://mysql:3306/hospital_db"
+    },
+    "config:patient-service:patient-service/src/main/resources/application.properties:4": {
+      "kind": "config_entry",
+      "module": "patient-service",
+      "file": "patient-service/src/main/resources/application.properties",
+      "line": 4,
+      "key": "spring.datasource.username",
+      "value": "root"
+    },
+    "config:patient-service:patient-service/src/main/resources/application.properties:5": {
+      "kind": "config_entry",
+      "module": "patient-service",
+      "file": "patient-service/src/main/resources/application.properties",
+      "line": 5,
+      "key": "spring.datasource.password",
+      "value": "root"
+    },
+    "config:patient-service:patient-service/src/main/resources/application.properties:7": {
+      "kind": "config_entry",
+      "module": "patient-service",
+      "file": "patient-service/src/main/resources/application.properties",
+      "line": 7,
+      "key": "spring.jpa.hibernate.ddl-auto",
+      "value": "update"
+    },
+    "config:patient-service:patient-service/src/main/resources/application.properties:8": {
+      "kind": "config_entry",
+      "module": "patient-service",
+      "file": "patient-service/src/main/resources/application.properties",
+      "line": 8,
+      "key": "spring.jpa.database-platform",
+      "value": "org.hibernate.dialect.MySQLDialect"
+    },
+    "config:patient-service:patient-service/src/main/resources/application.properties:10": {
+      "kind": "config_entry",
+      "module": "patient-service",
+      "file": "patient-service/src/main/resources/application.properties",
+      "line": 10,
+      "key": "spring.kafka.bootstrap-servers",
+      "value": "kafka:9092"
+    }
+  },
+  "edges": [
+    {
+      "source": "type:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl",
+      "type": "implements",
+      "target": "type:doctor-service:com.hospital.doctorservice.service.DoctorService"
+    },
+    {
+      "source": "type:patient-service:com.hospital.patientservice.service.PatientServiceImpl",
+      "type": "implements",
+      "target": "type:patient-service:com.hospital.patientservice.service.PatientService"
+    },
+    {
+      "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#createDoctor(Doctor)",
+      "type": "overrides",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorService#createDoctor(Doctor)"
+    },
+    {
+      "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getAllDoctors(Pageable)",
+      "type": "overrides",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorService#getAllDoctors(Pageable)"
+    },
+    {
+      "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+      "type": "overrides",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorService#getDoctorById(Long)"
+    },
+    {
+      "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#updateDoctor(Long,Doctor)",
+      "type": "overrides",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorService#updateDoctor(Long,Doctor)"
+    },
+    {
+      "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+      "type": "overrides",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorService#getDoctorWithPatient(Long,Long)"
+    },
+    {
+      "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#deleteDoctor(Long)",
+      "type": "overrides",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorService#deleteDoctor(Long)"
+    },
+    {
+      "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)",
+      "type": "overrides",
+      "target": "method:patient-service:com.hospital.patientservice.service.PatientService#createPatient(Patient)"
+    },
+    {
+      "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getAllPatients(Pageable)",
+      "type": "overrides",
+      "target": "method:patient-service:com.hospital.patientservice.service.PatientService#getAllPatients(Pageable)"
+    },
+    {
+      "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+      "type": "overrides",
+      "target": "method:patient-service:com.hospital.patientservice.service.PatientService#getPatientById(Long)"
+    },
+    {
+      "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+      "type": "overrides",
+      "target": "method:patient-service:com.hospital.patientservice.service.PatientService#updatePatient(Long,Patient)"
+    },
+    {
+      "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)",
+      "type": "overrides",
+      "target": "method:patient-service:com.hospital.patientservice.service.PatientService#deletePatient(Long)"
+    },
+    {
+      "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#searchPatients(String,Integer,String)",
+      "type": "overrides",
+      "target": "method:patient-service:com.hospital.patientservice.service.PatientService#searchPatients(String,Integer,String)"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java:23:24:createDoctor",
+      "type": "calls",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorService#createDoctor(Doctor)"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java:29:24:getAllDoctors",
+      "type": "calls",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorService#getAllDoctors(Pageable)"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java:34:24:getDoctorById",
+      "type": "calls",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorService#getDoctorById(Long)"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java:40:24:updateDoctor",
+      "type": "calls",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorService#updateDoctor(Long,Doctor)"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java:45:17:deleteDoctor",
+      "type": "calls",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorService#deleteDoctor(Long)"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java:54:24:getDoctorWithPatient",
+      "type": "calls",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorService#getDoctorWithPatient(Long,Long)"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:27:27:save",
+      "type": "data_access",
+      "target": "res:table:hospital_db.doctors"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:32:27:findAll",
+      "type": "data_access",
+      "target": "res:table:hospital_db.doctors"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:37:27:findById",
+      "type": "data_access",
+      "target": "res:table:hospital_db.doctors"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:39:25:<init>",
+      "type": "calls",
+      "target": "method:doctor-service:com.hospital.doctorservice.exception.DoctorNotFoundException#<init>(String)"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:48:27:getDoctorById",
+      "type": "calls",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorService#getDoctorById(Long)"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:48:27:getDoctorById",
+      "type": "calls",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:55:27:save",
+      "type": "data_access",
+      "target": "res:table:hospital_db.doctors"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:68:25:getDoctorById",
+      "type": "calls",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorService#getDoctorById(Long)"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:68:25:getDoctorById",
+      "type": "calls",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:71:36:getPatientById",
+      "type": "calls",
+      "target": "method:doctor-service:com.hospital.doctorservice.feign.PatientFeignClient#getPatientById(Long)"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:85:25:getDoctorById",
+      "type": "calls",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorService#getDoctorById(Long)"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:85:25:getDoctorById",
+      "type": "calls",
+      "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+    },
+    {
+      "source": "call:doctor-service:doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java:104:20:deleteById",
+      "type": "data_access",
+      "target": "res:table:hospital_db.doctors"
+    },
+    {
+      "source": "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java:22:24:createPatient",
+      "type": "calls",
+      "target": "method:patient-service:com.hospital.patientservice.service.PatientService#createPatient(Patient)"
+    },
+    {
+      "source": "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java:28:24:getAllPatients",
+      "type": "calls",
+      "target": "method:patient-service:com.hospital.patientservice.service.PatientService#getAllPatients(Pageable)"
+    },
+    {
+      "source": "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java:33:24:getPatientById",
+      "type": "calls",
+      "target": "method:patient-service:com.hospital.patientservice.service.PatientService#getPatientById(Long)"
+    },
+    {
+      "source": "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java:39:24:updatePatient",
+      "type": "calls",
+      "target": "method:patient-service:com.hospital.patientservice.service.PatientService#updatePatient(Long,Patient)"
+    },
+    {
+      "source": "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java:44:17:deletePatient",
+      "type": "calls",
+      "target": "method:patient-service:com.hospital.patientservice.service.PatientService#deletePatient(Long)"
+    },
+    {
+      "source": "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java:53:24:searchPatients",
+      "type": "calls",
+      "target": "method:patient-service:com.hospital.patientservice.service.PatientService#searchPatients(String,Integer,String)"
+    },
+    {
+      "source": "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:21:27:save",
+      "type": "data_access",
+      "target": "res:table:hospital_db.patients"
+    },
+    {
+      "source": "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:26:27:findAll",
+      "type": "data_access",
+      "target": "res:table:hospital_db.patients"
+    },
+    {
+      "source": "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:31:27:findById",
+      "type": "data_access",
+      "target": "res:table:hospital_db.patients"
+    },
+    {
+      "source": "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:33:25:<init>",
+      "type": "calls",
+      "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+    },
+    {
+      "source": "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:42:28:getPatientById",
+      "type": "calls",
+      "target": "method:patient-service:com.hospital.patientservice.service.PatientService#getPatientById(Long)"
+    },
+    {
+      "source": "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:42:28:getPatientById",
+      "type": "calls",
+      "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+    },
+    {
+      "source": "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:50:27:save",
+      "type": "data_access",
+      "target": "res:table:hospital_db.patients"
+    },
+    {
+      "source": "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:55:20:deleteById",
+      "type": "data_access",
+      "target": "res:table:hospital_db.patients"
+    },
+    {
+      "source": "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:60:27:searchPatients",
+      "type": "calls",
+      "target": "method:patient-service:com.hospital.patientservice.repository.PatientRepository#searchPatients(String,Integer,String)"
+    },
+    {
+      "source": "call:patient-service:patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java:60:27:searchPatients",
+      "type": "data_access",
+      "target": "res:table:hospital_db.patients"
+    }
+  ],
+  "context": {
+    "clock": "The system clock is 2026-10-19T12:00:00",
+    "configuration": {
+      "doctor-service": {
+        "profiles": [
+          "default"
+        ],
+        "propertySources": [
+          {
+            "name": "independent resolved deployment snapshot, from pinned source defaults",
+            "source": {
+              "server.port": "8083",
+              "spring.application.name": "doctor-service",
+              "spring.datasource.url": "jdbc:mysql://mysql:3306/hospital_db",
+              "spring.datasource.username": "root",
+              "spring.datasource.password": "root",
+              "spring.datasource.driver-class-name": "com.mysql.cj.jdbc.Driver",
+              "spring.jpa.hibernate.ddl-auto": "update",
+              "spring.jpa.database-platform": "org.hibernate.dialect.MySQLDialect",
+              "spring.jpa.show-sql": "true",
+              "spring.jpa.open-in-view": "false",
+              "resilience4j.circuitbreaker.instances.patientService.register-health-indicator": "true",
+              "resilience4j.circuitbreaker.instances.patientService.sliding-window-type": "COUNT_BASED",
+              "resilience4j.circuitbreaker.instances.patientService.sliding-window-size": "10",
+              "resilience4j.circuitbreaker.instances.patientService.minimum-number-of-calls": "5",
+              "resilience4j.circuitbreaker.instances.patientService.failure-rate-threshold": "50",
+              "resilience4j.circuitbreaker.instances.patientService.wait-duration-in-open-state": "10s",
+              "resilience4j.circuitbreaker.instances.patientService.permitted-number-of-calls-in-half-open-state": "3",
+              "resilience4j.circuitbreaker.instances.patientService.automatic-transition-from-open-to-half-open-enabled": "true",
+              "management.endpoints.web.exposure.include": "health,info,circuitbreakers",
+              "management.endpoint.health.show-details": "always",
+              "management.health.circuitbreakers.enabled": "true"
+            }
+          }
+        ]
+      },
+      "patient-service": {
+        "profiles": [
+          "default"
+        ],
+        "propertySources": [
+          {
+            "name": "independent resolved deployment snapshot, from pinned source defaults",
+            "source": {
+              "server.port": "8081",
+              "spring.datasource.url": "jdbc:mysql://mysql:3306/hospital_db",
+              "spring.datasource.username": "root",
+              "spring.datasource.password": "root",
+              "spring.jpa.hibernate.ddl-auto": "update",
+              "spring.jpa.database-platform": "org.hibernate.dialect.MySQLDialect",
+              "spring.kafka.bootstrap-servers": "kafka:9092"
+            }
+          }
+        ]
+      }
+    },
+    "environment_scope": "Direct service API requests; initial datastore and runtime facts will be frozen with the source oracle before inference.",
+    "preflight_only": true
+  }
+}

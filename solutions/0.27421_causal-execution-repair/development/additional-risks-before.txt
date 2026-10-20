@@ -1,0 +1,320 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+____ test_unknown_loop_events_are_possible_and_return_keeps_its_completion _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-153/test_unknown_loop_events_are_p0')
+
+    def test_unknown_loop_events_are_possible_and_return_keeps_its_completion(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''class Api{int entry(boolean flag){while(flag){conditional();return 7;}return after();}
+          void conditional(){}int after(){return 9;}}'''})
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{'flag':U},limit=1)
+>       assert {row['result'] for row in outcomes}=={7,9}
+E       assert {9} == {7, 9}
+E         
+E         Extra items in the right set:
+E         7
+E         Use -v to get more diff
+
+solutions/—_causal-execution-repair/code/tests/test_regression_additional_risks.py:15: AssertionError
+____________ test_uncertain_save_has_no_uninitialized_python_local _____________
+
+project = <analyzer.project.Project object at 0x10398bbd0>
+state = <analyzer.state.ScenarioState object at 0x100adadd0>
+entry = 'method:service:Api#entry(boolean)'
+params = {'flag': <Unknown.VALUE: 'unknown'>}, limit = 1, constraints = True
+
+    def run_paths(project, state, entry, params, limit=8, constraints=True):
+        pending, completed, pruned = [{}], [], []
+        completion_splits=0
+        completion_budget=max(8,limit)
+        while pending:
+            decisions = pending.pop(0)
+            (owned_state,owned_params),_ = clone_execution(state,params)
+            engine = Engine(project, owned_state, decisions=decisions, constraints=constraints)
+            engine.path_replay = True
+            try:
+>               result = engine.run(entry, owned_params)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/paths.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:362: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:435: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:519: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:669: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:749: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:1247: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:1337: in execute
+    decision = self.choose(self.method + ':loop:' + str(node.start_point.row + 1), [True, False])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x103984950>
+label = 'method:service:Api#entry(boolean):loop:1', choices = [True, False]
+
+    def choose(self, label, choices):
+        self.branch_index += 1
+        key = str(self.branch_index) + ':' + label
+        if key in self.decisions:
+            return self.decisions[key]
+        if not self.conservative:
+>           raise AlternativeRequired(key, choices)
+E           analyzer.engine.AlternativeRequired: ('1:method:service:Api#entry(boolean):loop:1', [True, False])
+
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:289: AlternativeRequired
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-153/test_uncertain_save_has_no_uni0')
+
+    def test_uncertain_save_has_no_uninitialized_python_local(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''class Api{Store store;void entry(boolean flag){while(flag){Row row=new Row();row.id="x";store.save(row);break;}}}
+          @Entity @Table(name="rows")class Row{@Id String id;}interface Store extends JpaRepository<Row,String>{Row save(Row value);}'''},rows={'rows':[]})
+>       outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{'flag':U},limit=1)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+solutions/—_causal-execution-repair/code/tests/test_regression_additional_risks.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/paths.py:68: in run_paths
+    result = engine.run(entry, owned_params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:362: in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:435: in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:519: in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:669: in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:749: in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:1247: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:1344: in execute
+    result, control = self.execute(node.child_by_field_name('body'), env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:1247: in execute
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:1423: in execute
+    return self.value(node, env), None
+           ^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:1477: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:1885: in expression_value
+    return self.value(node.named_children[0], env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:1477: in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:1873: in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:2604: in call
+    return self.repository(mid, cs, args, sorted(wiring['data_access']), reason)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <analyzer.engine.Engine object at 0x10398a150>
+mid = 'method:service:Api#entry(boolean)'
+cs = {'arg_count': 1, 'callee': 'save', 'col': 95, 'file': 'Api.java', ...}
+args = [{'__type__': 'Row', '__http_entity__': False, 'id': 'x'}]
+resources = ['res:table:service.rows']
+reason = 'call:method:service:Api#entry(boolean)@1:95'
+
+    def repository(self, mid, cs, args, resources, reason):
+        from . import persistence
+        result = U
+        primary=persistence.primary_resources(self,cs.get('receiver_type'))
+        for rid in resources:
+            if primary and rid not in primary:
+                self.candidate_edges.add((mid,'data',rid))
+                continue
+            name = cs.get('callee', '')
+            if self.p.nodes[rid].get('collection_of'):
+                self.candidate_edges.add((mid,'data',rid))
+                continue
+            query_key = (cs.get('receiver_type'), name)
+            if not name.startswith(('save','insert','delete','find','query','get','read','exists','count')) and name != 'flush' and query_key not in self.p.repository_queries:
+                self.candidate_edges.add((mid,'data',rid))
+                self.approximate=True
+                self.warnings.add('repository wiring has no supported SQL operation: '+reason)
+                continue
+            if name in ('getReferenceById','getById','getOne') and args:
+                result = persistence.lazy(self,rid,args[0])
+                if result is U:
+                    self.approximate=True;self.warnings.add('lazy entity identity is not modeled: '+reason)
+                continue
+            tx = persistence.transaction(self)
+            if name == 'flush':
+                persistence.flush(self,reason)
+                result = None
+                continue
+            if name == 'findById' and args and tx:
+                existing = persistence.cached(self,rid,args[0])
+                if existing is not U:
+                    declared_owner=self.p.resolve_type(cs.get('receiver_type',''),self.p.methods[mid]['module'],self.p.methods[mid]['file'])
+                    returns=[method.get('return_raw','') for method in self.p.methods.values()
+                             if method['owner']==declared_owner and method['name']==name]
+                    result = {'__optional__': True, 'optional': existing} if not returns or 'Optional' in returns[0] else existing
+                    continue
+            operation = {'method': mid, 'resource': rid, 'operation': name,
+                         'arguments': deepcopy(args), 'source_site': reason,
+                         'uncertain_write': bool(self.uncertain)}
+            if name.startswith(('save','insert','delete')):
+                persistence.queue(self,operation)
+            else:
+                if tx:persistence.flush(self,reason)
+                persistence.sql(self,operation)
+            resource = self.p.nodes[rid]
+            rows = self.state.database.rows(resource)
+            if rows is None or resource.get('collection_of'):
+                self.approximate = True
+                self.warnings.add('ORM access is approximated from static mapping: ' + rid)
+                continue
+            entity = self.p.entities.get(rid)
+            if name.startswith(('save', 'insert', 'delete')):
+                assumptions = self.input_assumptions + self.execution_assumptions
+                if assumptions:
+                    self.state.resource_assumptions[rid] = sorted(set(self.state.resource_assumptions.get(rid, []) + assumptions))
+            else:
+                self.execution_assumptions = list(dict.fromkeys(self.execution_assumptions +
+                    self.state.resource_assumptions.get(rid, []) + self.state.unscoped_state_assumptions))
+            if name.startswith(('save', 'insert')) and args and isinstance(args[0], dict):
+                record = deepcopy(args[0])
+                if self.uncertain:
+                    self.warnings.add('possible database write not committed: ' + reason)
+                    self.state.database.invalidate(rows)
+                else:
+                    generated = self.p.generated_ids.get(rid)
+                    if generated and record.get(generated, U) in (U, None):
+                        field=self.p.type_fields.get(entity,{}).get(generated,{})
+                        record[generated] = self.state.generated_value(field.get('type','Object'),'ORM generated identifier',
+                                                                       [row.get(generated,U) for row in rows])
+                        if field.get('uuid_generated') and field.get('type','').split('.')[-1]=='String':
+                            record[generated].update(__uuid_text__=True,__length__=36,
+                                                     __generation__='org.hibernate.id.UUIDGenerator')
+                        args[0][generated] = record[generated]
+                        if isinstance(args[0],JavaRecord):
+                            args[0]._native_field_kinds={**getattr(args[0],'_native_field_kinds',{}),generated:self.declared_kind(field.get('type','Object'))}
+                    keys = self.p.id_fields.get(rid, [])
+                    key = tuple(record.get(k, U) for k in keys) if keys else U
+                    existing = next((r for r in rows if key is not U and U not in key and all(self.p.materialize(self.state.database, rid, r).get(k, U) == record.get(k, U) for k in keys)), None)
+                    if existing is None and keys and any(key_equal({k:self.p.materialize(self.state.database,rid,r).get(k,U) for k in keys},
+                                                                 {k:record.get(k,U) for k in keys}) is U for r in rows):
+                        self.approximate=True
+                        self.warnings.add('opaque primary-key upsert overlap is not modeled; abstract write identity retained: '+reason)
+                    if existing is None:
+                        rows.append(record)
+                        self.created_objects.append({**deepcopy(record), '__resource__': rid,
+                                                     '__type__': self.p.nodes[entity]['fqn'] if entity else record.get('__type__', '')})
+                    else:
+                        existing.update(record)
+>               result = persistence.manage(self,rid,args[0] if existing is None else record)
+                                                                ^^^^^^^^
+E               UnboundLocalError: cannot access local variable 'existing' where it is not associated with a value
+
+solutions/—_causal-execution-repair/development/stages/H-real-chain/code/analyzer/engine.py:3599: UnboundLocalError
+__________ test_nested_required_marks_outer_transaction_rollback_only __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-153/test_nested_required_marks_out0')
+
+    def test_nested_required_marks_outer_transaction_rollback_only(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''class Api{Inner inner;Store store;
+          @Transactional void entry(){Row a=new Row();a.id="a";store.save(a);try{inner.fail();}catch(RuntimeException ignored){}
+            Row b=new Row();b.id="b";store.save(b);}}
+          class Inner{Store store;@Transactional void fail(){Row c=new Row();c.id="c";store.save(c);throw new IllegalStateException();}}
+          @Entity @Table(name="rows")class Row{@Id String id;}interface Store extends JpaRepository<Row,String>{Row save(Row value);}'''},rows={'rows':[]})
+        engine=Engine(project,ScenarioState(db));engine.run(ids['Api.entry'],{})
+>       assert engine.state.database.tables[('service','rows')]==[]
+E       AssertionError: assert [{'__type__':...e, 'id': 'b'}] == []
+E         
+E         Left contains 3 more items, first extra item: {'__type__': 'Row', '__http_entity__': False, 'id': 'a'}
+E         Use -v to get more diff
+
+solutions/—_causal-execution-repair/code/tests/test_regression_additional_risks.py:34: AssertionError
+_________ test_cached_table_identities_include_an_appended_live_alias __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-153/test_cached_table_identities_i0')
+
+    def test_cached_table_identities_include_an_appended_live_alias(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'class Api{void entry(){}}'},rows={'rows':[{'id':'old'}]})
+        state=ScenarioState(db);key=('service','rows')
+        rows=state.database.tables[key]
+        state.database.tables.shared_identities(key,mutable_ids)
+        row=JavaRecord('Row',{'id':'new'},['id']);rows.append(row)
+        (owned,params),_=clone_execution(state,{'row':row})
+        params['row']['id']='changed'
+>       assert owned.database.tables[key][-1] is params['row']
+E       AssertionError: assert {'id': 'new'} is {'id': 'changed'}
+
+solutions/—_causal-execution-repair/code/tests/test_regression_additional_risks.py:47: AssertionError
+___________ test_dirty_checking_uses_the_same_column_mapping_as_read ___________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-153/test_dirty_checking_uses_the_s0')
+
+    def test_dirty_checking_uses_the_same_column_mapping_as_read(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''class Api{Store store;
+          @Transactional String entry(){Row row=store.findById("x");row.label="after";store.flush();return store.findById("x").label;}}
+          @Entity @Table(name="rows")class Row{@Id @Column(name="row_key") String id;@Column(name="display_text") String label;}
+          interface Store extends JpaRepository<Row,String>{Row findById(String key);void flush();}'''},rows={'rows':[{'row_key':'x','display_text':'before'}]})
+        engine=Engine(project,ScenarioState(db));assert engine.run(ids['Api.entry'],{})=='after'
+        row=engine.state.database.tables[('service','rows')][0]
+>       assert row['displayText']=='after' and row['rowKey']=='x'
+E       AssertionError: assert ('before' == 'after'
+E         
+E         - after
+E         + before)
+
+solutions/—_causal-execution-repair/code/tests/test_regression_additional_risks.py:58: AssertionError
+__ test_lazy_materialization_runs_the_same_constructor_helpers_as_normal_load __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-153/test_lazy_materialization_runs0')
+
+    def test_lazy_materialization_runs_the_same_constructor_helpers_as_normal_load(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''class Api{Store store;String entry(){return store.getReferenceById("x").label;}}
+          @Entity @Table(name="rows")class Row{@Id String id;String label;Row(){helper();}void helper(){nested();}void nested(){}}
+          interface Store extends JpaRepository<Row,String>{Row getReferenceById(String key);}'''},rows={'rows':[{'id':'x','label':'persisted'}]})
+        engine=Engine(project,ScenarioState(db));assert engine.run(ids['Api.entry'],{})=='persisted'
+>       assert ('','executes',ids['Row.helper']) in engine.edges
+E       AssertionError: assert ('', 'executes', 'method:service:Row#helper()') in {('', 'executes', 'method:service:Api#entry()'), ('method:service:Api#entry()', 'data', 'res:table:service.rows')}
+E        +  where {('', 'executes', 'method:service:Api#entry()'), ('method:service:Api#entry()', 'data', 'res:table:service.rows')} = <analyzer.engine.Engine object at 0x10256d910>.edges
+
+solutions/—_causal-execution-repair/code/tests/test_regression_additional_risks.py:67: AssertionError
+____________ test_multiple_url_aliases_keep_the_shared_http_binder _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-153/test_multiple_url_aliases_keep0')
+
+    def test_multiple_url_aliases_keep_the_shared_http_binder(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''class Api{@GetMapping({"/items/{id}","/v2/items/{id}"}) String read(@PathVariable int id){return "entered";}}'''})
+        request=grounded_request(project,ids['Api.read'],{'id':'invalid'})
+>       assert request is not None
+E       assert None is not None
+
+solutions/—_causal-execution-repair/code/tests/test_regression_additional_risks.py:74: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_additional_risks.py::test_unknown_loop_events_are_possible_and_return_keeps_its_completion
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_additional_risks.py::test_uncertain_save_has_no_uninitialized_python_local
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_additional_risks.py::test_nested_required_marks_outer_transaction_rollback_only
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_additional_risks.py::test_cached_table_identities_include_an_appended_live_alias
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_additional_risks.py::test_dirty_checking_uses_the_same_column_mapping_as_read
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_additional_risks.py::test_lazy_materialization_runs_the_same_constructor_helpers_as_normal_load
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_additional_risks.py::test_multiple_url_aliases_keep_the_shared_http_binder
+7 failed in 0.60s

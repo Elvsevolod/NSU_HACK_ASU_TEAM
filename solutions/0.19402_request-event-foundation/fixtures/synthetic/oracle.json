@@ -1,0 +1,215 @@
+{
+  "reference_fixed_before_prediction": true,
+  "application_started": false,
+  "scope": "independent synthetic full NL/HTTP/state journey; not evidence of real-app portability",
+  "edges": [
+    {
+      "source": "method:review:Gateway#cancelBooking(String)",
+      "relation": "remote",
+      "target": "method:review:Warehouse#remove(String)"
+    },
+    {
+      "source": "method:review:Gateway#createBooking(BookingInput)",
+      "relation": "calls",
+      "target": "method:review:Gateway#failed()"
+    },
+    {
+      "source": "method:review:Gateway#createBooking(BookingInput)",
+      "relation": "remote",
+      "target": "method:review:Warehouse#reserve(BookingInput)"
+    },
+    {
+      "source": "method:review:Gateway#inspectBooking(String)",
+      "relation": "remote",
+      "target": "method:review:Warehouse#read(String)"
+    },
+    {
+      "source": "method:review:Gateway#listBookings()",
+      "relation": "remote",
+      "target": "method:review:Warehouse#list()"
+    },
+    {
+      "source": "method:review:Warehouse#list()",
+      "relation": "data",
+      "target": "res:table:review.bookings"
+    },
+    {
+      "source": "method:review:Warehouse#read(String)",
+      "relation": "data",
+      "target": "res:table:review.bookings"
+    },
+    {
+      "source": "method:review:Warehouse#remove(String)",
+      "relation": "data",
+      "target": "res:table:review.bookings"
+    },
+    {
+      "source": "method:review:Warehouse#reserve(BookingInput)",
+      "relation": "data",
+      "target": "res:table:review.bookings"
+    },
+    {
+      "source": "scenario:review-journey",
+      "relation": "executes",
+      "target": "method:review:Gateway#cancelBooking(String)"
+    },
+    {
+      "source": "scenario:review-journey",
+      "relation": "executes",
+      "target": "method:review:Gateway#createBooking(BookingInput)"
+    },
+    {
+      "source": "scenario:review-journey",
+      "relation": "executes",
+      "target": "method:review:Gateway#failed()"
+    },
+    {
+      "source": "scenario:review-journey",
+      "relation": "executes",
+      "target": "method:review:Gateway#inspectBooking(String)"
+    },
+    {
+      "source": "scenario:review-journey",
+      "relation": "executes",
+      "target": "method:review:Gateway#listBookings()"
+    },
+    {
+      "source": "scenario:review-journey",
+      "relation": "executes",
+      "target": "method:review:Warehouse#list()"
+    },
+    {
+      "source": "scenario:review-journey",
+      "relation": "executes",
+      "target": "method:review:Warehouse#read(String)"
+    },
+    {
+      "source": "scenario:review-journey",
+      "relation": "executes",
+      "target": "method:review:Warehouse#remove(String)"
+    },
+    {
+      "source": "scenario:review-journey",
+      "relation": "executes",
+      "target": "method:review:Warehouse#reserve(BookingInput)"
+    }
+  ],
+  "steps": [
+    {
+      "n": 1,
+      "endpoint": "method:review:Gateway#createBooking(BookingInput)",
+      "result": {
+        "id": "A",
+        "title": "Alpha"
+      },
+      "rows": 1,
+      "result_must_be_unresolved": false,
+      "optional_result": false
+    },
+    {
+      "n": 2,
+      "endpoint": "method:review:Gateway#listBookings()",
+      "result": [
+        {
+          "id": "A",
+          "title": "Alpha"
+        }
+      ],
+      "rows": 1,
+      "result_must_be_unresolved": false,
+      "optional_result": false
+    },
+    {
+      "n": 3,
+      "endpoint": "method:review:Gateway#createBooking(BookingInput)",
+      "result": {
+        "id": "B",
+        "title": "Beta"
+      },
+      "rows": 2,
+      "result_must_be_unresolved": false,
+      "optional_result": false
+    },
+    {
+      "n": 4,
+      "endpoint": "method:review:Gateway#listBookings()",
+      "result": [
+        {
+          "id": "A",
+          "title": "Alpha"
+        },
+        {
+          "id": "B",
+          "title": "Beta"
+        }
+      ],
+      "rows": 2,
+      "result_must_be_unresolved": false,
+      "optional_result": false
+    },
+    {
+      "n": 5,
+      "endpoint": "method:review:Gateway#cancelBooking(String)",
+      "result": null,
+      "rows": 1,
+      "result_must_be_unresolved": false,
+      "optional_result": true
+    },
+    {
+      "n": 6,
+      "endpoint": "method:review:Gateway#listBookings()",
+      "result": [
+        {
+          "id": "B",
+          "title": "Beta"
+        }
+      ],
+      "rows": 1,
+      "result_must_be_unresolved": false,
+      "optional_result": false
+    },
+    {
+      "n": 7,
+      "endpoint": "method:review:Gateway#inspectBooking(String)",
+      "result": {
+        "id": "B",
+        "title": "Beta"
+      },
+      "rows": 1,
+      "result_must_be_unresolved": false,
+      "optional_result": false
+    },
+    {
+      "n": 8,
+      "endpoint": "method:review:Gateway#createBooking(BookingInput)",
+      "result": "refused",
+      "rows": 1,
+      "result_must_be_unresolved": false,
+      "optional_result": false
+    },
+    {
+      "n": 9,
+      "endpoint": "method:review:Gateway#cancelBooking(String)",
+      "result": null,
+      "rows": 0,
+      "result_must_be_unresolved": false,
+      "optional_result": true
+    },
+    {
+      "n": 10,
+      "endpoint": "method:review:Gateway#listBookings()",
+      "result": [],
+      "rows": 0,
+      "result_must_be_unresolved": false,
+      "optional_result": false
+    },
+    {
+      "n": 11,
+      "endpoint": "method:review:Gateway#inspectBooking(String)",
+      "result": null,
+      "rows": 0,
+      "result_must_be_unresolved": true,
+      "optional_result": false
+    }
+  ]
+}

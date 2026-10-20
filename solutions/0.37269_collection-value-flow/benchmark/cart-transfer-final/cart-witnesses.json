@@ -1,0 +1,1472 @@
+{
+  "schema": "producer-consumer/1",
+  "case": "cart/failed-explicit-transfer",
+  "steps": [
+    {
+      "step": 1,
+      "source_producers": [
+        {
+          "unmeasured_or_initial_context": true
+        }
+      ],
+      "preceding_step_result": {
+        "initial_context": true
+      },
+      "consumer_request": {
+        "deployment": "payment-service",
+        "method": "GET",
+        "url": "/api/payments?orderId=11",
+        "path": [
+          "api",
+          "payments"
+        ],
+        "query": {
+          "orderId": [
+            "11"
+          ]
+        },
+        "query_complete": true,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "actual_arguments": [
+        [
+          {
+            "name": "orderId",
+            "declared_type": "java.lang.Long",
+            "value": 11
+          }
+        ]
+      ],
+      "result": {
+        "unknown": true
+      },
+      "state_delta": {
+        "beans_and_aliases": {
+          "before": {
+            "missing": true
+          },
+          "after": {
+            "unmeasured": true
+          }
+        },
+        "browser": {
+          "before": {
+            "missing": true
+          },
+          "after": {
+            "storage": {},
+            "form": {},
+            "dom": {},
+            "url": {},
+            "options": {},
+            "script": {}
+          }
+        },
+        "database": {
+          "before": {
+            "missing": true
+          },
+          "after": {
+            "payment-service.payments": [
+              {
+                "id": 21,
+                "orderId": 11,
+                "customerId": 7,
+                "amount": 12.5,
+                "paymentMethod": "CREDIT_CARD",
+                "status": "APPROVED",
+                "createdAt": "2026-10-17 12:00:00"
+              },
+              {
+                "id": 23,
+                "orderId": 11,
+                "customerId": 7,
+                "amount": 12.5,
+                "paymentMethod": "CREDIT_CARD",
+                "status": "REJECTED",
+                "createdAt": "2026-10-17 11:00:00"
+              },
+              {
+                "id": 22,
+                "orderId": 12,
+                "customerId": 7,
+                "amount": 25.0,
+                "paymentMethod": "DEBIT_CARD",
+                "status": "APPROVED",
+                "createdAt": "2026-10-17 13:00:00"
+              }
+            ],
+            "order-service.orders": [
+              {
+                "id": 11,
+                "customerId": 7,
+                "customerName": "Ari",
+                "customerEmail": "ari@example.test",
+                "status": "PAID",
+                "createdAt": "2026-10-17 10:00:00"
+              },
+              {
+                "id": 12,
+                "customerId": 7,
+                "customerName": "Ari",
+                "customerEmail": "ari@example.test",
+                "status": "PAID",
+                "createdAt": "2026-10-17 10:30:00"
+              }
+            ],
+            "order-service.order_details": [
+              {
+                "id": 31,
+                "orderId": 11,
+                "productId": 51,
+                "productName": "Notebook",
+                "quantity": 2,
+                "unitPrice": 6.25
+              },
+              {
+                "id": 32,
+                "orderId": 12,
+                "productId": 52,
+                "productName": "Lamp",
+                "quantity": 1,
+                "unitPrice": 25.0
+              }
+            ]
+          }
+        }
+      },
+      "per_step_edges": [
+        [
+          "",
+          "executes",
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:JwtAuthenticationFilter#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentController#getByOrder(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+          "calls",
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:PaymentController#getByOrder(Long)",
+          "calls",
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+          "data",
+          "res:table:payment-service.payments"
+        ],
+        [
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+          "calls",
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+        ]
+      ],
+      "diagnostics": [],
+      "first_loss": null
+    },
+    {
+      "step": 1,
+      "source_producers": [
+        {
+          "unmeasured_or_initial_context": true
+        }
+      ],
+      "preceding_step_result": {
+        "unknown": true
+      },
+      "consumer_request": {
+        "deployment": "payment-service",
+        "method": "GET",
+        "url": "/api/payments?orderId=11",
+        "path": [
+          "api",
+          "payments"
+        ],
+        "query": {
+          "orderId": [
+            "11"
+          ]
+        },
+        "query_complete": true,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "actual_arguments": [
+        [
+          {
+            "name": "orderId",
+            "declared_type": "java.lang.Long",
+            "value": 11
+          }
+        ]
+      ],
+      "result": {
+        "unknown": true
+      },
+      "state_delta": {},
+      "per_step_edges": [
+        [
+          "",
+          "executes",
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:JwtAuthenticationFilter#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentController#getByOrder(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+          "calls",
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:PaymentController#getByOrder(Long)",
+          "calls",
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+          "data",
+          "res:table:payment-service.payments"
+        ],
+        [
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+          "calls",
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+        ]
+      ],
+      "diagnostics": [],
+      "first_loss": null
+    },
+    {
+      "step": 1,
+      "source_producers": [
+        {
+          "unmeasured_or_initial_context": true
+        }
+      ],
+      "preceding_step_result": {
+        "unknown": true
+      },
+      "consumer_request": {
+        "deployment": "payment-service",
+        "method": "GET",
+        "url": "/api/payments?orderId=11",
+        "path": [
+          "api",
+          "payments"
+        ],
+        "query": {
+          "orderId": [
+            "11"
+          ]
+        },
+        "query_complete": true,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "actual_arguments": [
+        [
+          {
+            "name": "orderId",
+            "declared_type": "java.lang.Long",
+            "value": 11
+          }
+        ]
+      ],
+      "result": {
+        "unknown": true
+      },
+      "state_delta": {},
+      "per_step_edges": [
+        [
+          "",
+          "executes",
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:JwtAuthenticationFilter#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentController#getByOrder(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+          "calls",
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:PaymentController#getByOrder(Long)",
+          "calls",
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+          "data",
+          "res:table:payment-service.payments"
+        ],
+        [
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+          "calls",
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+        ]
+      ],
+      "diagnostics": [],
+      "first_loss": null
+    },
+    {
+      "step": 1,
+      "source_producers": [
+        {
+          "unmeasured_or_initial_context": true
+        }
+      ],
+      "preceding_step_result": {
+        "unknown": true
+      },
+      "consumer_request": {
+        "deployment": "payment-service",
+        "method": "GET",
+        "url": "/api/payments?orderId=11",
+        "path": [
+          "api",
+          "payments"
+        ],
+        "query": {
+          "orderId": [
+            "11"
+          ]
+        },
+        "query_complete": true,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "actual_arguments": [
+        [
+          {
+            "name": "orderId",
+            "declared_type": "java.lang.Long",
+            "value": 11
+          }
+        ]
+      ],
+      "result": {
+        "unknown": true
+      },
+      "state_delta": {},
+      "per_step_edges": [
+        [
+          "",
+          "executes",
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:JwtAuthenticationFilter#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentController#getByOrder(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+          "calls",
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:PaymentController#getByOrder(Long)",
+          "calls",
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+          "data",
+          "res:table:payment-service.payments"
+        ],
+        [
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+          "calls",
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+        ]
+      ],
+      "diagnostics": [],
+      "first_loss": null
+    },
+    {
+      "step": 6,
+      "source_producers": [
+        {
+          "unmeasured_or_initial_context": true
+        }
+      ],
+      "preceding_step_result": {
+        "unknown": true
+      },
+      "consumer_request": {
+        "deployment": "payment-service",
+        "method": "GET",
+        "url": "/api/payments/999",
+        "path": [
+          "api",
+          "payments",
+          "999"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "actual_arguments": [
+        [
+          {
+            "name": "id",
+            "declared_type": "java.lang.Long",
+            "value": 999
+          }
+        ]
+      ],
+      "result": {
+        "unknown": true
+      },
+      "state_delta": {},
+      "per_step_edges": [
+        [
+          "",
+          "executes",
+          "method:payment-service:GetPaymentUseCase#execute(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:JwtAuthenticationFilter#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentController#getById(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentQueryService#getById(Long)"
+        ],
+        [
+          "method:payment-service:GetPaymentUseCase#execute(Long)",
+          "calls",
+          "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+        ],
+        [
+          "method:payment-service:PaymentController#getById(Long)",
+          "calls",
+          "method:payment-service:PaymentQueryService#getById(Long)"
+        ],
+        [
+          "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+          "data",
+          "res:table:payment-service.payments"
+        ],
+        [
+          "method:payment-service:PaymentQueryService#getById(Long)",
+          "calls",
+          "method:payment-service:GetPaymentUseCase#execute(Long)"
+        ]
+      ],
+      "diagnostics": [],
+      "first_loss": null
+    },
+    {
+      "step": 6,
+      "source_producers": [
+        {
+          "unmeasured_or_initial_context": true
+        }
+      ],
+      "preceding_step_result": {
+        "unknown": true
+      },
+      "consumer_request": {
+        "deployment": "payment-service",
+        "method": "GET",
+        "url": "/api/payments/999",
+        "path": [
+          "api",
+          "payments",
+          "999"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "actual_arguments": [
+        [
+          {
+            "name": "id",
+            "declared_type": "java.lang.Long",
+            "value": 999
+          }
+        ]
+      ],
+      "result": {
+        "id": null,
+        "orderId": null,
+        "customerId": null,
+        "amount": null,
+        "paymentMethod": null,
+        "status": null,
+        "createdAt": null
+      },
+      "state_delta": {},
+      "per_step_edges": [
+        [
+          "",
+          "executes",
+          "method:payment-service:GetPaymentUseCase#execute(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:JwtAuthenticationFilter#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:Payment#getAmount()"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:Payment#getCreatedAt()"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:Payment#getCustomerId()"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:Payment#getId()"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:Payment#getOrderId()"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:Payment#getPaymentMethod()"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:Payment#getStatus()"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentController#getById(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentQueryService#getById(Long)"
+        ],
+        [
+          "method:payment-service:GetPaymentUseCase#execute(Long)",
+          "calls",
+          "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+        ],
+        [
+          "method:payment-service:PaymentController#getById(Long)",
+          "calls",
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)"
+        ],
+        [
+          "method:payment-service:PaymentController#getById(Long)",
+          "calls",
+          "method:payment-service:PaymentQueryService#getById(Long)"
+        ],
+        [
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+          "calls",
+          "method:payment-service:Payment#getAmount()"
+        ],
+        [
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+          "calls",
+          "method:payment-service:Payment#getCreatedAt()"
+        ],
+        [
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+          "calls",
+          "method:payment-service:Payment#getCustomerId()"
+        ],
+        [
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+          "calls",
+          "method:payment-service:Payment#getId()"
+        ],
+        [
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+          "calls",
+          "method:payment-service:Payment#getOrderId()"
+        ],
+        [
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+          "calls",
+          "method:payment-service:Payment#getPaymentMethod()"
+        ],
+        [
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+          "calls",
+          "method:payment-service:Payment#getStatus()"
+        ],
+        [
+          "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+          "data",
+          "res:table:payment-service.payments"
+        ],
+        [
+          "method:payment-service:PaymentQueryService#getById(Long)",
+          "calls",
+          "method:payment-service:GetPaymentUseCase#execute(Long)"
+        ]
+      ],
+      "diagnostics": [],
+      "first_loss": null
+    },
+    {
+      "step": 6,
+      "source_producers": [
+        {
+          "unmeasured_or_initial_context": true
+        }
+      ],
+      "preceding_step_result": {
+        "id": null,
+        "orderId": null,
+        "customerId": null,
+        "amount": null,
+        "paymentMethod": null,
+        "status": null,
+        "createdAt": null
+      },
+      "consumer_request": {
+        "deployment": "payment-service",
+        "method": "GET",
+        "url": "/api/payments/999",
+        "path": [
+          "api",
+          "payments",
+          "999"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "actual_arguments": [
+        [
+          {
+            "name": "id",
+            "declared_type": "java.lang.Long",
+            "value": 999
+          }
+        ]
+      ],
+      "result": {
+        "id": null,
+        "orderId": null,
+        "customerId": null,
+        "amount": null,
+        "paymentMethod": null,
+        "status": null,
+        "createdAt": null
+      },
+      "state_delta": {},
+      "per_step_edges": [
+        [
+          "",
+          "executes",
+          "method:payment-service:GetPaymentUseCase#execute(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:JwtAuthenticationFilter#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:Payment#getAmount()"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:Payment#getCreatedAt()"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:Payment#getCustomerId()"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:Payment#getId()"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:Payment#getOrderId()"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:Payment#getPaymentMethod()"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:Payment#getStatus()"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentController#getById(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentQueryService#getById(Long)"
+        ],
+        [
+          "method:payment-service:GetPaymentUseCase#execute(Long)",
+          "calls",
+          "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+        ],
+        [
+          "method:payment-service:PaymentController#getById(Long)",
+          "calls",
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)"
+        ],
+        [
+          "method:payment-service:PaymentController#getById(Long)",
+          "calls",
+          "method:payment-service:PaymentQueryService#getById(Long)"
+        ],
+        [
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+          "calls",
+          "method:payment-service:Payment#getAmount()"
+        ],
+        [
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+          "calls",
+          "method:payment-service:Payment#getCreatedAt()"
+        ],
+        [
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+          "calls",
+          "method:payment-service:Payment#getCustomerId()"
+        ],
+        [
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+          "calls",
+          "method:payment-service:Payment#getId()"
+        ],
+        [
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+          "calls",
+          "method:payment-service:Payment#getOrderId()"
+        ],
+        [
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+          "calls",
+          "method:payment-service:Payment#getPaymentMethod()"
+        ],
+        [
+          "method:payment-service:PaymentHttpMapper#toResponse(Payment)",
+          "calls",
+          "method:payment-service:Payment#getStatus()"
+        ],
+        [
+          "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+          "data",
+          "res:table:payment-service.payments"
+        ],
+        [
+          "method:payment-service:PaymentQueryService#getById(Long)",
+          "calls",
+          "method:payment-service:GetPaymentUseCase#execute(Long)"
+        ]
+      ],
+      "diagnostics": [],
+      "first_loss": null
+    },
+    {
+      "step": 6,
+      "source_producers": [
+        {
+          "unmeasured_or_initial_context": true
+        }
+      ],
+      "preceding_step_result": {
+        "id": null,
+        "orderId": null,
+        "customerId": null,
+        "amount": null,
+        "paymentMethod": null,
+        "status": null,
+        "createdAt": null
+      },
+      "consumer_request": {
+        "deployment": "payment-service",
+        "method": "GET",
+        "url": "/api/payments/999",
+        "path": [
+          "api",
+          "payments",
+          "999"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "actual_arguments": [
+        [
+          {
+            "name": "id",
+            "declared_type": "java.lang.Long",
+            "value": 999
+          }
+        ]
+      ],
+      "result": {
+        "unknown": true
+      },
+      "state_delta": {},
+      "per_step_edges": [
+        [
+          "",
+          "executes",
+          "method:payment-service:GetPaymentUseCase#execute(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:JwtAuthenticationFilter#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentController#getById(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentQueryService#getById(Long)"
+        ],
+        [
+          "method:payment-service:GetPaymentUseCase#execute(Long)",
+          "calls",
+          "method:payment-service:PaymentPersistenceAdapter#findById(Long)"
+        ],
+        [
+          "method:payment-service:PaymentController#getById(Long)",
+          "calls",
+          "method:payment-service:PaymentQueryService#getById(Long)"
+        ],
+        [
+          "method:payment-service:PaymentPersistenceAdapter#findById(Long)",
+          "data",
+          "res:table:payment-service.payments"
+        ],
+        [
+          "method:payment-service:PaymentQueryService#getById(Long)",
+          "calls",
+          "method:payment-service:GetPaymentUseCase#execute(Long)"
+        ]
+      ],
+      "diagnostics": [],
+      "first_loss": null
+    },
+    {
+      "step": 8,
+      "source_producers": [
+        {
+          "unmeasured_or_initial_context": true
+        }
+      ],
+      "preceding_step_result": {
+        "unknown": true
+      },
+      "consumer_request": {
+        "deployment": "payment-service",
+        "method": "GET",
+        "url": "/api/payments?orderId=11",
+        "path": [
+          "api",
+          "payments"
+        ],
+        "query": {
+          "orderId": [
+            "11"
+          ]
+        },
+        "query_complete": true,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "actual_arguments": [
+        [
+          {
+            "name": "orderId",
+            "declared_type": "java.lang.Long",
+            "value": 11
+          }
+        ]
+      ],
+      "result": {
+        "unknown": true
+      },
+      "state_delta": {},
+      "per_step_edges": [
+        [
+          "",
+          "executes",
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:JwtAuthenticationFilter#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentController#getByOrder(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+          "calls",
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:PaymentController#getByOrder(Long)",
+          "calls",
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+          "data",
+          "res:table:payment-service.payments"
+        ],
+        [
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+          "calls",
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+        ]
+      ],
+      "diagnostics": [],
+      "first_loss": null
+    },
+    {
+      "step": 8,
+      "source_producers": [
+        {
+          "unmeasured_or_initial_context": true
+        }
+      ],
+      "preceding_step_result": {
+        "unknown": true
+      },
+      "consumer_request": {
+        "deployment": "payment-service",
+        "method": "GET",
+        "url": "/api/payments?orderId=11",
+        "path": [
+          "api",
+          "payments"
+        ],
+        "query": {
+          "orderId": [
+            "11"
+          ]
+        },
+        "query_complete": true,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "actual_arguments": [
+        [
+          {
+            "name": "orderId",
+            "declared_type": "java.lang.Long",
+            "value": 11
+          }
+        ]
+      ],
+      "result": {
+        "unknown": true
+      },
+      "state_delta": {},
+      "per_step_edges": [
+        [
+          "",
+          "executes",
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:JwtAuthenticationFilter#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentController#getByOrder(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+          "calls",
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:PaymentController#getByOrder(Long)",
+          "calls",
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+          "data",
+          "res:table:payment-service.payments"
+        ],
+        [
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+          "calls",
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+        ]
+      ],
+      "diagnostics": [],
+      "first_loss": null
+    },
+    {
+      "step": 8,
+      "source_producers": [
+        {
+          "unmeasured_or_initial_context": true
+        }
+      ],
+      "preceding_step_result": {
+        "unknown": true
+      },
+      "consumer_request": {
+        "deployment": "payment-service",
+        "method": "GET",
+        "url": "/api/payments?orderId=11",
+        "path": [
+          "api",
+          "payments"
+        ],
+        "query": {
+          "orderId": [
+            "11"
+          ]
+        },
+        "query_complete": true,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "actual_arguments": [
+        [
+          {
+            "name": "orderId",
+            "declared_type": "java.lang.Long",
+            "value": 11
+          }
+        ]
+      ],
+      "result": {
+        "unknown": true
+      },
+      "state_delta": {},
+      "per_step_edges": [
+        [
+          "",
+          "executes",
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:JwtAuthenticationFilter#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentController#getByOrder(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+          "calls",
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:PaymentController#getByOrder(Long)",
+          "calls",
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+          "data",
+          "res:table:payment-service.payments"
+        ],
+        [
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+          "calls",
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+        ]
+      ],
+      "diagnostics": [],
+      "first_loss": null
+    },
+    {
+      "step": 8,
+      "source_producers": [
+        {
+          "unmeasured_or_initial_context": true
+        }
+      ],
+      "preceding_step_result": {
+        "unknown": true
+      },
+      "consumer_request": {
+        "deployment": "payment-service",
+        "method": "GET",
+        "url": "/api/payments?orderId=11",
+        "path": [
+          "api",
+          "payments"
+        ],
+        "query": {
+          "orderId": [
+            "11"
+          ]
+        },
+        "query_complete": true,
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "actual_arguments": [
+        [
+          {
+            "name": "orderId",
+            "declared_type": "java.lang.Long",
+            "value": 11
+          }
+        ]
+      ],
+      "result": {
+        "unknown": true
+      },
+      "state_delta": {},
+      "per_step_edges": [
+        [
+          "",
+          "executes",
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:JwtAuthenticationFilter#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentController#getByOrder(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+        ],
+        [
+          "",
+          "executes",
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)",
+          "calls",
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:PaymentController#getByOrder(Long)",
+          "calls",
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)"
+        ],
+        [
+          "method:payment-service:PaymentPersistenceAdapter#findByOrderId(Long)",
+          "data",
+          "res:table:payment-service.payments"
+        ],
+        [
+          "method:payment-service:PaymentQueryService#getByOrderId(Long)",
+          "calls",
+          "method:payment-service:GetPaymentsByOrderUseCase#execute(Long)"
+        ]
+      ],
+      "diagnostics": [],
+      "first_loss": null
+    }
+  ]
+}

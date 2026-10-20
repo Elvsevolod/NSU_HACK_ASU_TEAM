@@ -1,0 +1,25 @@
+......................................F..                                [100%]
+=================================== FAILURES ===================================
+_____________ test_unknown_category_rows_remain_a_negative_control _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-255/test_unknown_category_rows_rem0')
+
+    def test_unknown_category_rows_remain_a_negative_control(tmp_path):
+        p,db,ids=fixture(tmp_path);db.unknown_tables.add(('catalog','categories'))
+        paths=run_paths(p,ScenarioState(db),ids['gateway.InventoryGateway.listProducts'],Request.http('gateway','GET','/inventory'),limit=4)
+>       assert paths and all(path['result'] is U for path in paths)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+code/tests/test_inventory_collection_journey.py:125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x102afcdf0>
+
+>   assert paths and all(path['result'] is U for path in paths)
+                                           ^
+E   NameError: name 'U' is not defined
+
+code/tests/test_inventory_collection_journey.py:125: NameError
+=========================== short test summary info ============================
+FAILED code/tests/test_inventory_collection_journey.py::test_unknown_category_rows_remain_a_negative_control
+1 failed, 40 passed in 0.57s

@@ -1,0 +1,19 @@
+{
+  "project": "fixture",
+  "scenarios": {
+    "equipment-read": {
+      "edges": [
+        {
+          "source": "scenario:equipment-read",
+          "relation": "executes",
+          "target": "method:service:Warehouse#read(String)"
+        },
+        {
+          "source": "method:service:Warehouse#read(String)",
+          "relation": "data",
+          "target": "res:table:service.equipment"
+        }
+      ]
+    }
+  }
+}

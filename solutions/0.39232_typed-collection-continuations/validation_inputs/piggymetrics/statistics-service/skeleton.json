@@ -1,0 +1,3352 @@
+{
+  "project": "fixture",
+  "nodes": {
+    "module:statistics-service": {
+      "kind": "module",
+      "name": "statistics-service",
+      "deployment_units": [
+        "statistics-service"
+      ]
+    },
+    "type:statistics-service:StatisticsApplication": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.StatisticsApplication",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/StatisticsApplication.java",
+      "annotations": [
+        {
+          "name": "SpringBootApplication",
+          "args": ""
+        },
+        {
+          "name": "EnableDiscoveryClient",
+          "args": ""
+        },
+        {
+          "name": "EnableOAuth2Client",
+          "args": ""
+        },
+        {
+          "name": "EnableFeignClients",
+          "args": ""
+        },
+        {
+          "name": "EnableGlobalMethodSecurity",
+          "args": "(prePostEnabled = true)"
+        }
+      ]
+    },
+    "type:statistics-service:CustomConversionsConfig": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.CustomConversionsConfig",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/StatisticsApplication.java",
+      "annotations": [
+        {
+          "name": "Configuration",
+          "args": ""
+        }
+      ]
+    },
+    "type:statistics-service:ExchangeRatesClient": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.client.ExchangeRatesClient",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/client/ExchangeRatesClient.java",
+      "annotations": [
+        {
+          "name": "FeignClient",
+          "args": "(url = \"${rates.url}\", name = \"rates-client\", fallback = ExchangeRatesClientFallback.class)"
+        }
+      ]
+    },
+    "type:statistics-service:ExchangeRatesClientFallback": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.client.ExchangeRatesClientFallback",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/client/ExchangeRatesClientFallback.java",
+      "annotations": [
+        {
+          "name": "Component",
+          "args": ""
+        }
+      ]
+    },
+    "type:statistics-service:ResourceServerConfig": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.config.ResourceServerConfig",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/config/ResourceServerConfig.java",
+      "annotations": [
+        {
+          "name": "EnableResourceServer",
+          "args": ""
+        },
+        {
+          "name": "Configuration",
+          "args": ""
+        }
+      ]
+    },
+    "type:statistics-service:StatisticsController": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.controller.StatisticsController",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/controller/StatisticsController.java",
+      "annotations": [
+        {
+          "name": "RestController",
+          "args": ""
+        }
+      ]
+    },
+    "type:statistics-service:Account": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.domain.Account",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Account.java",
+      "annotations": [
+        {
+          "name": "Document",
+          "args": "(collection = \"accounts\")"
+        },
+        {
+          "name": "JsonIgnoreProperties",
+          "args": "(ignoreUnknown = true)"
+        }
+      ]
+    },
+    "type:statistics-service:Currency": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.domain.Currency",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Currency.java",
+      "annotations": []
+    },
+    "type:statistics-service:ExchangeRatesContainer": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.domain.ExchangeRatesContainer",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/ExchangeRatesContainer.java",
+      "annotations": [
+        {
+          "name": "JsonIgnoreProperties",
+          "args": "(ignoreUnknown = true, value = {\"date\"})"
+        }
+      ]
+    },
+    "type:statistics-service:Item": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.domain.Item",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Item.java",
+      "annotations": []
+    },
+    "type:statistics-service:Saving": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.domain.Saving",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java",
+      "annotations": []
+    },
+    "type:statistics-service:TimePeriod": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.domain.TimePeriod",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/TimePeriod.java",
+      "annotations": []
+    },
+    "type:statistics-service:DataPoint": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.domain.timeseries.DataPoint",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPoint.java",
+      "annotations": [
+        {
+          "name": "Document",
+          "args": "(collection = \"datapoints\")"
+        }
+      ]
+    },
+    "type:statistics-service:DataPointId": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.domain.timeseries.DataPointId",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPointId.java",
+      "annotations": []
+    },
+    "type:statistics-service:ItemMetric": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.domain.timeseries.ItemMetric",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/ItemMetric.java",
+      "annotations": []
+    },
+    "type:statistics-service:StatisticMetric": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.domain.timeseries.StatisticMetric",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/StatisticMetric.java",
+      "annotations": []
+    },
+    "type:statistics-service:DataPointRepository": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.repository.DataPointRepository",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/repository/DataPointRepository.java",
+      "annotations": [
+        {
+          "name": "Repository",
+          "args": ""
+        }
+      ]
+    },
+    "type:statistics-service:DataPointIdReaderConverter": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.repository.converter.DataPointIdReaderConverter",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/repository/converter/DataPointIdReaderConverter.java",
+      "annotations": [
+        {
+          "name": "Component",
+          "args": ""
+        }
+      ]
+    },
+    "type:statistics-service:DataPointIdWriterConverter": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.repository.converter.DataPointIdWriterConverter",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/repository/converter/DataPointIdWriterConverter.java",
+      "annotations": [
+        {
+          "name": "Component",
+          "args": ""
+        }
+      ]
+    },
+    "type:statistics-service:ExchangeRatesService": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.service.ExchangeRatesService",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesService.java",
+      "annotations": []
+    },
+    "type:statistics-service:ExchangeRatesServiceImpl": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.service.ExchangeRatesServiceImpl",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java",
+      "annotations": [
+        {
+          "name": "Service",
+          "args": ""
+        }
+      ]
+    },
+    "type:statistics-service:StatisticsService": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.service.StatisticsService",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsService.java",
+      "annotations": []
+    },
+    "type:statistics-service:StatisticsServiceImpl": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.service.StatisticsServiceImpl",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java",
+      "annotations": [
+        {
+          "name": "Service",
+          "args": ""
+        }
+      ]
+    },
+    "type:statistics-service:CustomUserInfoTokenServices": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.statistics.service.security.CustomUserInfoTokenServices",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java",
+      "annotations": []
+    },
+    "method:statistics-service:StatisticsApplication#main(String[])": {
+      "kind": "method",
+      "name": "main",
+      "owner": "type:statistics-service:StatisticsApplication",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/StatisticsApplication.java",
+      "line": 28,
+      "end": 30,
+      "params_as_written": [
+        "String[]"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:CustomConversionsConfig#customConversions()": {
+      "kind": "method",
+      "name": "customConversions",
+      "owner": "type:statistics-service:CustomConversionsConfig",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/StatisticsApplication.java",
+      "line": 35,
+      "end": 39,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Bean",
+          "args": ""
+        }
+      ],
+      "return_raw": "CustomConversions"
+    },
+    "method:statistics-service:ExchangeRatesClient#getRates(Currency)": {
+      "kind": "method",
+      "name": "getRates",
+      "owner": "type:statistics-service:ExchangeRatesClient",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/client/ExchangeRatesClient.java",
+      "line": 13,
+      "end": 14,
+      "params_as_written": [
+        "Currency"
+      ],
+      "abstract": true,
+      "annotations": [
+        {
+          "name": "RequestMapping",
+          "args": "(method = RequestMethod.GET, value = \"/latest\")"
+        }
+      ],
+      "return_raw": "ExchangeRatesContainer"
+    },
+    "method:statistics-service:ExchangeRatesClientFallback#getRates(Currency)": {
+      "kind": "method",
+      "name": "getRates",
+      "owner": "type:statistics-service:ExchangeRatesClientFallback",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/client/ExchangeRatesClientFallback.java",
+      "line": 12,
+      "end": 18,
+      "params_as_written": [
+        "Currency"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "ExchangeRatesContainer"
+    },
+    "method:statistics-service:ResourceServerConfig#tokenServices()": {
+      "kind": "method",
+      "name": "tokenServices",
+      "owner": "type:statistics-service:ResourceServerConfig",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/config/ResourceServerConfig.java",
+      "line": 21,
+      "end": 24,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Bean",
+          "args": ""
+        }
+      ],
+      "return_raw": "ResourceServerTokenServices"
+    },
+    "method:statistics-service:StatisticsController#getCurrentAccountStatistics(Principal)": {
+      "kind": "method",
+      "name": "getCurrentAccountStatistics",
+      "owner": "type:statistics-service:StatisticsController",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/controller/StatisticsController.java",
+      "line": 20,
+      "end": 23,
+      "params_as_written": [
+        "Principal"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "RequestMapping",
+          "args": "(value = \"/current\", method = RequestMethod.GET)"
+        }
+      ],
+      "return_raw": "List<DataPoint>"
+    },
+    "method:statistics-service:StatisticsController#getStatisticsByAccountName(String)": {
+      "kind": "method",
+      "name": "getStatisticsByAccountName",
+      "owner": "type:statistics-service:StatisticsController",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/controller/StatisticsController.java",
+      "line": 25,
+      "end": 29,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "PreAuthorize",
+          "args": "(\"#oauth2.hasScope('server') or #accountName.equals('demo')\")"
+        },
+        {
+          "name": "RequestMapping",
+          "args": "(value = \"/{accountName}\", method = RequestMethod.GET)"
+        }
+      ],
+      "return_raw": "List<DataPoint>"
+    },
+    "method:statistics-service:StatisticsController#saveAccountStatistics(String,Account)": {
+      "kind": "method",
+      "name": "saveAccountStatistics",
+      "owner": "type:statistics-service:StatisticsController",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/controller/StatisticsController.java",
+      "line": 31,
+      "end": 35,
+      "params_as_written": [
+        "String",
+        "Account"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "PreAuthorize",
+          "args": "(\"#oauth2.hasScope('server')\")"
+        },
+        {
+          "name": "RequestMapping",
+          "args": "(value = \"/{accountName}\", method = RequestMethod.PUT)"
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:statistics-service:Account#getIncomes()": {
+      "kind": "method",
+      "name": "getIncomes",
+      "owner": "type:statistics-service:Account",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Account.java",
+      "line": 26,
+      "end": 28,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "List<Item>"
+    },
+    "method:statistics-service:Account#setIncomes(List<Item>)": {
+      "kind": "method",
+      "name": "setIncomes",
+      "owner": "type:statistics-service:Account",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Account.java",
+      "line": 30,
+      "end": 32,
+      "params_as_written": [
+        "List<Item>"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:Account#getExpenses()": {
+      "kind": "method",
+      "name": "getExpenses",
+      "owner": "type:statistics-service:Account",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Account.java",
+      "line": 34,
+      "end": 36,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "List<Item>"
+    },
+    "method:statistics-service:Account#setExpenses(List<Item>)": {
+      "kind": "method",
+      "name": "setExpenses",
+      "owner": "type:statistics-service:Account",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Account.java",
+      "line": 38,
+      "end": 40,
+      "params_as_written": [
+        "List<Item>"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:Account#getSaving()": {
+      "kind": "method",
+      "name": "getSaving",
+      "owner": "type:statistics-service:Account",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Account.java",
+      "line": 42,
+      "end": 44,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Saving"
+    },
+    "method:statistics-service:Account#setSaving(Saving)": {
+      "kind": "method",
+      "name": "setSaving",
+      "owner": "type:statistics-service:Account",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Account.java",
+      "line": 46,
+      "end": 48,
+      "params_as_written": [
+        "Saving"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:ExchangeRatesContainer#getDate()": {
+      "kind": "method",
+      "name": "getDate",
+      "owner": "type:statistics-service:ExchangeRatesContainer",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/ExchangeRatesContainer.java",
+      "line": 18,
+      "end": 20,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "LocalDate"
+    },
+    "method:statistics-service:ExchangeRatesContainer#setDate(LocalDate)": {
+      "kind": "method",
+      "name": "setDate",
+      "owner": "type:statistics-service:ExchangeRatesContainer",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/ExchangeRatesContainer.java",
+      "line": 22,
+      "end": 24,
+      "params_as_written": [
+        "LocalDate"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:ExchangeRatesContainer#getBase()": {
+      "kind": "method",
+      "name": "getBase",
+      "owner": "type:statistics-service:ExchangeRatesContainer",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/ExchangeRatesContainer.java",
+      "line": 26,
+      "end": 28,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Currency"
+    },
+    "method:statistics-service:ExchangeRatesContainer#setBase(Currency)": {
+      "kind": "method",
+      "name": "setBase",
+      "owner": "type:statistics-service:ExchangeRatesContainer",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/ExchangeRatesContainer.java",
+      "line": 30,
+      "end": 32,
+      "params_as_written": [
+        "Currency"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:ExchangeRatesContainer#getRates()": {
+      "kind": "method",
+      "name": "getRates",
+      "owner": "type:statistics-service:ExchangeRatesContainer",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/ExchangeRatesContainer.java",
+      "line": 34,
+      "end": 36,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Map<String, BigDecimal>"
+    },
+    "method:statistics-service:ExchangeRatesContainer#setRates(Map<String, BigDecimal>)": {
+      "kind": "method",
+      "name": "setRates",
+      "owner": "type:statistics-service:ExchangeRatesContainer",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/ExchangeRatesContainer.java",
+      "line": 38,
+      "end": 40,
+      "params_as_written": [
+        "Map<String, BigDecimal>"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:ExchangeRatesContainer#toString()": {
+      "kind": "method",
+      "name": "toString",
+      "owner": "type:statistics-service:ExchangeRatesContainer",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/ExchangeRatesContainer.java",
+      "line": 42,
+      "end": 49,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "String"
+    },
+    "method:statistics-service:Item#getTitle()": {
+      "kind": "method",
+      "name": "getTitle",
+      "owner": "type:statistics-service:Item",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Item.java",
+      "line": 23,
+      "end": 25,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "String"
+    },
+    "method:statistics-service:Item#setTitle(String)": {
+      "kind": "method",
+      "name": "setTitle",
+      "owner": "type:statistics-service:Item",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Item.java",
+      "line": 27,
+      "end": 29,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:Item#getAmount()": {
+      "kind": "method",
+      "name": "getAmount",
+      "owner": "type:statistics-service:Item",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Item.java",
+      "line": 31,
+      "end": 33,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "BigDecimal"
+    },
+    "method:statistics-service:Item#setAmount(BigDecimal)": {
+      "kind": "method",
+      "name": "setAmount",
+      "owner": "type:statistics-service:Item",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Item.java",
+      "line": 35,
+      "end": 37,
+      "params_as_written": [
+        "BigDecimal"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:Item#getCurrency()": {
+      "kind": "method",
+      "name": "getCurrency",
+      "owner": "type:statistics-service:Item",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Item.java",
+      "line": 39,
+      "end": 41,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Currency"
+    },
+    "method:statistics-service:Item#setCurrency(Currency)": {
+      "kind": "method",
+      "name": "setCurrency",
+      "owner": "type:statistics-service:Item",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Item.java",
+      "line": 43,
+      "end": 45,
+      "params_as_written": [
+        "Currency"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:Item#getPeriod()": {
+      "kind": "method",
+      "name": "getPeriod",
+      "owner": "type:statistics-service:Item",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Item.java",
+      "line": 47,
+      "end": 49,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "TimePeriod"
+    },
+    "method:statistics-service:Item#setPeriod(TimePeriod)": {
+      "kind": "method",
+      "name": "setPeriod",
+      "owner": "type:statistics-service:Item",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Item.java",
+      "line": 51,
+      "end": 53,
+      "params_as_written": [
+        "TimePeriod"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:Saving#getAmount()": {
+      "kind": "method",
+      "name": "getAmount",
+      "owner": "type:statistics-service:Saving",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java",
+      "line": 23,
+      "end": 25,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "BigDecimal"
+    },
+    "method:statistics-service:Saving#setAmount(BigDecimal)": {
+      "kind": "method",
+      "name": "setAmount",
+      "owner": "type:statistics-service:Saving",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java",
+      "line": 27,
+      "end": 29,
+      "params_as_written": [
+        "BigDecimal"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:Saving#getCurrency()": {
+      "kind": "method",
+      "name": "getCurrency",
+      "owner": "type:statistics-service:Saving",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java",
+      "line": 31,
+      "end": 33,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Currency"
+    },
+    "method:statistics-service:Saving#setCurrency(Currency)": {
+      "kind": "method",
+      "name": "setCurrency",
+      "owner": "type:statistics-service:Saving",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java",
+      "line": 35,
+      "end": 37,
+      "params_as_written": [
+        "Currency"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:Saving#getInterest()": {
+      "kind": "method",
+      "name": "getInterest",
+      "owner": "type:statistics-service:Saving",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java",
+      "line": 39,
+      "end": 41,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "BigDecimal"
+    },
+    "method:statistics-service:Saving#setInterest(BigDecimal)": {
+      "kind": "method",
+      "name": "setInterest",
+      "owner": "type:statistics-service:Saving",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java",
+      "line": 43,
+      "end": 45,
+      "params_as_written": [
+        "BigDecimal"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:Saving#getDeposit()": {
+      "kind": "method",
+      "name": "getDeposit",
+      "owner": "type:statistics-service:Saving",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java",
+      "line": 47,
+      "end": 49,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Boolean"
+    },
+    "method:statistics-service:Saving#setDeposit(Boolean)": {
+      "kind": "method",
+      "name": "setDeposit",
+      "owner": "type:statistics-service:Saving",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java",
+      "line": 51,
+      "end": 53,
+      "params_as_written": [
+        "Boolean"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:Saving#getCapitalization()": {
+      "kind": "method",
+      "name": "getCapitalization",
+      "owner": "type:statistics-service:Saving",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java",
+      "line": 55,
+      "end": 57,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Boolean"
+    },
+    "method:statistics-service:Saving#setCapitalization(Boolean)": {
+      "kind": "method",
+      "name": "setCapitalization",
+      "owner": "type:statistics-service:Saving",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Saving.java",
+      "line": 59,
+      "end": 61,
+      "params_as_written": [
+        "Boolean"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:DataPoint#getId()": {
+      "kind": "method",
+      "name": "getId",
+      "owner": "type:statistics-service:DataPoint",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPoint.java",
+      "line": 29,
+      "end": 31,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "DataPointId"
+    },
+    "method:statistics-service:DataPoint#setId(DataPointId)": {
+      "kind": "method",
+      "name": "setId",
+      "owner": "type:statistics-service:DataPoint",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPoint.java",
+      "line": 33,
+      "end": 35,
+      "params_as_written": [
+        "DataPointId"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:DataPoint#getIncomes()": {
+      "kind": "method",
+      "name": "getIncomes",
+      "owner": "type:statistics-service:DataPoint",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPoint.java",
+      "line": 37,
+      "end": 39,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Set<ItemMetric>"
+    },
+    "method:statistics-service:DataPoint#setIncomes(Set<ItemMetric>)": {
+      "kind": "method",
+      "name": "setIncomes",
+      "owner": "type:statistics-service:DataPoint",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPoint.java",
+      "line": 41,
+      "end": 43,
+      "params_as_written": [
+        "Set<ItemMetric>"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:DataPoint#getExpenses()": {
+      "kind": "method",
+      "name": "getExpenses",
+      "owner": "type:statistics-service:DataPoint",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPoint.java",
+      "line": 45,
+      "end": 47,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Set<ItemMetric>"
+    },
+    "method:statistics-service:DataPoint#setExpenses(Set<ItemMetric>)": {
+      "kind": "method",
+      "name": "setExpenses",
+      "owner": "type:statistics-service:DataPoint",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPoint.java",
+      "line": 49,
+      "end": 51,
+      "params_as_written": [
+        "Set<ItemMetric>"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:DataPoint#getStatistics()": {
+      "kind": "method",
+      "name": "getStatistics",
+      "owner": "type:statistics-service:DataPoint",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPoint.java",
+      "line": 53,
+      "end": 55,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Map<StatisticMetric, BigDecimal>"
+    },
+    "method:statistics-service:DataPoint#setStatistics(Map<StatisticMetric, BigDecimal>)": {
+      "kind": "method",
+      "name": "setStatistics",
+      "owner": "type:statistics-service:DataPoint",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPoint.java",
+      "line": 57,
+      "end": 59,
+      "params_as_written": [
+        "Map<StatisticMetric, BigDecimal>"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:DataPoint#getRates()": {
+      "kind": "method",
+      "name": "getRates",
+      "owner": "type:statistics-service:DataPoint",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPoint.java",
+      "line": 61,
+      "end": 63,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Map<Currency, BigDecimal>"
+    },
+    "method:statistics-service:DataPoint#setRates(Map<Currency, BigDecimal>)": {
+      "kind": "method",
+      "name": "setRates",
+      "owner": "type:statistics-service:DataPoint",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPoint.java",
+      "line": 65,
+      "end": 67,
+      "params_as_written": [
+        "Map<Currency, BigDecimal>"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:DataPointId#<init>(String,Date)": {
+      "kind": "method",
+      "name": "<init>",
+      "owner": "type:statistics-service:DataPointId",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPointId.java",
+      "line": 14,
+      "end": 17,
+      "params_as_written": [
+        "String",
+        "Date"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": ""
+    },
+    "method:statistics-service:DataPointId#getAccount()": {
+      "kind": "method",
+      "name": "getAccount",
+      "owner": "type:statistics-service:DataPointId",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPointId.java",
+      "line": 19,
+      "end": 21,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "String"
+    },
+    "method:statistics-service:DataPointId#getDate()": {
+      "kind": "method",
+      "name": "getDate",
+      "owner": "type:statistics-service:DataPointId",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPointId.java",
+      "line": 23,
+      "end": 25,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Date"
+    },
+    "method:statistics-service:DataPointId#toString()": {
+      "kind": "method",
+      "name": "toString",
+      "owner": "type:statistics-service:DataPointId",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPointId.java",
+      "line": 27,
+      "end": 33,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "String"
+    },
+    "method:statistics-service:ItemMetric#<init>(String,BigDecimal)": {
+      "kind": "method",
+      "name": "<init>",
+      "owner": "type:statistics-service:ItemMetric",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/ItemMetric.java",
+      "line": 18,
+      "end": 21,
+      "params_as_written": [
+        "String",
+        "BigDecimal"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": ""
+    },
+    "method:statistics-service:ItemMetric#getTitle()": {
+      "kind": "method",
+      "name": "getTitle",
+      "owner": "type:statistics-service:ItemMetric",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/ItemMetric.java",
+      "line": 23,
+      "end": 25,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "String"
+    },
+    "method:statistics-service:ItemMetric#getAmount()": {
+      "kind": "method",
+      "name": "getAmount",
+      "owner": "type:statistics-service:ItemMetric",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/ItemMetric.java",
+      "line": 27,
+      "end": 29,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "BigDecimal"
+    },
+    "method:statistics-service:ItemMetric#equals(Object)": {
+      "kind": "method",
+      "name": "equals",
+      "owner": "type:statistics-service:ItemMetric",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/ItemMetric.java",
+      "line": 31,
+      "end": 40,
+      "params_as_written": [
+        "Object"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "boolean"
+    },
+    "method:statistics-service:ItemMetric#hashCode()": {
+      "kind": "method",
+      "name": "hashCode",
+      "owner": "type:statistics-service:ItemMetric",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/ItemMetric.java",
+      "line": 42,
+      "end": 45,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "int"
+    },
+    "method:statistics-service:DataPointRepository#findByIdAccount(String)": {
+      "kind": "method",
+      "name": "findByIdAccount",
+      "owner": "type:statistics-service:DataPointRepository",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/repository/DataPointRepository.java",
+      "line": 13,
+      "end": 13,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "List<DataPoint>"
+    },
+    "method:statistics-service:DataPointIdReaderConverter#convert(DBObject)": {
+      "kind": "method",
+      "name": "convert",
+      "owner": "type:statistics-service:DataPointIdReaderConverter",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/repository/converter/DataPointIdReaderConverter.java",
+      "line": 13,
+      "end": 20,
+      "params_as_written": [
+        "DBObject"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "DataPointId"
+    },
+    "method:statistics-service:DataPointIdWriterConverter#convert(DataPointId)": {
+      "kind": "method",
+      "name": "convert",
+      "owner": "type:statistics-service:DataPointIdWriterConverter",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/repository/converter/DataPointIdWriterConverter.java",
+      "line": 14,
+      "end": 23,
+      "params_as_written": [
+        "DataPointId"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "DBObject"
+    },
+    "method:statistics-service:ExchangeRatesService#getCurrentRates()": {
+      "kind": "method",
+      "name": "getCurrentRates",
+      "owner": "type:statistics-service:ExchangeRatesService",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesService.java",
+      "line": 16,
+      "end": 16,
+      "params_as_written": [],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "Map<Currency, BigDecimal>"
+    },
+    "method:statistics-service:ExchangeRatesService#convert(Currency,Currency,BigDecimal)": {
+      "kind": "method",
+      "name": "convert",
+      "owner": "type:statistics-service:ExchangeRatesService",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesService.java",
+      "line": 26,
+      "end": 26,
+      "params_as_written": [
+        "Currency",
+        "Currency",
+        "BigDecimal"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "BigDecimal"
+    },
+    "method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()": {
+      "kind": "method",
+      "name": "getCurrentRates",
+      "owner": "type:statistics-service:ExchangeRatesServiceImpl",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java",
+      "line": 31,
+      "end": 44,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "Map<Currency, BigDecimal>"
+    },
+    "method:statistics-service:ExchangeRatesServiceImpl#convert(Currency,Currency,BigDecimal)": {
+      "kind": "method",
+      "name": "convert",
+      "owner": "type:statistics-service:ExchangeRatesServiceImpl",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java",
+      "line": 49,
+      "end": 58,
+      "params_as_written": [
+        "Currency",
+        "Currency",
+        "BigDecimal"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "BigDecimal"
+    },
+    "method:statistics-service:StatisticsService#findByAccountName(String)": {
+      "kind": "method",
+      "name": "findByAccountName",
+      "owner": "type:statistics-service:StatisticsService",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsService.java",
+      "line": 16,
+      "end": 16,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "List<DataPoint>"
+    },
+    "method:statistics-service:StatisticsService#save(String,Account)": {
+      "kind": "method",
+      "name": "save",
+      "owner": "type:statistics-service:StatisticsService",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsService.java",
+      "line": 28,
+      "end": 28,
+      "params_as_written": [
+        "String",
+        "Account"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "DataPoint"
+    },
+    "method:statistics-service:StatisticsServiceImpl#findByAccountName(String)": {
+      "kind": "method",
+      "name": "findByAccountName",
+      "owner": "type:statistics-service:StatisticsServiceImpl",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java",
+      "line": 41,
+      "end": 45,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "List<DataPoint>"
+    },
+    "method:statistics-service:StatisticsServiceImpl#save(String,Account)": {
+      "kind": "method",
+      "name": "save",
+      "owner": "type:statistics-service:StatisticsServiceImpl",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java",
+      "line": 50,
+      "end": 78,
+      "params_as_written": [
+        "String",
+        "Account"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "DataPoint"
+    },
+    "method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)": {
+      "kind": "method",
+      "name": "createStatisticMetrics",
+      "owner": "type:statistics-service:StatisticsServiceImpl",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java",
+      "line": 80,
+      "end": 97,
+      "params_as_written": [
+        "Set<ItemMetric>",
+        "Set<ItemMetric>",
+        "Saving"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Map<StatisticMetric, BigDecimal>"
+    },
+    "method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)": {
+      "kind": "method",
+      "name": "createItemMetric",
+      "owner": "type:statistics-service:StatisticsServiceImpl",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java",
+      "line": 103,
+      "end": 110,
+      "params_as_written": [
+        "Item"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "ItemMetric"
+    },
+    "method:statistics-service:CustomUserInfoTokenServices#<init>(String,String)": {
+      "kind": "method",
+      "name": "<init>",
+      "owner": "type:statistics-service:CustomUserInfoTokenServices",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java",
+      "line": 46,
+      "end": 49,
+      "params_as_written": [
+        "String",
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": ""
+    },
+    "method:statistics-service:CustomUserInfoTokenServices#setTokenType(String)": {
+      "kind": "method",
+      "name": "setTokenType",
+      "owner": "type:statistics-service:CustomUserInfoTokenServices",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java",
+      "line": 51,
+      "end": 53,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:CustomUserInfoTokenServices#setRestTemplate(OAuth2RestOperations)": {
+      "kind": "method",
+      "name": "setRestTemplate",
+      "owner": "type:statistics-service:CustomUserInfoTokenServices",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java",
+      "line": 55,
+      "end": 57,
+      "params_as_written": [
+        "OAuth2RestOperations"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:CustomUserInfoTokenServices#setAuthoritiesExtractor(AuthoritiesExtractor)": {
+      "kind": "method",
+      "name": "setAuthoritiesExtractor",
+      "owner": "type:statistics-service:CustomUserInfoTokenServices",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java",
+      "line": 59,
+      "end": 61,
+      "params_as_written": [
+        "AuthoritiesExtractor"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:statistics-service:CustomUserInfoTokenServices#loadAuthentication(String)": {
+      "kind": "method",
+      "name": "loadAuthentication",
+      "owner": "type:statistics-service:CustomUserInfoTokenServices",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java",
+      "line": 63,
+      "end": 72,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "OAuth2Authentication"
+    },
+    "method:statistics-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)": {
+      "kind": "method",
+      "name": "extractAuthentication",
+      "owner": "type:statistics-service:CustomUserInfoTokenServices",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java",
+      "line": 74,
+      "end": 83,
+      "params_as_written": [
+        "Map<String, Object>"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "OAuth2Authentication"
+    },
+    "method:statistics-service:CustomUserInfoTokenServices#getPrincipal(Map<String, Object>)": {
+      "kind": "method",
+      "name": "getPrincipal",
+      "owner": "type:statistics-service:CustomUserInfoTokenServices",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java",
+      "line": 85,
+      "end": 92,
+      "params_as_written": [
+        "Map<String, Object>"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "Object"
+    },
+    "method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)": {
+      "kind": "method",
+      "name": "getRequest",
+      "owner": "type:statistics-service:CustomUserInfoTokenServices",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java",
+      "line": 94,
+      "end": 104,
+      "params_as_written": [
+        "Map<String, Object>"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "SuppressWarnings",
+          "args": "({ \"unchecked\" })"
+        }
+      ],
+      "return_raw": "OAuth2Request"
+    },
+    "method:statistics-service:CustomUserInfoTokenServices#readAccessToken(String)": {
+      "kind": "method",
+      "name": "readAccessToken",
+      "owner": "type:statistics-service:CustomUserInfoTokenServices",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java",
+      "line": 106,
+      "end": 109,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "OAuth2AccessToken"
+    },
+    "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)": {
+      "kind": "method",
+      "name": "getMap",
+      "owner": "type:statistics-service:CustomUserInfoTokenServices",
+      "module": "statistics-service",
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java",
+      "line": 111,
+      "end": 137,
+      "params_as_written": [
+        "String",
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "SuppressWarnings",
+          "args": "({ \"unchecked\" })"
+        }
+      ],
+      "return_raw": "Map<String, Object>"
+    },
+    "call:method:statistics-service:StatisticsApplication#main(String[])@29:21": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsApplication#main(String[])",
+      "callee": "run",
+      "receiver": "SpringApplication",
+      "receiver_type": "SpringApplication",
+      "line": 29,
+      "col": 21,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/StatisticsApplication.java"
+    },
+    "call:method:statistics-service:CustomConversionsConfig#customConversions()@37:11": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomConversionsConfig#customConversions()",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "CustomConversions",
+      "line": 37,
+      "col": 11,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/StatisticsApplication.java"
+    },
+    "call:method:statistics-service:CustomConversionsConfig#customConversions()@37:40": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomConversionsConfig#customConversions()",
+      "callee": "asList",
+      "receiver": "Arrays",
+      "receiver_type": "Arrays",
+      "line": 37,
+      "col": 40,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/StatisticsApplication.java"
+    },
+    "call:method:statistics-service:CustomConversionsConfig#customConversions()@37:47": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomConversionsConfig#customConversions()",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "DataPointIdReaderConverter",
+      "line": 37,
+      "col": 47,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/StatisticsApplication.java"
+    },
+    "call:method:statistics-service:CustomConversionsConfig#customConversions()@38:6": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomConversionsConfig#customConversions()",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "DataPointIdWriterConverter",
+      "line": 38,
+      "col": 6,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/StatisticsApplication.java"
+    },
+    "call:method:statistics-service:ExchangeRatesClientFallback#getRates(Currency)@14:44": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesClientFallback#getRates(Currency)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "ExchangeRatesContainer",
+      "line": 14,
+      "col": 44,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/client/ExchangeRatesClientFallback.java"
+    },
+    "call:method:statistics-service:ExchangeRatesClientFallback#getRates(Currency)@15:19": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesClientFallback#getRates(Currency)",
+      "callee": "setBase",
+      "receiver": "container",
+      "receiver_type": "ExchangeRatesContainer",
+      "line": 15,
+      "col": 19,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/client/ExchangeRatesClientFallback.java"
+    },
+    "call:method:statistics-service:ExchangeRatesClientFallback#getRates(Currency)@15:36": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesClientFallback#getRates(Currency)",
+      "callee": "getBase",
+      "receiver": "Currency",
+      "receiver_type": "Currency",
+      "line": 15,
+      "col": 36,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/client/ExchangeRatesClientFallback.java"
+    },
+    "call:method:statistics-service:ExchangeRatesClientFallback#getRates(Currency)@16:19": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesClientFallback#getRates(Currency)",
+      "callee": "setRates",
+      "receiver": "container",
+      "receiver_type": "ExchangeRatesContainer",
+      "line": 16,
+      "col": 19,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/client/ExchangeRatesClientFallback.java"
+    },
+    "call:method:statistics-service:ExchangeRatesClientFallback#getRates(Currency)@16:40": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesClientFallback#getRates(Currency)",
+      "callee": "emptyMap",
+      "receiver": "Collections",
+      "receiver_type": "Collections",
+      "line": 16,
+      "col": 40,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/client/ExchangeRatesClientFallback.java"
+    },
+    "call:method:statistics-service:ResourceServerConfig#tokenServices()@23:16": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ResourceServerConfig#tokenServices()",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "CustomUserInfoTokenServices",
+      "line": 23,
+      "col": 16,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/config/ResourceServerConfig.java"
+    },
+    "call:method:statistics-service:ResourceServerConfig#tokenServices()@23:52": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ResourceServerConfig#tokenServices()",
+      "callee": "getUserInfoUri",
+      "receiver": "sso",
+      "receiver_type": "ResourceServerProperties",
+      "line": 23,
+      "col": 52,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/config/ResourceServerConfig.java"
+    },
+    "call:method:statistics-service:ResourceServerConfig#tokenServices()@23:74": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ResourceServerConfig#tokenServices()",
+      "callee": "getClientId",
+      "receiver": "sso",
+      "receiver_type": "ResourceServerProperties",
+      "line": 23,
+      "col": 74,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/config/ResourceServerConfig.java"
+    },
+    "call:method:statistics-service:StatisticsController#getCurrentAccountStatistics(Principal)@22:28": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsController#getCurrentAccountStatistics(Principal)",
+      "callee": "findByAccountName",
+      "receiver": "statisticsService",
+      "receiver_type": "StatisticsService",
+      "line": 22,
+      "col": 28,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/controller/StatisticsController.java"
+    },
+    "call:method:statistics-service:StatisticsController#getCurrentAccountStatistics(Principal)@22:56": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsController#getCurrentAccountStatistics(Principal)",
+      "callee": "getName",
+      "receiver": "principal",
+      "receiver_type": "Principal",
+      "line": 22,
+      "col": 56,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/controller/StatisticsController.java"
+    },
+    "call:method:statistics-service:StatisticsController#getStatisticsByAccountName(String)@28:28": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsController#getStatisticsByAccountName(String)",
+      "callee": "findByAccountName",
+      "receiver": "statisticsService",
+      "receiver_type": "StatisticsService",
+      "line": 28,
+      "col": 28,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/controller/StatisticsController.java"
+    },
+    "call:method:statistics-service:StatisticsController#saveAccountStatistics(String,Account)@34:21": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsController#saveAccountStatistics(String,Account)",
+      "callee": "save",
+      "receiver": "statisticsService",
+      "receiver_type": "StatisticsService",
+      "line": 34,
+      "col": 21,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/controller/StatisticsController.java"
+    },
+    "call:method:statistics-service:ItemMetric#equals(Object)@34:20": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ItemMetric#equals(Object)",
+      "callee": "getClass",
+      "receiver": "",
+      "receiver_type": "ItemMetric",
+      "line": 34,
+      "col": 20,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/ItemMetric.java"
+    },
+    "call:method:statistics-service:ItemMetric#equals(Object)@34:36": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ItemMetric#equals(Object)",
+      "callee": "getClass",
+      "receiver": "o",
+      "receiver_type": "Object",
+      "line": 34,
+      "col": 36,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/ItemMetric.java"
+    },
+    "call:method:statistics-service:ItemMetric#equals(Object)@38:16": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ItemMetric#equals(Object)",
+      "callee": "equalsIgnoreCase",
+      "receiver": "title",
+      "receiver_type": "String",
+      "line": 38,
+      "col": 16,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/ItemMetric.java"
+    },
+    "call:method:statistics-service:ItemMetric#hashCode()@44:16": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ItemMetric#hashCode()",
+      "callee": "hashCode",
+      "receiver": "title",
+      "receiver_type": "String",
+      "line": 44,
+      "col": 16,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/ItemMetric.java"
+    },
+    "call:method:statistics-service:DataPointIdReaderConverter#convert(DBObject)@16:29": {
+      "kind": "call_site",
+      "method": "method:statistics-service:DataPointIdReaderConverter#convert(DBObject)",
+      "callee": "get",
+      "receiver": "object",
+      "receiver_type": "DBObject",
+      "line": 16,
+      "col": 29,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/repository/converter/DataPointIdReaderConverter.java"
+    },
+    "call:method:statistics-service:DataPointIdReaderConverter#convert(DBObject)@17:36": {
+      "kind": "call_site",
+      "method": "method:statistics-service:DataPointIdReaderConverter#convert(DBObject)",
+      "callee": "get",
+      "receiver": "object",
+      "receiver_type": "DBObject",
+      "line": 17,
+      "col": 36,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/repository/converter/DataPointIdReaderConverter.java"
+    },
+    "call:method:statistics-service:DataPointIdReaderConverter#convert(DBObject)@19:10": {
+      "kind": "call_site",
+      "method": "method:statistics-service:DataPointIdReaderConverter#convert(DBObject)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "DataPointId",
+      "line": 19,
+      "col": 10,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/repository/converter/DataPointIdReaderConverter.java"
+    },
+    "call:method:statistics-service:DataPointIdWriterConverter#convert(DataPointId)@17:21": {
+      "kind": "call_site",
+      "method": "method:statistics-service:DataPointIdWriterConverter#convert(DataPointId)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "BasicDBObject",
+      "line": 17,
+      "col": 21,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/repository/converter/DataPointIdWriterConverter.java"
+    },
+    "call:method:statistics-service:DataPointIdWriterConverter#convert(DataPointId)@19:10": {
+      "kind": "call_site",
+      "method": "method:statistics-service:DataPointIdWriterConverter#convert(DataPointId)",
+      "callee": "put",
+      "receiver": "object",
+      "receiver_type": "DBObject",
+      "line": 19,
+      "col": 10,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/repository/converter/DataPointIdWriterConverter.java"
+    },
+    "call:method:statistics-service:DataPointIdWriterConverter#convert(DataPointId)@19:25": {
+      "kind": "call_site",
+      "method": "method:statistics-service:DataPointIdWriterConverter#convert(DataPointId)",
+      "callee": "getDate",
+      "receiver": "id",
+      "receiver_type": "DataPointId",
+      "line": 19,
+      "col": 25,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/repository/converter/DataPointIdWriterConverter.java"
+    },
+    "call:method:statistics-service:DataPointIdWriterConverter#convert(DataPointId)@20:10": {
+      "kind": "call_site",
+      "method": "method:statistics-service:DataPointIdWriterConverter#convert(DataPointId)",
+      "callee": "put",
+      "receiver": "object",
+      "receiver_type": "DBObject",
+      "line": 20,
+      "col": 10,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/repository/converter/DataPointIdWriterConverter.java"
+    },
+    "call:method:statistics-service:DataPointIdWriterConverter#convert(DataPointId)@20:28": {
+      "kind": "call_site",
+      "method": "method:statistics-service:DataPointIdWriterConverter#convert(DataPointId)",
+      "callee": "getAccount",
+      "receiver": "id",
+      "receiver_type": "DataPointId",
+      "line": 20,
+      "col": 28,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/repository/converter/DataPointIdWriterConverter.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@34:49": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()",
+      "callee": "equals",
+      "receiver": "container.getDate()",
+      "receiver_type": "container.getDate()",
+      "line": 34,
+      "col": 49,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@34:39": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()",
+      "callee": "getDate",
+      "receiver": "container",
+      "receiver_type": "ExchangeRatesContainer",
+      "line": 34,
+      "col": 39,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@34:66": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()",
+      "callee": "now",
+      "receiver": "LocalDate",
+      "receiver_type": "LocalDate",
+      "line": 34,
+      "col": 66,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@35:23": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()",
+      "callee": "getRates",
+      "receiver": "client",
+      "receiver_type": "ExchangeRatesClient",
+      "line": 35,
+      "col": 23,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@35:41": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()",
+      "callee": "getBase",
+      "receiver": "Currency",
+      "receiver_type": "Currency",
+      "line": 35,
+      "col": 41,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@36:8": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()",
+      "callee": "info",
+      "receiver": "log",
+      "receiver_type": "Logger",
+      "line": 36,
+      "col": 8,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@39:23": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()",
+      "callee": "of",
+      "receiver": "ImmutableMap",
+      "receiver_type": "ImmutableMap",
+      "line": 39,
+      "col": 23,
+      "arg_count": 6,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@40:40": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()",
+      "callee": "get",
+      "receiver": "container.getRates()",
+      "receiver_type": "container.getRates()",
+      "line": 40,
+      "col": 40,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@40:29": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()",
+      "callee": "getRates",
+      "receiver": "container",
+      "receiver_type": "ExchangeRatesContainer",
+      "line": 40,
+      "col": 29,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@40:57": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()",
+      "callee": "name",
+      "receiver": "Currency.EUR",
+      "receiver_type": "Currency.EUR",
+      "line": 40,
+      "col": 57,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@41:40": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()",
+      "callee": "get",
+      "receiver": "container.getRates()",
+      "receiver_type": "container.getRates()",
+      "line": 41,
+      "col": 40,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@41:29": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()",
+      "callee": "getRates",
+      "receiver": "container",
+      "receiver_type": "ExchangeRatesContainer",
+      "line": 41,
+      "col": 29,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@41:57": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()",
+      "callee": "name",
+      "receiver": "Currency.RUB",
+      "receiver_type": "Currency.RUB",
+      "line": 41,
+      "col": 57,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#convert(Currency,Currency,BigDecimal)@52:10": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#convert(Currency,Currency,BigDecimal)",
+      "callee": "notNull",
+      "receiver": "Assert",
+      "receiver_type": "Assert",
+      "line": 52,
+      "col": 10,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#convert(Currency,Currency,BigDecimal)@54:37": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#convert(Currency,Currency,BigDecimal)",
+      "callee": "getCurrentRates",
+      "receiver": "",
+      "receiver_type": "ExchangeRatesServiceImpl",
+      "line": 54,
+      "col": 37,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#convert(Currency,Currency,BigDecimal)@55:36": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#convert(Currency,Currency,BigDecimal)",
+      "callee": "divide",
+      "receiver": "rates.get(to)",
+      "receiver_type": "rates.get(to)",
+      "line": 55,
+      "col": 36,
+      "arg_count": 3,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#convert(Currency,Currency,BigDecimal)@55:28": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#convert(Currency,Currency,BigDecimal)",
+      "callee": "get",
+      "receiver": "rates",
+      "receiver_type": "Map<Currency, BigDecimal>",
+      "line": 55,
+      "col": 28,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#convert(Currency,Currency,BigDecimal)@55:49": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#convert(Currency,Currency,BigDecimal)",
+      "callee": "get",
+      "receiver": "rates",
+      "receiver_type": "Map<Currency, BigDecimal>",
+      "line": 55,
+      "col": 49,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:ExchangeRatesServiceImpl#convert(Currency,Currency,BigDecimal)@57:17": {
+      "kind": "call_site",
+      "method": "method:statistics-service:ExchangeRatesServiceImpl#convert(Currency,Currency,BigDecimal)",
+      "callee": "multiply",
+      "receiver": "amount",
+      "receiver_type": "BigDecimal",
+      "line": 57,
+      "col": 17,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#findByAccountName(String)@43:10": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#findByAccountName(String)",
+      "callee": "hasLength",
+      "receiver": "Assert",
+      "receiver_type": "Assert",
+      "line": 43,
+      "col": 10,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#findByAccountName(String)@44:21": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#findByAccountName(String)",
+      "callee": "findByIdAccount",
+      "receiver": "repository",
+      "receiver_type": "DataPointRepository",
+      "line": 44,
+      "col": 21,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@54:37": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "toInstant",
+      "receiver": "LocalDate.now().atStartOfDay()\n\t\t\t\t.atZone(ZoneId.systemDefault())",
+      "receiver_type": "LocalDate.now().atStartOfDay()\n\t\t\t\t.atZone(ZoneId.systemDefault())",
+      "line": 54,
+      "col": 37,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@54:6": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "atZone",
+      "receiver": "LocalDate.now().atStartOfDay()",
+      "receiver_type": "LocalDate.now().atStartOfDay()",
+      "line": 54,
+      "col": 6,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@53:37": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "atStartOfDay",
+      "receiver": "LocalDate.now()",
+      "receiver_type": "LocalDate.now()",
+      "line": 53,
+      "col": 37,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@53:31": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "now",
+      "receiver": "LocalDate",
+      "receiver_type": "LocalDate",
+      "line": 53,
+      "col": 31,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@54:20": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "systemDefault",
+      "receiver": "ZoneId",
+      "receiver_type": "ZoneId",
+      "line": 54,
+      "col": 20,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@56:25": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "DataPointId",
+      "line": 56,
+      "col": 25,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@56:59": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "from",
+      "receiver": "Date",
+      "receiver_type": "Date",
+      "line": 56,
+      "col": 59,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@60:6": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "collect",
+      "receiver": "account.getIncomes().stream()\n\t\t\t\t.map(this::createItemMetric)",
+      "receiver_type": "account.getIncomes().stream()\n\t\t\t\t.map(this::createItemMetric)",
+      "line": 60,
+      "col": 6,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@59:6": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "map",
+      "receiver": "account.getIncomes().stream()",
+      "receiver_type": "account.getIncomes().stream()",
+      "line": 59,
+      "col": 6,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@58:50": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "stream",
+      "receiver": "account.getIncomes()",
+      "receiver_type": "account.getIncomes()",
+      "line": 58,
+      "col": 50,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@58:37": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "getIncomes",
+      "receiver": "account",
+      "receiver_type": "Account",
+      "line": 58,
+      "col": 37,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@60:25": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "toSet",
+      "receiver": "Collectors",
+      "receiver_type": "Collectors",
+      "line": 60,
+      "col": 25,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@64:6": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "collect",
+      "receiver": "account.getExpenses().stream()\n\t\t\t\t.map(this::createItemMetric)",
+      "receiver_type": "account.getExpenses().stream()\n\t\t\t\t.map(this::createItemMetric)",
+      "line": 64,
+      "col": 6,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@63:6": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "map",
+      "receiver": "account.getExpenses().stream()",
+      "receiver_type": "account.getExpenses().stream()",
+      "line": 63,
+      "col": 6,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@62:52": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "stream",
+      "receiver": "account.getExpenses()",
+      "receiver_type": "account.getExpenses()",
+      "line": 62,
+      "col": 52,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@62:38": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "getExpenses",
+      "receiver": "account",
+      "receiver_type": "Account",
+      "line": 62,
+      "col": 38,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@64:25": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "toSet",
+      "receiver": "Collectors",
+      "receiver_type": "Collectors",
+      "line": 64,
+      "col": 25,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@66:49": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "createStatisticMetrics",
+      "receiver": "",
+      "receiver_type": "StatisticsServiceImpl",
+      "line": 66,
+      "col": 49,
+      "arg_count": 3,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@66:99": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "getSaving",
+      "receiver": "account",
+      "receiver_type": "Account",
+      "line": 66,
+      "col": 99,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@68:25": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "DataPoint",
+      "line": 68,
+      "col": 25,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@69:13": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "setId",
+      "receiver": "dataPoint",
+      "receiver_type": "DataPoint",
+      "line": 69,
+      "col": 13,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@70:13": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "setIncomes",
+      "receiver": "dataPoint",
+      "receiver_type": "DataPoint",
+      "line": 70,
+      "col": 13,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@71:13": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "setExpenses",
+      "receiver": "dataPoint",
+      "receiver_type": "DataPoint",
+      "line": 71,
+      "col": 13,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@72:13": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "setStatistics",
+      "receiver": "dataPoint",
+      "receiver_type": "DataPoint",
+      "line": 72,
+      "col": 13,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@73:13": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "setRates",
+      "receiver": "dataPoint",
+      "receiver_type": "DataPoint",
+      "line": 73,
+      "col": 13,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@73:35": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "getCurrentRates",
+      "receiver": "ratesService",
+      "receiver_type": "ExchangeRatesService",
+      "line": 73,
+      "col": 35,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@75:7": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "debug",
+      "receiver": "log",
+      "receiver_type": "Logger",
+      "line": 75,
+      "col": 7,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@77:21": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "callee": "save",
+      "receiver": "repository",
+      "receiver_type": "DataPointRepository",
+      "line": 77,
+      "col": 21,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)@82:42": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)",
+      "callee": "convert",
+      "receiver": "ratesService",
+      "receiver_type": "ExchangeRatesService",
+      "line": 82,
+      "col": 42,
+      "arg_count": 3,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)@82:57": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)",
+      "callee": "getCurrency",
+      "receiver": "saving",
+      "receiver_type": "Saving",
+      "line": 82,
+      "col": 57,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)@82:81": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)",
+      "callee": "getBase",
+      "receiver": "Currency",
+      "receiver_type": "Currency",
+      "line": 82,
+      "col": 81,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)@82:99": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)",
+      "callee": "getAmount",
+      "receiver": "saving",
+      "receiver_type": "Saving",
+      "line": 82,
+      "col": 99,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)@86:6": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)",
+      "callee": "reduce",
+      "receiver": "expenses.stream()\n\t\t\t\t.map(ItemMetric::getAmount)",
+      "receiver_type": "expenses.stream()\n\t\t\t\t.map(ItemMetric::getAmount)",
+      "line": 86,
+      "col": 6,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)@85:6": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)",
+      "callee": "map",
+      "receiver": "expenses.stream()",
+      "receiver_type": "expenses.stream()",
+      "line": 85,
+      "col": 6,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)@84:40": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)",
+      "callee": "stream",
+      "receiver": "expenses",
+      "receiver_type": "Set<ItemMetric>",
+      "line": 84,
+      "col": 40,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)@90:6": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)",
+      "callee": "reduce",
+      "receiver": "incomes.stream()\n\t\t\t\t.map(ItemMetric::getAmount)",
+      "receiver_type": "incomes.stream()\n\t\t\t\t.map(ItemMetric::getAmount)",
+      "line": 90,
+      "col": 6,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)@89:6": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)",
+      "callee": "map",
+      "receiver": "incomes.stream()",
+      "receiver_type": "incomes.stream()",
+      "line": 89,
+      "col": 6,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)@88:38": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)",
+      "callee": "stream",
+      "receiver": "incomes",
+      "receiver_type": "Set<ItemMetric>",
+      "line": 88,
+      "col": 38,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)@92:23": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)",
+      "callee": "of",
+      "receiver": "ImmutableMap",
+      "receiver_type": "ImmutableMap",
+      "line": 92,
+      "col": 23,
+      "arg_count": 6,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)@107:6": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)",
+      "callee": "divide",
+      "receiver": "ratesService\n\t\t\t\t.convert(item.getCurrency(), Currency.getBase(), item.getAmount())",
+      "receiver_type": "ratesService\n\t\t\t\t.convert(item.getCurrency(), Currency.getBase(), item.getAmount())",
+      "line": 107,
+      "col": 6,
+      "arg_count": 3,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)@106:6": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)",
+      "callee": "convert",
+      "receiver": "ratesService",
+      "receiver_type": "ExchangeRatesService",
+      "line": 106,
+      "col": 6,
+      "arg_count": 3,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)@106:19": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)",
+      "callee": "getCurrency",
+      "receiver": "item",
+      "receiver_type": "Item",
+      "line": 106,
+      "col": 19,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)@106:43": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)",
+      "callee": "getBase",
+      "receiver": "Currency",
+      "receiver_type": "Currency",
+      "line": 106,
+      "col": 43,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)@106:59": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)",
+      "callee": "getAmount",
+      "receiver": "item",
+      "receiver_type": "Item",
+      "line": 106,
+      "col": 59,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)@107:30": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)",
+      "callee": "getBaseRatio",
+      "receiver": "item.getPeriod()",
+      "receiver_type": "item.getPeriod()",
+      "line": 107,
+      "col": 30,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)@107:18": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)",
+      "callee": "getPeriod",
+      "receiver": "item",
+      "receiver_type": "Item",
+      "line": 107,
+      "col": 18,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)@109:10": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "ItemMetric",
+      "line": 109,
+      "col": 10,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)@109:30": {
+      "kind": "call_site",
+      "method": "method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)",
+      "callee": "getTitle",
+      "receiver": "item",
+      "receiver_type": "Item",
+      "line": 109,
+      "col": 30,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/StatisticsServiceImpl.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#loadAuthentication(String)@66:29": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#loadAuthentication(String)",
+      "callee": "getMap",
+      "receiver": "",
+      "receiver_type": "CustomUserInfoTokenServices",
+      "line": 66,
+      "col": 29,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#loadAuthentication(String)@67:11": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#loadAuthentication(String)",
+      "callee": "containsKey",
+      "receiver": "map",
+      "receiver_type": "Map<String, Object>",
+      "line": 67,
+      "col": 11,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#loadAuthentication(String)@68:16": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#loadAuthentication(String)",
+      "callee": "debug",
+      "receiver": "this.logger",
+      "receiver_type": "Log",
+      "line": 68,
+      "col": 16,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#loadAuthentication(String)@68:56": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#loadAuthentication(String)",
+      "callee": "get",
+      "receiver": "map",
+      "receiver_type": "Map<String, Object>",
+      "line": 68,
+      "col": 56,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#loadAuthentication(String)@69:10": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#loadAuthentication(String)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "InvalidTokenException",
+      "line": 69,
+      "col": 10,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#loadAuthentication(String)@71:10": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#loadAuthentication(String)",
+      "callee": "extractAuthentication",
+      "receiver": "",
+      "receiver_type": "CustomUserInfoTokenServices",
+      "line": 71,
+      "col": 10,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)@75:22": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)",
+      "callee": "getPrincipal",
+      "receiver": "",
+      "receiver_type": "CustomUserInfoTokenServices",
+      "line": 75,
+      "col": 22,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)@76:27": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)",
+      "callee": "getRequest",
+      "receiver": "",
+      "receiver_type": "CustomUserInfoTokenServices",
+      "line": 76,
+      "col": 27,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)@78:6": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)",
+      "callee": "extractAuthorities",
+      "receiver": "this.authoritiesExtractor",
+      "receiver_type": "AuthoritiesExtractor",
+      "line": 78,
+      "col": 6,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)@79:47": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "UsernamePasswordAuthenticationToken",
+      "line": 79,
+      "col": 47,
+      "arg_count": 3,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)@81:9": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)",
+      "callee": "setDetails",
+      "receiver": "token",
+      "receiver_type": "DefaultOAuth2AccessToken",
+      "line": 81,
+      "col": 9,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)@82:10": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "OAuth2Authentication",
+      "line": 82,
+      "col": 10,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getPrincipal(Map<String, Object>)@87:12": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getPrincipal(Map<String, Object>)",
+      "callee": "containsKey",
+      "receiver": "map",
+      "receiver_type": "Map<String, Object>",
+      "line": 87,
+      "col": 12,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getPrincipal(Map<String, Object>)@88:16": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getPrincipal(Map<String, Object>)",
+      "callee": "get",
+      "receiver": "map",
+      "receiver_type": "Map<String, Object>",
+      "line": 88,
+      "col": 16,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)@96:59": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)",
+      "callee": "get",
+      "receiver": "map",
+      "receiver_type": "Map<String, Object>",
+      "line": 96,
+      "col": 59,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)@98:38": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)",
+      "callee": "get",
+      "receiver": "request",
+      "receiver_type": "Map<String, Object>",
+      "line": 98,
+      "col": 38,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)@99:23": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "LinkedHashSet<>",
+      "line": 99,
+      "col": 23,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)@99:51": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)",
+      "callee": "containsKey",
+      "receiver": "request",
+      "receiver_type": "Map<String, Object>",
+      "line": 99,
+      "col": 51,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)@100:34": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)",
+      "callee": "get",
+      "receiver": "request",
+      "receiver_type": "Map<String, Object>",
+      "line": 100,
+      "col": 34,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)@100:69": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)",
+      "callee": "emptySet",
+      "receiver": "Collections",
+      "receiver_type": "Collections",
+      "line": 100,
+      "col": 69,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)@102:10": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "OAuth2Request",
+      "line": 102,
+      "col": 10,
+      "arg_count": 9,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)@102:56": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "HashSet<>",
+      "line": 102,
+      "col": 56,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#readAccessToken(String)@108:9": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#readAccessToken(String)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "UnsupportedOperationException",
+      "line": 108,
+      "col": 9,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@113:15": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "debug",
+      "receiver": "this.logger",
+      "receiver_type": "Log",
+      "line": 113,
+      "col": 15,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@117:51": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "BaseOAuth2ProtectedResourceDetails",
+      "line": 117,
+      "col": 51,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@118:14": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "setClientId",
+      "receiver": "resource",
+      "receiver_type": "BaseOAuth2ProtectedResourceDetails",
+      "line": 118,
+      "col": 14,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@119:20": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "OAuth2RestTemplate",
+      "line": 119,
+      "col": 20,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@122:7": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "getAccessToken",
+      "receiver": "restTemplate.getOAuth2ClientContext()",
+      "receiver_type": "restTemplate.getOAuth2ClientContext()",
+      "line": 122,
+      "col": 7,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@121:51": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "getOAuth2ClientContext",
+      "receiver": "restTemplate",
+      "receiver_type": "OAuth2RestOperations",
+      "line": 121,
+      "col": 51,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@123:46": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "equals",
+      "receiver": "accessToken",
+      "receiver_type": "String",
+      "line": 123,
+      "col": 46,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@123:67": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "getValue",
+      "receiver": "existingToken",
+      "receiver_type": "OAuth2AccessToken",
+      "line": 123,
+      "col": 67,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@124:38": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "DefaultOAuth2AccessToken",
+      "line": 124,
+      "col": 38,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@126:11": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "setTokenType",
+      "receiver": "token",
+      "receiver_type": "DefaultOAuth2AccessToken",
+      "line": 126,
+      "col": 11,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@127:43": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "setAccessToken",
+      "receiver": "restTemplate.getOAuth2ClientContext()",
+      "receiver_type": "restTemplate.getOAuth2ClientContext()",
+      "line": 127,
+      "col": 43,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@127:18": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "getOAuth2ClientContext",
+      "receiver": "restTemplate",
+      "receiver_type": "OAuth2RestOperations",
+      "line": 127,
+      "col": 18,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@129:54": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "getBody",
+      "receiver": "restTemplate.getForEntity(path, Map.class)",
+      "receiver_type": "restTemplate.getForEntity(path, Map.class)",
+      "line": 129,
+      "col": 54,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@129:24": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "getForEntity",
+      "receiver": "restTemplate",
+      "receiver_type": "OAuth2RestOperations",
+      "line": 129,
+      "col": 24,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@132:16": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "info",
+      "receiver": "this.logger",
+      "receiver_type": "Log",
+      "line": 132,
+      "col": 16,
+      "arg_count": 1,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@132:59": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "getClass",
+      "receiver": "ex",
+      "receiver_type": "ex",
+      "line": 132,
+      "col": 59,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@133:11": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "getMessage",
+      "receiver": "ex",
+      "receiver_type": "ex",
+      "line": 133,
+      "col": 11,
+      "arg_count": 0,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "call:method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)@134:39": {
+      "kind": "call_site",
+      "method": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)",
+      "callee": "singletonMap",
+      "receiver": "Collections",
+      "receiver_type": "Collections",
+      "line": 134,
+      "col": 39,
+      "arg_count": 2,
+      "file": "statistics-service/src/main/java/com/piggymetrics/statistics/service/security/CustomUserInfoTokenServices.java"
+    },
+    "res:collection:statistics-service.accounts": {
+      "kind": "data_resource",
+      "resource_kind": "collection",
+      "schema": "statistics-service",
+      "name": "accounts",
+      "origin": [
+        {
+          "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/Account.java"
+        }
+      ]
+    },
+    "res:collection:statistics-service.datapoints": {
+      "kind": "data_resource",
+      "resource_kind": "collection",
+      "schema": "statistics-service",
+      "name": "datapoints",
+      "origin": [
+        {
+          "file": "statistics-service/src/main/java/com/piggymetrics/statistics/domain/timeseries/DataPoint.java"
+        }
+      ]
+    }
+  },
+  "edges": [
+    {
+      "source": "type:statistics-service:ExchangeRatesClientFallback",
+      "type": "implements",
+      "target": "type:statistics-service:ExchangeRatesClient"
+    },
+    {
+      "source": "method:statistics-service:ExchangeRatesClientFallback#getRates(Currency)",
+      "type": "overrides",
+      "target": "method:statistics-service:ExchangeRatesClient#getRates(Currency)"
+    },
+    {
+      "source": "type:statistics-service:ExchangeRatesServiceImpl",
+      "type": "implements",
+      "target": "type:statistics-service:ExchangeRatesService"
+    },
+    {
+      "source": "method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()",
+      "type": "overrides",
+      "target": "method:statistics-service:ExchangeRatesService#getCurrentRates()"
+    },
+    {
+      "source": "method:statistics-service:ExchangeRatesServiceImpl#convert(Currency,Currency,BigDecimal)",
+      "type": "overrides",
+      "target": "method:statistics-service:ExchangeRatesService#convert(Currency,Currency,BigDecimal)"
+    },
+    {
+      "source": "type:statistics-service:StatisticsServiceImpl",
+      "type": "implements",
+      "target": "type:statistics-service:StatisticsService"
+    },
+    {
+      "source": "method:statistics-service:StatisticsServiceImpl#findByAccountName(String)",
+      "type": "overrides",
+      "target": "method:statistics-service:StatisticsService#findByAccountName(String)"
+    },
+    {
+      "source": "method:statistics-service:StatisticsServiceImpl#save(String,Account)",
+      "type": "overrides",
+      "target": "method:statistics-service:StatisticsService#save(String,Account)"
+    },
+    {
+      "source": "call:method:statistics-service:ExchangeRatesClientFallback#getRates(Currency)@15:19",
+      "type": "calls",
+      "target": "method:statistics-service:ExchangeRatesContainer#setBase(Currency)"
+    },
+    {
+      "source": "call:method:statistics-service:ExchangeRatesClientFallback#getRates(Currency)@16:19",
+      "type": "calls",
+      "target": "method:statistics-service:ExchangeRatesContainer#setRates(Map<String, BigDecimal>)"
+    },
+    {
+      "source": "call:method:statistics-service:ResourceServerConfig#tokenServices()@23:16",
+      "type": "calls",
+      "target": "method:statistics-service:CustomUserInfoTokenServices#<init>(String,String)"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsController#getCurrentAccountStatistics(Principal)@22:28",
+      "type": "calls",
+      "target": "method:statistics-service:StatisticsService#findByAccountName(String)"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsController#getStatisticsByAccountName(String)@28:28",
+      "type": "calls",
+      "target": "method:statistics-service:StatisticsService#findByAccountName(String)"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsController#saveAccountStatistics(String,Account)@34:21",
+      "type": "calls",
+      "target": "method:statistics-service:StatisticsService#save(String,Account)"
+    },
+    {
+      "source": "call:method:statistics-service:DataPointIdReaderConverter#convert(DBObject)@19:10",
+      "type": "calls",
+      "target": "method:statistics-service:DataPointId#<init>(String,Date)"
+    },
+    {
+      "source": "call:method:statistics-service:DataPointIdWriterConverter#convert(DataPointId)@19:25",
+      "type": "calls",
+      "target": "method:statistics-service:DataPointId#getDate()"
+    },
+    {
+      "source": "call:method:statistics-service:DataPointIdWriterConverter#convert(DataPointId)@20:28",
+      "type": "calls",
+      "target": "method:statistics-service:DataPointId#getAccount()"
+    },
+    {
+      "source": "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@34:39",
+      "type": "calls",
+      "target": "method:statistics-service:ExchangeRatesContainer#getDate()"
+    },
+    {
+      "source": "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@35:23",
+      "type": "calls",
+      "target": "method:statistics-service:ExchangeRatesClient#getRates(Currency)"
+    },
+    {
+      "source": "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@40:29",
+      "type": "calls",
+      "target": "method:statistics-service:ExchangeRatesContainer#getRates()"
+    },
+    {
+      "source": "call:method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()@41:29",
+      "type": "calls",
+      "target": "method:statistics-service:ExchangeRatesContainer#getRates()"
+    },
+    {
+      "source": "call:method:statistics-service:ExchangeRatesServiceImpl#convert(Currency,Currency,BigDecimal)@54:37",
+      "type": "calls",
+      "target": "method:statistics-service:ExchangeRatesServiceImpl#getCurrentRates()"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#findByAccountName(String)@44:21",
+      "type": "calls",
+      "target": "method:statistics-service:DataPointRepository#findByIdAccount(String)"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@56:25",
+      "type": "calls",
+      "target": "method:statistics-service:DataPointId#<init>(String,Date)"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@58:37",
+      "type": "calls",
+      "target": "method:statistics-service:Account#getIncomes()"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@62:38",
+      "type": "calls",
+      "target": "method:statistics-service:Account#getExpenses()"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@66:49",
+      "type": "calls",
+      "target": "method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@66:99",
+      "type": "calls",
+      "target": "method:statistics-service:Account#getSaving()"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@69:13",
+      "type": "calls",
+      "target": "method:statistics-service:DataPoint#setId(DataPointId)"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@70:13",
+      "type": "calls",
+      "target": "method:statistics-service:DataPoint#setIncomes(Set<ItemMetric>)"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@71:13",
+      "type": "calls",
+      "target": "method:statistics-service:DataPoint#setExpenses(Set<ItemMetric>)"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@72:13",
+      "type": "calls",
+      "target": "method:statistics-service:DataPoint#setStatistics(Map<StatisticMetric, BigDecimal>)"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@73:13",
+      "type": "calls",
+      "target": "method:statistics-service:DataPoint#setRates(Map<Currency, BigDecimal>)"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@73:35",
+      "type": "calls",
+      "target": "method:statistics-service:ExchangeRatesService#getCurrentRates()"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)@82:42",
+      "type": "calls",
+      "target": "method:statistics-service:ExchangeRatesService#convert(Currency,Currency,BigDecimal)"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)@82:57",
+      "type": "calls",
+      "target": "method:statistics-service:Saving#getCurrency()"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#createStatisticMetrics(Set<ItemMetric>,Set<ItemMetric>,Saving)@82:99",
+      "type": "calls",
+      "target": "method:statistics-service:Saving#getAmount()"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)@106:6",
+      "type": "calls",
+      "target": "method:statistics-service:ExchangeRatesService#convert(Currency,Currency,BigDecimal)"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)@106:19",
+      "type": "calls",
+      "target": "method:statistics-service:Item#getCurrency()"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)@106:59",
+      "type": "calls",
+      "target": "method:statistics-service:Item#getAmount()"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)@107:18",
+      "type": "calls",
+      "target": "method:statistics-service:Item#getPeriod()"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)@109:10",
+      "type": "calls",
+      "target": "method:statistics-service:ItemMetric#<init>(String,BigDecimal)"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#createItemMetric(Item)@109:30",
+      "type": "calls",
+      "target": "method:statistics-service:Item#getTitle()"
+    },
+    {
+      "source": "call:method:statistics-service:CustomUserInfoTokenServices#loadAuthentication(String)@66:29",
+      "type": "calls",
+      "target": "method:statistics-service:CustomUserInfoTokenServices#getMap(String,String)"
+    },
+    {
+      "source": "call:method:statistics-service:CustomUserInfoTokenServices#loadAuthentication(String)@71:10",
+      "type": "calls",
+      "target": "method:statistics-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)"
+    },
+    {
+      "source": "call:method:statistics-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)@75:22",
+      "type": "calls",
+      "target": "method:statistics-service:CustomUserInfoTokenServices#getPrincipal(Map<String, Object>)"
+    },
+    {
+      "source": "call:method:statistics-service:CustomUserInfoTokenServices#extractAuthentication(Map<String, Object>)@76:27",
+      "type": "calls",
+      "target": "method:statistics-service:CustomUserInfoTokenServices#getRequest(Map<String, Object>)"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#findByAccountName(String)@44:21",
+      "type": "data_access",
+      "target": "res:collection:statistics-service.datapoints"
+    },
+    {
+      "source": "call:method:statistics-service:StatisticsServiceImpl#save(String,Account)@77:21",
+      "type": "data_access",
+      "target": "res:collection:statistics-service.datapoints"
+    }
+  ],
+  "context": {}
+}

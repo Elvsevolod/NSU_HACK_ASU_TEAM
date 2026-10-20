@@ -1,0 +1,2381 @@
+{
+  "healthcare-state-chain-explicit-script": [
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+        "deployment": "patient-service",
+        "method": "POST",
+        "path": [
+          "patients"
+        ],
+        "query": {},
+        "headers": {
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "name": "Mira Bell",
+          "age": 29,
+          "gender": "F",
+          "department": "Cardiology",
+          "phone": "703"
+        },
+        "status": 200
+      },
+      "bound": {},
+      "history": {},
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "save",
+          "arguments": [
+            {
+              "id": null,
+              "name": "Mira Bell",
+              "age": 29,
+              "gender": "F",
+              "department": "Cardiology",
+              "phone": "703"
+            }
+          ],
+          "argument_kinds": [
+            null
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+        "deployment": "patient-service",
+        "method": "GET",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+        "deployment": "patient-service",
+        "method": "PUT",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "name": "Mira Bell",
+          "age": 30,
+          "gender": "F",
+          "department": "Rehabilitation",
+          "phone": "704"
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        },
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "save",
+          "arguments": [
+            {
+              "id": {
+                "$identity": "new_patient",
+                "native_kind": "Long",
+                "fresh": true
+              },
+              "name": "Mira Bell",
+              "age": 30,
+              "gender": "F",
+              "department": "Rehabilitation",
+              "phone": "704"
+            }
+          ],
+          "argument_kinds": [
+            null
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+        "deployment": "patient-service",
+        "method": "GET",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+        "deployment": "doctor-service",
+        "method": "GET",
+        "path": [
+          "doctors",
+          7,
+          "patient",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "doctorId": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": 7
+        },
+        "patientId": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "patientId": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [
+        {
+          "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+          "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "deployment": "patient-service",
+          "method": "GET",
+          "path": [
+            "patients",
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "query": {},
+          "status": 200,
+          "headers": {},
+          "body": {
+            "missing": true
+          },
+          "authority": "http://patient-service:8081",
+          "response_body": {
+            "id": {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            },
+            "name": "Mira Bell",
+            "age": 30,
+            "gender": "F",
+            "department": "Rehabilitation",
+            "phone": "704"
+          }
+        }
+      ],
+      "operations": [
+        {
+          "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+          "resource": "res:table:hospital_db.doctors",
+          "operation": "findById",
+          "arguments": [
+            7
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        },
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 2
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)",
+        "deployment": "patient-service",
+        "method": "DELETE",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "deleteById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+        "deployment": "patient-service",
+        "method": "PUT",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "name": "Mira Bell",
+          "age": 30,
+          "gender": "F",
+          "department": "Rehabilitation",
+          "phone": "704"
+        },
+        "status": 404
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+        "deployment": "patient-service",
+        "method": "PUT",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "name": "Mira Bell",
+          "age": 30,
+          "gender": "F",
+          "department": "Rehabilitation",
+          "phone": "704"
+        },
+        "status": 404
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+        "deployment": "doctor-service",
+        "method": "GET",
+        "path": [
+          "doctors",
+          7,
+          "patient",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 500
+      },
+      "bound": {
+        "doctorId": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": 7
+        },
+        "patientId": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "patientId": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [
+        {
+          "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+          "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "deployment": "patient-service",
+          "method": "GET",
+          "path": [
+            "patients",
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "query": {},
+          "status": 404,
+          "headers": {},
+          "body": {
+            "missing": true
+          },
+          "authority": "http://patient-service:8081",
+          "response_body": {
+            "timestamp": {
+              "$native": "LocalDateTime"
+            },
+            "message": {
+              "$text": [
+                "Patient not found with ID: ",
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ]
+            },
+            "status": 404
+          }
+        }
+      ],
+      "operations": [
+        {
+          "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+          "resource": "res:table:hospital_db.doctors",
+          "operation": "findById",
+          "arguments": [
+            7
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        },
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 2
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+        "deployment": "patient-service",
+        "method": "GET",
+        "path": [
+          "patients",
+          11
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": 11
+        }
+      },
+      "history": {},
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            11
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    }
+  ],
+  "healthcare-state-chain-nl-en": [
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+        "deployment": "patient-service",
+        "method": "POST",
+        "path": [
+          "patients"
+        ],
+        "query": {},
+        "headers": {
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "name": "Mira Bell",
+          "age": 29,
+          "gender": "F",
+          "department": "Cardiology",
+          "phone": "703"
+        },
+        "status": 200
+      },
+      "bound": {},
+      "history": {},
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "save",
+          "arguments": [
+            {
+              "id": null,
+              "name": "Mira Bell",
+              "age": 29,
+              "gender": "F",
+              "department": "Cardiology",
+              "phone": "703"
+            }
+          ],
+          "argument_kinds": [
+            null
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+        "deployment": "patient-service",
+        "method": "GET",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+        "deployment": "patient-service",
+        "method": "PUT",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "name": "Mira Bell",
+          "age": 30,
+          "gender": "F",
+          "department": "Rehabilitation",
+          "phone": "704"
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        },
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "save",
+          "arguments": [
+            {
+              "id": {
+                "$identity": "new_patient",
+                "native_kind": "Long",
+                "fresh": true
+              },
+              "name": "Mira Bell",
+              "age": 30,
+              "gender": "F",
+              "department": "Rehabilitation",
+              "phone": "704"
+            }
+          ],
+          "argument_kinds": [
+            null
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+        "deployment": "patient-service",
+        "method": "GET",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+        "deployment": "doctor-service",
+        "method": "GET",
+        "path": [
+          "doctors",
+          7,
+          "patient",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "doctorId": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": 7
+        },
+        "patientId": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "patientId": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [
+        {
+          "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+          "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "deployment": "patient-service",
+          "method": "GET",
+          "path": [
+            "patients",
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "query": {},
+          "status": 200,
+          "headers": {},
+          "body": {
+            "missing": true
+          },
+          "authority": "http://patient-service:8081",
+          "response_body": {
+            "id": {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            },
+            "name": "Mira Bell",
+            "age": 30,
+            "gender": "F",
+            "department": "Rehabilitation",
+            "phone": "704"
+          }
+        }
+      ],
+      "operations": [
+        {
+          "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+          "resource": "res:table:hospital_db.doctors",
+          "operation": "findById",
+          "arguments": [
+            7
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        },
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 2
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)",
+        "deployment": "patient-service",
+        "method": "DELETE",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "deleteById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+        "deployment": "patient-service",
+        "method": "PUT",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "name": "Mira Bell",
+          "age": 30,
+          "gender": "F",
+          "department": "Rehabilitation",
+          "phone": "704"
+        },
+        "status": 404
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+        "deployment": "patient-service",
+        "method": "PUT",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "name": "Mira Bell",
+          "age": 30,
+          "gender": "F",
+          "department": "Rehabilitation",
+          "phone": "704"
+        },
+        "status": 404
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+        "deployment": "doctor-service",
+        "method": "GET",
+        "path": [
+          "doctors",
+          7,
+          "patient",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 500
+      },
+      "bound": {
+        "doctorId": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": 7
+        },
+        "patientId": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "patientId": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [
+        {
+          "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+          "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "deployment": "patient-service",
+          "method": "GET",
+          "path": [
+            "patients",
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "query": {},
+          "status": 404,
+          "headers": {},
+          "body": {
+            "missing": true
+          },
+          "authority": "http://patient-service:8081",
+          "response_body": {
+            "timestamp": {
+              "$native": "LocalDateTime"
+            },
+            "message": {
+              "$text": [
+                "Patient not found with ID: ",
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ]
+            },
+            "status": 404
+          }
+        }
+      ],
+      "operations": [
+        {
+          "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+          "resource": "res:table:hospital_db.doctors",
+          "operation": "findById",
+          "arguments": [
+            7
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        },
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 2
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+        "deployment": "patient-service",
+        "method": "GET",
+        "path": [
+          "patients",
+          11
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": 11
+        }
+      },
+      "history": {},
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            11
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    }
+  ],
+  "healthcare-state-chain-nl-ru": [
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+        "deployment": "patient-service",
+        "method": "POST",
+        "path": [
+          "patients"
+        ],
+        "query": {},
+        "headers": {
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "name": "Mira Bell",
+          "age": 29,
+          "gender": "F",
+          "department": "Cardiology",
+          "phone": "703"
+        },
+        "status": 200
+      },
+      "bound": {},
+      "history": {},
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "save",
+          "arguments": [
+            {
+              "id": null,
+              "name": "Mira Bell",
+              "age": 29,
+              "gender": "F",
+              "department": "Cardiology",
+              "phone": "703"
+            }
+          ],
+          "argument_kinds": [
+            null
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+        "deployment": "patient-service",
+        "method": "GET",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+        "deployment": "patient-service",
+        "method": "PUT",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "name": "Mira Bell",
+          "age": 30,
+          "gender": "F",
+          "department": "Rehabilitation",
+          "phone": "704"
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        },
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "save",
+          "arguments": [
+            {
+              "id": {
+                "$identity": "new_patient",
+                "native_kind": "Long",
+                "fresh": true
+              },
+              "name": "Mira Bell",
+              "age": 30,
+              "gender": "F",
+              "department": "Rehabilitation",
+              "phone": "704"
+            }
+          ],
+          "argument_kinds": [
+            null
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+        "deployment": "patient-service",
+        "method": "GET",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+        "deployment": "doctor-service",
+        "method": "GET",
+        "path": [
+          "doctors",
+          7,
+          "patient",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "doctorId": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": 7
+        },
+        "patientId": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "patientId": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [
+        {
+          "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+          "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "deployment": "patient-service",
+          "method": "GET",
+          "path": [
+            "patients",
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "query": {},
+          "status": 200,
+          "headers": {},
+          "body": {
+            "missing": true
+          },
+          "authority": "http://patient-service:8081",
+          "response_body": {
+            "id": {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            },
+            "name": "Mira Bell",
+            "age": 30,
+            "gender": "F",
+            "department": "Rehabilitation",
+            "phone": "704"
+          }
+        }
+      ],
+      "operations": [
+        {
+          "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+          "resource": "res:table:hospital_db.doctors",
+          "operation": "findById",
+          "arguments": [
+            7
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        },
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 2
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)",
+        "deployment": "patient-service",
+        "method": "DELETE",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "deleteById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+        "deployment": "patient-service",
+        "method": "PUT",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "name": "Mira Bell",
+          "age": 30,
+          "gender": "F",
+          "department": "Rehabilitation",
+          "phone": "704"
+        },
+        "status": 404
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+        "deployment": "patient-service",
+        "method": "PUT",
+        "path": [
+          "patients",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "name": "Mira Bell",
+          "age": 30,
+          "gender": "F",
+          "department": "Rehabilitation",
+          "phone": "704"
+        },
+        "status": 404
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "id": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+        "deployment": "doctor-service",
+        "method": "GET",
+        "path": [
+          "doctors",
+          7,
+          "patient",
+          {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 500
+      },
+      "bound": {
+        "doctorId": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": 7
+        },
+        "patientId": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          }
+        }
+      },
+      "history": {
+        "patientId": {
+          "step": 1,
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "value": {
+            "$identity": "new_patient",
+            "native_kind": "Long",
+            "fresh": true
+          },
+          "reference": "history[0].result.id"
+        }
+      },
+      "remotes": [
+        {
+          "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+          "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "deployment": "patient-service",
+          "method": "GET",
+          "path": [
+            "patients",
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "query": {},
+          "status": 404,
+          "headers": {},
+          "body": {
+            "missing": true
+          },
+          "authority": "http://patient-service:8081",
+          "response_body": {
+            "timestamp": {
+              "$native": "LocalDateTime"
+            },
+            "message": {
+              "$text": [
+                "Patient not found with ID: ",
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ]
+            },
+            "status": 404
+          }
+        }
+      ],
+      "operations": [
+        {
+          "method": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+          "resource": "res:table:hospital_db.doctors",
+          "operation": "findById",
+          "arguments": [
+            7
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        },
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            }
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 2
+        }
+      ]
+    },
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+        "deployment": "patient-service",
+        "method": "GET",
+        "path": [
+          "patients",
+          11
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": 11
+        }
+      },
+      "history": {},
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            11
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    }
+  ],
+  "healthcare-fresh-state-explicit-script": [
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+        "deployment": "patient-service",
+        "method": "GET",
+        "path": [
+          "patients",
+          11
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": 11
+        }
+      },
+      "history": {},
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            11
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    }
+  ],
+  "healthcare-fresh-state-nl-en": [
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+        "deployment": "patient-service",
+        "method": "GET",
+        "path": [
+          "patients",
+          11
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": 11
+        }
+      },
+      "history": {},
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            11
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    }
+  ],
+  "healthcare-fresh-state-nl-ru": [
+    {
+      "outer": {
+        "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+        "deployment": "patient-service",
+        "method": "GET",
+        "path": [
+          "patients",
+          11
+        ],
+        "query": {},
+        "headers": {},
+        "body": {
+          "missing": true
+        },
+        "status": 200
+      },
+      "bound": {
+        "id": {
+          "declared_type": "java.lang.Long",
+          "native_kind": "Long",
+          "value": 11
+        }
+      },
+      "history": {},
+      "remotes": [],
+      "operations": [
+        {
+          "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+          "resource": "res:table:hospital_db.patients",
+          "operation": "findById",
+          "arguments": [
+            11
+          ],
+          "argument_kinds": [
+            "Long"
+          ],
+          "request_id": 1
+        }
+      ]
+    }
+  ]
+}

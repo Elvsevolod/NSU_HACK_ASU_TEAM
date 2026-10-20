@@ -1,0 +1,71 @@
+{
+  "frozen_at": "2026-10-19T08:33:48.296805+00:00",
+  "version": 33,
+  "task": "Rank existing static source HTTP handlers, no method/body/edge generation",
+  "development": "32 previously observed organization/library queries; never called fresh holdout",
+  "test": "16 licensing-domain queries from pinned real source, no prior inference in our work; not a full semantic holdout",
+  "public_pretraining_overlap": "unknown",
+  "seed": 0,
+  "max_sequence_tokens": 512,
+  "document_batch": 4,
+  "query_batch": 1,
+  "max_candidates_per_project": 128,
+  "candidate_pool": "Identical complete source handler IDs for every embedding model and common lexical baseline",
+  "context_ablation": "Same selected development winner; append at most four deduplicated source AST chunks. No test-based winner or tuning.",
+  "ranking_k": [
+    1,
+    3,
+    6
+  ],
+  "dtype": "float32",
+  "threads": 4,
+  "device": "mps; CPU fallback is a separately reported runtime if needed",
+  "resource_authority": "User allowed three local model pilots; no paid/cloud APIs, no target application execution",
+  "refusal_calibration": {
+    "development_only": true,
+    "minimum_score_grid": [
+      0.0,
+      0.05,
+      0.1,
+      0.15,
+      0.2,
+      0.25,
+      0.3,
+      0.35,
+      0.4,
+      0.45,
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.8,
+      0.85,
+      0.9,
+      0.95,
+      1.0,
+      1.01
+    ],
+    "minimum_margin_grid": [
+      0,
+      0.01,
+      0.03,
+      0.05,
+      0.1
+    ],
+    "objective": "Maximize accepted correct - 2*accepted wrong - 2*false accepts; then fewer errors, more accepted correct, stronger margin"
+  },
+  "model_selection": "Highest development MRR, then top1, then fewer calibrated false accepts; test labels not consulted",
+  "models": {
+    "unixcoder": "5604afdc964f6c53782a6813140ade5216b99006",
+    "codet5p": "d9f3a534af4252f04b10cd9f78e05037542d10f6",
+    "coderank": "3c4b60807d71f79b43f3c4363786d9493691f8b1",
+    "qwen": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3"
+  },
+  "guardrails": "Inference sees corpus/actions/protocol only; no labels, expected graphs, traces or saved predictions in model input",
+  "cost": "One fresh-process load per model, reused index; three separately reported warm forwards; OS page cache uncontrolled",
+  "protocol_revision": 2,
+  "pre_inference_changes": "Replace duplicated no-SMS query family with new document-conversion refusal; define common BM25 monotone score s/(1+s). No model/query forward occurred before this revision.",
+  "common_lexical_score": "BM25 s/(1+s), only for same 0..1 calibration grid; not a probability"
+}

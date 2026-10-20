@@ -1,0 +1,261 @@
+{
+  "passed": true,
+  "runs": [
+    {
+      "label": "legacy-analysis",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/compare_public_corpus.py",
+        "--fixtures",
+        "validation_inputs/legacy-real",
+        "--output",
+        "benchmark/feign-wire-integration/legacy",
+        "--candidate-only"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.6117358330011484
+    },
+    {
+      "label": "legacy-state",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_legacy_state.py",
+        "--reports",
+        "benchmark/feign-wire-integration/legacy",
+        "--output",
+        "benchmark/feign-wire-integration/legacy/checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.04794725000101607
+    },
+    {
+      "label": "main",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/run_real_journey.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--output",
+        "benchmark/feign-wire-integration/main",
+        "--path-limit",
+        "4"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.3169806250007241
+    },
+    {
+      "label": "main-values",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_real_journey.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-main.oracle-v3.json",
+        "--trace",
+        "benchmark/feign-wire-integration/main/trace.json",
+        "--output",
+        "benchmark/feign-wire-integration/main/checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.047526374997687526
+    },
+    {
+      "label": "main-semantic",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_semantic_projection.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-main.oracle-v3.json",
+        "--trace",
+        "benchmark/feign-wire-integration/main/trace.json",
+        "--output",
+        "benchmark/feign-wire-integration/main/semantic-checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.047683374999905936
+    },
+    {
+      "label": "main-mutations",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_journey_mutations.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-main.oracle-v3.json",
+        "--trace",
+        "benchmark/feign-wire-integration/main/trace.json",
+        "--output",
+        "benchmark/feign-wire-integration/main/mutations"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.48886920799850486
+    },
+    {
+      "label": "additional",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/run_additional_journey.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--output",
+        "benchmark/feign-wire-integration/additional"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.2564255420002155
+    },
+    {
+      "label": "additional-values",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_additional_journey.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-additional.oracle-v3.json",
+        "--trace",
+        "benchmark/feign-wire-integration/additional/trace.json",
+        "--output",
+        "benchmark/feign-wire-integration/additional/checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.0413048330010497
+    },
+    {
+      "label": "additional-semantic",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_semantic_projection.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-additional.oracle-v3.json",
+        "--trace",
+        "benchmark/feign-wire-integration/additional/trace.json",
+        "--output",
+        "benchmark/feign-wire-integration/additional/semantic-checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.04136087500228314
+    },
+    {
+      "label": "additional-mutations",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_additional_mutations.py",
+        "--input",
+        "validation_inputs/piggymetrics",
+        "--oracle",
+        "development/oracles/parent29/piggymetrics-additional.oracle-v3.json",
+        "--trace",
+        "benchmark/feign-wire-integration/additional/trace.json",
+        "--output",
+        "benchmark/feign-wire-integration/additional/mutations"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.25968016700062435
+    },
+    {
+      "label": "document",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/run_document_journey.py",
+        "--output",
+        "benchmark/feign-wire-integration/document"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.2563567079996574
+    },
+    {
+      "label": "document-mutations",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_document_mutations.py",
+        "--input",
+        "benchmark/feign-wire-integration/document"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.0454563750026864
+    },
+    {
+      "label": "actor-singleton-http",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_boundary_wires.py",
+        "--output",
+        "benchmark/feign-wire-integration/boundary-wires"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.24550708400056465
+    },
+    {
+      "label": "flow-witnesses",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/export_flow_witnesses.py",
+        "--output",
+        "benchmark/feign-wire-integration/flow-witnesses"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.6097045420028735
+    },
+    {
+      "label": "cart",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/run_cart_profile.py",
+        "--output",
+        "benchmark/feign-wire-integration/cart"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.9280330830006278
+    },
+    {
+      "label": "cart-check",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_cart_profile.py",
+        "--trace",
+        "benchmark/feign-wire-integration/cart",
+        "--output",
+        "benchmark/feign-wire-integration/cart/checks.json"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.08661512500111712
+    },
+    {
+      "label": "cart-mutations",
+      "command": [
+        "/Users/elvsevolod/Desktop/\u0443\u0447\u0435\u0431\u0430/\u0423\u0447\u0435\u0308\u0431\u0430 4 \u043a\u0443\u0440\u0441/\u0445\u0430\u043a\u0430\u0442\u043e\u043d \u043d\u0441\u043a \u043e\u043a\u0442\u044f\u0431\u0440\u044c/.venv/bin/python",
+        "-B",
+        "checks/check_cart_mutations.py",
+        "--trace",
+        "benchmark/feign-wire-integration/cart",
+        "--output",
+        "benchmark/feign-wire-integration/cart/mutations"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 1.2476577919951524
+    }
+  ],
+  "targets_started": false
+}

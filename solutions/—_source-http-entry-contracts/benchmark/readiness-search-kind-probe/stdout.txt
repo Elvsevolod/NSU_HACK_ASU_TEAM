@@ -1,0 +1,50 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____ test_callback_encounter_order_and_method_return_consumer[indexOf-AB] _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-218/test_callback_encounter_order_0')
+operation = 'indexOf', expected_trace = 'AB'
+
+    @pytest.mark.parametrize('operation,expected_trace', [('indexOf', 'AB'), ('lastIndexOf', 'CB')])
+    def test_callback_encounter_order_and_method_return_consumer(tmp_path, operation, expected_trace):
+        p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;
+          class Key{String seen="";public boolean equals(Object x){seen=seen+x;return "B".equals(x);}}
+          class Api{int find(List<Object> values,Key key){return values.OPERATION(key);}
+            Object entry(){Key key=new Key();List<Object> values=Arrays.asList("A","B","C");
+              List<Object> alias=values;int pos=find(values,key);
+              return Arrays.asList(pos,key.seen,alias.get(0),alias.get(2),alias==values);}}'''.replace('OPERATION',operation)})
+        e=Engine(p,ScenarioState(db));result=e.run(ids['Api.entry'],{})
+>       assert result == [1, expected_trace, 'A', 'C', True], (result, sorted(e.warnings), e.effect_events)
+E       AssertionError: ([1, 'AB', <Unknown.VALUE: 'unknown'>, <Unknown.VALUE: 'unknown'>, True], ['implicit reference cast context or runtime...Object>,Key)@3:69', 'declared_return': 'int', 'membership_known': True, 'model_version': 'native-list-search/1', ...}])
+E       assert [1, 'AB', <Un...known'>, True] == [1, 'AB', 'A', 'C', True]
+E         
+E         At index 2 diff: <Unknown.VALUE: 'unknown'> != 'A'
+E         Use -v to get more diff
+
+code/tests/test_list_search_contracts.py:48: AssertionError
+___ test_callback_encounter_order_and_method_return_consumer[lastIndexOf-CB] ___
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-218/test_callback_encounter_order_1')
+operation = 'lastIndexOf', expected_trace = 'CB'
+
+    @pytest.mark.parametrize('operation,expected_trace', [('indexOf', 'AB'), ('lastIndexOf', 'CB')])
+    def test_callback_encounter_order_and_method_return_consumer(tmp_path, operation, expected_trace):
+        p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;
+          class Key{String seen="";public boolean equals(Object x){seen=seen+x;return "B".equals(x);}}
+          class Api{int find(List<Object> values,Key key){return values.OPERATION(key);}
+            Object entry(){Key key=new Key();List<Object> values=Arrays.asList("A","B","C");
+              List<Object> alias=values;int pos=find(values,key);
+              return Arrays.asList(pos,key.seen,alias.get(0),alias.get(2),alias==values);}}'''.replace('OPERATION',operation)})
+        e=Engine(p,ScenarioState(db));result=e.run(ids['Api.entry'],{})
+>       assert result == [1, expected_trace, 'A', 'C', True], (result, sorted(e.warnings), e.effect_events)
+E       AssertionError: ([1, 'CB', <Unknown.VALUE: 'unknown'>, <Unknown.VALUE: 'unknown'>, True], ['implicit reference cast context or runtime...Object>,Key)@3:69', 'declared_return': 'int', 'membership_known': True, 'model_version': 'native-list-search/1', ...}])
+E       assert [1, 'CB', <Un...known'>, True] == [1, 'CB', 'A', 'C', True]
+E         
+E         At index 2 diff: <Unknown.VALUE: 'unknown'> != 'A'
+E         Use -v to get more diff
+
+code/tests/test_list_search_contracts.py:48: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_list_search_contracts.py::test_callback_encounter_order_and_method_return_consumer[indexOf-AB]
+FAILED code/tests/test_list_search_contracts.py::test_callback_encounter_order_and_method_return_consumer[lastIndexOf-CB]
+2 failed, 9 deselected in 0.11s

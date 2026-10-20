@@ -1,0 +1,70 @@
+--- E20-response-only-history/analyzer/contracts.py
++++ E21-history-choice-guards/analyzer/contracts.py
+@@ -363,7 +363,9 @@
+         if explicit is not None:
+             return explicit
+         ranked = self.index.rank(action, state.browser.get('active_page'), scenario_text)
+-        constrained = self.source_history_choice(action,state) if not ranked else []
++        constraint_error=None
++        try:constrained = self.source_history_choice(action,state) if not ranked else []
++        except LiteralBodyError as error:constrained=[];constraint_error=str(error)
+         if constrained:ranked=constrained
+         candidates = [c['entry'] for _, _, c in ranked[:6]]
+         detail = {'candidates': candidates, 'ranking': [
+@@ -375,6 +377,10 @@
+             detail['grounding_status']='source_history_constraint'
+             detail['source_history_constraint']=deepcopy(constrained[0][2]['history_constraint'])
+         detail['certainty_note'] = 'Graph certainty is conditional on the selected source contract and validated bindings'
++        if constraint_error:
++            detail['grounding_status']='invalid_or_ambiguous_inline_json_body'
++            detail['unresolved']=[constraint_error]
++            return [],detail
+         if not ranked:
+             detail['unresolved'] = ['No lexical evidence for a source request']
+             return [], detail
+@@ -466,6 +472,11 @@
+             not re.search(r'\b(?:just|newly|recently|previously)\s+(?:created|added|registered|saved)\b',action,re.I) or
+             re.search(r'\b(?:all|every|each|both|list|collection)\b',action,re.I)):
+             return []
++        words=set(self.index.tokenize(action))
++        mentioned={frozenset(entity) for contract in self.index.contracts.values()
++            for entity in [contract['owner_entity'],*contract['result_entities'],*contract['inferred_result_entities']]
++            if entity and entity<=words}
++        if len(mentioned)>1:return []
+         from .result_contracts import result_shape
+         from .history_refs import object_scope
+         from .history_agreement import key,observation
+--- E20-response-only-history/tests/test_history_request_choice33.py
++++ E21-history-choice-guards/tests/test_history_request_choice33.py
+@@ -11,11 +11,11 @@
+ from analyzer.state import ScenarioState,U
+ 
+ 
+-def fixture(root,extra=''):
++def fixture(root,extra='',declarations=''):
+     p,db,ids=build(root,{'Api.java':'''import org.springframework.web.bind.annotation.*;
+       import java.util.List;
+       class Parcel{public Long id;public String name;}
+-      @RestController class ParcelController{
++      '''+declarations+'''@RestController class ParcelController{
+       @PostMapping("/parcels") Parcel create(@RequestBody Parcel parcel){return parcel;}
+       @GetMapping("/parcels/{id}") Parcel getById(@PathVariable Long id){return null;}
+       @GetMapping("/parcels") List<Parcel> getAll(){return null;}
+@@ -165,3 +165,17 @@
+     assert len(proposals)==1 and proposals[0]['params']=={'id':7}
+     assert proposals[0]['bindings']['id']['reference']=='history[1].result.id'
+     assert detail['source_history_constraint']['value_producer']['step']==2
++
++
++def test_a_compound_request_cannot_be_reduced_to_reading_only_one_entity(tmp_path):
++    p,ids,g,state=fixture(tmp_path,extra='''@GetMapping("/depots/{id}")
++      Depot getDepot(@PathVariable Long id){return null;}''',declarations='class Depot{public Long id;}')
++    proposals,detail=g.step('Read the parcel just created together with depot 9',state)
++    assert not proposals and detail['unresolved']
++
++
++def test_invalid_read_body_is_reported_even_when_retrieval_first_refuses_a_tie(tmp_path):
++    p,ids,g,state=fixture(tmp_path)
++    proposals,detail=g.step('Read the parcel just created: {"junk":1}',state)
++    assert not proposals and detail['unresolved']
++    assert detail['grounding_status']=='invalid_or_ambiguous_inline_json_body'

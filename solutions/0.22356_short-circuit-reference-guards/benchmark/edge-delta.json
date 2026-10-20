@@ -1,0 +1,452 @@
+{
+  "S0": {
+    "added": [],
+    "removed": [],
+    "before": {
+      "calls": 15,
+      "executes": 30,
+      "data": 7
+    },
+    "after": {
+      "calls": 15,
+      "executes": 30,
+      "data": 7
+    }
+  },
+  "S1": {
+    "added": [],
+    "removed": [],
+    "before": {
+      "executes": 66,
+      "calls": 50,
+      "remote": 5,
+      "data": 14
+    },
+    "after": {
+      "executes": 66,
+      "calls": 50,
+      "remote": 5,
+      "data": 14
+    }
+  },
+  "S2": {
+    "added": [],
+    "removed": [],
+    "before": {
+      "executes": 78,
+      "calls": 64,
+      "data": 12,
+      "remote": 5
+    },
+    "after": {
+      "executes": 78,
+      "calls": 64,
+      "data": 12,
+      "remote": 5
+    }
+  },
+  "S3": {
+    "added": [],
+    "removed": [],
+    "before": {
+      "executes": 59,
+      "calls": 44,
+      "data": 13,
+      "remote": 2
+    },
+    "after": {
+      "executes": 59,
+      "calls": 44,
+      "data": 13,
+      "remote": 2
+    }
+  },
+  "S4": {
+    "added": [],
+    "removed": [],
+    "before": {
+      "executes": 55,
+      "calls": 46,
+      "data": 10,
+      "remote": 3
+    },
+    "after": {
+      "executes": 55,
+      "calls": 46,
+      "data": 10,
+      "remote": 3
+    }
+  },
+  "S5": {
+    "added": [
+      [
+        "method:ts-execute-service:execute.controller.ExecuteControlller#executeTicket(java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#ticketExecute(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#ticketExecute(java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "method:ts-inside-payment-service:inside_payment.service.InsidePaymentServiceImpl#pay(inside_payment.entity.PaymentInfo,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-common:edu.fudan.common.entity.OrderStatus#getCode()"
+      ],
+      [
+        "scenario:S5",
+        "executes",
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#ticketExecute(java.lang.String,org.springframework.http.HttpHeaders)"
+      ]
+    ],
+    "removed": [
+      [
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#executeOrder(java.lang.String,int,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#getServiceUrl(java.lang.String)"
+      ],
+      [
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#executeOrder(java.lang.String,int,org.springframework.http.HttpHeaders)",
+        "remote",
+        "method:ts-order-service:order.controller.OrderController#modifyOrder(java.lang.String,int,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#getOrderByIdFromOrder(java.lang.String,org.springframework.http.HttpHeaders)",
+        "remote",
+        "method:ts-order-service:order.controller.OrderController#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#getOrderByIdFromOrderOther(java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#getServiceUrl(java.lang.String)"
+      ],
+      [
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#ticketCollect(java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-common:edu.fudan.common.entity.OrderStatus#getCode()"
+      ],
+      [
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#ticketCollect(java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#executeOrder(java.lang.String,int,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#ticketCollect(java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#getOrderByIdFromOrderOther(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "method:ts-inside-payment-service:inside_payment.service.InsidePaymentServiceImpl#pay(inside_payment.entity.PaymentInfo,org.springframework.http.HttpHeaders)",
+        "remote",
+        "method:ts-order-service:order.controller.OrderController#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "method:ts-order-service:order.controller.OrderController#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.service.OrderServiceImpl#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "method:ts-order-service:order.controller.OrderController#modifyOrder(java.lang.String,int,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.service.OrderServiceImpl#modifyOrder(java.lang.String,int,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.entity.OrderInfo#getLoginId()"
+      ],
+      [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrdersForRefresh(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)",
+        "data",
+        "res:table:ts-order-service.orders"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#modifyOrder(java.lang.String,int,org.springframework.http.HttpHeaders)",
+        "data",
+        "res:table:ts-order-service.orders"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrders(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.entity.OrderInfo#getLoginId()"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrders(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.entity.OrderInfo#isEnableBoughtDateQuery()"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrders(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.entity.OrderInfo#isEnableStateQuery()"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrders(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.entity.OrderInfo#isEnableTravelDateQuery()"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrders(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)",
+        "data",
+        "res:table:ts-order-service.orders"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrdersForRefresh(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrders(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "scenario:S5",
+        "executes",
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#executeOrder(java.lang.String,int,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "scenario:S5",
+        "executes",
+        "method:ts-execute-service:execute.serivce.ExecuteServiceImpl#getOrderByIdFromOrderOther(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "scenario:S5",
+        "executes",
+        "method:ts-order-service:order.controller.OrderController#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "scenario:S5",
+        "executes",
+        "method:ts-order-service:order.controller.OrderController#modifyOrder(java.lang.String,int,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "scenario:S5",
+        "executes",
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "scenario:S5",
+        "executes",
+        "method:ts-order-service:order.entity.OrderInfo#getLoginId()"
+      ],
+      [
+        "scenario:S5",
+        "executes",
+        "method:ts-order-service:order.entity.OrderInfo#isEnableBoughtDateQuery()"
+      ],
+      [
+        "scenario:S5",
+        "executes",
+        "method:ts-order-service:order.entity.OrderInfo#isEnableStateQuery()"
+      ],
+      [
+        "scenario:S5",
+        "executes",
+        "method:ts-order-service:order.entity.OrderInfo#isEnableTravelDateQuery()"
+      ],
+      [
+        "scenario:S5",
+        "executes",
+        "method:ts-order-service:order.service.OrderServiceImpl#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "scenario:S5",
+        "executes",
+        "method:ts-order-service:order.service.OrderServiceImpl#modifyOrder(java.lang.String,int,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "scenario:S5",
+        "executes",
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrders(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "scenario:S5",
+        "executes",
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrdersForRefresh(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)"
+      ]
+    ],
+    "before": {
+      "executes": 98,
+      "calls": 101,
+      "remote": 13,
+      "data": 10
+    },
+    "after": {
+      "executes": 86,
+      "calls": 90,
+      "remote": 10,
+      "data": 7
+    }
+  },
+  "S6": {
+    "added": [
+      [
+        "method:ts-inside-payment-service:inside_payment.service.InsidePaymentServiceImpl#pay(inside_payment.entity.PaymentInfo,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-common:edu.fudan.common.entity.OrderStatus#getCode()"
+      ],
+      [
+        "scenario:S6",
+        "executes",
+        "method:ts-common:edu.fudan.common.entity.OrderStatus#getCode()"
+      ]
+    ],
+    "removed": [
+      [
+        "method:ts-admin-order-service:adminorder.service.AdminOrderServiceImpl#getAllOrders(org.springframework.http.HttpHeaders)",
+        "remote",
+        "method:ts-order-service:order.controller.OrderController#findAllOrder(org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "method:ts-inside-payment-service:inside_payment.service.InsidePaymentServiceImpl#pay(inside_payment.entity.PaymentInfo,org.springframework.http.HttpHeaders)",
+        "remote",
+        "method:ts-order-service:order.controller.OrderController#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "method:ts-order-service:order.controller.OrderController#findAllOrder(org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.service.OrderServiceImpl#getAllOrders(org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "method:ts-order-service:order.controller.OrderController#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.service.OrderServiceImpl#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.entity.OrderInfo#getLoginId()"
+      ],
+      [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrdersForRefresh(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#getAllOrders(org.springframework.http.HttpHeaders)",
+        "data",
+        "res:table:ts-order-service.orders"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)",
+        "data",
+        "res:table:ts-order-service.orders"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrders(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.entity.OrderInfo#getLoginId()"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrders(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.entity.OrderInfo#isEnableBoughtDateQuery()"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrders(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.entity.OrderInfo#isEnableStateQuery()"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrders(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.entity.OrderInfo#isEnableTravelDateQuery()"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrders(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)",
+        "data",
+        "res:table:ts-order-service.orders"
+      ],
+      [
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrdersForRefresh(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)",
+        "calls",
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrders(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "scenario:S6",
+        "executes",
+        "method:ts-order-service:order.controller.OrderController#findAllOrder(org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "scenario:S6",
+        "executes",
+        "method:ts-order-service:order.controller.OrderController#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "scenario:S6",
+        "executes",
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "scenario:S6",
+        "executes",
+        "method:ts-order-service:order.entity.OrderInfo#getLoginId()"
+      ],
+      [
+        "scenario:S6",
+        "executes",
+        "method:ts-order-service:order.entity.OrderInfo#isEnableBoughtDateQuery()"
+      ],
+      [
+        "scenario:S6",
+        "executes",
+        "method:ts-order-service:order.entity.OrderInfo#isEnableStateQuery()"
+      ],
+      [
+        "scenario:S6",
+        "executes",
+        "method:ts-order-service:order.entity.OrderInfo#isEnableTravelDateQuery()"
+      ],
+      [
+        "scenario:S6",
+        "executes",
+        "method:ts-order-service:order.service.OrderServiceImpl#getAllOrders(org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "scenario:S6",
+        "executes",
+        "method:ts-order-service:order.service.OrderServiceImpl#getOrderById(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "scenario:S6",
+        "executes",
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrders(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      [
+        "scenario:S6",
+        "executes",
+        "method:ts-order-service:order.service.OrderServiceImpl#queryOrdersForRefresh(order.entity.OrderInfo,java.lang.String,org.springframework.http.HttpHeaders)"
+      ]
+    ],
+    "before": {
+      "executes": 85,
+      "calls": 69,
+      "remote": 9,
+      "data": 12
+    },
+    "after": {
+      "executes": 75,
+      "calls": 61,
+      "remote": 7,
+      "data": 9
+    }
+  },
+  "S7": {
+    "added": [],
+    "removed": [],
+    "before": {
+      "executes": 73,
+      "calls": 59,
+      "remote": 6,
+      "data": 11
+    },
+    "after": {
+      "executes": 73,
+      "calls": 59,
+      "remote": 6,
+      "data": 11
+    }
+  }
+}

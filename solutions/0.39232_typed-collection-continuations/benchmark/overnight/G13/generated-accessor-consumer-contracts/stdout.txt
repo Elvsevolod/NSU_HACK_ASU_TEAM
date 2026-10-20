@@ -1,0 +1,41 @@
+...................F...........F..............                           [100%]
+=================================== FAILURES ===================================
+_________ test_erased_map_value_can_flow_into_source_generated_setter __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-299/test_erased_map_value_can_flow0')
+
+    def test_erased_map_value_can_flow_into_source_generated_setter(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;@Data class Code{String label;}
+          @Data class Holder{Code code;}
+          class Api{Object entry(){Map<String,Code> codes=new HashMap<>();Code code=new Code();code.label="kept";codes.put("x",code);
+          Holder holder=new Holder();holder.setCode(codes.get("x"));return holder.getCode().label;}}'''})
+>       e=Engine(p,ScenarioState(db));assert e.run(ids['Api.entry'],{})=='kept',e.warnings
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: {'Java Map operation remains unresolved: get at call:method:service:Api#entry()@4:55', 'implicit reference cast context or runtime kind is unresolved: call:method:service:Api#entry()@4:55 -> <unresolved consumer>'}
+E       assert <Unknown.VALUE: 'unknown'> == 'kept'
+E        +  where <Unknown.VALUE: 'unknown'> = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1066aab90>.run
+
+code/tests/test_bulk_consumer_types.py:115: AssertionError
+_________ test_source_generated_getters_need_no_invented_method_edges __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-299/test_source_generated_getters_0')
+
+    def test_source_generated_getters_need_no_invented_method_edges(tmp_path):
+        source=SOURCE.replace('class Plan {','@Data class Plan {').replace('class Item {','@Data class Item {')
+        source=source.replace('List<String> stops(){return stations;}','').replace('String from(){return origin;}String to(){return destination;}','')
+        source=source.replace('.stops()','.getStations()').replace('.from()','.getOrigin()').replace('.to()','.getDestination()')
+        p,db,ids=build(tmp_path,{'Api.java':source});paths=run_paths(p,ScenarioState(db),ids['Api.entry'],{},limit=1)
+>       assert len(paths)==1 and list(paths[0]['result'])==['A']
+E       AssertionError: assert (1 == 1 and [<Unknown.VAL...E: 'unknown'>] == ['A']
+E        +  where 1 = len([{'approximate': True, 'decisions': {}, 'engine': <analyzer.engine.Engine object at 0x1066b0e90>, 'pruned_paths': [], ...}])
+E         
+E         At index 0 diff: <Unknown.VALUE: 'unknown'> != 'A'
+E         Left contains 2 more items, first extra item: <Unknown.VALUE: 'unknown'>
+E         Use -v to get more diff)
+
+code/tests/test_commuting_map_filter.py:124: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_bulk_consumer_types.py::test_erased_map_value_can_flow_into_source_generated_setter
+FAILED code/tests/test_commuting_map_filter.py::test_source_generated_getters_need_no_invented_method_edges
+2 failed, 44 passed in 1.63s

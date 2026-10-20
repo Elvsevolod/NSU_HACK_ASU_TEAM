@@ -1,0 +1,69 @@
+{
+  "status": "not_run",
+  "recorded_at": "2026-10-18T20:09:53.579989+00:00",
+  "new_prediction_run": false,
+  "reason": "No complete genuinely new real Java/Spring source package with an already supplied skeleton, initial context, explicit+NL scenarios and a source-frozen independent checker/oracle was supplied or found in the checked input corpus.",
+  "checked_profiles": [
+    {
+      "path": "solutions/—_typed-collection-continuations/validation_inputs/shopping-cart",
+      "classification": "tuned in G07–G12; not fresh holdout",
+      "ready_skeletons": [
+        "solutions/—_typed-collection-continuations/validation_inputs/shopping-cart/order-service/skeleton.json",
+        "solutions/—_typed-collection-continuations/validation_inputs/shopping-cart/payment-service/skeleton.json",
+        "solutions/—_typed-collection-continuations/validation_inputs/shopping-cart/skeleton.json"
+      ],
+      "oracle_files": {
+        "solutions/—_typed-collection-continuations/validation_inputs/shopping-cart/oracle-v1.json": "34f6bb40967e3b86d2d45e9e59ecdcf36e261762359f270bd2e8a8a62aca163d",
+        "solutions/—_typed-collection-continuations/validation_inputs/shopping-cart/oracle-v2.json": "1e1a118fc11ba9500fdbe0ac2497d1cfe24819410ed74385ad0c830c0a625a50",
+        "solutions/—_typed-collection-continuations/validation_inputs/shopping-cart/oracle-v3.json": "0612d43076d5e00fe1223c35889c095c503e6999ab899fc73b6428ecc764c2b8"
+      }
+    },
+    {
+      "path": "solutions/—_typed-collection-continuations/validation_inputs/piggymetrics",
+      "classification": "existing parent29 real-source regression",
+      "ready_skeletons": [
+        "solutions/—_typed-collection-continuations/validation_inputs/piggymetrics/account-service/skeleton.json",
+        "solutions/—_typed-collection-continuations/validation_inputs/piggymetrics/auth-service/skeleton.json",
+        "solutions/—_typed-collection-continuations/validation_inputs/piggymetrics/skeleton.json",
+        "solutions/—_typed-collection-continuations/validation_inputs/piggymetrics/statistics-service/skeleton.json"
+      ],
+      "oracle_files": {}
+    },
+    {
+      "path": "solutions/—_typed-collection-continuations/validation_inputs/legacy-real",
+      "classification": "existing legacy Petclinic/PiggyMetrics corpus",
+      "ready_skeletons": [
+        "solutions/—_typed-collection-continuations/validation_inputs/legacy-real/petclinic-customers/skeleton.json",
+        "solutions/—_typed-collection-continuations/validation_inputs/legacy-real/piggymetrics-account/skeleton.json"
+      ],
+      "oracle_files": {
+        "solutions/—_typed-collection-continuations/validation_inputs/legacy-real/petclinic-customers/oracle.json": "c06a7f6dafbb769c1fa09d7c1cd5ed4adcc13b871145e480e081319cecab40cd",
+        "solutions/—_typed-collection-continuations/validation_inputs/legacy-real/piggymetrics-account/oracle.json": "7e678e9b8c8325b212ca3983d17b5b31209faaffe13edf7137a678240d55a000"
+      }
+    },
+    {
+      "path": "experiments/20261018-review-corpus/booking-journey",
+      "classification": "existing synthetic journey, explicitly not real-app portability",
+      "ready_skeletons": [
+        "experiments/20261018-review-corpus/booking-journey/skeleton.json"
+      ],
+      "oracle_files": {
+        "experiments/20261018-review-corpus/booking-journey/oracle.json": "7f5ff1040bd4fbc09fa31079417ad3e4f6dc8630b3920b2d92c2422fcafe8584"
+      }
+    }
+  ],
+  "missing_inputs": [
+    "new real application source/config at a pinned revision",
+    "ready graph skeleton for that application",
+    "declared deployment/authentication boundary and initial DB/context",
+    "explicit and NL stateful selection→mutation→remote→reread scenarios including refusal/ambiguity",
+    "source-derived pre-result oracle and negative-mutation checker"
+  ],
+  "not_substituted": [
+    "cart after tuning",
+    "synthetic/renamed Train Ticket or inventory",
+    "a generated skeleton or invented external package",
+    "downloaded models or target execution"
+  ],
+  "next_action": "Provide the five matching inputs as a new frozen package; preserve its first prediction before any tuning. G16–G18 continue independently."
+}

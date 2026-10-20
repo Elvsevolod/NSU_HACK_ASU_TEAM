@@ -1,0 +1,23 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_a_mapping_annotation_namesake_cannot_create_a_feign_http_method _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-114/test_a_mapping_annotation_name0')
+
+    def test_a_mapping_annotation_namesake_cannot_create_a_feign_http_method(tmp_path):
+        source='''import org.springframework.cloud.openfeign.FeignClient;
+          @interface GetMapping{String value();}
+          @FeignClient(name="service",url="http://service:8080")interface Client{@GetMapping("/read")String read();}
+          class Api{Client client;String entry(){return client.read();}}
+          @org.springframework.web.bind.annotation.RestController class Target{
+            @org.springframework.web.bind.annotation.GetMapping("/read")String read(){return "wrong";}}'''
+        p,db,ids=build(tmp_path,{'Api.java':source});e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Api.entry'],{}) is U and not outbound(e)
+E       AssertionError: assert ('wrong' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'wrong' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x103a7ce10>.run
+
+code/tests/test_feign_wire_controls33.py:105: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_feign_wire_controls33.py::test_a_mapping_annotation_namesake_cannot_create_a_feign_http_method
+1 failed, 11 deselected in 0.12s

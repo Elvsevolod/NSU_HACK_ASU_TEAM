@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "prepared_run": "benchmark/repeated-analysis-final.json",
+  "prepared_code_snapshot": "development/stages/G16-candidate-final",
+  "accepted_code_snapshot": "development/stages/G16-report-fastpath",
+  "changed_files": [
+    "analyzer/portable.py",
+    "analyzer/reporting.py",
+    "tests/test_reporting_measurements.py"
+  ],
+  "reason": "Only report-write fast path and its tests changed. Prepared runner calls analyze and unchanged finite_report; it never calls portable.main or dump_report. Exact packaged replay separately checks final code.",
+  "analysis_engine_and_prepared_runner_unchanged": true
+}

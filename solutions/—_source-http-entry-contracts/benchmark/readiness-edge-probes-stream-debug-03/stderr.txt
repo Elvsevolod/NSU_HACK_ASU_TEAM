@@ -1,0 +1,107 @@
+Traceback (most recent call last):
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/repros/readiness_stream_debug33.py", line 30, in <module>
+    runpy.run_path(sys.argv[0], run_name='__main__')
+  File "<frozen runpy>", line 291, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "checks/readiness_edge_probes33.py", line 72, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "checks/readiness_edge_probes33.py", line 61, in main
+    result=e.run(ids['Api.entry'],{'input':values})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 389, in run
+    result,_ = self.http_invoke(entry, args, 'scenario request', request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 481, in http_invoke
+    self.continue_filter(len(self.filter_frames)-1,0)
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 573, in continue_filter
+    frame['result']=self.invoke(frame['entry'],args,reason=frame['reason'],on_entry=entered)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 723, in invoke
+    return self._invoke(mid,args,receiver,reason,type_context,argument_kinds,on_entry)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 815, in _invoke
+    result, control = self.execute(body, env)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 1387, in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 1420, in execute_statement
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 1387, in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 1622, in execute_statement
+    return self.value(node, env), None
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 1676, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 2133, in expression_value
+    return self.value(node.named_children[0], env)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 1676, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 2116, in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/repros/readiness_stream_debug33.py", line 22, in observed_call
+    result = prior_call(self, node, env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 2688, in call
+    obj = self.value(objnode, env) if objnode else env.get('this', U)
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 1676, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 2116, in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/repros/readiness_stream_debug33.py", line 22, in observed_call
+    result = prior_call(self, node, env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 3479, in call
+    return apply_unknown(self,name,obj,args,env,declared,reason)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/call_effects.py", line 111, in apply_unknown
+    value,control=engine.fork_join([False,True],env,[callback],invoke_callback)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 905, in fork_join
+    value, control = operation(choice, owned['env'], owned['values'])
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/call_effects.py", line 107, in invoke_callback
+    if selected:engine.callback_value(values[0],[U]*count)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 3826, in callback_value
+    value, control = self.execute(body, local)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 1387, in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 1420, in execute_statement
+    value, control = self.execute(child, env)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 1387, in execute
+    try:return self.execute_statement(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 1611, in execute_statement
+    value=self.value(initializer,env)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 1676, in value
+    try:result=self.expression_value(node,env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 2116, in expression_value
+    return self.call(node, env)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/repros/readiness_stream_debug33.py", line 22, in observed_call
+    result = prior_call(self, node, env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 3363, in call
+    empty = self.choose(reason+':optional-empty',[True,False])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/elvsevolod/Desktop/учеба/Учёба 4 курс/хакатон нск октябрь/solutions/—_source-http-entry-contracts/development/stages/E26-history-boundary-controls/code/analyzer/engine.py", line 314, in choose
+    raise AlternativeRequired(key, choices)
+analyzer.engine.AlternativeRequired: ('1:call:method:service:Api#entry(List<String>)@5:68:optional-empty', [True, False])

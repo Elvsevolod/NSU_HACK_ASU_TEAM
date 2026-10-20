@@ -1,0 +1,250 @@
+FFFFFFFFFFFF....                                                         [100%]
+=================================== FAILURES ===================================
+_ test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[False-List] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-55/test_unknown_query_keeps_nonnu0')
+shape = 'List', unknown_database = False
+
+    @pytest.mark.parametrize('shape',['List','ArrayList','LinkedList','Collection','Set','HashSet'])
+    @pytest.mark.parametrize('unknown_database',[False,True])
+    def test_unknown_query_keeps_nonnull_shape_through_return_field_parameter(tmp_path,shape,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':source(shape)},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        paths=run_paths(project,ScenarioState(db),ids['Api.entry'],{'label':U},limit=4)
+        assert {row['result'] for row in paths}=={'after'}
+        value=Engine(project,ScenarioState(db)).run(ids['Api.expose'],{'label':U})
+        assert isinstance(value,JavaList) and value.opaque
+>       assert value.flavor==shape
+E       AssertionError: assert 'ArrayList' == 'List'
+E         
+E         - List
+E         + ArrayList
+
+code/tests/test_repository_collection_shapes33.py:36: AssertionError
+_ test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[False-ArrayList] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-55/test_unknown_query_keeps_nonnu1')
+shape = 'ArrayList', unknown_database = False
+
+    @pytest.mark.parametrize('shape',['List','ArrayList','LinkedList','Collection','Set','HashSet'])
+    @pytest.mark.parametrize('unknown_database',[False,True])
+    def test_unknown_query_keeps_nonnull_shape_through_return_field_parameter(tmp_path,shape,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':source(shape)},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        paths=run_paths(project,ScenarioState(db),ids['Api.entry'],{'label':U},limit=4)
+>       assert {row['result'] for row in paths}=={'after'}
+E       AssertionError: assert {'after', 'spurious-null'} == {'after'}
+E         
+E         Extra items in the left set:
+E         'spurious-null'
+E         Use -v to get more diff
+
+code/tests/test_repository_collection_shapes33.py:33: AssertionError
+_ test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[False-LinkedList] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-55/test_unknown_query_keeps_nonnu2')
+shape = 'LinkedList', unknown_database = False
+
+    @pytest.mark.parametrize('shape',['List','ArrayList','LinkedList','Collection','Set','HashSet'])
+    @pytest.mark.parametrize('unknown_database',[False,True])
+    def test_unknown_query_keeps_nonnull_shape_through_return_field_parameter(tmp_path,shape,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':source(shape)},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        paths=run_paths(project,ScenarioState(db),ids['Api.entry'],{'label':U},limit=4)
+>       assert {row['result'] for row in paths}=={'after'}
+E       AssertionError: assert {'after', 'spurious-null'} == {'after'}
+E         
+E         Extra items in the left set:
+E         'spurious-null'
+E         Use -v to get more diff
+
+code/tests/test_repository_collection_shapes33.py:33: AssertionError
+_ test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[False-Collection] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-55/test_unknown_query_keeps_nonnu3')
+shape = 'Collection', unknown_database = False
+
+    @pytest.mark.parametrize('shape',['List','ArrayList','LinkedList','Collection','Set','HashSet'])
+    @pytest.mark.parametrize('unknown_database',[False,True])
+    def test_unknown_query_keeps_nonnull_shape_through_return_field_parameter(tmp_path,shape,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':source(shape)},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        paths=run_paths(project,ScenarioState(db),ids['Api.entry'],{'label':U},limit=4)
+>       assert {row['result'] for row in paths}=={'after'}
+E       AssertionError: assert {'after', 'spurious-null'} == {'after'}
+E         
+E         Extra items in the left set:
+E         'spurious-null'
+E         Use -v to get more diff
+
+code/tests/test_repository_collection_shapes33.py:33: AssertionError
+_ test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[False-Set] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-55/test_unknown_query_keeps_nonnu4')
+shape = 'Set', unknown_database = False
+
+    @pytest.mark.parametrize('shape',['List','ArrayList','LinkedList','Collection','Set','HashSet'])
+    @pytest.mark.parametrize('unknown_database',[False,True])
+    def test_unknown_query_keeps_nonnull_shape_through_return_field_parameter(tmp_path,shape,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':source(shape)},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        paths=run_paths(project,ScenarioState(db),ids['Api.entry'],{'label':U},limit=4)
+>       assert {row['result'] for row in paths}=={'after'}
+E       AssertionError: assert {'after', 'spurious-null'} == {'after'}
+E         
+E         Extra items in the left set:
+E         'spurious-null'
+E         Use -v to get more diff
+
+code/tests/test_repository_collection_shapes33.py:33: AssertionError
+_ test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[False-HashSet] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-55/test_unknown_query_keeps_nonnu5')
+shape = 'HashSet', unknown_database = False
+
+    @pytest.mark.parametrize('shape',['List','ArrayList','LinkedList','Collection','Set','HashSet'])
+    @pytest.mark.parametrize('unknown_database',[False,True])
+    def test_unknown_query_keeps_nonnull_shape_through_return_field_parameter(tmp_path,shape,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':source(shape)},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        paths=run_paths(project,ScenarioState(db),ids['Api.entry'],{'label':U},limit=4)
+>       assert {row['result'] for row in paths}=={'after'}
+E       AssertionError: assert {'after', <Un...purious-null'} == {'after'}
+E         
+E         Extra items in the left set:
+E         <Unknown.VALUE: 'unknown'>
+E         'spurious-null'
+E         Use -v to get more diff
+
+code/tests/test_repository_collection_shapes33.py:33: AssertionError
+_ test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[True-List] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-55/test_unknown_query_keeps_nonnu6')
+shape = 'List', unknown_database = True
+
+    @pytest.mark.parametrize('shape',['List','ArrayList','LinkedList','Collection','Set','HashSet'])
+    @pytest.mark.parametrize('unknown_database',[False,True])
+    def test_unknown_query_keeps_nonnull_shape_through_return_field_parameter(tmp_path,shape,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':source(shape)},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        paths=run_paths(project,ScenarioState(db),ids['Api.entry'],{'label':U},limit=4)
+        assert {row['result'] for row in paths}=={'after'}
+        value=Engine(project,ScenarioState(db)).run(ids['Api.expose'],{'label':U})
+        assert isinstance(value,JavaList) and value.opaque
+>       assert value.flavor==shape
+E       AssertionError: assert 'ArrayList' == 'List'
+E         
+E         - List
+E         + ArrayList
+
+code/tests/test_repository_collection_shapes33.py:36: AssertionError
+_ test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[True-ArrayList] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-55/test_unknown_query_keeps_nonnu7')
+shape = 'ArrayList', unknown_database = True
+
+    @pytest.mark.parametrize('shape',['List','ArrayList','LinkedList','Collection','Set','HashSet'])
+    @pytest.mark.parametrize('unknown_database',[False,True])
+    def test_unknown_query_keeps_nonnull_shape_through_return_field_parameter(tmp_path,shape,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':source(shape)},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        paths=run_paths(project,ScenarioState(db),ids['Api.entry'],{'label':U},limit=4)
+>       assert {row['result'] for row in paths}=={'after'}
+E       AssertionError: assert {'after', 'spurious-null'} == {'after'}
+E         
+E         Extra items in the left set:
+E         'spurious-null'
+E         Use -v to get more diff
+
+code/tests/test_repository_collection_shapes33.py:33: AssertionError
+_ test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[True-LinkedList] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-55/test_unknown_query_keeps_nonnu8')
+shape = 'LinkedList', unknown_database = True
+
+    @pytest.mark.parametrize('shape',['List','ArrayList','LinkedList','Collection','Set','HashSet'])
+    @pytest.mark.parametrize('unknown_database',[False,True])
+    def test_unknown_query_keeps_nonnull_shape_through_return_field_parameter(tmp_path,shape,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':source(shape)},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        paths=run_paths(project,ScenarioState(db),ids['Api.entry'],{'label':U},limit=4)
+>       assert {row['result'] for row in paths}=={'after'}
+E       AssertionError: assert {'after', 'spurious-null'} == {'after'}
+E         
+E         Extra items in the left set:
+E         'spurious-null'
+E         Use -v to get more diff
+
+code/tests/test_repository_collection_shapes33.py:33: AssertionError
+_ test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[True-Collection] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-55/test_unknown_query_keeps_nonnu9')
+shape = 'Collection', unknown_database = True
+
+    @pytest.mark.parametrize('shape',['List','ArrayList','LinkedList','Collection','Set','HashSet'])
+    @pytest.mark.parametrize('unknown_database',[False,True])
+    def test_unknown_query_keeps_nonnull_shape_through_return_field_parameter(tmp_path,shape,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':source(shape)},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        paths=run_paths(project,ScenarioState(db),ids['Api.entry'],{'label':U},limit=4)
+>       assert {row['result'] for row in paths}=={'after'}
+E       AssertionError: assert {'after', 'spurious-null'} == {'after'}
+E         
+E         Extra items in the left set:
+E         'spurious-null'
+E         Use -v to get more diff
+
+code/tests/test_repository_collection_shapes33.py:33: AssertionError
+_ test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[True-Set] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-55/test_unknown_query_keeps_nonnu10')
+shape = 'Set', unknown_database = True
+
+    @pytest.mark.parametrize('shape',['List','ArrayList','LinkedList','Collection','Set','HashSet'])
+    @pytest.mark.parametrize('unknown_database',[False,True])
+    def test_unknown_query_keeps_nonnull_shape_through_return_field_parameter(tmp_path,shape,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':source(shape)},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        paths=run_paths(project,ScenarioState(db),ids['Api.entry'],{'label':U},limit=4)
+>       assert {row['result'] for row in paths}=={'after'}
+E       AssertionError: assert {'after', 'spurious-null'} == {'after'}
+E         
+E         Extra items in the left set:
+E         'spurious-null'
+E         Use -v to get more diff
+
+code/tests/test_repository_collection_shapes33.py:33: AssertionError
+_ test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[True-HashSet] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-55/test_unknown_query_keeps_nonnu11')
+shape = 'HashSet', unknown_database = True
+
+    @pytest.mark.parametrize('shape',['List','ArrayList','LinkedList','Collection','Set','HashSet'])
+    @pytest.mark.parametrize('unknown_database',[False,True])
+    def test_unknown_query_keeps_nonnull_shape_through_return_field_parameter(tmp_path,shape,unknown_database):
+        project,db,ids=build(tmp_path,{'Api.java':source(shape)},rows={'parcels':[{'id':'p1','label':'one'}]})
+        if unknown_database:db.unknown_tables.add(('service','parcels'))
+        paths=run_paths(project,ScenarioState(db),ids['Api.entry'],{'label':U},limit=4)
+>       assert {row['result'] for row in paths}=={'after'}
+E       AssertionError: assert {'after', <Un...purious-null'} == {'after'}
+E         
+E         Extra items in the left set:
+E         <Unknown.VALUE: 'unknown'>
+E         'spurious-null'
+E         Use -v to get more diff
+
+code/tests/test_repository_collection_shapes33.py:33: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_repository_collection_shapes33.py::test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[False-List]
+FAILED code/tests/test_repository_collection_shapes33.py::test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[False-ArrayList]
+FAILED code/tests/test_repository_collection_shapes33.py::test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[False-LinkedList]
+FAILED code/tests/test_repository_collection_shapes33.py::test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[False-Collection]
+FAILED code/tests/test_repository_collection_shapes33.py::test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[False-Set]
+FAILED code/tests/test_repository_collection_shapes33.py::test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[False-HashSet]
+FAILED code/tests/test_repository_collection_shapes33.py::test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[True-List]
+FAILED code/tests/test_repository_collection_shapes33.py::test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[True-ArrayList]
+FAILED code/tests/test_repository_collection_shapes33.py::test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[True-LinkedList]
+FAILED code/tests/test_repository_collection_shapes33.py::test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[True-Collection]
+FAILED code/tests/test_repository_collection_shapes33.py::test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[True-Set]
+FAILED code/tests/test_repository_collection_shapes33.py::test_unknown_query_keeps_nonnull_shape_through_return_field_parameter[True-HashSet]
+12 failed, 4 passed in 0.25s

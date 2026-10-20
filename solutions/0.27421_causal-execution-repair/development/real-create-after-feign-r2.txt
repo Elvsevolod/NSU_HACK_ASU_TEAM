@@ -1,0 +1,77 @@
+{
+  "result": {
+    "unknown": true
+  },
+  "outcome": "analysis completion budget exhausted",
+  "warnings": [
+    "Feign target handler is absent or ambiguous: call:method:account-service:AccountServiceImpl#create(User)@51:14",
+    "request bean validation is not fully modeled: method:account-service:AccountController#createNewAccount(User)"
+  ],
+  "effects": [],
+  "responses": [],
+  "data": [
+    {
+      "method": "method:account-service:AccountServiceImpl#create(User)",
+      "resource": "res:collection:account-service.accounts",
+      "operation": "findByName",
+      "arguments": [
+        "aurora"
+      ],
+      "source_site": "call:method:account-service:AccountServiceImpl#create(User)@48:33",
+      "uncertain_write": false,
+      "sql_emitted": false,
+      "datastore_event": true,
+      "transactional": false,
+      "emitted_by": "call:method:account-service:AccountServiceImpl#create(User)@48:33"
+    }
+  ],
+  "request": [
+    {
+      "id": 1,
+      "entry": "method:account-service:AccountController#createNewAccount(User)",
+      "reason": "scenario request",
+      "request": {
+        "deployment": "account-service",
+        "method": "POST",
+        "url": "/accounts/",
+        "path": [
+          "accounts"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {
+          "content-type": [
+            "application/json"
+          ],
+          "accept": [
+            "application/json"
+          ]
+        },
+        "body": {
+          "username": "aurora",
+          "password": "alpha-safe-pass"
+        },
+        "actor": {
+          "unknown": true
+        },
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {},
+        "provenance": []
+      },
+      "bound_arguments": [
+        {
+          "name": "user",
+          "declared_type": "com.piggymetrics.account.domain.User",
+          "value": {
+            "__type__": "com.piggymetrics.account.domain.User",
+            "__http_entity__": false,
+            "username": "aurora",
+            "password": "alpha-safe-pass"
+          }
+        }
+      ]
+    }
+  ]
+}

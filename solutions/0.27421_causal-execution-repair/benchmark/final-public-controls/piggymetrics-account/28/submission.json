@@ -1,0 +1,104 @@
+{
+  "project": "fixture",
+  "scenarios": {
+    "finance-refusal": {
+      "edges": [
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:Account#getExpenses()"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:Account#getIncomes()"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:Account#getLastSeen()"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:Account#getName()"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:Account#getNote()"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:Account#getSaving()"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:AccountController#createNewAccount(User)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:AccountController#getAccountByName(String)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:AccountServiceImpl#create(User)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:AccountServiceImpl#findByName(String)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:ErrorHandler#processValidationError(IllegalArgumentException)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:User#getUsername()"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:User#setPassword(String)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:User#setUsername(String)"
+        },
+        {
+          "source": "method:account:AccountController#createNewAccount(User)",
+          "relation": "calls",
+          "target": "method:account:AccountServiceImpl#create(User)"
+        },
+        {
+          "source": "method:account:AccountController#getAccountByName(String)",
+          "relation": "calls",
+          "target": "method:account:AccountServiceImpl#findByName(String)"
+        },
+        {
+          "source": "method:account:AccountServiceImpl#create(User)",
+          "relation": "calls",
+          "target": "method:account:User#getUsername()"
+        },
+        {
+          "source": "method:account:AccountServiceImpl#create(User)",
+          "relation": "data",
+          "target": "res:collection:account.accounts"
+        },
+        {
+          "source": "method:account:AccountServiceImpl#findByName(String)",
+          "relation": "data",
+          "target": "res:collection:account.accounts"
+        }
+      ]
+    }
+  }
+}

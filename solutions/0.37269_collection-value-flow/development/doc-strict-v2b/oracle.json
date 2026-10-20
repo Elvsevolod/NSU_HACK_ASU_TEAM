@@ -1,0 +1,723 @@
+{
+  "source": "manually enumerated in test_document_array_journey.expected before prediction",
+  "kind": "synthetic regression, not a public application",
+  "edges": [
+    [
+      [
+        "",
+        "executes",
+        "method:docs:DocumentController#listDocuments()"
+      ],
+      [
+        "",
+        "executes",
+        "method:portal:PortalGateway#decode(String,Class<T>)"
+      ],
+      [
+        "",
+        "executes",
+        "method:portal:PortalGateway#listDocuments()"
+      ],
+      [
+        "method:docs:DocumentController#listDocuments()",
+        "data",
+        "res:table:docs.documents"
+      ],
+      [
+        "method:portal:PortalGateway#listDocuments()",
+        "calls",
+        "method:portal:PortalGateway#decode(String,Class<T>)"
+      ],
+      [
+        "method:portal:PortalGateway#listDocuments()",
+        "remote",
+        "method:docs:DocumentController#listDocuments()"
+      ]
+    ],
+    [
+      [
+        "",
+        "executes",
+        "method:audit:AuditController#accept(String)"
+      ],
+      [
+        "",
+        "executes",
+        "method:docs:DocumentController#approveDocument(String,Approval)"
+      ],
+      [
+        "",
+        "executes",
+        "method:docs:DocumentController#fallback()"
+      ],
+      [
+        "",
+        "executes",
+        "method:portal:PortalGateway#approveDocument(Approval)"
+      ],
+      [
+        "method:docs:DocumentController#approveDocument(String,Approval)",
+        "calls",
+        "method:docs:DocumentController#fallback()"
+      ],
+      [
+        "method:docs:DocumentController#approveDocument(String,Approval)",
+        "data",
+        "res:table:docs.documents"
+      ],
+      [
+        "method:docs:DocumentController#approveDocument(String,Approval)",
+        "remote",
+        "method:audit:AuditController#accept(String)"
+      ],
+      [
+        "method:portal:PortalGateway#approveDocument(Approval)",
+        "remote",
+        "method:docs:DocumentController#approveDocument(String,Approval)"
+      ]
+    ],
+    [
+      [
+        "",
+        "executes",
+        "method:docs:DocumentController#listDocuments()"
+      ],
+      [
+        "",
+        "executes",
+        "method:portal:PortalGateway#decode(String,Class<T>)"
+      ],
+      [
+        "",
+        "executes",
+        "method:portal:PortalGateway#listDocuments()"
+      ],
+      [
+        "method:docs:DocumentController#listDocuments()",
+        "data",
+        "res:table:docs.documents"
+      ],
+      [
+        "method:portal:PortalGateway#listDocuments()",
+        "calls",
+        "method:portal:PortalGateway#decode(String,Class<T>)"
+      ],
+      [
+        "method:portal:PortalGateway#listDocuments()",
+        "remote",
+        "method:docs:DocumentController#listDocuments()"
+      ]
+    ]
+  ],
+  "values": [
+    [
+      {
+        "id": "D7",
+        "revision": 7,
+        "approved": false
+      }
+    ],
+    {
+      "id": "D7",
+      "revision": 8,
+      "approved": true
+    },
+    [
+      {
+        "id": "D7",
+        "revision": 8,
+        "approved": true
+      }
+    ]
+  ],
+  "version": 2,
+  "steps": [
+    {
+      "n": 1,
+      "wire": {
+        "explicit": {
+          "method": "GET",
+          "url": "/library",
+          "body": {
+            "missing": true
+          },
+          "headers": {},
+          "query": {}
+        },
+        "nl": {
+          "method": "GET",
+          "url": "/library",
+          "body": {
+            "missing": true
+          },
+          "headers": {
+            "__rest_unknown__": true
+          },
+          "query": {}
+        }
+      },
+      "arguments": [
+        [],
+        []
+      ],
+      "entries": [
+        "method:portal:PortalGateway#listDocuments()",
+        "method:docs:DocumentController#listDocuments()"
+      ],
+      "state": {
+        "explicit": {
+          "browser": {
+            "storage": {},
+            "form": {},
+            "dom": {},
+            "url": {},
+            "options": {},
+            "script": {}
+          },
+          "history": [],
+          "clock": {
+            "unknown": true
+          },
+          "database_rows": {
+            "docs.documents": 1
+          },
+          "unknown_tables": [],
+          "analysis_assumptions": [],
+          "limitations": [],
+          "tables": {
+            "docs.documents": [
+              {
+                "id": "D7",
+                "revision": 7,
+                "approved": 0
+              }
+            ]
+          }
+        },
+        "nl": {
+          "browser": {
+            "storage": {},
+            "form": {
+              "documents": [
+                {
+                  "id": "D7",
+                  "revision": 7,
+                  "approved": false
+                }
+              ]
+            },
+            "dom": {},
+            "url": {},
+            "options": {},
+            "script": {},
+            "pages": {},
+            "dom_text": {},
+            "script_unknown": false,
+            "active_page": "portal/page.html",
+            "source_options": []
+          },
+          "history": [
+            {
+              "step": 1,
+              "entry": "method:portal:PortalGateway#listDocuments()",
+              "action": "List documents"
+            }
+          ],
+          "clock": {
+            "unknown": true
+          },
+          "database_rows": {
+            "docs.documents": 1
+          },
+          "unknown_tables": [],
+          "analysis_assumptions": [
+            "step 1: unresolved source/request/state assumptions"
+          ],
+          "limitations": [],
+          "tables": {
+            "docs.documents": [
+              {
+                "id": "D7",
+                "revision": 7,
+                "approved": 0
+              }
+            ]
+          }
+        }
+      },
+      "result": [
+        {
+          "id": "D7",
+          "revision": 7,
+          "approved": false
+        }
+      ],
+      "statuses": [
+        [
+          2,
+          200
+        ],
+        [
+          1,
+          200
+        ]
+      ],
+      "diagnostics": {
+        "explicit": [
+          "codec_payload_projection"
+        ],
+        "nl": [
+          "codec_payload_projection"
+        ]
+      },
+      "edges": [
+        [
+          "",
+          "executes",
+          "method:docs:DocumentController#listDocuments()"
+        ],
+        [
+          "",
+          "executes",
+          "method:portal:PortalGateway#decode(String,Class<T>)"
+        ],
+        [
+          "",
+          "executes",
+          "method:portal:PortalGateway#listDocuments()"
+        ],
+        [
+          "method:docs:DocumentController#listDocuments()",
+          "data",
+          "res:table:docs.documents"
+        ],
+        [
+          "method:portal:PortalGateway#listDocuments()",
+          "calls",
+          "method:portal:PortalGateway#decode(String,Class<T>)"
+        ],
+        [
+          "method:portal:PortalGateway#listDocuments()",
+          "remote",
+          "method:docs:DocumentController#listDocuments()"
+        ]
+      ]
+    },
+    {
+      "n": 2,
+      "wire": {
+        "explicit": {
+          "method": "POST",
+          "url": "/library/approve",
+          "body": {
+            "id": "D7",
+            "revision": 7,
+            "approved": true
+          },
+          "headers": {
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "query": {}
+        },
+        "nl": {
+          "method": "POST",
+          "url": "/library/approve",
+          "body": {
+            "id": "D7",
+            "revision": 7,
+            "approved": true
+          },
+          "headers": {
+            "__rest_unknown__": true,
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "query": {}
+        }
+      },
+      "arguments": [
+        [
+          {
+            "name": "input",
+            "declared_type": "Approval",
+            "value": {
+              "id": "D7",
+              "revision": 7,
+              "approved": true
+            }
+          }
+        ],
+        [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "D7"
+          },
+          {
+            "name": "input",
+            "declared_type": "Approval",
+            "value": {
+              "id": "D7",
+              "revision": 7,
+              "approved": true
+            }
+          }
+        ],
+        [
+          {
+            "name": "id",
+            "declared_type": "java.lang.String",
+            "value": "D7"
+          }
+        ]
+      ],
+      "entries": [
+        "method:portal:PortalGateway#approveDocument(Approval)",
+        "method:docs:DocumentController#approveDocument(String,Approval)",
+        "method:audit:AuditController#accept(String)"
+      ],
+      "state": {
+        "explicit": {
+          "browser": {
+            "storage": {},
+            "form": {},
+            "dom": {},
+            "url": {},
+            "options": {},
+            "script": {}
+          },
+          "history": [],
+          "clock": {
+            "unknown": true
+          },
+          "database_rows": {
+            "docs.documents": 1
+          },
+          "unknown_tables": [],
+          "analysis_assumptions": [],
+          "limitations": [],
+          "tables": {
+            "docs.documents": [
+              {
+                "id": "D7",
+                "revision": 8,
+                "approved": true
+              }
+            ]
+          }
+        },
+        "nl": {
+          "browser": {
+            "storage": {},
+            "form": {
+              "documents": [
+                {
+                  "id": "D7",
+                  "revision": 7,
+                  "approved": false
+                }
+              ]
+            },
+            "dom": {},
+            "url": {},
+            "options": {},
+            "script": {},
+            "pages": {},
+            "dom_text": {},
+            "script_unknown": false,
+            "active_page": "portal/page.html",
+            "source_options": []
+          },
+          "history": [
+            {
+              "step": 1,
+              "entry": "method:portal:PortalGateway#listDocuments()",
+              "action": "List documents"
+            },
+            {
+              "step": 2,
+              "entry": "method:portal:PortalGateway#approveDocument(Approval)",
+              "action": "Approve the first document"
+            }
+          ],
+          "clock": {
+            "unknown": true
+          },
+          "database_rows": {
+            "docs.documents": 1
+          },
+          "unknown_tables": [],
+          "analysis_assumptions": [
+            "step 1: unresolved source/request/state assumptions"
+          ],
+          "limitations": [],
+          "tables": {
+            "docs.documents": [
+              {
+                "id": "D7",
+                "revision": 8,
+                "approved": true
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "id": "D7",
+        "revision": 8,
+        "approved": true
+      },
+      "statuses": [
+        [
+          3,
+          503
+        ],
+        [
+          2,
+          200
+        ],
+        [
+          1,
+          200
+        ]
+      ],
+      "diagnostics": {
+        "explicit": [],
+        "nl": [
+          "prior_analysis_assumption"
+        ]
+      },
+      "edges": [
+        [
+          "",
+          "executes",
+          "method:audit:AuditController#accept(String)"
+        ],
+        [
+          "",
+          "executes",
+          "method:docs:DocumentController#approveDocument(String,Approval)"
+        ],
+        [
+          "",
+          "executes",
+          "method:docs:DocumentController#fallback()"
+        ],
+        [
+          "",
+          "executes",
+          "method:portal:PortalGateway#approveDocument(Approval)"
+        ],
+        [
+          "method:docs:DocumentController#approveDocument(String,Approval)",
+          "calls",
+          "method:docs:DocumentController#fallback()"
+        ],
+        [
+          "method:docs:DocumentController#approveDocument(String,Approval)",
+          "data",
+          "res:table:docs.documents"
+        ],
+        [
+          "method:docs:DocumentController#approveDocument(String,Approval)",
+          "remote",
+          "method:audit:AuditController#accept(String)"
+        ],
+        [
+          "method:portal:PortalGateway#approveDocument(Approval)",
+          "remote",
+          "method:docs:DocumentController#approveDocument(String,Approval)"
+        ]
+      ]
+    },
+    {
+      "n": 3,
+      "wire": {
+        "explicit": {
+          "method": "GET",
+          "url": "/library",
+          "body": {
+            "missing": true
+          },
+          "headers": {},
+          "query": {}
+        },
+        "nl": {
+          "method": "GET",
+          "url": "/library",
+          "body": {
+            "missing": true
+          },
+          "headers": {
+            "__rest_unknown__": true
+          },
+          "query": {}
+        }
+      },
+      "arguments": [
+        [],
+        []
+      ],
+      "entries": [
+        "method:portal:PortalGateway#listDocuments()",
+        "method:docs:DocumentController#listDocuments()"
+      ],
+      "state": {
+        "explicit": {
+          "browser": {
+            "storage": {},
+            "form": {},
+            "dom": {},
+            "url": {},
+            "options": {},
+            "script": {}
+          },
+          "history": [],
+          "clock": {
+            "unknown": true
+          },
+          "database_rows": {
+            "docs.documents": 1
+          },
+          "unknown_tables": [],
+          "analysis_assumptions": [],
+          "limitations": [],
+          "tables": {
+            "docs.documents": [
+              {
+                "id": "D7",
+                "revision": 8,
+                "approved": true
+              }
+            ]
+          }
+        },
+        "nl": {
+          "browser": {
+            "storage": {},
+            "form": {
+              "documents": [
+                {
+                  "id": "D7",
+                  "revision": 8,
+                  "approved": true
+                }
+              ]
+            },
+            "dom": {},
+            "url": {},
+            "options": {},
+            "script": {},
+            "pages": {},
+            "dom_text": {},
+            "script_unknown": false,
+            "active_page": "portal/page.html",
+            "source_options": []
+          },
+          "history": [
+            {
+              "step": 1,
+              "entry": "method:portal:PortalGateway#listDocuments()",
+              "action": "List documents"
+            },
+            {
+              "step": 2,
+              "entry": "method:portal:PortalGateway#approveDocument(Approval)",
+              "action": "Approve the first document"
+            },
+            {
+              "step": 3,
+              "entry": "method:portal:PortalGateway#listDocuments()",
+              "action": "List documents"
+            }
+          ],
+          "clock": {
+            "unknown": true
+          },
+          "database_rows": {
+            "docs.documents": 1
+          },
+          "unknown_tables": [],
+          "analysis_assumptions": [
+            "step 1: unresolved source/request/state assumptions"
+          ],
+          "limitations": [],
+          "tables": {
+            "docs.documents": [
+              {
+                "id": "D7",
+                "revision": 8,
+                "approved": true
+              }
+            ]
+          }
+        }
+      },
+      "result": [
+        {
+          "id": "D7",
+          "revision": 8,
+          "approved": true
+        }
+      ],
+      "statuses": [
+        [
+          2,
+          200
+        ],
+        [
+          1,
+          200
+        ]
+      ],
+      "diagnostics": {
+        "explicit": [
+          "codec_payload_projection"
+        ],
+        "nl": [
+          "codec_payload_projection",
+          "prior_analysis_assumption"
+        ]
+      },
+      "edges": [
+        [
+          "",
+          "executes",
+          "method:docs:DocumentController#listDocuments()"
+        ],
+        [
+          "",
+          "executes",
+          "method:portal:PortalGateway#decode(String,Class<T>)"
+        ],
+        [
+          "",
+          "executes",
+          "method:portal:PortalGateway#listDocuments()"
+        ],
+        [
+          "method:docs:DocumentController#listDocuments()",
+          "data",
+          "res:table:docs.documents"
+        ],
+        [
+          "method:portal:PortalGateway#listDocuments()",
+          "calls",
+          "method:portal:PortalGateway#decode(String,Class<T>)"
+        ],
+        [
+          "method:portal:PortalGateway#listDocuments()",
+          "remote",
+          "method:docs:DocumentController#listDocuments()"
+        ]
+      ]
+    }
+  ],
+  "limits": [
+    "Codec failure completeness is explicitly unproven and its diagnostic must remain present",
+    "Synthetic regression, not new real-source holdout; native DTO metadata is checked separately from payload"
+  ]
+}

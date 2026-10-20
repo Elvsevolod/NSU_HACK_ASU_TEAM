@@ -1,0 +1,69 @@
+{
+  "project": "library",
+  "scenarios": {
+    "library-create-and-select": {
+      "edges": [
+        {
+          "source": "scenario:library-create-and-select",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#findAllByUser(Long)"
+        },
+        {
+          "source": "scenario:library-create-and-select",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findAllByUser(Long)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#findAllByUser(Long)",
+          "relation": "calls",
+          "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#findAllByUser(Long)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#findAllByUser(Long)",
+          "relation": "calls",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findAllByUser(Long)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findAllByUser(Long)",
+          "relation": "data",
+          "target": "res:table:order.book_order"
+        }
+      ]
+    },
+    "library-existing-order-state": {
+      "edges": []
+    },
+    "library-remote-refusal": {
+      "edges": [
+        {
+          "source": "scenario:library-remote-refusal",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#findAllByUser(Long)"
+        },
+        {
+          "source": "scenario:library-remote-refusal",
+          "relation": "executes",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findAllByUser(Long)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#findAllByUser(Long)",
+          "relation": "calls",
+          "target": "method:order:com.dhitha.lms.order.controller.BookOrderController#findAllByUser(Long)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.controller.BookOrderController#findAllByUser(Long)",
+          "relation": "calls",
+          "target": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findAllByUser(Long)"
+        },
+        {
+          "source": "method:order:com.dhitha.lms.order.service.BookOrderServiceImpl#findAllByUser(Long)",
+          "relation": "data",
+          "target": "res:table:order.book_order"
+        }
+      ]
+    },
+    "library-unordered-stock": {
+      "edges": []
+    }
+  }
+}

@@ -1,0 +1,19 @@
+.F..............                                                         [100%]
+=================================== FAILURES ===================================
+___ test_observed_native_kind_is_compatible_with_the_historical_typed_oracle ___
+
+    def test_observed_native_kind_is_compatible_with_the_historical_typed_oracle():
+        trace=positive()
+        for step in trace['steps']:
+            for alternative in step['alternatives']:
+                for event in alternative['requests']:
+                    for argument in event.get('bound_arguments',[]):argument['native_kind']='Long'
+>       result=evaluate(trace);assert result['passed'],result['errors']
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: ['1/0: root bound argument type/value differs', '2/0: root bound argument type/value differs', '2/0: remote controller...type/value differs', '4/0: root bound argument type/value differs', '5/0: root bound argument type/value differs', ...]
+E       assert False
+
+checks/tests/test_cart_evaluator_v3.py:39: AssertionError
+=========================== short test summary info ============================
+FAILED checks/tests/test_cart_evaluator_v3.py::test_observed_native_kind_is_compatible_with_the_historical_typed_oracle
+1 failed, 15 passed in 0.05s

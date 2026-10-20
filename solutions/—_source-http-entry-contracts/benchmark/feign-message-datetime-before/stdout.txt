@@ -1,0 +1,24 @@
+......F                                                                  [100%]
+=================================== FAILURES ===================================
+____ test_error_message_symbol_survives_the_report_datetime_representation _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-145/test_error_message_symbol_surv0')
+
+    def test_error_message_symbol_survives_the_report_datetime_representation(tmp_path):
+        e,ids=fixture(tmp_path,returned='Wire',body='new Wire()',
+            extra='class Wire{public java.time.LocalDateTime timestamp=java.time.LocalDateTime.now();}')
+        e.state.now=datetime(2026,1,2,3,4,5)
+        value=e.run(ids['Api.entry'],{})
+        assert value is not U and not e.approximate
+        recorded=json.loads(json.dumps(value,default=lambda value:value.isoformat()))
+        expected='feign-message-'+hashlib.sha256(json.dumps(recorded['__feign_error_message__'],sort_keys=True,ensure_ascii=True).encode()).hexdigest()[:20]
+>       assert recorded['__symbol__']==expected
+E       AssertionError: assert 'feign-messag...e6961d07e4408' == 'feign-messag...4a91edecd89f1'
+E         
+E         - feign-message-8606bc24a91edecd89f1
+E         + feign-message-17bf642e6961d07e4408
+
+code/tests/test_feign_error_message33.py:62: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_feign_error_message33.py::test_error_message_symbol_survives_the_report_datetime_representation
+1 failed, 6 passed in 0.16s

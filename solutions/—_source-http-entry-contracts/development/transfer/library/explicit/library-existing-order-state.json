@@ -1,0 +1,30 @@
+{
+  "id": "library-existing-order-state",
+  "project": "library",
+  "steps": [
+    {
+      "n": 1,
+      "action": "GET http://lms-order-service/api/orders/v1/100\nlms-key: 352019a6-1c73-11eb-adc1-0242ac120002"
+    },
+    {
+      "n": 2,
+      "action": "PUT http://lms-order-service/api/orders/v1/100/collect\nlms-key: 352019a6-1c73-11eb-adc1-0242ac120002"
+    },
+    {
+      "n": 3,
+      "action": "GET http://lms-order-service/api/orders/v1/100\nlms-key: 352019a6-1c73-11eb-adc1-0242ac120002"
+    },
+    {
+      "n": 4,
+      "action": "PUT http://lms-order-service/api/orders/v1/100/collect\nlms-key: 352019a6-1c73-11eb-adc1-0242ac120002"
+    },
+    {
+      "n": 5,
+      "action": "PUT http://lms-order-service/api/orders/v1/100/return\nlms-key: 352019a6-1c73-11eb-adc1-0242ac120002"
+    },
+    {
+      "n": 6,
+      "action": "GET http://lms-order-service/api/orders/v1/100\nlms-key: 352019a6-1c73-11eb-adc1-0242ac120002"
+    }
+  ]
+}

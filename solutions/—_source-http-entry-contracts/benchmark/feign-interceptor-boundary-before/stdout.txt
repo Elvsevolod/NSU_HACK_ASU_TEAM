@@ -1,0 +1,46 @@
+...........FF..                                                          [100%]
+=================================== FAILURES ===================================
+____ test_source_interceptor_effects_cannot_be_silently_skipped[component] _____
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-77/test_source_interceptor_effect0')
+registration = 'component'
+
+    @pytest.mark.parametrize('registration',['component','factory'])
+    def test_source_interceptor_effects_cannot_be_silently_skipped(tmp_path,registration):
+        extra='''import feign.RequestInterceptor;import feign.RequestTemplate;
+          import org.springframework.stereotype.Component;import org.springframework.context.annotation.*;'''
+        extra+=('@Component ' if registration=='component' else '')+'''
+          class Header implements RequestInterceptor{public void apply(RequestTemplate template){template.header("x-access","secret");}}'''
+        if registration=='factory':extra+='''@Configuration class Wiring{
+          @Bean RequestInterceptor outbound(){return new Header();}}'''
+        e,ids=fixture(tmp_path,'@FeignClient(name="service",path="/api/edition")',extra=extra)
+>       assert e.run(ids['Api.entry'],{}) is U and e.outcome=='unsupported_semantics boundary'
+E       AssertionError: assert ('item-7' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'item-7' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x1062c1910>.run
+
+code/tests/test_feign_path33.py:82: AssertionError
+_____ test_source_interceptor_effects_cannot_be_silently_skipped[factory] ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-77/test_source_interceptor_effect1')
+registration = 'factory'
+
+    @pytest.mark.parametrize('registration',['component','factory'])
+    def test_source_interceptor_effects_cannot_be_silently_skipped(tmp_path,registration):
+        extra='''import feign.RequestInterceptor;import feign.RequestTemplate;
+          import org.springframework.stereotype.Component;import org.springframework.context.annotation.*;'''
+        extra+=('@Component ' if registration=='component' else '')+'''
+          class Header implements RequestInterceptor{public void apply(RequestTemplate template){template.header("x-access","secret");}}'''
+        if registration=='factory':extra+='''@Configuration class Wiring{
+          @Bean RequestInterceptor outbound(){return new Header();}}'''
+        e,ids=fixture(tmp_path,'@FeignClient(name="service",path="/api/edition")',extra=extra)
+>       assert e.run(ids['Api.entry'],{}) is U and e.outcome=='unsupported_semantics boundary'
+E       AssertionError: assert ('item-7' is <Unknown.VALUE: 'unknown'>)
+E        +  where 'item-7' = run('method:service:Api#entry()', {})
+E        +    where run = <analyzer.engine.Engine object at 0x105d8a050>.run
+
+code/tests/test_feign_path33.py:82: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_feign_path33.py::test_source_interceptor_effects_cannot_be_silently_skipped[component]
+FAILED code/tests/test_feign_path33.py::test_source_interceptor_effects_cannot_be_silently_skipped[factory]
+2 failed, 13 passed in 0.15s

@@ -1,0 +1,29 @@
+{
+  "project": "holdout-employment-v1",
+  "scenarios": {
+    "employment-remote-error-nl-en": {
+      "edges": [
+        {
+          "source": "scenario:employment-remote-error-nl-en",
+          "relation": "executes",
+          "target": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getAllreview(Long)"
+        },
+        {
+          "source": "scenario:employment-remote-error-nl-en",
+          "relation": "executes",
+          "target": "method:reviewms:com.mohit.reviewms.Reviews.impl.reviewServiceImpl#getAllreview(Long)"
+        },
+        {
+          "source": "method:reviewms:com.mohit.reviewms.Reviews.ReviewController#getAllreview(Long)",
+          "relation": "calls",
+          "target": "method:reviewms:com.mohit.reviewms.Reviews.impl.reviewServiceImpl#getAllreview(Long)"
+        },
+        {
+          "source": "method:reviewms:com.mohit.reviewms.Reviews.impl.reviewServiceImpl#getAllreview(Long)",
+          "relation": "data",
+          "target": "res:table:review.review"
+        }
+      ]
+    }
+  }
+}

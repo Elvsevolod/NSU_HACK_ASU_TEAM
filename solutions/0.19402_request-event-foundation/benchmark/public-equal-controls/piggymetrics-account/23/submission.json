@@ -1,0 +1,34 @@
+{
+  "project": "fixture",
+  "scenarios": {
+    "finance-refusal": {
+      "edges": [
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:AccountController#getAccountByName(String)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:AccountServiceImpl#findByName(String)"
+        },
+        {
+          "source": "scenario:finance-refusal",
+          "relation": "executes",
+          "target": "method:account:AuthServiceClient#createUser(User)"
+        },
+        {
+          "source": "method:account:AccountController#getAccountByName(String)",
+          "relation": "calls",
+          "target": "method:account:AccountServiceImpl#findByName(String)"
+        },
+        {
+          "source": "method:account:AccountServiceImpl#findByName(String)",
+          "relation": "data",
+          "target": "res:collection:account.accounts"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,77 @@
+........................................................................ [  3%]
+........................................................................ [  6%]
+........................................................................ [ 10%]
+........................................................................ [ 13%]
+........................................................................ [ 17%]
+........................................................................ [ 20%]
+........................................................................ [ 24%]
+........................................................................ [ 27%]
+........................................................................ [ 31%]
+........................................................................ [ 34%]
+........................................................................ [ 38%]
+........................................................................ [ 41%]
+........................................................................ [ 45%]
+........................................................................ [ 48%]
+........................................................................ [ 52%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 62%]
+........................................................................ [ 66%]
+................................F....................................... [ 69%]
+........................................................................ [ 73%]
+........................................................................ [ 76%]
+........................................................................ [ 80%]
+........................................................................ [ 83%]
+........................................................................ [ 87%]
+........................................................................ [ 90%]
+........................................................................ [ 94%]
+........................................................................ [ 97%]
+..................................................                       [100%]
+=================================== FAILURES ===================================
+_____________ test_order_groups_survive_json_and_immutable_request _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-29/test_order_groups_survive_json0')
+
+    def test_order_groups_survive_json_and_immutable_request(tmp_path):
+        from analyzer.models import wire
+        from analyzer.request import Request
+        from analyzer.http_json import decode_response
+        rows=[{'id':1,'priority':10,'state':'OPEN'},{'id':2,'priority':10,'state':'OPEN'},{'id':3,'priority':20,'state':'OPEN'}]
+        p,db,ids=model(tmp_path,method='@Query("select r from Reservation r where r.state=?1 order by r.priority asc") List<Reservation> findByState(String state);',rows=rows)
+        e=Engine(p,ScenarioState(db));result=e.run(ids['Api.entry'],{})
+        payload=Request.http('service','POST','/rows',body=wire(result)).body
+>       decoded=decode_response(p,payload,'Reservation[]',p.methods[ids['Api.entry']],e.standard_type,
+            lambda message:pytest.fail(message))
+
+code/tests/test_repository_order32.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+code/analyzer/http_json.py:187: in decode_response
+    return decode(payload,response_type,meta)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/http_json.py:58: in decode
+    decoded=[decode(child,element,context,bindings,certain) for child in value]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/http_json.py:58: in <listcomp>
+    decoded=[decode(child,element,context,bindings,certain) for child in value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+code/analyzer/http_json.py:121: in decode
+    for message in limits:unresolved(message)
+                          ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+message = 'approximate JSON DTO field projection: non-public or transient fields require JSON visibility rules'
+
+>   lambda message:pytest.fail(message))
+                   ^^^^^^^^^^^^^^^^^^^^
+E   Failed: approximate JSON DTO field projection: non-public or transient fields require JSON visibility rules
+
+code/tests/test_repository_order32.py:130: Failed
+=============================== warnings summary ===============================
+checks/tests/test_archive_support.py::test_duplicate_symlink_or_corruption[options0]
+  /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/zipfile.py:1566: UserWarning: Duplicate name: 'submission.json'
+    return self._open_to_write(zinfo, force_zip64=force_zip64)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED code/tests/test_repository_order32.py::test_order_groups_survive_json_and_immutable_request
+1 failed, 2065 passed, 1 warning in 8.98s

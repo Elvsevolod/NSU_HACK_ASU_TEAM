@@ -1,0 +1,28 @@
+.........................F.................................              [100%]
+=================================== FAILURES ===================================
+_ test_selected_identity_needs_its_exact_completed_response_field[other-type] __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-181/test_selected_identity_needs_i3')
+mutation = 'other-type'
+
+    @pytest.mark.parametrize('mutation',[None,'other-path','other-value','other-type','other-producer'])
+    def test_selected_identity_needs_its_exact_completed_response_field(tmp_path,mutation):
+        p,ids,g,state=fixture(tmp_path);later=deepcopy(state.history[0])
+        later.update(step=2,entry=ids['ParcelController.getById'],action='Read the parcel')
+        selected={'entity':['parcel'],'value':7,'reference':'history[1].result.id',
+            'object':deepcopy(later['result']),'qualified_type':'Parcel','deployment':'service',
+            'producer_entry':ids['ParcelController.getById']}
+        if mutation=='other-path':selected['reference']='history[0].result.id'
+        elif mutation=='other-value':selected['value']=8
+        elif mutation=='other-type':selected['qualified_type']='Unrelated'
+        elif mutation=='other-producer':selected['producer_entry']=ids['ParcelController.create']
+        later['selected_objects']=[selected];state.history.append(later)
+        proposals,detail=g.step('Read the parcel just created again',state)
+>       assert bool(proposals)==(mutation is None)
+E       AssertionError: assert True == ('other-type' is None)
+E        +  where True = bool([{'actor': <Unknown.VALUE: 'unknown'>, 'bindings': {'id': {'producer_observation': {'digest': 'b8b0b1bec58d5c348bb621b...ult.id', 'resolved': True, ...}}, 'body_omissions': {}, 'entry': 'method:service:ParcelController#getById(Long)', ...}])
+
+code/tests/test_history_request_choice33.py:144: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_history_request_choice33.py::test_selected_identity_needs_its_exact_completed_response_field[other-type]
+1 failed, 58 passed in 0.31s

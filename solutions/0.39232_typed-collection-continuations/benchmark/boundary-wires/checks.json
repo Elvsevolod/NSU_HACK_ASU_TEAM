@@ -1,0 +1,508 @@
+{
+  "passed": true,
+  "admin_wire_does_not_borrow_dom_defaults": true,
+  "next_http_request_reads_joined_singleton_value": 10,
+  "actor_observations": [
+    {
+      "wire": {
+        "deployment": "service",
+        "method": "POST",
+        "url": "/login",
+        "path": [
+          "login"
+        ],
+        "query": {},
+        "query_complete": true,
+        "headers": {
+          "__rest_unknown__": true,
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "body": {},
+        "actor": "admin",
+        "session": {
+          "unknown": true
+        },
+        "body_properties": {
+          "input": {
+            "username": "present",
+            "password": "present"
+          }
+        },
+        "provenance": {
+          "username": {
+            "source": "actor_context",
+            "reference": "admin",
+            "quote": "",
+            "resolved": false,
+            "reason": "No established credentials for actor admin"
+          },
+          "password": {
+            "source": "actor_context",
+            "reference": "admin",
+            "quote": "",
+            "resolved": false,
+            "reason": "No established credentials for actor admin"
+          }
+        }
+      },
+      "requests": [
+        {
+          "id": 1,
+          "entry": "method:service:Login#login(Credentials)",
+          "reason": "scenario request",
+          "request": {
+            "deployment": "service",
+            "method": "POST",
+            "url": "/login",
+            "path": [
+              "login"
+            ],
+            "query": {},
+            "query_complete": true,
+            "headers": {
+              "__rest_unknown__": true,
+              "content-type": [
+                "application/json"
+              ]
+            },
+            "body": {},
+            "actor": "admin",
+            "session": {
+              "unknown": true
+            },
+            "body_properties": {
+              "input": {
+                "username": "present",
+                "password": "present"
+              }
+            },
+            "provenance": {
+              "username": {
+                "source": "actor_context",
+                "reference": "admin",
+                "quote": "",
+                "resolved": false,
+                "reason": "No established credentials for actor admin"
+              },
+              "password": {
+                "source": "actor_context",
+                "reference": "admin",
+                "quote": "",
+                "resolved": false,
+                "reason": "No established credentials for actor admin"
+              }
+            }
+          },
+          "authorization_checked": false,
+          "bound_arguments": [
+            {
+              "name": "input",
+              "declared_type": "Credentials",
+              "value": {
+                "__type__": "Credentials",
+                "__http_entity__": false,
+                "username": {
+                  "unknown": true
+                },
+                "password": {
+                  "unknown": true
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "result": {
+        "unknown": true
+      },
+      "responses": [],
+      "edges": [
+        [
+          "",
+          "executes",
+          "method:service:Gate#doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Login#login(Credentials)"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Profile#<init>(String,String,boolean)"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Profile#isAccountNonLocked()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Profile#isEnabled()"
+        ],
+        [
+          "",
+          "executes",
+          "method:service:Provider#loadUserByUsername(String)"
+        ],
+        [
+          "method:service:Provider#loadUserByUsername(String)",
+          "calls",
+          "method:service:Profile#<init>(String,String,boolean)"
+        ]
+      ],
+      "outcome": "unsupported_semantics boundary",
+      "diagnostics": [
+        "String receiver value is unknown: call:method:service:Provider#loadUserByUsername(String)@20:131",
+        "String receiver value is unknown: call:method:service:Provider#loadUserByUsername(String)@20:82",
+        "path budget: alternatives conservatively retained at call:method:service:Login#login(Credentials)@9:45:isEnabled",
+        "path budget: alternatives conservatively retained at method:service:Provider#loadUserByUsername(String):ternary:20",
+        "request filter registration is assumed from source classes; full bean registration is not modeled",
+        "security outcome needs isolated success/failure continuations: call:method:service:Login#login(Credentials)@9:45:isEnabled"
+      ],
+      "call_effects": [],
+      "data_operations": [],
+      "state_after": {
+        "browser": {
+          "active_page": "page.html",
+          "actor": "admin",
+          "dom": {
+            "#password": "secret",
+            "#username": "alice"
+          },
+          "dom_text": {},
+          "form": {},
+          "options": {},
+          "pages": {},
+          "script": {},
+          "script_unknown": false,
+          "source_options": [],
+          "storage": {},
+          "url": {}
+        },
+        "history": [],
+        "clock": {
+          "unknown": true
+        },
+        "database_rows": {},
+        "unknown_tables": [],
+        "analysis_assumptions": [],
+        "limitations": [
+          "state budget widening: conflicting database tables are unknown"
+        ],
+        "tables": {}
+      },
+      "heap_after": {
+        "$id": "h1",
+        "kind": "dict",
+        "fields": {
+          "actor_browsers": {
+            "$id": "h2",
+            "kind": "dict",
+            "fields": {}
+          },
+          "beans": {
+            "$id": "h3",
+            "kind": "dict",
+            "fields": {}
+          },
+          "browser": {
+            "$id": "h4",
+            "kind": "dict",
+            "fields": {
+              "active_page": "page.html",
+              "actor": "admin",
+              "dom": {
+                "$id": "h5",
+                "kind": "dict",
+                "fields": {
+                  "#password": "secret",
+                  "#username": "alice"
+                }
+              },
+              "dom_text": {
+                "$id": "h6",
+                "kind": "dict",
+                "fields": {}
+              },
+              "form": {
+                "$id": "h7",
+                "kind": "dict",
+                "fields": {}
+              },
+              "options": {
+                "$id": "h8",
+                "kind": "dict",
+                "fields": {}
+              },
+              "pages": {
+                "$id": "h9",
+                "kind": "dict",
+                "fields": {}
+              },
+              "script": {
+                "$id": "h10",
+                "kind": "dict",
+                "fields": {}
+              },
+              "script_unknown": false,
+              "source_options": {
+                "$id": "h11",
+                "kind": "list",
+                "fields": []
+              },
+              "storage": {
+                "$id": "h12",
+                "kind": "dict",
+                "fields": {}
+              },
+              "url": {
+                "$id": "h13",
+                "kind": "dict",
+                "fields": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "singleton": {
+    "schema": "producer-consumer/1",
+    "case": "singleton/actual-HTTP",
+    "steps": [
+      {
+        "step": 1,
+        "source_producers": [
+          {
+            "unmeasured_or_initial_context": true
+          }
+        ],
+        "preceding_step_result": {
+          "initial_context": true
+        },
+        "consumer_request": {
+          "deployment": "service",
+          "method": "POST",
+          "url": "/counter",
+          "path": [
+            "counter"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "body": {
+            "flag": {
+              "unknown": true
+            }
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": []
+        },
+        "actual_arguments": [
+          [
+            {
+              "name": "input",
+              "declared_type": "Patch",
+              "value": {
+                "__type__": "Patch",
+                "__http_entity__": false,
+                "flag": {
+                  "unknown": true
+                }
+              }
+            }
+          ]
+        ],
+        "result": 10,
+        "state_delta": {
+          "beans_and_aliases": {
+            "before": {
+              "missing": true
+            },
+            "after": {
+              "$id": "h1",
+              "kind": "dict",
+              "fields": {
+                "actor_browsers": {
+                  "$id": "h2",
+                  "kind": "dict",
+                  "fields": {}
+                },
+                "beans": {
+                  "$id": "h3",
+                  "kind": "dict",
+                  "fields": {
+                    "('service', 'type:service:Counter')": {
+                      "$id": "h4",
+                      "kind": "JavaObject",
+                      "fields": {
+                        "__http_entity__": false,
+                        "__type__": "Counter",
+                        "revision": 10
+                      },
+                      "attributes": {
+                        "declared_type": "Counter",
+                        "java_type": "Counter",
+                        "source_owner": "type:service:Counter",
+                        "wire_fields": {
+                          "unmeasured_type": "frozenset"
+                        }
+                      }
+                    }
+                  }
+                },
+                "browser": {
+                  "$id": "h5",
+                  "kind": "dict",
+                  "fields": {
+                    "dom": {
+                      "$id": "h6",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "form": {
+                      "$id": "h7",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "options": {
+                      "$id": "h8",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "script": {
+                      "$id": "h9",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "storage": {
+                      "$id": "h10",
+                      "kind": "dict",
+                      "fields": {}
+                    },
+                    "url": {
+                      "$id": "h11",
+                      "kind": "dict",
+                      "fields": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "browser": {
+            "before": {
+              "missing": true
+            },
+            "after": {
+              "dom": {},
+              "form": {},
+              "options": {},
+              "script": {},
+              "storage": {},
+              "url": {}
+            }
+          },
+          "database": {
+            "before": {
+              "missing": true
+            },
+            "after": {}
+          }
+        },
+        "per_step_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Api#write(Patch)"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Counter#set(boolean)"
+          ],
+          [
+            "method:service:Api#write(Patch)",
+            "calls",
+            "method:service:Counter#set(boolean)"
+          ]
+        ],
+        "diagnostics": [
+          "path budget: alternatives conservatively retained at method:service:Counter#set(boolean):4"
+        ],
+        "first_loss": "path budget: alternatives conservatively retained at method:service:Counter#set(boolean):4"
+      },
+      {
+        "step": 2,
+        "source_producers": [
+          {
+            "unmeasured_or_initial_context": true
+          }
+        ],
+        "preceding_step_result": 10,
+        "consumer_request": {
+          "deployment": "service",
+          "method": "GET",
+          "url": "/counter",
+          "path": [
+            "counter"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": {
+            "missing": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": []
+        },
+        "actual_arguments": [
+          []
+        ],
+        "result": 10,
+        "state_delta": {},
+        "per_step_edges": [
+          [
+            "",
+            "executes",
+            "method:service:Api#read()"
+          ],
+          [
+            "",
+            "executes",
+            "method:service:Counter#read()"
+          ],
+          [
+            "method:service:Api#read()",
+            "calls",
+            "method:service:Counter#read()"
+          ]
+        ],
+        "diagnostics": [],
+        "first_loss": null
+      }
+    ]
+  },
+  "scope": "unknown but valid typed flag; codec completeness diagnostics are retained"
+}

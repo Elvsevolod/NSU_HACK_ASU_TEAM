@@ -1,0 +1,122 @@
+........................................................................ [  4%]
+........................................................................ [  9%]
+........................................................................ [ 13%]
+........................................................................ [ 18%]
+........................................................................ [ 22%]
+........................................................................ [ 27%]
+........................................................................ [ 31%]
+........................................................................ [ 36%]
+........................................................................ [ 40%]
+........................................................................ [ 45%]
+..F...............................................F........F.....F...... [ 49%]
+..........F............................................................. [ 54%]
+........................................................................ [ 58%]
+........................................................................ [ 63%]
+........................................................................ [ 67%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+........................................................................ [ 81%]
+........................................................................ [ 85%]
+........................................................................ [ 90%]
+........................................................................ [ 95%]
+........................................................................ [ 99%]
+.......                                                                  [100%]
+=================================== FAILURES ===================================
+______ test_java_date_text_is_not_an_iso_string_and_numeric_parser_throws ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-120/test_java_date_text_is_not_an_0')
+
+    def test_java_date_text_is_not_an_iso_string_and_numeric_parser_throws(tmp_path):
+        project,db,ids=build(tmp_path,{'Api.java':'''class Api {long entry(){
+          Date date=new Date(0);String text=date.toString();
+          if(text.length()<=10){wrong();}
+          try {return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(text).getTime();}
+          catch(ParseException e){return 7;}}
+          void wrong(){}}'''})
+        outcomes=run_paths(project,ScenarioState(db),ids['Api.entry'],{})
+>       assert len(outcomes)==1 and outcomes[0]['result']==7
+E       AssertionError: assert (2 == 1)
+E        +  where 2 = len([{'approximate': False, 'decisions': {'1:method:service:Api#entry():3': True}, 'engine': <analyzer.engine.Engine objec...hod:service:Api#entry():3': False}, 'engine': <analyzer.engine.Engine object at 0x106080190>, 'pruned_paths': [], ...}])
+
+tests/test_java_date_text.py:16: AssertionError
+_______ test_deserialization_invokes_the_source_setter_before_returning ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-120/test_deserialization_invokes_t0')
+
+    def test_deserialization_invokes_the_source_setter_before_returning(tmp_path):
+        result,e,ids=run(tmp_path,'Item item=new ObjectMapper().readValue("{\\"name\\":\\"alpha\\"}",Item.class);return item.getName();',
+            'class Item{private String name;public void setName(String input){name=input.toUpperCase();}public String getName(){return name;}}')
+>       assert result=='ALPHA' and executed(e,ids,'Item.setName') and not e.approximate
+E       AssertionError: assert ({'__constraints__': ['non_null'], '__generation__': 'java.lang.String.toUpperCase', '__symbol__': 'path-scalar-1', '__type__': 'String'} == 'ALPHA')
+
+tests/test_json_bean_lifecycle.py:45: AssertionError
+____________ test_scenario_http_body_uses_the_same_setter_contract _____________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-120/test_scenario_http_body_uses_t0')
+
+    def test_scenario_http_body_uses_the_same_setter_contract(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''class Api{
+          @PostMapping("/items") String entry(@RequestBody Item input){return input.getName();}}
+          class Item{private String name;public void setName(String value){name=value.toUpperCase();}
+          public String getName(){return name;}}'''})
+        e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Api.entry'],{'name':'alpha'})=='ALPHA'
+E       AssertionError: assert {'__constraints__': ['non_null'], '__generation__': 'java.lang.String.toUpperCase', '__symbol__': 'path-scalar-1', '__type__': 'String'} == 'ALPHA'
+E        +  where {'__constraints__': ['non_null'], '__generation__': 'java.lang.String.toUpperCase', '__symbol__': 'path-scalar-1', '__type__': 'String'} = run('method:service:Api#entry(Item)', {'name': 'alpha'})
+E        +    where run = <analyzer.engine.Engine object at 0x105530bd0>.run
+
+tests/test_json_bean_lifecycle.py:103: AssertionError
+______ test_filter_context_does_not_change_the_controllers_body_contract _______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-120/test_filter_context_does_not_c0')
+
+    def test_filter_context_does_not_change_the_controllers_body_contract(tmp_path):
+        p,db,ids=build(tmp_path,{'Api.java':'''class Api{
+          @PostMapping("/items") String entry(@RequestBody Item input){return input.getName();}}
+          class Item{private String name;public void setName(String value){name=value.toUpperCase();}
+          public String getName(){return name;}}
+          class Gate extends OncePerRequestFilter{
+          void doFilterInternal(HttpServletRequest req,HttpServletResponse res,FilterChain chain){chain.doFilter(req,res);}}'''})
+        e=Engine(p,ScenarioState(db))
+>       assert e.run(ids['Api.entry'],{'name':'alpha'})=='ALPHA'
+E       AssertionError: assert {'__constraints__': ['non_null'], '__generation__': 'java.lang.String.toUpperCase', '__symbol__': 'path-scalar-1', '__type__': 'String'} == 'ALPHA'
+E        +  where {'__constraints__': ['non_null'], '__generation__': 'java.lang.String.toUpperCase', '__symbol__': 'path-scalar-1', '__type__': 'String'} = run('method:service:Api#entry(Item)', {'name': 'alpha'})
+E        +    where run = <analyzer.engine.Engine object at 0x10983d590>.run
+
+tests/test_json_bean_lifecycle.py:153: AssertionError
+_ test_ui_wire_properties_use_a_structured_body_when_java_field_names_differ[class Item{private String text;public void setName(String value){text=value.toUpperCase();}public String getName(){return text;}}-{name:"alpha"}-ALPHA] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-120/test_ui_wire_properties_use_a_1')
+bean = 'class Item{private String text;public void setName(String value){text=value.toUpperCase();}public String getName(){return text;}}'
+body = '{name:"alpha"}', expected = 'ALPHA'
+
+    @pytest.mark.parametrize('bean,body,expected',[
+        ('import lombok.Data;@Data class Item{private boolean isReady;}','{ready:true}',True),
+        ('class Item{private String text;public void setName(String value){text=value.toUpperCase();}public String getName(){return text;}}','{name:"alpha"}','ALPHA'),
+    ])
+    def test_ui_wire_properties_use_a_structured_body_when_java_field_names_differ(tmp_path,bean,body,expected):
+        from analyzer.contracts import ContractGrounder,ContractIndex
+        from analyzer.frontend import Frontend
+        imports='import lombok.Data;' if bean.startswith('import') else ''
+        bean=bean.removeprefix(imports)
+        read='isReady()' if expected is True else 'getName()'
+        typ='boolean' if expected is True else 'String'
+        p,db,ids=build(tmp_path,{'Api.java':imports+bean+'class Api{@PostMapping("/items") '+typ+' create(@RequestBody Item input){return input.'+read+';}}'})
+        (tmp_path/'page.html').write_text('<script src="ui.js"></script>')
+        (tmp_path/'ui.js').write_text('function create(){$.ajax({url:"/items",type:"POST",data:JSON.stringify('+body+')});}')
+        f=Frontend(p);proposal=ContractGrounder(p,f,ContractIndex(p,f),None,{'facts':{}}).step('Create item',ScenarioState(db))[0][0]
+        assert 'input' in proposal['params'] and not proposal['unresolved']
+        e=Engine(p,proposal['state'])
+>       assert e.run(proposal['entry'],proposal['params'])==expected and not e.approximate
+E       AssertionError: assert ({'__constraints__': ['non_null'], '__generation__': 'java.lang.String.toUpperCase', '__symbol__': 'path-scalar-1', '__type__': 'String'} == 'ALPHA')
+E        +  where {'__constraints__': ['non_null'], '__generation__': 'java.lang.String.toUpperCase', '__symbol__': 'path-scalar-1', '__type__': 'String'} = run('method:service:Api#create(Item)', {'input': {'name': 'alpha'}})
+E        +    where run = <analyzer.engine.Engine object at 0x1056b4b10>.run
+
+tests/test_json_bean_lifecycle.py:314: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_java_date_text.py::test_java_date_text_is_not_an_iso_string_and_numeric_parser_throws
+FAILED tests/test_json_bean_lifecycle.py::test_deserialization_invokes_the_source_setter_before_returning
+FAILED tests/test_json_bean_lifecycle.py::test_scenario_http_body_uses_the_same_setter_contract
+FAILED tests/test_json_bean_lifecycle.py::test_filter_context_does_not_change_the_controllers_body_contract
+FAILED tests/test_json_bean_lifecycle.py::test_ui_wire_properties_use_a_structured_body_when_java_field_names_differ[class Item{private String text;public void setName(String value){text=value.toUpperCase();}public String getName(){return text;}}-{name:"alpha"}-ALPHA]
+5 failed, 1586 passed in 4.81s

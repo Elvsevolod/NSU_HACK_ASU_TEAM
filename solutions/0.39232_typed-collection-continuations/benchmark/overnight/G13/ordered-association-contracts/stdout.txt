@@ -1,0 +1,109 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+_ test_default_jpa_order_column_uses_declared_sql_identifier_case_insensitively[codes_order] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-296/test_default_jpa_order_column_0')
+column = 'codes_order'
+
+    @pytest.mark.parametrize('column',['codes_order','codes_ORDER','CODES_ORDER'])
+    def test_default_jpa_order_column_uses_declared_sql_identifier_case_insensitively(tmp_path,column):
+        p,db,ids=profile(tmp_path,column=column);e=Engine(p,ScenarioState(db));r=e.run(ids['Api.entry'],{})
+>       assert list(r)==['A','B'] and not r.opaque,(r,e.warnings)
+E       AssertionError: ([], set())
+E       assert ([] == ['A', 'B']
+E         
+E         Right contains 2 more items, first extra item: 'A'
+E         Use -v to get more diff)
+
+code/tests/test_ordered_association_columns.py:25: AssertionError
+_ test_default_jpa_order_column_uses_declared_sql_identifier_case_insensitively[codes_ORDER] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-296/test_default_jpa_order_column_1')
+column = 'codes_ORDER'
+
+    @pytest.mark.parametrize('column',['codes_order','codes_ORDER','CODES_ORDER'])
+    def test_default_jpa_order_column_uses_declared_sql_identifier_case_insensitively(tmp_path,column):
+        p,db,ids=profile(tmp_path,column=column);e=Engine(p,ScenarioState(db));r=e.run(ids['Api.entry'],{})
+>       assert list(r)==['A','B'] and not r.opaque,(r,e.warnings)
+E       AssertionError: ([], set())
+E       assert ([] == ['A', 'B']
+E         
+E         Right contains 2 more items, first extra item: 'A'
+E         Use -v to get more diff)
+
+code/tests/test_ordered_association_columns.py:25: AssertionError
+_ test_default_jpa_order_column_uses_declared_sql_identifier_case_insensitively[CODES_ORDER] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-296/test_default_jpa_order_column_2')
+column = 'CODES_ORDER'
+
+    @pytest.mark.parametrize('column',['codes_order','codes_ORDER','CODES_ORDER'])
+    def test_default_jpa_order_column_uses_declared_sql_identifier_case_insensitively(tmp_path,column):
+        p,db,ids=profile(tmp_path,column=column);e=Engine(p,ScenarioState(db));r=e.run(ids['Api.entry'],{})
+>       assert list(r)==['A','B'] and not r.opaque,(r,e.warnings)
+E       AssertionError: ([], set())
+E       assert ([] == ['A', 'B']
+E         
+E         Right contains 2 more items, first extra item: 'A'
+E         Use -v to get more diff)
+
+code/tests/test_ordered_association_columns.py:25: AssertionError
+________ test_invalid_positions_do_not_become_a_known_order[positions0] ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-296/test_invalid_positions_do_not_0')
+positions = (0, 0)
+
+    @pytest.mark.parametrize('positions',[(0,0),(0,2),(-1,0)])
+    def test_invalid_positions_do_not_become_a_known_order(tmp_path,positions):
+        p,db,ids=profile(tmp_path,positions=positions);e=Engine(p,ScenarioState(db));r=e.run(ids['Api.entry'],{})
+>       assert r is U or getattr(r,'opaque',False)
+E       AssertionError: assert ([] is <Unknown.VALUE: 'unknown'> or False)
+E        +  where False = getattr([], 'opaque', False)
+
+code/tests/test_ordered_association_columns.py:32: AssertionError
+________ test_invalid_positions_do_not_become_a_known_order[positions1] ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-296/test_invalid_positions_do_not_1')
+positions = (0, 2)
+
+    @pytest.mark.parametrize('positions',[(0,0),(0,2),(-1,0)])
+    def test_invalid_positions_do_not_become_a_known_order(tmp_path,positions):
+        p,db,ids=profile(tmp_path,positions=positions);e=Engine(p,ScenarioState(db));r=e.run(ids['Api.entry'],{})
+>       assert r is U or getattr(r,'opaque',False)
+E       AssertionError: assert ([] is <Unknown.VALUE: 'unknown'> or False)
+E        +  where False = getattr([], 'opaque', False)
+
+code/tests/test_ordered_association_columns.py:32: AssertionError
+________ test_invalid_positions_do_not_become_a_known_order[positions2] ________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-296/test_invalid_positions_do_not_2')
+positions = (-1, 0)
+
+    @pytest.mark.parametrize('positions',[(0,0),(0,2),(-1,0)])
+    def test_invalid_positions_do_not_become_a_known_order(tmp_path,positions):
+        p,db,ids=profile(tmp_path,positions=positions);e=Engine(p,ScenarioState(db));r=e.run(ids['Api.entry'],{})
+>       assert r is U or getattr(r,'opaque',False)
+E       AssertionError: assert ([] is <Unknown.VALUE: 'unknown'> or False)
+E        +  where False = getattr([], 'opaque', False)
+
+code/tests/test_ordered_association_columns.py:32: AssertionError
+__________ test_unordered_association_retains_unknown_encounter_order __________
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-296/test_unordered_association_ret0')
+
+    def test_unordered_association_retains_unknown_encounter_order(tmp_path):
+        p,db,ids=profile(tmp_path,ordered=False);e=Engine(p,ScenarioState(db));r=e.run(ids['Api.entry'],{})
+>       assert len(r)==2 and r.order_known is False
+E       assert (0 == 2)
+E        +  where 0 = len([])
+
+code/tests/test_ordered_association_columns.py:37: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_ordered_association_columns.py::test_default_jpa_order_column_uses_declared_sql_identifier_case_insensitively[codes_order]
+FAILED code/tests/test_ordered_association_columns.py::test_default_jpa_order_column_uses_declared_sql_identifier_case_insensitively[codes_ORDER]
+FAILED code/tests/test_ordered_association_columns.py::test_default_jpa_order_column_uses_declared_sql_identifier_case_insensitively[CODES_ORDER]
+FAILED code/tests/test_ordered_association_columns.py::test_invalid_positions_do_not_become_a_known_order[positions0]
+FAILED code/tests/test_ordered_association_columns.py::test_invalid_positions_do_not_become_a_known_order[positions1]
+FAILED code/tests/test_ordered_association_columns.py::test_invalid_positions_do_not_become_a_known_order[positions2]
+FAILED code/tests/test_ordered_association_columns.py::test_unordered_association_retains_unknown_encounter_order
+7 failed in 0.14s

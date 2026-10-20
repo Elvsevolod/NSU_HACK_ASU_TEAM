@@ -1,0 +1,1196 @@
+{
+  "project": "fixture",
+  "nodes": {
+    "module:auth-service": {
+      "kind": "module",
+      "name": "auth-service",
+      "deployment_units": [
+        "auth-service"
+      ]
+    },
+    "type:auth-service:AuthApplication": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.auth.AuthApplication",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/AuthApplication.java",
+      "annotations": [
+        {
+          "name": "SpringBootApplication",
+          "args": ""
+        },
+        {
+          "name": "EnableResourceServer",
+          "args": ""
+        },
+        {
+          "name": "EnableDiscoveryClient",
+          "args": ""
+        },
+        {
+          "name": "EnableGlobalMethodSecurity",
+          "args": "(prePostEnabled = true)"
+        }
+      ]
+    },
+    "type:auth-service:OAuth2AuthorizationConfig": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.auth.config.OAuth2AuthorizationConfig",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java",
+      "annotations": [
+        {
+          "name": "Configuration",
+          "args": ""
+        },
+        {
+          "name": "EnableAuthorizationServer",
+          "args": ""
+        }
+      ]
+    },
+    "type:auth-service:WebSecurityConfig": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.auth.config.WebSecurityConfig",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/WebSecurityConfig.java",
+      "annotations": [
+        {
+          "name": "Configuration",
+          "args": ""
+        }
+      ]
+    },
+    "type:auth-service:UserController": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.auth.controller.UserController",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/controller/UserController.java",
+      "annotations": [
+        {
+          "name": "RestController",
+          "args": ""
+        },
+        {
+          "name": "RequestMapping",
+          "args": "(\"/users\")"
+        }
+      ]
+    },
+    "type:auth-service:User": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.auth.domain.User",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/domain/User.java",
+      "annotations": [
+        {
+          "name": "Document",
+          "args": "(collection = \"users\")"
+        }
+      ]
+    },
+    "type:auth-service:UserRepository": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.auth.repository.UserRepository",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/repository/UserRepository.java",
+      "annotations": [
+        {
+          "name": "Repository",
+          "args": ""
+        }
+      ]
+    },
+    "type:auth-service:UserService": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.auth.service.UserService",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/UserService.java",
+      "annotations": []
+    },
+    "type:auth-service:UserServiceImpl": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.auth.service.UserServiceImpl",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/UserServiceImpl.java",
+      "annotations": [
+        {
+          "name": "Service",
+          "args": ""
+        }
+      ]
+    },
+    "type:auth-service:MongoUserDetailsService": {
+      "kind": "type",
+      "fqn": "com.piggymetrics.auth.service.security.MongoUserDetailsService",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/security/MongoUserDetailsService.java",
+      "annotations": [
+        {
+          "name": "Service",
+          "args": ""
+        }
+      ]
+    },
+    "method:auth-service:AuthApplication#main(String[])": {
+      "kind": "method",
+      "name": "main",
+      "owner": "type:auth-service:AuthApplication",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/AuthApplication.java",
+      "line": 15,
+      "end": 17,
+      "params_as_written": [
+        "String[]"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)": {
+      "kind": "method",
+      "name": "configure",
+      "owner": "type:auth-service:OAuth2AuthorizationConfig",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java",
+      "line": 38,
+      "end": 64,
+      "params_as_written": [
+        "ClientDetailsServiceConfigurer"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:auth-service:OAuth2AuthorizationConfig#configure(AuthorizationServerEndpointsConfigurer)": {
+      "kind": "method",
+      "name": "configure",
+      "owner": "type:auth-service:OAuth2AuthorizationConfig",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java",
+      "line": 66,
+      "end": 72,
+      "params_as_written": [
+        "AuthorizationServerEndpointsConfigurer"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:auth-service:OAuth2AuthorizationConfig#configure(AuthorizationServerSecurityConfigurer)": {
+      "kind": "method",
+      "name": "configure",
+      "owner": "type:auth-service:OAuth2AuthorizationConfig",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java",
+      "line": 74,
+      "end": 80,
+      "params_as_written": [
+        "AuthorizationServerSecurityConfigurer"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:auth-service:WebSecurityConfig#configure(HttpSecurity)": {
+      "kind": "method",
+      "name": "configure",
+      "owner": "type:auth-service:WebSecurityConfig",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/WebSecurityConfig.java",
+      "line": 22,
+      "end": 30,
+      "params_as_written": [
+        "HttpSecurity"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:auth-service:WebSecurityConfig#configure(AuthenticationManagerBuilder)": {
+      "kind": "method",
+      "name": "configure",
+      "owner": "type:auth-service:WebSecurityConfig",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/WebSecurityConfig.java",
+      "line": 32,
+      "end": 36,
+      "params_as_written": [
+        "AuthenticationManagerBuilder"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:auth-service:WebSecurityConfig#authenticationManagerBean()": {
+      "kind": "method",
+      "name": "authenticationManagerBean",
+      "owner": "type:auth-service:WebSecurityConfig",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/WebSecurityConfig.java",
+      "line": 38,
+      "end": 42,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        },
+        {
+          "name": "Bean",
+          "args": ""
+        }
+      ],
+      "return_raw": "AuthenticationManager"
+    },
+    "method:auth-service:UserController#getUser(Principal)": {
+      "kind": "method",
+      "name": "getUser",
+      "owner": "type:auth-service:UserController",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/controller/UserController.java",
+      "line": 22,
+      "end": 25,
+      "params_as_written": [
+        "Principal"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "RequestMapping",
+          "args": "(value = \"/current\", method = RequestMethod.GET)"
+        }
+      ],
+      "return_raw": "Principal"
+    },
+    "method:auth-service:UserController#createUser(User)": {
+      "kind": "method",
+      "name": "createUser",
+      "owner": "type:auth-service:UserController",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/controller/UserController.java",
+      "line": 27,
+      "end": 31,
+      "params_as_written": [
+        "User"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "PreAuthorize",
+          "args": "(\"#oauth2.hasScope('server')\")"
+        },
+        {
+          "name": "RequestMapping",
+          "args": "(method = RequestMethod.POST)"
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:auth-service:User#getPassword()": {
+      "kind": "method",
+      "name": "getPassword",
+      "owner": "type:auth-service:User",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/domain/User.java",
+      "line": 18,
+      "end": 21,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "String"
+    },
+    "method:auth-service:User#getUsername()": {
+      "kind": "method",
+      "name": "getUsername",
+      "owner": "type:auth-service:User",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/domain/User.java",
+      "line": 23,
+      "end": 26,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "String"
+    },
+    "method:auth-service:User#getAuthorities()": {
+      "kind": "method",
+      "name": "getAuthorities",
+      "owner": "type:auth-service:User",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/domain/User.java",
+      "line": 28,
+      "end": 31,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "List<GrantedAuthority>"
+    },
+    "method:auth-service:User#setUsername(String)": {
+      "kind": "method",
+      "name": "setUsername",
+      "owner": "type:auth-service:User",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/domain/User.java",
+      "line": 33,
+      "end": 35,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:auth-service:User#setPassword(String)": {
+      "kind": "method",
+      "name": "setPassword",
+      "owner": "type:auth-service:User",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/domain/User.java",
+      "line": 37,
+      "end": 39,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:auth-service:User#isAccountNonExpired()": {
+      "kind": "method",
+      "name": "isAccountNonExpired",
+      "owner": "type:auth-service:User",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/domain/User.java",
+      "line": 41,
+      "end": 44,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "boolean"
+    },
+    "method:auth-service:User#isAccountNonLocked()": {
+      "kind": "method",
+      "name": "isAccountNonLocked",
+      "owner": "type:auth-service:User",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/domain/User.java",
+      "line": 46,
+      "end": 49,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "boolean"
+    },
+    "method:auth-service:User#isCredentialsNonExpired()": {
+      "kind": "method",
+      "name": "isCredentialsNonExpired",
+      "owner": "type:auth-service:User",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/domain/User.java",
+      "line": 51,
+      "end": 54,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "boolean"
+    },
+    "method:auth-service:User#isEnabled()": {
+      "kind": "method",
+      "name": "isEnabled",
+      "owner": "type:auth-service:User",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/domain/User.java",
+      "line": 56,
+      "end": 59,
+      "params_as_written": [],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "boolean"
+    },
+    "method:auth-service:UserService#create(User)": {
+      "kind": "method",
+      "name": "create",
+      "owner": "type:auth-service:UserService",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/UserService.java",
+      "line": 7,
+      "end": 7,
+      "params_as_written": [
+        "User"
+      ],
+      "abstract": true,
+      "annotations": [],
+      "return_raw": "void"
+    },
+    "method:auth-service:UserServiceImpl#create(User)": {
+      "kind": "method",
+      "name": "create",
+      "owner": "type:auth-service:UserServiceImpl",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/UserServiceImpl.java",
+      "line": 24,
+      "end": 36,
+      "params_as_written": [
+        "User"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "void"
+    },
+    "method:auth-service:MongoUserDetailsService#loadUserByUsername(String)": {
+      "kind": "method",
+      "name": "loadUserByUsername",
+      "owner": "type:auth-service:MongoUserDetailsService",
+      "module": "auth-service",
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/security/MongoUserDetailsService.java",
+      "line": 16,
+      "end": 20,
+      "params_as_written": [
+        "String"
+      ],
+      "abstract": false,
+      "annotations": [
+        {
+          "name": "Override",
+          "args": ""
+        }
+      ],
+      "return_raw": "UserDetails"
+    },
+    "call:method:auth-service:AuthApplication#main(String[])@16:21": {
+      "kind": "call_site",
+      "method": "method:auth-service:AuthApplication#main(String[])",
+      "callee": "run",
+      "receiver": "SpringApplication",
+      "receiver_type": "SpringApplication",
+      "line": 16,
+      "col": 21,
+      "arg_count": 2,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/AuthApplication.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@62:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "scopes",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"statistics-service\")\n                .secret(env.getProperty(\"STATISTICS_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"notification-service\")\n                .secret(env.getProperty(\"NOTIFICATION_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"statistics-service\")\n                .secret(env.getProperty(\"STATISTICS_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"notification-service\")\n                .secret(env.getProperty(\"NOTIFICATION_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")",
+      "line": 62,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@61:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "authorizedGrantTypes",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"statistics-service\")\n                .secret(env.getProperty(\"STATISTICS_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"notification-service\")\n                .secret(env.getProperty(\"NOTIFICATION_SERVICE_PASSWORD\"))",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"statistics-service\")\n                .secret(env.getProperty(\"STATISTICS_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"notification-service\")\n                .secret(env.getProperty(\"NOTIFICATION_SERVICE_PASSWORD\"))",
+      "line": 61,
+      "col": 18,
+      "arg_count": 2,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@60:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "secret",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"statistics-service\")\n                .secret(env.getProperty(\"STATISTICS_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"notification-service\")",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"statistics-service\")\n                .secret(env.getProperty(\"STATISTICS_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"notification-service\")",
+      "line": 60,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@59:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "withClient",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"statistics-service\")\n                .secret(env.getProperty(\"STATISTICS_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"statistics-service\")\n                .secret(env.getProperty(\"STATISTICS_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()",
+      "line": 59,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@58:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "and",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"statistics-service\")\n                .secret(env.getProperty(\"STATISTICS_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"statistics-service\")\n                .secret(env.getProperty(\"STATISTICS_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")",
+      "line": 58,
+      "col": 18,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@57:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "scopes",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"statistics-service\")\n                .secret(env.getProperty(\"STATISTICS_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"statistics-service\")\n                .secret(env.getProperty(\"STATISTICS_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")",
+      "line": 57,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@56:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "authorizedGrantTypes",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"statistics-service\")\n                .secret(env.getProperty(\"STATISTICS_SERVICE_PASSWORD\"))",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"statistics-service\")\n                .secret(env.getProperty(\"STATISTICS_SERVICE_PASSWORD\"))",
+      "line": 56,
+      "col": 18,
+      "arg_count": 2,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@55:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "secret",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"statistics-service\")",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()\n                .withClient(\"statistics-service\")",
+      "line": 55,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@54:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "withClient",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")\n                .and()",
+      "line": 54,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@53:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "and",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")\n                .scopes(\"server\")",
+      "line": 53,
+      "col": 18,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@52:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "scopes",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))\n                .authorizedGrantTypes(\"client_credentials\", \"refresh_token\")",
+      "line": 52,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@51:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "authorizedGrantTypes",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")\n                .secret(env.getProperty(\"ACCOUNT_SERVICE_PASSWORD\"))",
+      "line": 51,
+      "col": 18,
+      "arg_count": 2,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@50:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "secret",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()\n                .withClient(\"account-service\")",
+      "line": 50,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@49:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "withClient",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")\n                .and()",
+      "line": 49,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@48:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "and",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")\n                .scopes(\"ui\")",
+      "line": 48,
+      "col": 18,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@47:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "scopes",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")\n                .authorizedGrantTypes(\"refresh_token\", \"password\")",
+      "line": 47,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@46:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "authorizedGrantTypes",
+      "receiver": "clients.inMemory()\n                .withClient(\"browser\")",
+      "receiver_type": "clients.inMemory()\n                .withClient(\"browser\")",
+      "line": 46,
+      "col": 18,
+      "arg_count": 2,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@45:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "withClient",
+      "receiver": "clients.inMemory()",
+      "receiver_type": "clients.inMemory()",
+      "line": 45,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@44:17": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "inMemory",
+      "receiver": "clients",
+      "receiver_type": "ClientDetailsServiceConfigurer",
+      "line": 44,
+      "col": 17,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@50:29": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "getProperty",
+      "receiver": "env",
+      "receiver_type": "Environment",
+      "line": 50,
+      "col": 29,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@55:29": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "getProperty",
+      "receiver": "env",
+      "receiver_type": "Environment",
+      "line": 55,
+      "col": 29,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)@60:29": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(ClientDetailsServiceConfigurer)",
+      "callee": "getProperty",
+      "receiver": "env",
+      "receiver_type": "Environment",
+      "line": 60,
+      "col": 29,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(AuthorizationServerEndpointsConfigurer)@71:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(AuthorizationServerEndpointsConfigurer)",
+      "callee": "userDetailsService",
+      "receiver": "endpoints\n                .tokenStore(tokenStore)\n                .authenticationManager(authenticationManager)",
+      "receiver_type": "endpoints\n                .tokenStore(tokenStore)\n                .authenticationManager(authenticationManager)",
+      "line": 71,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(AuthorizationServerEndpointsConfigurer)@70:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(AuthorizationServerEndpointsConfigurer)",
+      "callee": "authenticationManager",
+      "receiver": "endpoints\n                .tokenStore(tokenStore)",
+      "receiver_type": "endpoints\n                .tokenStore(tokenStore)",
+      "line": 70,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(AuthorizationServerEndpointsConfigurer)@69:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(AuthorizationServerEndpointsConfigurer)",
+      "callee": "tokenStore",
+      "receiver": "endpoints",
+      "receiver_type": "AuthorizationServerEndpointsConfigurer",
+      "line": 69,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(AuthorizationServerSecurityConfigurer)@79:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(AuthorizationServerSecurityConfigurer)",
+      "callee": "passwordEncoder",
+      "receiver": "oauthServer\n                .tokenKeyAccess(\"permitAll()\")\n                .checkTokenAccess(\"isAuthenticated()\")",
+      "receiver_type": "oauthServer\n                .tokenKeyAccess(\"permitAll()\")\n                .checkTokenAccess(\"isAuthenticated()\")",
+      "line": 79,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(AuthorizationServerSecurityConfigurer)@78:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(AuthorizationServerSecurityConfigurer)",
+      "callee": "checkTokenAccess",
+      "receiver": "oauthServer\n                .tokenKeyAccess(\"permitAll()\")",
+      "receiver_type": "oauthServer\n                .tokenKeyAccess(\"permitAll()\")",
+      "line": 78,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(AuthorizationServerSecurityConfigurer)@77:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(AuthorizationServerSecurityConfigurer)",
+      "callee": "tokenKeyAccess",
+      "receiver": "oauthServer",
+      "receiver_type": "AuthorizationServerSecurityConfigurer",
+      "line": 77,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:OAuth2AuthorizationConfig#configure(AuthorizationServerSecurityConfigurer)@79:54": {
+      "kind": "call_site",
+      "method": "method:auth-service:OAuth2AuthorizationConfig#configure(AuthorizationServerSecurityConfigurer)",
+      "callee": "getInstance",
+      "receiver": "NoOpPasswordEncoder",
+      "receiver_type": "NoOpPasswordEncoder",
+      "line": 79,
+      "col": 54,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/OAuth2AuthorizationConfig.java"
+    },
+    "call:method:auth-service:WebSecurityConfig#configure(HttpSecurity)@28:25": {
+      "kind": "call_site",
+      "method": "method:auth-service:WebSecurityConfig#configure(HttpSecurity)",
+      "callee": "disable",
+      "receiver": "http\n                .authorizeRequests().anyRequest().authenticated()\n                .and()\n                .csrf()",
+      "receiver_type": "http\n                .authorizeRequests().anyRequest().authenticated()\n                .and()\n                .csrf()",
+      "line": 28,
+      "col": 25,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/WebSecurityConfig.java"
+    },
+    "call:method:auth-service:WebSecurityConfig#configure(HttpSecurity)@28:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:WebSecurityConfig#configure(HttpSecurity)",
+      "callee": "csrf",
+      "receiver": "http\n                .authorizeRequests().anyRequest().authenticated()\n                .and()",
+      "receiver_type": "http\n                .authorizeRequests().anyRequest().authenticated()\n                .and()",
+      "line": 28,
+      "col": 18,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/WebSecurityConfig.java"
+    },
+    "call:method:auth-service:WebSecurityConfig#configure(HttpSecurity)@27:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:WebSecurityConfig#configure(HttpSecurity)",
+      "callee": "and",
+      "receiver": "http\n                .authorizeRequests().anyRequest().authenticated()",
+      "receiver_type": "http\n                .authorizeRequests().anyRequest().authenticated()",
+      "line": 27,
+      "col": 18,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/WebSecurityConfig.java"
+    },
+    "call:method:auth-service:WebSecurityConfig#configure(HttpSecurity)@26:51": {
+      "kind": "call_site",
+      "method": "method:auth-service:WebSecurityConfig#configure(HttpSecurity)",
+      "callee": "authenticated",
+      "receiver": "http\n                .authorizeRequests().anyRequest()",
+      "receiver_type": "http\n                .authorizeRequests().anyRequest()",
+      "line": 26,
+      "col": 51,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/WebSecurityConfig.java"
+    },
+    "call:method:auth-service:WebSecurityConfig#configure(HttpSecurity)@26:38": {
+      "kind": "call_site",
+      "method": "method:auth-service:WebSecurityConfig#configure(HttpSecurity)",
+      "callee": "anyRequest",
+      "receiver": "http\n                .authorizeRequests()",
+      "receiver_type": "http\n                .authorizeRequests()",
+      "line": 26,
+      "col": 38,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/WebSecurityConfig.java"
+    },
+    "call:method:auth-service:WebSecurityConfig#configure(HttpSecurity)@26:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:WebSecurityConfig#configure(HttpSecurity)",
+      "callee": "authorizeRequests",
+      "receiver": "http",
+      "receiver_type": "HttpSecurity",
+      "line": 26,
+      "col": 18,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/WebSecurityConfig.java"
+    },
+    "call:method:auth-service:WebSecurityConfig#configure(AuthenticationManagerBuilder)@35:18": {
+      "kind": "call_site",
+      "method": "method:auth-service:WebSecurityConfig#configure(AuthenticationManagerBuilder)",
+      "callee": "passwordEncoder",
+      "receiver": "auth.userDetailsService(userDetailsService)",
+      "receiver_type": "auth.userDetailsService(userDetailsService)",
+      "line": 35,
+      "col": 18,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/WebSecurityConfig.java"
+    },
+    "call:method:auth-service:WebSecurityConfig#configure(AuthenticationManagerBuilder)@34:14": {
+      "kind": "call_site",
+      "method": "method:auth-service:WebSecurityConfig#configure(AuthenticationManagerBuilder)",
+      "callee": "userDetailsService",
+      "receiver": "auth",
+      "receiver_type": "AuthenticationManagerBuilder",
+      "line": 34,
+      "col": 14,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/WebSecurityConfig.java"
+    },
+    "call:method:auth-service:WebSecurityConfig#configure(AuthenticationManagerBuilder)@35:34": {
+      "kind": "call_site",
+      "method": "method:auth-service:WebSecurityConfig#configure(AuthenticationManagerBuilder)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "BCryptPasswordEncoder",
+      "line": 35,
+      "col": 34,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/WebSecurityConfig.java"
+    },
+    "call:method:auth-service:WebSecurityConfig#authenticationManagerBean()@41:22": {
+      "kind": "call_site",
+      "method": "method:auth-service:WebSecurityConfig#authenticationManagerBean()",
+      "callee": "authenticationManagerBean",
+      "receiver": "super",
+      "receiver_type": "super",
+      "line": 41,
+      "col": 22,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/config/WebSecurityConfig.java"
+    },
+    "call:method:auth-service:UserController#createUser(User)@30:15": {
+      "kind": "call_site",
+      "method": "method:auth-service:UserController#createUser(User)",
+      "callee": "create",
+      "receiver": "userService",
+      "receiver_type": "UserService",
+      "line": 30,
+      "col": 15,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/controller/UserController.java"
+    },
+    "call:method:auth-service:UserServiceImpl#create(User)@27:40": {
+      "kind": "call_site",
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "callee": "findById",
+      "receiver": "repository",
+      "receiver_type": "UserRepository",
+      "line": 27,
+      "col": 40,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/UserServiceImpl.java"
+    },
+    "call:method:auth-service:UserServiceImpl#create(User)@27:54": {
+      "kind": "call_site",
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "callee": "getUsername",
+      "receiver": "user",
+      "receiver_type": "User",
+      "line": 27,
+      "col": 54,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/UserServiceImpl.java"
+    },
+    "call:method:auth-service:UserServiceImpl#create(User)@28:12": {
+      "kind": "call_site",
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "callee": "ifPresent",
+      "receiver": "existing",
+      "receiver_type": "Optional<User>",
+      "line": 28,
+      "col": 12,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/UserServiceImpl.java"
+    },
+    "call:method:auth-service:UserServiceImpl#create(User)@28:34": {
+      "kind": "call_site",
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "IllegalArgumentException",
+      "line": 28,
+      "col": 34,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/UserServiceImpl.java"
+    },
+    "call:method:auth-service:UserServiceImpl#create(User)@28:92": {
+      "kind": "call_site",
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "callee": "getUsername",
+      "receiver": "it",
+      "receiver_type": "it",
+      "line": 28,
+      "col": 92,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/UserServiceImpl.java"
+    },
+    "call:method:auth-service:UserServiceImpl#create(User)@30:25": {
+      "kind": "call_site",
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "callee": "encode",
+      "receiver": "encoder",
+      "receiver_type": "BCryptPasswordEncoder",
+      "line": 30,
+      "col": 25,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/UserServiceImpl.java"
+    },
+    "call:method:auth-service:UserServiceImpl#create(User)@30:37": {
+      "kind": "call_site",
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "callee": "getPassword",
+      "receiver": "user",
+      "receiver_type": "User",
+      "line": 30,
+      "col": 37,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/UserServiceImpl.java"
+    },
+    "call:method:auth-service:UserServiceImpl#create(User)@31:8": {
+      "kind": "call_site",
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "callee": "setPassword",
+      "receiver": "user",
+      "receiver_type": "User",
+      "line": 31,
+      "col": 8,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/UserServiceImpl.java"
+    },
+    "call:method:auth-service:UserServiceImpl#create(User)@33:14": {
+      "kind": "call_site",
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "callee": "save",
+      "receiver": "repository",
+      "receiver_type": "UserRepository",
+      "line": 33,
+      "col": 14,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/UserServiceImpl.java"
+    },
+    "call:method:auth-service:UserServiceImpl#create(User)@35:7": {
+      "kind": "call_site",
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "callee": "info",
+      "receiver": "log",
+      "receiver_type": "Logger",
+      "line": 35,
+      "col": 7,
+      "arg_count": 2,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/UserServiceImpl.java"
+    },
+    "call:method:auth-service:UserServiceImpl#create(User)@35:50": {
+      "kind": "call_site",
+      "method": "method:auth-service:UserServiceImpl#create(User)",
+      "callee": "getUsername",
+      "receiver": "user",
+      "receiver_type": "User",
+      "line": 35,
+      "col": 50,
+      "arg_count": 0,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/UserServiceImpl.java"
+    },
+    "call:method:auth-service:MongoUserDetailsService#loadUserByUsername(String)@19:40": {
+      "kind": "call_site",
+      "method": "method:auth-service:MongoUserDetailsService#loadUserByUsername(String)",
+      "callee": "orElseThrow",
+      "receiver": "repository.findById(username)",
+      "receiver_type": "repository.findById(username)",
+      "line": 19,
+      "col": 40,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/security/MongoUserDetailsService.java"
+    },
+    "call:method:auth-service:MongoUserDetailsService#loadUserByUsername(String)@19:21": {
+      "kind": "call_site",
+      "method": "method:auth-service:MongoUserDetailsService#loadUserByUsername(String)",
+      "callee": "findById",
+      "receiver": "repository",
+      "receiver_type": "UserRepository",
+      "line": 19,
+      "col": 21,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/security/MongoUserDetailsService.java"
+    },
+    "call:method:auth-service:MongoUserDetailsService#loadUserByUsername(String)@19:56": {
+      "kind": "call_site",
+      "method": "method:auth-service:MongoUserDetailsService#loadUserByUsername(String)",
+      "callee": "<init>",
+      "receiver": "",
+      "receiver_type": "UsernameNotFoundException",
+      "line": 19,
+      "col": 56,
+      "arg_count": 1,
+      "file": "auth-service/src/main/java/com/piggymetrics/auth/service/security/MongoUserDetailsService.java"
+    },
+    "res:collection:auth-service.users": {
+      "kind": "data_resource",
+      "resource_kind": "collection",
+      "schema": "auth-service",
+      "name": "users",
+      "origin": [
+        {
+          "file": "auth-service/src/main/java/com/piggymetrics/auth/domain/User.java"
+        }
+      ]
+    }
+  },
+  "edges": [
+    {
+      "source": "type:auth-service:UserServiceImpl",
+      "type": "implements",
+      "target": "type:auth-service:UserService"
+    },
+    {
+      "source": "method:auth-service:UserServiceImpl#create(User)",
+      "type": "overrides",
+      "target": "method:auth-service:UserService#create(User)"
+    },
+    {
+      "source": "call:method:auth-service:UserController#createUser(User)@30:15",
+      "type": "calls",
+      "target": "method:auth-service:UserService#create(User)"
+    },
+    {
+      "source": "call:method:auth-service:UserServiceImpl#create(User)@27:54",
+      "type": "calls",
+      "target": "method:auth-service:User#getUsername()"
+    },
+    {
+      "source": "call:method:auth-service:UserServiceImpl#create(User)@30:37",
+      "type": "calls",
+      "target": "method:auth-service:User#getPassword()"
+    },
+    {
+      "source": "call:method:auth-service:UserServiceImpl#create(User)@31:8",
+      "type": "calls",
+      "target": "method:auth-service:User#setPassword(String)"
+    },
+    {
+      "source": "call:method:auth-service:UserServiceImpl#create(User)@35:50",
+      "type": "calls",
+      "target": "method:auth-service:User#getUsername()"
+    },
+    {
+      "source": "call:method:auth-service:UserServiceImpl#create(User)@27:40",
+      "type": "data_access",
+      "target": "res:collection:auth-service.users"
+    },
+    {
+      "source": "call:method:auth-service:UserServiceImpl#create(User)@33:14",
+      "type": "data_access",
+      "target": "res:collection:auth-service.users"
+    },
+    {
+      "source": "call:method:auth-service:MongoUserDetailsService#loadUserByUsername(String)@19:21",
+      "type": "data_access",
+      "target": "res:collection:auth-service.users"
+    }
+  ],
+  "context": {}
+}

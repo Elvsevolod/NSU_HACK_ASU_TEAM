@@ -1,0 +1,1489 @@
+[
+  {
+    "schema": "producer-consumer/1",
+    "case": "petclinic-customers",
+    "steps": [
+      {
+        "step": 1,
+        "source_producers": [
+          {
+            "unmeasured_or_initial_context": true
+          }
+        ],
+        "preceding_step_result": {
+          "initial_context": true
+        },
+        "consumer_request": {
+          "deployment": "customers",
+          "method": "GET",
+          "url": "/owners",
+          "path": [
+            "owners"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "__rest_unknown__": true
+          },
+          "body": {
+            "missing": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "storage": {},
+            "actor": {
+              "unknown": true
+            }
+          },
+          "body_properties": {},
+          "provenance": {
+            "__assumptions__": []
+          }
+        },
+        "actual_arguments": [
+          []
+        ],
+        "result": [
+          {
+            "address": "Main",
+            "city": "York",
+            "firstName": "Joe",
+            "id": 1,
+            "lastName": "Smith",
+            "pets": [],
+            "telephone": "12345"
+          }
+        ],
+        "state_delta": {
+          "beans_and_aliases": {
+            "before": {
+              "missing": true
+            },
+            "after": {
+              "unmeasured": true
+            }
+          },
+          "browser": {
+            "before": {
+              "missing": true
+            },
+            "after": {
+              "storage": {},
+              "form": {},
+              "dom": {},
+              "url": {},
+              "options": {},
+              "script": {}
+            }
+          },
+          "database": {
+            "before": {
+              "missing": true
+            },
+            "after": {
+              "customers.owners": [
+                {
+                  "id": 1,
+                  "firstName": "Joe",
+                  "lastName": "Smith",
+                  "address": "Main",
+                  "city": "York",
+                  "telephone": "12345"
+                }
+              ],
+              "customers.pets": [],
+              "customers.types": []
+            }
+          }
+        },
+        "per_step_edges": [
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#getPetsInternal()"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:OwnerResource#findAll()"
+          },
+          {
+            "source": "method:customers:OwnerResource#findAll()",
+            "relation": "data",
+            "target": "res:table:customers.owners"
+          },
+          {
+            "source": "method:customers:OwnerResource#findAll()",
+            "relation": "data",
+            "target": "res:table:customers.pets"
+          }
+        ],
+        "diagnostics": [],
+        "first_loss": null
+      },
+      {
+        "step": 2,
+        "source_producers": [
+          {
+            "consumer_field": "firstName",
+            "source": "literal",
+            "reference": "action"
+          },
+          {
+            "consumer_field": "lastName",
+            "source": "literal",
+            "reference": "action"
+          },
+          {
+            "consumer_field": "address",
+            "source": "literal",
+            "reference": "action"
+          },
+          {
+            "consumer_field": "city",
+            "source": "literal",
+            "reference": "action"
+          },
+          {
+            "consumer_field": "telephone",
+            "source": "literal",
+            "reference": "action"
+          }
+        ],
+        "preceding_step_result": [
+          {
+            "address": "Main",
+            "city": "York",
+            "firstName": "Joe",
+            "id": 1,
+            "lastName": "Smith",
+            "pets": [],
+            "telephone": "12345"
+          }
+        ],
+        "consumer_request": {
+          "deployment": "customers",
+          "method": "POST",
+          "url": "/owners",
+          "path": [
+            "owners"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "__rest_unknown__": true,
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "body": {
+            "firstName": "Eva",
+            "lastName": "Jones",
+            "address": "Elm",
+            "city": "York",
+            "telephone": "67890"
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "storage": {},
+            "actor": {
+              "unknown": true
+            }
+          },
+          "body_properties": {
+            "ownerRequest": {}
+          },
+          "provenance": {
+            "firstName": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "firstName \"Eva\"",
+              "resolved": true
+            },
+            "lastName": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "lastName \"Jones\"",
+              "resolved": true
+            },
+            "address": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "address \"Elm\"",
+              "resolved": true
+            },
+            "city": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "city \"York\"",
+              "resolved": true
+            },
+            "telephone": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "telephone \"67890\"",
+              "resolved": true
+            },
+            "__assumptions__": []
+          }
+        },
+        "actual_arguments": [
+          [
+            {
+              "name": "ownerRequest",
+              "declared_type": "org.springframework.samples.petclinic.customers.web.OwnerRequest",
+              "native_kind": null,
+              "value": {
+                "__type__": "org.springframework.samples.petclinic.customers.web.OwnerRequest",
+                "__http_entity__": false,
+                "firstName": "Eva",
+                "lastName": "Jones",
+                "address": "Elm",
+                "city": "York",
+                "telephone": "67890"
+              }
+            }
+          ]
+        ],
+        "result": {
+          "address": "Elm",
+          "city": "York",
+          "firstName": "Eva",
+          "id": {
+            "__symbol__": "generated-1",
+            "__type__": "Integer",
+            "__constraints__": [
+              "non_null"
+            ],
+            "__generation__": "ORM generated identifier",
+            "__distinct_from__": [
+              1
+            ],
+            "__distinct_symbols__": []
+          },
+          "lastName": "Jones",
+          "pets": [],
+          "telephone": "67890"
+        },
+        "state_delta": {
+          "database": {
+            "before": {
+              "customers.owners": [
+                {
+                  "id": 1,
+                  "firstName": "Joe",
+                  "lastName": "Smith",
+                  "address": "Main",
+                  "city": "York",
+                  "telephone": "12345"
+                }
+              ],
+              "customers.pets": [],
+              "customers.types": []
+            },
+            "after": {
+              "customers.owners": [
+                {
+                  "id": 1,
+                  "firstName": "Joe",
+                  "lastName": "Smith",
+                  "address": "Main",
+                  "city": "York",
+                  "telephone": "12345"
+                },
+                {
+                  "id": {
+                    "__symbol__": "generated-1",
+                    "__type__": "Integer",
+                    "__constraints__": [
+                      "non_null"
+                    ],
+                    "__generation__": "ORM generated identifier",
+                    "__distinct_from__": [
+                      1
+                    ],
+                    "__distinct_symbols__": []
+                  },
+                  "firstName": "Eva",
+                  "lastName": "Jones",
+                  "address": "Elm",
+                  "city": "York",
+                  "telephone": "67890"
+                }
+              ],
+              "customers.pets": [],
+              "customers.types": []
+            }
+          }
+        },
+        "per_step_edges": [
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#getPetsInternal()"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#setAddress(String)"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#setCity(String)"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#setFirstName(String)"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#setLastName(String)"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#setTelephone(String)"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:OwnerResource#createOwner(OwnerRequest)"
+          },
+          {
+            "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+            "relation": "calls",
+            "target": "method:customers:Owner#setAddress(String)"
+          },
+          {
+            "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+            "relation": "calls",
+            "target": "method:customers:Owner#setCity(String)"
+          },
+          {
+            "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+            "relation": "calls",
+            "target": "method:customers:Owner#setFirstName(String)"
+          },
+          {
+            "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+            "relation": "calls",
+            "target": "method:customers:Owner#setLastName(String)"
+          },
+          {
+            "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+            "relation": "calls",
+            "target": "method:customers:Owner#setTelephone(String)"
+          },
+          {
+            "source": "method:customers:OwnerResource#createOwner(OwnerRequest)",
+            "relation": "calls",
+            "target": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)"
+          },
+          {
+            "source": "method:customers:OwnerResource#createOwner(OwnerRequest)",
+            "relation": "data",
+            "target": "res:table:customers.owners"
+          }
+        ],
+        "diagnostics": [
+          "request bean validation is not fully modeled: method:customers:OwnerResource#createOwner(OwnerRequest)"
+        ],
+        "first_loss": null
+      },
+      {
+        "step": 3,
+        "source_producers": [
+          {
+            "unmeasured_or_initial_context": true
+          }
+        ],
+        "preceding_step_result": {
+          "address": "Elm",
+          "city": "York",
+          "firstName": "Eva",
+          "id": {
+            "__symbol__": "generated-1",
+            "__type__": "Integer",
+            "__constraints__": [
+              "non_null"
+            ],
+            "__generation__": "ORM generated identifier",
+            "__distinct_from__": [
+              1
+            ],
+            "__distinct_symbols__": []
+          },
+          "lastName": "Jones",
+          "pets": [],
+          "telephone": "67890"
+        },
+        "consumer_request": {
+          "deployment": "customers",
+          "method": "GET",
+          "url": "/owners",
+          "path": [
+            "owners"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "__rest_unknown__": true
+          },
+          "body": {
+            "missing": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "storage": {},
+            "actor": {
+              "unknown": true
+            }
+          },
+          "body_properties": {},
+          "provenance": {
+            "__assumptions__": []
+          }
+        },
+        "actual_arguments": [
+          []
+        ],
+        "result": [
+          {
+            "address": "Main",
+            "city": "York",
+            "firstName": "Joe",
+            "id": 1,
+            "lastName": "Smith",
+            "pets": [],
+            "telephone": "12345"
+          },
+          {
+            "address": "Elm",
+            "city": "York",
+            "firstName": "Eva",
+            "id": {
+              "__symbol__": "generated-1",
+              "__type__": "Integer",
+              "__constraints__": [
+                "non_null"
+              ],
+              "__generation__": "ORM generated identifier",
+              "__distinct_from__": [
+                1
+              ],
+              "__distinct_symbols__": []
+            },
+            "lastName": "Jones",
+            "pets": [],
+            "telephone": "67890"
+          }
+        ],
+        "state_delta": {},
+        "per_step_edges": [
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#getPetsInternal()"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:OwnerResource#findAll()"
+          },
+          {
+            "source": "method:customers:OwnerResource#findAll()",
+            "relation": "data",
+            "target": "res:table:customers.owners"
+          },
+          {
+            "source": "method:customers:OwnerResource#findAll()",
+            "relation": "data",
+            "target": "res:table:customers.pets"
+          }
+        ],
+        "diagnostics": [
+          "State depends on earlier analysis assumptions: step 2: unresolved source/request/state assumptions"
+        ],
+        "first_loss": "State depends on earlier analysis assumptions: step 2: unresolved source/request/state assumptions"
+      },
+      {
+        "step": 4,
+        "source_producers": [
+          {
+            "consumer_field": "ownerId",
+            "source": "literal",
+            "reference": "action"
+          },
+          {
+            "consumer_field": "firstName",
+            "source": "literal",
+            "reference": "action"
+          },
+          {
+            "consumer_field": "lastName",
+            "source": "literal",
+            "reference": "action"
+          },
+          {
+            "consumer_field": "address",
+            "source": "literal",
+            "reference": "action"
+          },
+          {
+            "consumer_field": "city",
+            "source": "literal",
+            "reference": "action"
+          },
+          {
+            "consumer_field": "telephone",
+            "source": "literal",
+            "reference": "action"
+          }
+        ],
+        "preceding_step_result": [
+          {
+            "address": "Main",
+            "city": "York",
+            "firstName": "Joe",
+            "id": 1,
+            "lastName": "Smith",
+            "pets": [],
+            "telephone": "12345"
+          },
+          {
+            "address": "Elm",
+            "city": "York",
+            "firstName": "Eva",
+            "id": {
+              "__symbol__": "generated-1",
+              "__type__": "Integer",
+              "__constraints__": [
+                "non_null"
+              ],
+              "__generation__": "ORM generated identifier",
+              "__distinct_from__": [
+                1
+              ],
+              "__distinct_symbols__": []
+            },
+            "lastName": "Jones",
+            "pets": [],
+            "telephone": "67890"
+          }
+        ],
+        "consumer_request": {
+          "deployment": "customers",
+          "method": "PUT",
+          "url": "/owners/1",
+          "path": [
+            "owners",
+            "1"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "__rest_unknown__": true,
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "body": {
+            "firstName": "Joe",
+            "lastName": "Smith",
+            "address": "Oak",
+            "city": "Leeds",
+            "telephone": "11223"
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "storage": {},
+            "actor": {
+              "unknown": true
+            }
+          },
+          "body_properties": {
+            "ownerRequest": {}
+          },
+          "provenance": {
+            "ownerId": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "ownerId \"1\"",
+              "resolved": true
+            },
+            "firstName": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "firstName \"Joe\"",
+              "resolved": true
+            },
+            "lastName": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "lastName \"Smith\"",
+              "resolved": true
+            },
+            "address": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "address \"Oak\"",
+              "resolved": true
+            },
+            "city": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "city \"Leeds\"",
+              "resolved": true
+            },
+            "telephone": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "telephone \"11223\"",
+              "resolved": true
+            },
+            "__assumptions__": []
+          }
+        },
+        "actual_arguments": [
+          [
+            {
+              "name": "ownerId",
+              "declared_type": "int",
+              "native_kind": "Integer",
+              "value": 1
+            },
+            {
+              "name": "ownerRequest",
+              "declared_type": "org.springframework.samples.petclinic.customers.web.OwnerRequest",
+              "native_kind": null,
+              "value": {
+                "__type__": "org.springframework.samples.petclinic.customers.web.OwnerRequest",
+                "__http_entity__": false,
+                "firstName": "Joe",
+                "lastName": "Smith",
+                "address": "Oak",
+                "city": "Leeds",
+                "telephone": "11223"
+              }
+            }
+          ]
+        ],
+        "result": null,
+        "state_delta": {
+          "database": {
+            "before": {
+              "customers.owners": [
+                {
+                  "id": 1,
+                  "firstName": "Joe",
+                  "lastName": "Smith",
+                  "address": "Main",
+                  "city": "York",
+                  "telephone": "12345"
+                },
+                {
+                  "id": {
+                    "__symbol__": "generated-1",
+                    "__type__": "Integer",
+                    "__constraints__": [
+                      "non_null"
+                    ],
+                    "__generation__": "ORM generated identifier",
+                    "__distinct_from__": [
+                      1
+                    ],
+                    "__distinct_symbols__": []
+                  },
+                  "firstName": "Eva",
+                  "lastName": "Jones",
+                  "address": "Elm",
+                  "city": "York",
+                  "telephone": "67890"
+                }
+              ],
+              "customers.pets": [],
+              "customers.types": []
+            },
+            "after": {
+              "customers.owners": [
+                {
+                  "id": 1,
+                  "firstName": "Joe",
+                  "lastName": "Smith",
+                  "address": "Oak",
+                  "city": "Leeds",
+                  "telephone": "11223"
+                },
+                {
+                  "id": {
+                    "__symbol__": "generated-1",
+                    "__type__": "Integer",
+                    "__constraints__": [
+                      "non_null"
+                    ],
+                    "__generation__": "ORM generated identifier",
+                    "__distinct_from__": [
+                      1
+                    ],
+                    "__distinct_symbols__": []
+                  },
+                  "firstName": "Eva",
+                  "lastName": "Jones",
+                  "address": "Elm",
+                  "city": "York",
+                  "telephone": "67890"
+                }
+              ],
+              "customers.pets": [],
+              "customers.types": []
+            }
+          }
+        },
+        "per_step_edges": [
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#getFirstName()"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#getId()"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#getLastName()"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#setAddress(String)"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#setCity(String)"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#setFirstName(String)"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#setLastName(String)"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#setTelephone(String)"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#toString()"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)"
+          },
+          {
+            "source": "method:customers:Owner#toString()",
+            "relation": "calls",
+            "target": "method:customers:Owner#getFirstName()"
+          },
+          {
+            "source": "method:customers:Owner#toString()",
+            "relation": "calls",
+            "target": "method:customers:Owner#getId()"
+          },
+          {
+            "source": "method:customers:Owner#toString()",
+            "relation": "calls",
+            "target": "method:customers:Owner#getLastName()"
+          },
+          {
+            "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+            "relation": "calls",
+            "target": "method:customers:Owner#setAddress(String)"
+          },
+          {
+            "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+            "relation": "calls",
+            "target": "method:customers:Owner#setCity(String)"
+          },
+          {
+            "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+            "relation": "calls",
+            "target": "method:customers:Owner#setFirstName(String)"
+          },
+          {
+            "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+            "relation": "calls",
+            "target": "method:customers:Owner#setLastName(String)"
+          },
+          {
+            "source": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)",
+            "relation": "calls",
+            "target": "method:customers:Owner#setTelephone(String)"
+          },
+          {
+            "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+            "relation": "calls",
+            "target": "method:customers:Owner#toString()"
+          },
+          {
+            "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+            "relation": "calls",
+            "target": "method:customers:OwnerEntityMapper#map(Owner,OwnerRequest)"
+          },
+          {
+            "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+            "relation": "data",
+            "target": "res:table:customers.owners"
+          },
+          {
+            "source": "method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+            "relation": "data",
+            "target": "res:table:customers.pets"
+          }
+        ],
+        "diagnostics": [
+          "SLF4J enabled level is unknown; enabled and disabled formatting effects are joined: call:method:customers:OwnerResource#updateOwner(int,OwnerRequest)@89:13",
+          "SLF4J native contract: provider transport failures are not modeled; source formatting callbacks and their caught throwables are modeled",
+          "request bean validation is not fully modeled: method:customers:OwnerResource#updateOwner(int,OwnerRequest)",
+          "State depends on earlier analysis assumptions: step 2: unresolved source/request/state assumptions"
+        ],
+        "first_loss": "SLF4J enabled level is unknown; enabled and disabled formatting effects are joined: call:method:customers:OwnerResource#updateOwner(int,OwnerRequest)@89:13"
+      },
+      {
+        "step": 5,
+        "source_producers": [
+          {
+            "unmeasured_or_initial_context": true
+          }
+        ],
+        "preceding_step_result": null,
+        "consumer_request": {
+          "deployment": "customers",
+          "method": "GET",
+          "url": {
+            "unknown": true
+          },
+          "path": [
+            "owners",
+            {
+              "unknown": true
+            }
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "__rest_unknown__": true
+          },
+          "body": {
+            "missing": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "storage": {},
+            "actor": {
+              "unknown": true
+            }
+          },
+          "body_properties": {},
+          "provenance": {
+            "__assumptions__": [
+              "Unknown input: ownerId"
+            ]
+          }
+        },
+        "actual_arguments": [
+          [
+            {
+              "name": "ownerId",
+              "declared_type": "int",
+              "native_kind": "Integer",
+              "value": {
+                "unknown": true
+              }
+            }
+          ]
+        ],
+        "result": {
+          "unknown": true
+        },
+        "state_delta": {},
+        "per_step_edges": [
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:OwnerResource#findOwner(int)"
+          },
+          {
+            "source": "method:customers:OwnerResource#findOwner(int)",
+            "relation": "data",
+            "target": "res:table:customers.owners"
+          },
+          {
+            "source": "method:customers:OwnerResource#findOwner(int)",
+            "relation": "data",
+            "target": "res:table:customers.pets"
+          }
+        ],
+        "diagnostics": [
+          "Unknown input: ownerId",
+          "repository predicate is not fully modeled: call:method:customers:OwnerResource#findOwner(int)@69:32",
+          "unresolved HTTP request binding: unknown scalar conversion: ownerId",
+          "State depends on earlier analysis assumptions: step 2: unresolved source/request/state assumptions"
+        ],
+        "first_loss": "Unknown input: ownerId"
+      },
+      {
+        "step": 6,
+        "source_producers": [
+          {
+            "unmeasured_or_initial_context": true
+          }
+        ],
+        "preceding_step_result": {
+          "unknown": true
+        },
+        "consumer_request": {
+          "deployment": "customers",
+          "method": "GET",
+          "url": "/owners/invalid",
+          "path": [
+            "owners",
+            "invalid"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {},
+          "body": {
+            "missing": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "unknown": true
+          },
+          "body_properties": {},
+          "provenance": {
+            "source": "explicit_action",
+            "quote": "GET /owners/invalid"
+          }
+        },
+        "actual_arguments": [
+          null
+        ],
+        "result": {
+          "unknown": true
+        },
+        "state_delta": {},
+        "per_step_edges": [],
+        "diagnostics": [
+          "HTTP binding rejected request: invalid integer: ownerId",
+          "State depends on earlier analysis assumptions: step 2: unresolved source/request/state assumptions"
+        ],
+        "first_loss": "State depends on earlier analysis assumptions: step 2: unresolved source/request/state assumptions"
+      },
+      {
+        "step": 7,
+        "source_producers": [
+          {
+            "unmeasured_or_initial_context": true
+          }
+        ],
+        "preceding_step_result": {
+          "unknown": true
+        },
+        "consumer_request": {
+          "deployment": "customers",
+          "method": "GET",
+          "url": "/owners",
+          "path": [
+            "owners"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "__rest_unknown__": true
+          },
+          "body": {
+            "missing": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "storage": {},
+            "actor": {
+              "unknown": true
+            }
+          },
+          "body_properties": {},
+          "provenance": {
+            "__assumptions__": []
+          }
+        },
+        "actual_arguments": [
+          []
+        ],
+        "result": [
+          {
+            "address": "Oak",
+            "city": "Leeds",
+            "firstName": "Joe",
+            "id": 1,
+            "lastName": "Smith",
+            "pets": [],
+            "telephone": "11223"
+          },
+          {
+            "address": "Elm",
+            "city": "York",
+            "firstName": "Eva",
+            "id": {
+              "__symbol__": "generated-1",
+              "__type__": "Integer",
+              "__constraints__": [
+                "non_null"
+              ],
+              "__generation__": "ORM generated identifier",
+              "__distinct_from__": [
+                1
+              ],
+              "__distinct_symbols__": []
+            },
+            "lastName": "Jones",
+            "pets": [],
+            "telephone": "67890"
+          }
+        ],
+        "state_delta": {},
+        "per_step_edges": [
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:Owner#getPetsInternal()"
+          },
+          {
+            "source": "scenario:clinic-journey",
+            "relation": "executes",
+            "target": "method:customers:OwnerResource#findAll()"
+          },
+          {
+            "source": "method:customers:OwnerResource#findAll()",
+            "relation": "data",
+            "target": "res:table:customers.owners"
+          },
+          {
+            "source": "method:customers:OwnerResource#findAll()",
+            "relation": "data",
+            "target": "res:table:customers.pets"
+          }
+        ],
+        "diagnostics": [
+          "State depends on earlier analysis assumptions: step 2: unresolved source/request/state assumptions"
+        ],
+        "first_loss": "State depends on earlier analysis assumptions: step 2: unresolved source/request/state assumptions"
+      }
+    ]
+  },
+  {
+    "schema": "producer-consumer/1",
+    "case": "piggymetrics-account",
+    "steps": [
+      {
+        "step": 1,
+        "source_producers": [
+          {
+            "consumer_field": "name",
+            "source": "literal",
+            "reference": "action"
+          }
+        ],
+        "preceding_step_result": {
+          "initial_context": true
+        },
+        "consumer_request": {
+          "deployment": "account",
+          "method": "GET",
+          "url": "/demo",
+          "path": [
+            "demo"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "__rest_unknown__": true
+          },
+          "body": {
+            "missing": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "storage": {},
+            "actor": {
+              "unknown": true
+            }
+          },
+          "body_properties": {},
+          "provenance": {
+            "name": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "name \"demo\"",
+              "resolved": true
+            },
+            "__assumptions__": []
+          }
+        },
+        "actual_arguments": [
+          [
+            {
+              "name": "name",
+              "declared_type": "java.lang.String",
+              "native_kind": "String",
+              "value": "demo"
+            }
+          ]
+        ],
+        "result": {
+          "expenses": null,
+          "incomes": null,
+          "lastSeen": null,
+          "name": "demo",
+          "note": "seed",
+          "saving": null
+        },
+        "state_delta": {
+          "beans_and_aliases": {
+            "before": {
+              "missing": true
+            },
+            "after": {
+              "unmeasured": true
+            }
+          },
+          "browser": {
+            "before": {
+              "missing": true
+            },
+            "after": {
+              "storage": {},
+              "form": {},
+              "dom": {},
+              "url": {},
+              "options": {},
+              "script": {}
+            }
+          },
+          "database": {
+            "before": {
+              "missing": true
+            },
+            "after": {
+              "account.accounts": [
+                {
+                  "name": "demo",
+                  "lastSeen": null,
+                  "incomes": null,
+                  "expenses": null,
+                  "saving": null,
+                  "note": "seed"
+                }
+              ]
+            }
+          }
+        },
+        "per_step_edges": [
+          {
+            "source": "scenario:finance-refusal",
+            "relation": "executes",
+            "target": "method:account:AccountController#getAccountByName(String)"
+          },
+          {
+            "source": "scenario:finance-refusal",
+            "relation": "executes",
+            "target": "method:account:AccountServiceImpl#findByName(String)"
+          },
+          {
+            "source": "method:account:AccountController#getAccountByName(String)",
+            "relation": "calls",
+            "target": "method:account:AccountServiceImpl#findByName(String)"
+          },
+          {
+            "source": "method:account:AccountServiceImpl#findByName(String)",
+            "relation": "data",
+            "target": "res:collection:account.accounts"
+          }
+        ],
+        "diagnostics": [
+          "framework method interception is not fully modeled: PreAuthorize at method:account:AccountController#getAccountByName(String)"
+        ],
+        "first_loss": null
+      },
+      {
+        "step": 2,
+        "source_producers": [
+          {
+            "consumer_field": "username",
+            "source": "literal",
+            "reference": "action"
+          },
+          {
+            "consumer_field": "password",
+            "source": "literal",
+            "reference": "action"
+          }
+        ],
+        "preceding_step_result": {
+          "expenses": null,
+          "incomes": null,
+          "lastSeen": null,
+          "name": "demo",
+          "note": "seed",
+          "saving": null
+        },
+        "consumer_request": {
+          "deployment": "account",
+          "method": "POST",
+          "url": "/",
+          "path": [],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "__rest_unknown__": true,
+            "content-type": [
+              "application/json"
+            ]
+          },
+          "body": {
+            "username": "demo",
+            "password": "valid-password"
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "storage": {},
+            "actor": {
+              "unknown": true
+            }
+          },
+          "body_properties": {
+            "user": {}
+          },
+          "provenance": {
+            "username": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "username \"demo\"",
+              "resolved": true
+            },
+            "password": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "password \"valid-password\"",
+              "resolved": true
+            },
+            "__assumptions__": []
+          }
+        },
+        "actual_arguments": [
+          [
+            {
+              "name": "user",
+              "declared_type": "com.piggymetrics.account.domain.User",
+              "native_kind": null,
+              "value": {
+                "__type__": "com.piggymetrics.account.domain.User",
+                "__http_entity__": false,
+                "username": "demo",
+                "password": "valid-password"
+              }
+            }
+          ]
+        ],
+        "result": null,
+        "state_delta": {},
+        "per_step_edges": [
+          {
+            "source": "scenario:finance-refusal",
+            "relation": "executes",
+            "target": "method:account:AccountController#createNewAccount(User)"
+          },
+          {
+            "source": "scenario:finance-refusal",
+            "relation": "executes",
+            "target": "method:account:AccountServiceImpl#create(User)"
+          },
+          {
+            "source": "scenario:finance-refusal",
+            "relation": "executes",
+            "target": "method:account:ErrorHandler#processValidationError(IllegalArgumentException)"
+          },
+          {
+            "source": "scenario:finance-refusal",
+            "relation": "executes",
+            "target": "method:account:User#getUsername()"
+          },
+          {
+            "source": "scenario:finance-refusal",
+            "relation": "executes",
+            "target": "method:account:User#setPassword(String)"
+          },
+          {
+            "source": "scenario:finance-refusal",
+            "relation": "executes",
+            "target": "method:account:User#setUsername(String)"
+          },
+          {
+            "source": "method:account:AccountController#createNewAccount(User)",
+            "relation": "calls",
+            "target": "method:account:AccountServiceImpl#create(User)"
+          },
+          {
+            "source": "method:account:AccountServiceImpl#create(User)",
+            "relation": "calls",
+            "target": "method:account:User#getUsername()"
+          },
+          {
+            "source": "method:account:AccountServiceImpl#create(User)",
+            "relation": "data",
+            "target": "res:collection:account.accounts"
+          }
+        ],
+        "diagnostics": [
+          "SLF4J native contract: provider transport failures are not modeled; source formatting callbacks and their caught throwables are modeled",
+          "request bean validation is not fully modeled: method:account:AccountController#createNewAccount(User)",
+          "State depends on earlier analysis assumptions: step 1: unresolved source/request/state assumptions"
+        ],
+        "first_loss": "SLF4J native contract: provider transport failures are not modeled; source formatting callbacks and their caught throwables are modeled"
+      },
+      {
+        "step": 3,
+        "source_producers": [
+          {
+            "consumer_field": "name",
+            "source": "literal",
+            "reference": "action"
+          }
+        ],
+        "preceding_step_result": null,
+        "consumer_request": {
+          "deployment": "account",
+          "method": "GET",
+          "url": "/demo",
+          "path": [
+            "demo"
+          ],
+          "query": {},
+          "query_complete": true,
+          "headers": {
+            "__rest_unknown__": true
+          },
+          "body": {
+            "missing": true
+          },
+          "actor": {
+            "unknown": true
+          },
+          "session": {
+            "storage": {},
+            "actor": {
+              "unknown": true
+            }
+          },
+          "body_properties": {},
+          "provenance": {
+            "name": {
+              "source": "literal",
+              "reference": "action",
+              "quote": "name \"demo\"",
+              "resolved": true
+            },
+            "__assumptions__": []
+          }
+        },
+        "actual_arguments": [
+          [
+            {
+              "name": "name",
+              "declared_type": "java.lang.String",
+              "native_kind": "String",
+              "value": "demo"
+            }
+          ]
+        ],
+        "result": {
+          "expenses": null,
+          "incomes": null,
+          "lastSeen": null,
+          "name": "demo",
+          "note": "seed",
+          "saving": null
+        },
+        "state_delta": {},
+        "per_step_edges": [
+          {
+            "source": "scenario:finance-refusal",
+            "relation": "executes",
+            "target": "method:account:AccountController#getAccountByName(String)"
+          },
+          {
+            "source": "scenario:finance-refusal",
+            "relation": "executes",
+            "target": "method:account:AccountServiceImpl#findByName(String)"
+          },
+          {
+            "source": "method:account:AccountController#getAccountByName(String)",
+            "relation": "calls",
+            "target": "method:account:AccountServiceImpl#findByName(String)"
+          },
+          {
+            "source": "method:account:AccountServiceImpl#findByName(String)",
+            "relation": "data",
+            "target": "res:collection:account.accounts"
+          }
+        ],
+        "diagnostics": [
+          "framework method interception is not fully modeled: PreAuthorize at method:account:AccountController#getAccountByName(String)",
+          "State depends on earlier analysis assumptions: step 1: unresolved source/request/state assumptions"
+        ],
+        "first_loss": "State depends on earlier analysis assumptions: step 1: unresolved source/request/state assumptions"
+      }
+    ]
+  }
+]

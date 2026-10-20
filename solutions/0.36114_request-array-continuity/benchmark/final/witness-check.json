@@ -1,0 +1,1320 @@
+{
+  "passed": true,
+  "steps": 103,
+  "per_scenario_relations": {
+    "S0": {
+      "executes": 30,
+      "calls": 15,
+      "remote": 0,
+      "data": 7
+    },
+    "S1": {
+      "executes": 101,
+      "calls": 94,
+      "remote": 13,
+      "data": 21
+    },
+    "S2": {
+      "executes": 100,
+      "calls": 90,
+      "remote": 11,
+      "data": 17
+    },
+    "S3": {
+      "executes": 90,
+      "calls": 80,
+      "remote": 9,
+      "data": 19
+    },
+    "S4": {
+      "executes": 88,
+      "calls": 86,
+      "remote": 10,
+      "data": 16
+    },
+    "S5": {
+      "executes": 108,
+      "calls": 115,
+      "remote": 16,
+      "data": 12
+    },
+    "S6": {
+      "executes": 119,
+      "calls": 101,
+      "remote": 18,
+      "data": 16
+    },
+    "S7": {
+      "executes": 90,
+      "calls": 78,
+      "remote": 12,
+      "data": 14
+    }
+  },
+  "entry_overview": [
+    {
+      "scenario": "S0",
+      "step": 1,
+      "action": "Log in with username and password",
+      "entries": [
+        "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S0",
+      "step": 2,
+      "action": "Open the contact book",
+      "entries": [
+        "method:ts-contacts-service:contacts.controller.ContactsController#findContactsByAccountId(java.lang.String,?HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S0",
+      "step": 3,
+      "action": "Refresh the list of orders for high-speed (GaoTie/DongChe) trains",
+      "entries": [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S0",
+      "step": 4,
+      "action": "Refresh the list of orders for regular ('Other' type) trains",
+      "entries": [
+        "method:ts-order-other-service:other.controller.OrderOtherController#queryOrdersForRefresh(other.entity.QueryInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S0",
+      "step": 5,
+      "action": "Refresh the list of orders filtered by the 'Paid' status",
+      "entries": [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S0",
+      "step": 6,
+      "action": "Look up the luggage consignments registered on the account",
+      "entries": [
+        "method:ts-consign-service:consign.controller.ConsignController#findByAccountId(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S1",
+      "step": 1,
+      "action": "Log in with username and password",
+      "entries": [
+        "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S1",
+      "step": 2,
+      "action": "Search high-speed (GaoTie/DongChe) trains from Shanghai to Suzhou departing on 1 October 2026",
+      "entries": [
+        "method:ts-travel-service:travel.controller.TravelController#queryInfo(edu.fudan.common.entity.TripInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S1",
+      "step": 3,
+      "action": "Open the details of the first trip found",
+      "entries": [
+        "method:ts-travel-service:travel.controller.TravelController#getTripAllDetailInfo(edu.fudan.common.entity.TripAllDetailInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S1",
+      "step": 4,
+      "action": "View the food menu offered on this trip",
+      "entries": [
+        "method:ts-train-food-service:trainFood.controller.TrainFoodController#getTrainFoodOfTrip(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S1",
+      "step": 5,
+      "action": "Open the contact book and take the first contact",
+      "entries": [
+        "method:ts-contacts-service:contacts.controller.ContactsController#findContactsByAccountId(java.lang.String,?HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S1",
+      "step": 6,
+      "action": "Book one first-class seat on the trip for this contact, with food on the train, assurance (insurance) of the first type and luggage consignment of 2 kg to a consignee",
+      "entries": [
+        "method:ts-preserve-other-service:preserveOther.controller.PreserveOtherController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+        "method:ts-preserve-service:preserve.controller.PreserveController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S1",
+      "step": 7,
+      "action": "Refresh the list of orders",
+      "entries": [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S1",
+      "step": 8,
+      "action": "Open the new order",
+      "entries": [
+        "method:ts-order-other-service:other.controller.OrderOtherController#queryOrdersForRefresh(other.entity.QueryInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S1",
+      "step": 9,
+      "action": "Check the price of the order",
+      "entries": [
+        "method:ts-order-service:order.controller.OrderController#getOrderPrice(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S1",
+      "step": 10,
+      "action": "Pay for the order from the internal account balance",
+      "entries": [
+        "method:ts-inside-payment-service:inside_payment.controller.InsidePaymentController#pay(inside_payment.entity.PaymentInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S1",
+      "step": 11,
+      "action": "Collect the ticket for the order",
+      "entries": [
+        "method:ts-execute-service:execute.controller.ExecuteControlller#collectTicket(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S1",
+      "step": 12,
+      "action": "Enter the station (board the train) with the order",
+      "entries": [
+        "method:ts-execute-service:execute.controller.ExecuteControlller#executeTicket(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S1",
+      "step": 13,
+      "action": "Look up the luggage consignment record of the order",
+      "entries": [
+        "method:ts-consign-service:consign.controller.ConsignController#findByOrderId(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S1",
+      "step": 14,
+      "action": "Look up the assurance (insurance) record of the order",
+      "entries": [
+        "method:ts-assurance-service:assurance.controller.AssuranceController#findAssuranceByOrderId(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S2",
+      "step": 1,
+      "action": "Log in with username and password",
+      "entries": [
+        "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S2",
+      "step": 2,
+      "action": "Search regular trains (the 'Other' train type, not high-speed) from Shanghai to Nanjing departing on 1 October 2026",
+      "entries": [
+        "method:ts-travel2-service:travel2.controller.Travel2Controller#queryInfo(edu.fudan.common.entity.TripInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S2",
+      "step": 3,
+      "action": "Open the details of the first trip found",
+      "entries": [
+        "method:ts-travel-service:travel.controller.TravelController#getTripAllDetailInfo(edu.fudan.common.entity.TripAllDetailInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S2",
+      "step": 4,
+      "action": "Browse the food stores at Suzhou station",
+      "entries": [
+        "method:ts-station-food-service:food.controller.StationFoodController#getFoodStoresByStationNames(java.util.List)",
+        "method:ts-station-food-service:food.controller.StationFoodController#getFoodStoresOfStation(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "HTTP binding failure",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S2",
+      "step": 5,
+      "action": "Open the contact book and take the first contact",
+      "entries": [
+        "method:ts-contacts-service:contacts.controller.ContactsController#findContactsByAccountId(java.lang.String,?HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S2",
+      "step": 6,
+      "action": "Book one first-class seat on the regular train for this contact, with food from a station store, no assurance (insurance) and no luggage consignment",
+      "entries": [
+        "method:ts-preserve-other-service:preserveOther.controller.PreserveOtherController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+        "method:ts-preserve-service:preserve.controller.PreserveController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S2",
+      "step": 7,
+      "action": "Refresh the list of orders",
+      "entries": [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S2",
+      "step": 8,
+      "action": "Pay for the order from the internal account balance",
+      "entries": [
+        "method:ts-inside-payment-service:inside_payment.controller.InsidePaymentController#pay(inside_payment.entity.PaymentInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S2",
+      "step": 9,
+      "action": "Ask how much would be refunded if the order were cancelled",
+      "entries": [
+        "method:ts-cancel-service:cancel.controller.CancelController#calculate(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S2",
+      "step": 10,
+      "action": "Cancel the order",
+      "entries": [
+        "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S2",
+      "step": 11,
+      "action": "Book another first-class seat on the same regular train for the same contact with the same station food",
+      "entries": [
+        "method:ts-rebook-service:rebook.controller.RebookController#rebook(rebook.entity.RebookInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S2",
+      "step": 12,
+      "action": "Refresh the list of orders",
+      "entries": [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S2",
+      "step": 13,
+      "action": "Pay for the new order from the internal account balance",
+      "entries": [
+        "method:ts-inside-payment-service:inside_payment.controller.InsidePaymentController#pay(inside_payment.entity.PaymentInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S2",
+      "step": 14,
+      "action": "Rebook the paid ticket to a second-class seat on the same regular train (the cheaper ticket: the difference is refunded to the internal balance)",
+      "entries": [
+        "method:ts-rebook-service:rebook.controller.RebookController#payDifference(rebook.entity.RebookInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S3",
+      "step": 1,
+      "action": "Log in with username and password",
+      "entries": [
+        "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S3",
+      "step": 2,
+      "action": "Search high-speed (GaoTie/DongChe) trains from Shanghai to Suzhou departing on 1 October 2026",
+      "entries": [
+        "method:ts-travel-service:travel.controller.TravelController#queryInfo(edu.fudan.common.entity.TripInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S3",
+      "step": 3,
+      "action": "Open the details of the first trip found",
+      "entries": [
+        "method:ts-travel-service:travel.controller.TravelController#getTripAllDetailInfo(edu.fudan.common.entity.TripAllDetailInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S3",
+      "step": 4,
+      "action": "Browse the food stores at Suzhou station",
+      "entries": [
+        "method:ts-station-food-service:food.controller.StationFoodController#getFoodStoresByStationNames(java.util.List)",
+        "method:ts-station-food-service:food.controller.StationFoodController#getFoodStoresOfStation(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "HTTP binding failure",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S3",
+      "step": 5,
+      "action": "Open the contact book and take the first contact",
+      "entries": [
+        "method:ts-contacts-service:contacts.controller.ContactsController#findContactsByAccountId(java.lang.String,?HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S3",
+      "step": 6,
+      "action": "Add a new contact (a companion with an ID card) to the contact book",
+      "entries": [
+        "method:ts-contacts-service:contacts.controller.ContactsController#createNewContacts(contacts.entity.Contacts,?HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S3",
+      "step": 7,
+      "action": "Book a first-class seat on the trip for the first contact, with food from a station store, assurance (insurance) of the first type and a luggage consignment of 0.5 kg to a consignee",
+      "entries": [
+        "method:ts-preserve-other-service:preserveOther.controller.PreserveOtherController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+        "method:ts-preserve-service:preserve.controller.PreserveController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S3",
+      "step": 8,
+      "action": "Book a second-class seat on the same trip for the new contact, without food, assurance or consignment",
+      "entries": [
+        "method:ts-preserve-other-service:preserveOther.controller.PreserveOtherController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+        "method:ts-preserve-service:preserve.controller.PreserveController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S3",
+      "step": 9,
+      "action": "Refresh the list of orders",
+      "entries": [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S3",
+      "step": 10,
+      "action": "Open the first new order",
+      "entries": [
+        "method:ts-order-other-service:other.controller.OrderOtherController#queryOrdersForRefresh(other.entity.QueryInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S3",
+      "step": 11,
+      "action": "Open the second new order",
+      "entries": [
+        "method:ts-order-other-service:other.controller.OrderOtherController#queryOrdersForRefresh(other.entity.QueryInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S3",
+      "step": 12,
+      "action": "Pay for the first order from the internal account balance",
+      "entries": [
+        "method:ts-inside-payment-service:inside_payment.controller.InsidePaymentController#pay(inside_payment.entity.PaymentInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S3",
+      "step": 13,
+      "action": "Pay for the second order from the internal account balance",
+      "entries": [
+        "method:ts-inside-payment-service:inside_payment.controller.InsidePaymentController#pay(inside_payment.entity.PaymentInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S3",
+      "step": 14,
+      "action": "Check what a 0.5 kg consignment within the region costs",
+      "entries": [
+        "method:ts-consign-price-service:consignprice.controller.ConsignPriceController#getPriceByWeightAndRegion(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S3",
+      "step": 15,
+      "action": "Look at the list of assurance types",
+      "entries": [
+        "method:ts-assurance-service:assurance.controller.AssuranceController#getAllAssuranceType(org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S4",
+      "step": 1,
+      "action": "Register a new passenger account (username, password, gender, ID document, e-mail)",
+      "entries": [
+        "method:ts-user-service:user.controller.UserController#registerUser(user.dto.UserDto,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S4",
+      "step": 2,
+      "action": "Log in with the new username and password",
+      "entries": [
+        "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception",
+        "unsupported_semantics boundary"
+      ]
+    },
+    {
+      "scenario": "S4",
+      "step": 3,
+      "action": "Add a contact (the passenger themselves) to the empty contact book",
+      "entries": [
+        "method:ts-contacts-service:contacts.controller.ContactsController#createNewContacts(contacts.entity.Contacts,?HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S4",
+      "step": 4,
+      "action": "Search high-speed (GaoTie/DongChe) trains from Shanghai to Suzhou departing on 1 October 2026",
+      "entries": [
+        "method:ts-travel-service:travel.controller.TravelController#queryInfo(edu.fudan.common.entity.TripInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S4",
+      "step": 5,
+      "action": "Open the details of the first trip found",
+      "entries": [
+        "method:ts-travel-service:travel.controller.TravelController#getTripAllDetailInfo(edu.fudan.common.entity.TripAllDetailInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S4",
+      "step": 6,
+      "action": "View the food menu offered on this trip",
+      "entries": [
+        "method:ts-train-food-service:trainFood.controller.TrainFoodController#getTrainFoodOfTrip(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S4",
+      "step": 7,
+      "action": "Book a first-class seat on the trip for the new contact, with food on the train and assurance (insurance) of the first type, without consignment",
+      "entries": [
+        "method:ts-preserve-other-service:preserveOther.controller.PreserveOtherController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+        "method:ts-preserve-service:preserve.controller.PreserveController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S4",
+      "step": 8,
+      "action": "Refresh the list of orders",
+      "entries": [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S4",
+      "step": 9,
+      "action": "Open the new order",
+      "entries": [
+        "method:ts-order-other-service:other.controller.OrderOtherController#queryOrdersForRefresh(other.entity.QueryInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S4",
+      "step": 10,
+      "action": "Check the price of the order",
+      "entries": [
+        "method:ts-order-service:order.controller.OrderController#getOrderPrice(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S4",
+      "step": 11,
+      "action": "Pay for the order: the internal balance is empty, so the payment is completed through the external payment channel",
+      "entries": [
+        "method:ts-inside-payment-service:inside_payment.controller.InsidePaymentController#pay(inside_payment.entity.PaymentInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S4",
+      "step": 12,
+      "action": "Ask how much would be refunded if the paid order were cancelled",
+      "entries": [
+        "method:ts-cancel-service:cancel.controller.CancelController#calculate(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S4",
+      "step": 13,
+      "action": "Cancel the paid order (the refund goes back to the internal balance)",
+      "entries": [
+        "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S4",
+      "step": 14,
+      "action": "Refresh the list of orders filtered by the 'Cancel' status",
+      "entries": [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S5",
+      "step": 1,
+      "action": "Log in with username and password",
+      "entries": [
+        "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S5",
+      "step": 2,
+      "action": "Advanced search: the cheapest trips from Shanghai to Nanjing on 1 October 2026",
+      "entries": [
+        "method:ts-travel-plan-service:travelplan.controller.TravelPlanController#getByCheapest(edu.fudan.common.entity.TripInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S5",
+      "step": 3,
+      "action": "Advanced search: the quickest trips from Shanghai to Nanjing on 1 October 2026",
+      "entries": [
+        "method:ts-travel-plan-service:travelplan.controller.TravelPlanController#getByQuickest(edu.fudan.common.entity.TripInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S5",
+      "step": 4,
+      "action": "Advanced search: the trips with the fewest stops from Shanghai to Nanjing on 1 October 2026",
+      "entries": [
+        "method:ts-travel-plan-service:travelplan.controller.TravelPlanController#getByMinStation(edu.fudan.common.entity.TripInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S5",
+      "step": 5,
+      "action": "Ask for trips with a transfer at Suzhou (Shanghai — Suzhou — Nanjing) on 1 October 2026",
+      "entries": [
+        "method:ts-travel-plan-service:travelplan.controller.TravelPlanController#getTransferResult(travelplan.entity.TransferTravelInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S5",
+      "step": 6,
+      "action": "Open the details of the cheapest trip found (a regular, 'Other'-type train)",
+      "entries": [
+        "method:ts-travel-service:travel.controller.TravelController#getTripAllDetailInfo(edu.fudan.common.entity.TripAllDetailInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S5",
+      "step": 7,
+      "action": "Open the contact book and take the first contact",
+      "entries": [
+        "method:ts-contacts-service:contacts.controller.ContactsController#findContactsByAccountId(java.lang.String,?HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S5",
+      "step": 8,
+      "action": "Book a first-class seat on the cheapest (regular) trip for this contact, without food, assurance or consignment",
+      "entries": [
+        "method:ts-preserve-other-service:preserveOther.controller.PreserveOtherController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+        "method:ts-preserve-service:preserve.controller.PreserveController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S5",
+      "step": 9,
+      "action": "Refresh the list of orders",
+      "entries": [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S5",
+      "step": 10,
+      "action": "Pay for the order from the internal account balance",
+      "entries": [
+        "method:ts-inside-payment-service:inside_payment.controller.InsidePaymentController#pay(inside_payment.entity.PaymentInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S5",
+      "step": 11,
+      "action": "Collect the ticket for the order",
+      "entries": [
+        "method:ts-execute-service:execute.controller.ExecuteControlller#collectTicket(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S5",
+      "step": 12,
+      "action": "Enter the station (board the train) with the order",
+      "entries": [
+        "method:ts-execute-service:execute.controller.ExecuteControlller#executeTicket(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S6",
+      "step": 1,
+      "action": "Log in to the admin console with the administrator's username and password",
+      "entries": [
+        "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S6",
+      "step": 2,
+      "action": "Add a new station Ning Bo with a stay time of 5 minutes",
+      "entries": [
+        "method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#addStation(edu.fudan.common.entity.Station,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "uncaught application exception",
+        "unsupported_semantics boundary"
+      ]
+    },
+    {
+      "scenario": "S6",
+      "step": 3,
+      "action": "Add a new train type GaoTieSix with 100 second-class and 30 first-class seats and an average speed of 300",
+      "entries": [
+        "method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#addTrain(edu.fudan.common.entity.TrainType,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception",
+        "unsupported_semantics boundary"
+      ]
+    },
+    {
+      "scenario": "S6",
+      "step": 4,
+      "action": "Add a new route Shanghai — Suzhou — Ning Bo with distances 0, 100 and 250",
+      "entries": [
+        "method:ts-admin-route-service:adminroute.controller.AdminRouteController#addRoute(edu.fudan.common.entity.RouteInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S6",
+      "step": 5,
+      "action": "Add a price configuration for train type GaoTieSix on the new route: basic rate 0.5, first-class rate 1.2",
+      "entries": [
+        "method:ts-admin-basic-info-service:adminbasic.controller.AdminBasicInfoController#addPrice(adminbasic.entity.PriceInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception",
+        "unsupported_semantics boundary"
+      ]
+    },
+    {
+      "scenario": "S6",
+      "step": 6,
+      "action": "Add a new high-speed trip G9101 of type GaoTieSix on the new route from Shanghai via Suzhou to Ning Bo, departing 09:00 and arriving 12:00",
+      "entries": [
+        "method:ts-admin-travel-service:admintravel.controller.AdminTravelController#addTravel(edu.fudan.common.entity.TravelInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S6",
+      "step": 7,
+      "action": "Log in as a passenger with username and password",
+      "entries": [
+        "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S6",
+      "step": 8,
+      "action": "Search high-speed (GaoTie/DongChe) trains from Shanghai to Ning Bo departing on 1 October 2026",
+      "entries": [
+        "method:ts-travel-service:travel.controller.TravelController#queryInfo(edu.fudan.common.entity.TripInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S6",
+      "step": 9,
+      "action": "Open the details of the new trip found",
+      "entries": [
+        "method:ts-travel-service:travel.controller.TravelController#getTripAllDetailInfo(edu.fudan.common.entity.TripAllDetailInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S6",
+      "step": 10,
+      "action": "Open the contact book and take the first contact",
+      "entries": [
+        "method:ts-contacts-service:contacts.controller.ContactsController#findContactsByAccountId(java.lang.String,?HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S6",
+      "step": 11,
+      "action": "Book a first-class seat on the new trip for this contact, without food, assurance or consignment",
+      "entries": [
+        "method:ts-preserve-other-service:preserveOther.controller.PreserveOtherController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+        "method:ts-preserve-service:preserve.controller.PreserveController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S6",
+      "step": 12,
+      "action": "Refresh the list of orders",
+      "entries": [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S6",
+      "step": 13,
+      "action": "Pay for the order from the internal account balance",
+      "entries": [
+        "method:ts-inside-payment-service:inside_payment.controller.InsidePaymentController#pay(inside_payment.entity.PaymentInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S6",
+      "step": 14,
+      "action": "As the administrator, open the list of all orders in the system",
+      "entries": [
+        "method:ts-admin-order-service:adminorder.controller.AdminOrderController#getAllOrders(org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S7",
+      "step": 1,
+      "action": "Log in with username and password",
+      "entries": [
+        "method:ts-auth-service:auth.controller.UserController#getToken(auth.dto.BasicAuthDto,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S7",
+      "step": 2,
+      "action": "Search high-speed (GaoTie/DongChe) trains from Shanghai to Suzhou departing on 1 October 2026",
+      "entries": [
+        "method:ts-travel-service:travel.controller.TravelController#queryInfo(edu.fudan.common.entity.TripInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S7",
+      "step": 3,
+      "action": "Open the contact book and take the first contact",
+      "entries": [
+        "method:ts-contacts-service:contacts.controller.ContactsController#findContactsByAccountId(java.lang.String,?HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S7",
+      "step": 4,
+      "action": "Book a first-class seat on the first trip found for this contact, with a luggage consignment of 3 kg to a consignee, without food or assurance",
+      "entries": [
+        "method:ts-preserve-other-service:preserveOther.controller.PreserveOtherController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)",
+        "method:ts-preserve-service:preserve.controller.PreserveController#preserve(edu.fudan.common.entity.OrderTicketsInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted"
+      ]
+    },
+    {
+      "scenario": "S7",
+      "step": 5,
+      "action": "Refresh the list of orders",
+      "entries": [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S7",
+      "step": 6,
+      "action": "Pay for the order from the internal account balance",
+      "entries": [
+        "method:ts-inside-payment-service:inside_payment.controller.InsidePaymentController#pay(inside_payment.entity.PaymentInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned"
+      ]
+    },
+    {
+      "scenario": "S7",
+      "step": 7,
+      "action": "Collect the ticket for the order",
+      "entries": [
+        "method:ts-execute-service:execute.controller.ExecuteControlller#collectTicket(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S7",
+      "step": 8,
+      "action": "Ask how much would be refunded for the collected order",
+      "entries": [
+        "method:ts-cancel-service:cancel.controller.CancelController#calculate(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S7",
+      "step": 9,
+      "action": "Try to cancel the collected order (the system refuses)",
+      "entries": [
+        "method:ts-cancel-service:cancel.controller.CancelController#cancelTicket(java.lang.String,java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S7",
+      "step": 10,
+      "action": "Try to rebook the collected order onto the second high-speed trip found (the system refuses)",
+      "entries": [
+        "method:ts-rebook-service:rebook.controller.RebookController#rebook(rebook.entity.RebookInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S7",
+      "step": 11,
+      "action": "Look up the luggage consignment of the order",
+      "entries": [
+        "method:ts-consign-service:consign.controller.ConsignController#findByOrderId(java.lang.String,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "returned",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S7",
+      "step": 12,
+      "action": "Change the consignee's name and phone number in the consignment",
+      "entries": [
+        "method:ts-consign-service:consign.controller.ConsignController#updateConsign(consign.entity.Consign,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S7",
+      "step": 13,
+      "action": "Refresh the list of orders filtered by travel date (September — December 2026)",
+      "entries": [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "uncaught application exception"
+      ]
+    },
+    {
+      "scenario": "S7",
+      "step": 14,
+      "action": "Refresh the list of orders filtered by purchase date (today)",
+      "entries": [
+        "method:ts-order-service:order.controller.OrderController#queryOrdersForRefresh(order.entity.OrderInfo,org.springframework.http.HttpHeaders)"
+      ],
+      "outcomes": [
+        "analysis completion budget exhausted",
+        "uncaught application exception"
+      ]
+    }
+  ],
+  "all_step_graph_unions_match_submission": true,
+  "public_payment_entries": 8,
+  "preserved_related_reads_and_admin": {
+    "S1/13": [
+      "method:ts-consign-service:consign.controller.ConsignController#findByOrderId(java.lang.String,org.springframework.http.HttpHeaders)"
+    ],
+    "S1/14": [
+      "method:ts-assurance-service:assurance.controller.AssuranceController#findAssuranceByOrderId(java.lang.String,org.springframework.http.HttpHeaders)"
+    ],
+    "S7/11": [
+      "method:ts-consign-service:consign.controller.ConsignController#findByOrderId(java.lang.String,org.springframework.http.HttpHeaders)"
+    ],
+    "S6/14": [
+      "method:ts-admin-order-service:adminorder.controller.AdminOrderController#getAllOrders(org.springframework.http.HttpHeaders)"
+    ]
+  },
+  "partial_dto_explicit_fields_preserved": true,
+  "submission_sha256": "1f634b961b983d1ef5bfb63d06d8f5b2fb6542c2ef321d36146f920554dd5353",
+  "limits": [
+    "TT assertions cover handler and value regressions, not hidden graph correctness",
+    "Remaining TT search/list ambiguity and missing client storage are reported as unresolved",
+    "Public payment entry correctness alone does not prove successful payment for an NL-created order"
+  ]
+}

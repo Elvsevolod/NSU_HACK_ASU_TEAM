@@ -1,0 +1,488 @@
+{
+  "project": "organization",
+  "cases": [
+    {
+      "id": "organization-state-chain",
+      "steps": [
+        {
+          "explicit_action": "POST http://organization/\n{\"id\": \"O1\", \"name\": \"North Lab\", \"address\": \"Main Street\"}",
+          "nl_action": "Создай организацию: id=\"O1\", name=\"North Lab\", address=\"Main Street\".",
+          "http_request": {
+            "method": "POST",
+            "url": "http://organization/",
+            "headers": {},
+            "body": {
+              "id": "O1",
+              "name": "North Lab",
+              "address": "Main Street"
+            }
+          },
+          "expected_entry": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#add(Organization)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#add(Organization)"
+            },
+            {
+              "source": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#add(Organization)",
+              "relation": "data",
+              "target": "res:table:organization-service.organization"
+            }
+          ],
+          "expected_result_projection": {
+            "id": "O1",
+            "name": "North Lab",
+            "address": "Main Street"
+          },
+          "expected_completion": "returned",
+          "notes": [],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        },
+        {
+          "explicit_action": "POST http://department/\n{\"id\": \"D1\", \"organizationId\": \"O1\", \"name\": \"Research\"}",
+          "nl_action": "Создай отдел организации O1: id=\"D1\", organizationId=\"O1\", name=\"Research\".",
+          "http_request": {
+            "method": "POST",
+            "url": "http://department/",
+            "headers": {},
+            "body": {
+              "id": "D1",
+              "organizationId": "O1",
+              "name": "Research"
+            }
+          },
+          "expected_entry": "method:department-service:pl.piomin.services.department.controller.DepartmentController#add(Department)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:department-service:pl.piomin.services.department.controller.DepartmentController#add(Department)"
+            },
+            {
+              "source": "method:department-service:pl.piomin.services.department.controller.DepartmentController#add(Department)",
+              "relation": "data",
+              "target": "res:table:department-service.department"
+            }
+          ],
+          "expected_result_projection": {
+            "id": "D1",
+            "organizationId": "O1",
+            "name": "Research"
+          },
+          "expected_completion": "returned",
+          "notes": [],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        },
+        {
+          "explicit_action": "POST http://employee/\n{\"id\": \"E1\", \"organizationId\": \"O1\", \"departmentId\": \"D1\", \"name\": \"Ada\", \"age\": 23, \"position\": \"Engineer\"}",
+          "nl_action": "Добавь сотрудника отдела D1: id=\"E1\", organizationId=\"O1\", departmentId=\"D1\", name=\"Ada\", age=23, position=\"Engineer\".",
+          "http_request": {
+            "method": "POST",
+            "url": "http://employee/",
+            "headers": {},
+            "body": {
+              "id": "E1",
+              "organizationId": "O1",
+              "departmentId": "D1",
+              "name": "Ada",
+              "age": 23,
+              "position": "Engineer"
+            }
+          },
+          "expected_entry": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#add(Employee)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#add(Employee)"
+            },
+            {
+              "source": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#add(Employee)",
+              "relation": "data",
+              "target": "res:table:employee-service.employee"
+            }
+          ],
+          "expected_result_projection": {
+            "id": "E1",
+            "organizationId": "O1",
+            "departmentId": "D1",
+            "name": "Ada",
+            "age": 23,
+            "position": "Engineer"
+          },
+          "expected_completion": "returned",
+          "notes": [],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        },
+        {
+          "explicit_action": "GET http://department/D1/with-employees",
+          "nl_action": "Покажи отдел D1 вместе с его сотрудниками.",
+          "http_request": {
+            "method": "GET",
+            "url": "http://department/D1/with-employees",
+            "headers": {}
+          },
+          "expected_entry": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findByIdWithEmployees(String)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findByIdWithEmployees(String)"
+            },
+            {
+              "source": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findByIdWithEmployees(String)",
+              "relation": "data",
+              "target": "res:table:department-service.department"
+            },
+            {
+              "source": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findByDepartment(String)",
+              "relation": "data",
+              "target": "res:table:employee-service.employee"
+            },
+            {
+              "source": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findByIdWithEmployees(String)",
+              "relation": "remote",
+              "target": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findByDepartment(String)"
+            },
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findByDepartment(String)"
+            }
+          ],
+          "expected_result_projection": {
+            "id": "D1",
+            "employees": [
+              {
+                "id": "E1",
+                "age": 23
+              }
+            ]
+          },
+          "expected_completion": "returned",
+          "notes": [],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        },
+        {
+          "explicit_action": "POST http://employee/\n{\"id\": \"E1\", \"organizationId\": \"O1\", \"departmentId\": \"D1\", \"name\": \"Ada\", \"age\": 24, \"position\": \"Senior Engineer\"}",
+          "nl_action": "Обнови сотрудника E1 через сохранение: id=\"E1\", organizationId=\"O1\", departmentId=\"D1\", name=\"Ada\", age=24, position=\"Senior Engineer\".",
+          "http_request": {
+            "method": "POST",
+            "url": "http://employee/",
+            "headers": {},
+            "body": {
+              "id": "E1",
+              "organizationId": "O1",
+              "departmentId": "D1",
+              "name": "Ada",
+              "age": 24,
+              "position": "Senior Engineer"
+            }
+          },
+          "expected_entry": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#add(Employee)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#add(Employee)"
+            },
+            {
+              "source": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#add(Employee)",
+              "relation": "data",
+              "target": "res:table:employee-service.employee"
+            }
+          ],
+          "expected_result_projection": {
+            "id": "E1",
+            "organizationId": "O1",
+            "departmentId": "D1",
+            "name": "Ada",
+            "age": 24,
+            "position": "Senior Engineer"
+          },
+          "expected_completion": "returned",
+          "notes": [
+            "Mongo save with an already assigned id replaces that document; it does not create a second E1."
+          ],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        },
+        {
+          "explicit_action": "GET http://organization/O1/with-departments-and-employees",
+          "nl_action": "Покажи организацию O1 вместе с отделами и сотрудниками.",
+          "http_request": {
+            "method": "GET",
+            "url": "http://organization/O1/with-departments-and-employees",
+            "headers": {}
+          },
+          "expected_entry": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#findByIdWithDepartmentsAndEmployees(String)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#findByIdWithDepartmentsAndEmployees(String)"
+            },
+            {
+              "source": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#findByIdWithDepartmentsAndEmployees(String)",
+              "relation": "data",
+              "target": "res:table:organization-service.organization"
+            },
+            {
+              "source": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findByOrganizationWithEmployees(String)",
+              "relation": "data",
+              "target": "res:table:department-service.department"
+            },
+            {
+              "source": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findByDepartment(String)",
+              "relation": "data",
+              "target": "res:table:employee-service.employee"
+            },
+            {
+              "source": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#findByIdWithDepartmentsAndEmployees(String)",
+              "relation": "remote",
+              "target": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findByOrganizationWithEmployees(String)"
+            },
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findByOrganizationWithEmployees(String)"
+            },
+            {
+              "source": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findByOrganizationWithEmployees(String)",
+              "relation": "remote",
+              "target": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findByDepartment(String)"
+            },
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findByDepartment(String)"
+            }
+          ],
+          "expected_result_projection": {
+            "id": "O1",
+            "departments": [
+              {
+                "id": "D1",
+                "employees": [
+                  {
+                    "id": "E1",
+                    "age": 24,
+                    "position": "Senior Engineer"
+                  }
+                ]
+              }
+            ]
+          },
+          "expected_completion": "returned",
+          "notes": [],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        },
+        {
+          "explicit_action": "GET http://employee/E1",
+          "nl_action": "Прочитай обновлённого сотрудника E1.",
+          "http_request": {
+            "method": "GET",
+            "url": "http://employee/E1",
+            "headers": {}
+          },
+          "expected_entry": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)"
+            },
+            {
+              "source": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)",
+              "relation": "data",
+              "target": "res:table:employee-service.employee"
+            }
+          ],
+          "expected_result_projection": {
+            "id": "E1",
+            "organizationId": "O1",
+            "departmentId": "D1",
+            "name": "Ada",
+            "age": 24,
+            "position": "Senior Engineer"
+          },
+          "expected_completion": "returned",
+          "notes": [],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        },
+        {
+          "explicit_action": "GET http://employee/absent",
+          "nl_action": "Повтори чтение отсутствующего сотрудника absent.",
+          "http_request": {
+            "method": "GET",
+            "url": "http://employee/absent",
+            "headers": {}
+          },
+          "expected_entry": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)"
+            },
+            {
+              "source": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)",
+              "relation": "data",
+              "target": "res:table:employee-service.employee"
+            }
+          ],
+          "expected_result_projection": null,
+          "expected_completion": "failure",
+          "notes": [
+            "orElseThrow has no business 404 mapping here; unhandled NoSuchElementException, not a fabricated successful empty Employee."
+          ],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        },
+        {
+          "explicit_action": "GET http://employee/absent",
+          "nl_action": "Повтори чтение отсутствующего сотрудника absent.",
+          "http_request": {
+            "method": "GET",
+            "url": "http://employee/absent",
+            "headers": {}
+          },
+          "expected_entry": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)"
+            },
+            {
+              "source": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)",
+              "relation": "data",
+              "target": "res:table:employee-service.employee"
+            }
+          ],
+          "expected_result_projection": null,
+          "expected_completion": "failure",
+          "notes": [
+            "orElseThrow has no business 404 mapping here; unhandled NoSuchElementException, not a fabricated successful empty Employee."
+          ],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        }
+      ],
+      "covers": [
+        "create",
+        "select",
+        "update",
+        "read",
+        "repeat-refusal",
+        "remote",
+        "data",
+        "scenario-isolation"
+      ]
+    },
+    {
+      "id": "organization-fresh-isolation",
+      "steps": [
+        {
+          "explicit_action": "GET http://employee/E1",
+          "nl_action": "В независимом сценарии найди сотрудника E1.",
+          "http_request": {
+            "method": "GET",
+            "url": "http://employee/E1",
+            "headers": {}
+          },
+          "expected_entry": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)",
+          "required_edges": [
+            {
+              "source": "$scenario",
+              "relation": "executes",
+              "target": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)"
+            },
+            {
+              "source": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)",
+              "relation": "data",
+              "target": "res:table:employee-service.employee"
+            }
+          ],
+          "expected_result_projection": null,
+          "expected_completion": "failure",
+          "notes": [
+            "Initial datastore is empty again; preceding scenario writes must not leak."
+          ],
+          "oracle_scope": "partial HTTP/source-body requirements; not full JVM/Jackson/filter precision"
+        }
+      ],
+      "covers": [
+        "scenario-isolation",
+        "refusal"
+      ]
+    }
+  ],
+  "inference_predictions_used": false,
+  "partial_sections": [
+    "Framework/logging/Jackson callback execution is not a complete oracle.",
+    "No forced transport outage is claimed. Real delayed Resilience4J route is present in source but its scheduler/timeout alternatives are outside this exact subset.",
+    "Inactive DepartmentWithRestTemplateController is not an acceptable live HTTP handler; original source annotation facts remain in the skeleton."
+  ],
+  "reviewer": "Codex independent source engineering before first prediction",
+  "source_evidence": [
+    {
+      "entry": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#add(Organization)",
+      "file": "organization-service/src/main/java/pl/piomin/services/organization/controller/OrganizationController.java",
+      "line": 24,
+      "source_sha256": "141fda154771429a3f311f5ded095d90f77a89d5d1a17786bb06652874245448"
+    },
+    {
+      "entry": "method:department-service:pl.piomin.services.department.controller.DepartmentController#add(Department)",
+      "file": "department-service/src/main/java/pl/piomin/services/department/controller/DepartmentController.java",
+      "line": 37,
+      "source_sha256": "ad32e282817f5f682c037e0084ce262ba5c2fa8aa85fe2a89ed6feee1d54a979"
+    },
+    {
+      "entry": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#add(Employee)",
+      "file": "employee-service/src/main/java/pl/piomin/services/employee/controller/EmployeeController.java",
+      "line": 25,
+      "source_sha256": "e0dfafbd70626f1cbab7922aa1dd584399c88134798baef5090d54e07e0c2221"
+    },
+    {
+      "entry": "method:department-service:pl.piomin.services.department.controller.DepartmentController#findByIdWithEmployees(String)",
+      "file": "department-service/src/main/java/pl/piomin/services/department/controller/DepartmentController.java",
+      "line": 49,
+      "source_sha256": "ad32e282817f5f682c037e0084ce262ba5c2fa8aa85fe2a89ed6feee1d54a979"
+    },
+    {
+      "entry": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#add(Employee)",
+      "file": "employee-service/src/main/java/pl/piomin/services/employee/controller/EmployeeController.java",
+      "line": 25,
+      "source_sha256": "e0dfafbd70626f1cbab7922aa1dd584399c88134798baef5090d54e07e0c2221"
+    },
+    {
+      "entry": "method:organization-service:pl.piomin.services.organization.controller.OrganizationController#findByIdWithDepartmentsAndEmployees(String)",
+      "file": "organization-service/src/main/java/pl/piomin/services/organization/controller/OrganizationController.java",
+      "line": 50,
+      "source_sha256": "141fda154771429a3f311f5ded095d90f77a89d5d1a17786bb06652874245448"
+    },
+    {
+      "entry": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)",
+      "file": "employee-service/src/main/java/pl/piomin/services/employee/controller/EmployeeController.java",
+      "line": 31,
+      "source_sha256": "e0dfafbd70626f1cbab7922aa1dd584399c88134798baef5090d54e07e0c2221"
+    },
+    {
+      "entry": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)",
+      "file": "employee-service/src/main/java/pl/piomin/services/employee/controller/EmployeeController.java",
+      "line": 31,
+      "source_sha256": "e0dfafbd70626f1cbab7922aa1dd584399c88134798baef5090d54e07e0c2221"
+    },
+    {
+      "entry": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)",
+      "file": "employee-service/src/main/java/pl/piomin/services/employee/controller/EmployeeController.java",
+      "line": 31,
+      "source_sha256": "e0dfafbd70626f1cbab7922aa1dd584399c88134798baef5090d54e07e0c2221"
+    },
+    {
+      "entry": "method:employee-service:pl.piomin.services.employee.controller.EmployeeController#findById(String)",
+      "file": "employee-service/src/main/java/pl/piomin/services/employee/controller/EmployeeController.java",
+      "line": 31,
+      "source_sha256": "e0dfafbd70626f1cbab7922aa1dd584399c88134798baef5090d54e07e0c2221"
+    }
+  ]
+}

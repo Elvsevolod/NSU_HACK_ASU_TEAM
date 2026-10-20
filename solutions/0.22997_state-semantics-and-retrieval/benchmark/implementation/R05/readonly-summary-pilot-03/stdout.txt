@@ -1,0 +1,23 @@
+.......F................                                                 [100%]
+=================================== FAILURES ===================================
+_ test_potential_writes_and_transaction_do_not_get_readonly_summary[String projected=item;--@Transactional ] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-18/test_potential_writes_and_tran2')
+body = 'String projected=item;', suffix = '', annotation = '@Transactional '
+
+    @pytest.mark.parametrize('body,suffix,annotation',[
+        ('String projected=item;','rest.postForObject("http://warehouse/reserve/A",null,String.class);',''),
+        ('rest.postForObject("http://warehouse/reserve/"+item,null,String.class);','',''),
+        ('String projected=item;','','@Transactional '),
+    ])
+    def test_potential_writes_and_transaction_do_not_get_readonly_summary(tmp_path,body,suffix,annotation):
+        p,db,ids=fixture(tmp_path,body,suffix,annotation);_,e=run(p,db,ids,True)
+        assert e.outcome=='unsupported_semantics boundary'
+>       assert not any(x.get('model_version')=='readonly-native-foreach-stop/1' for x in e.effect_events)
+E       assert not True
+E        +  where True = any(<generator object test_potential_writes_and_transaction_do_not_get_readonly_summary.<locals>.<genexpr> at 0x102043060>)
+
+code/tests/test_scoped_effects32.py:99: AssertionError
+=========================== short test summary info ============================
+FAILED code/tests/test_scoped_effects32.py::test_potential_writes_and_transaction_do_not_get_readonly_summary[String projected=item;--@Transactional ]
+1 failed, 23 passed in 0.21s

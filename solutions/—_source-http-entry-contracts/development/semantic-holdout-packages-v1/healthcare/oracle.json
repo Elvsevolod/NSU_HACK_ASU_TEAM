@@ -1,0 +1,3581 @@
+{
+  "project": "holdout-healthcare-v1",
+  "source_revision": "ec9dc6ce8c6df49607b5bbdb5f072ac1cae980d4",
+  "prepared_before_inference": true,
+  "inference_predictions_used": false,
+  "projection_reference": "tt-challenge/REFERENCE.md:62-64",
+  "initial_tables": {
+    "hospital_db.doctors": [
+      {
+        "id": 7,
+        "name": "Dr Vale",
+        "specialization": "Cardiology",
+        "experience": 12,
+        "phone": "701"
+      }
+    ],
+    "hospital_db.patients": [
+      {
+        "id": 11,
+        "name": "Seed Patient",
+        "age": 45,
+        "gender": "F",
+        "department": "General",
+        "phone": "702"
+      }
+    ]
+  },
+  "identity_rule": "Fresh source-declared Long, same identity in producer response, subsequent wire/binding and persistent rows; numeric spelling never chosen from a prediction.",
+  "cases": {
+    "healthcare-state-chain-explicit-script": {
+      "mode": "explicit-script",
+      "steps": [
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            },
+            "name": "Mira Bell",
+            "age": 29,
+            "gender": "F",
+            "department": "Cardiology",
+            "phone": "703"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              },
+              {
+                "id": {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                },
+                "name": "Mira Bell",
+                "age": 29,
+                "gender": "F",
+                "department": "Cardiology",
+                "phone": "703"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)",
+              "operation": "save",
+              "table": "res:table:hospital_db.patients",
+              "writes": true
+            }
+          ],
+          "remote_requests": [],
+          "producer": {
+            "identity": "new_patient",
+            "response_path": [
+              "id"
+            ],
+            "origin": "ORM generated identifier",
+            "native_kind": "Long"
+          },
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            },
+            "name": "Mira Bell",
+            "age": 29,
+            "gender": "F",
+            "department": "Cardiology",
+            "phone": "703"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              },
+              {
+                "id": {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                },
+                "name": "Mira Bell",
+                "age": 29,
+                "gender": "F",
+                "department": "Cardiology",
+                "phone": "703"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "operation": "findById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": false
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            },
+            "name": "Mira Bell",
+            "age": 30,
+            "gender": "F",
+            "department": "Rehabilitation",
+            "phone": "704"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              },
+              {
+                "id": {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                },
+                "name": "Mira Bell",
+                "age": 30,
+                "gender": "F",
+                "department": "Rehabilitation",
+                "phone": "704"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "operation": "findById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": false
+            },
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+              "operation": "save",
+              "table": "res:table:hospital_db.patients",
+              "writes": true
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            },
+            "name": "Mira Bell",
+            "age": 30,
+            "gender": "F",
+            "department": "Rehabilitation",
+            "phone": "704"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              },
+              {
+                "id": {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                },
+                "name": "Mira Bell",
+                "age": 30,
+                "gender": "F",
+                "department": "Rehabilitation",
+                "phone": "704"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "operation": "findById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": false
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+              "relation": "calls",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.doctors"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "relation": "calls",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "relation": "remote",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "doctor": {
+              "id": 7,
+              "name": "Dr Vale",
+              "specialization": "Cardiology",
+              "experience": 12,
+              "phone": "701"
+            },
+            "patient": {
+              "id": {
+                "$identity": "new_patient",
+                "native_kind": "Long",
+                "fresh": true
+              },
+              "name": "Mira Bell",
+              "age": 30,
+              "gender": "F",
+              "department": "Rehabilitation",
+              "phone": "704"
+            }
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              },
+              {
+                "id": {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                },
+                "name": "Mira Bell",
+                "age": 30,
+                "gender": "F",
+                "department": "Rehabilitation",
+                "phone": "704"
+              }
+            ]
+          },
+          "operations": [],
+          "remote_requests": [
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "deployment": "patient-service",
+              "method": "GET",
+              "path": [
+                "patients",
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "query": {},
+              "status": 200
+            }
+          ],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": null,
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)",
+              "operation": "deleteById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": true
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            }
+          ],
+          "status": 404,
+          "result": {
+            "timestamp": {
+              "$native": "LocalDateTime"
+            },
+            "message": {
+              "$text": [
+                "Patient not found with ID: ",
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ]
+            },
+            "status": 404
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "operation": "findById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": false
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            }
+          ],
+          "status": 404,
+          "result": {
+            "timestamp": {
+              "$native": "LocalDateTime"
+            },
+            "message": {
+              "$text": [
+                "Patient not found with ID: ",
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ]
+            },
+            "status": 404
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "operation": "findById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": false
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleGenericException(Exception)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+              "relation": "calls",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.doctors"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "relation": "calls",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "relation": "remote",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 500,
+          "result": {
+            "timestamp": {
+              "$native": "LocalDateTime"
+            },
+            "message": {
+              "$native": "FeignExceptionMessage",
+              "response": {
+                "timestamp": {
+                  "$native": "LocalDateTime"
+                },
+                "message": {
+                  "$text": [
+                    "Patient not found with ID: ",
+                    {
+                      "$identity": "new_patient",
+                      "native_kind": "Long",
+                      "fresh": true
+                    }
+                  ]
+                },
+                "status": 404
+              }
+            },
+            "status": 500
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [],
+          "remote_requests": [
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "deployment": "patient-service",
+              "method": "GET",
+              "path": [
+                "patients",
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "query": {},
+              "status": 404
+            }
+          ],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": [
+            "Exact Feign exception message spelling is version dependent; assert the source exception-message relationship and String kind, not a guessed literal."
+          ]
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": 11,
+            "name": "Seed Patient",
+            "age": 45,
+            "gender": "F",
+            "department": "General",
+            "phone": "702"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        }
+      ],
+      "environment": "normal",
+      "full_graph_oracle": true,
+      "full_persistent_state_oracle": true
+    },
+    "healthcare-state-chain-nl-en": {
+      "mode": "nl-en",
+      "steps": [
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            },
+            "name": "Mira Bell",
+            "age": 29,
+            "gender": "F",
+            "department": "Cardiology",
+            "phone": "703"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              },
+              {
+                "id": {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                },
+                "name": "Mira Bell",
+                "age": 29,
+                "gender": "F",
+                "department": "Cardiology",
+                "phone": "703"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)",
+              "operation": "save",
+              "table": "res:table:hospital_db.patients",
+              "writes": true
+            }
+          ],
+          "remote_requests": [],
+          "producer": {
+            "identity": "new_patient",
+            "response_path": [
+              "id"
+            ],
+            "origin": "ORM generated identifier",
+            "native_kind": "Long"
+          },
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            },
+            "name": "Mira Bell",
+            "age": 29,
+            "gender": "F",
+            "department": "Cardiology",
+            "phone": "703"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              },
+              {
+                "id": {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                },
+                "name": "Mira Bell",
+                "age": 29,
+                "gender": "F",
+                "department": "Cardiology",
+                "phone": "703"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "operation": "findById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": false
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            },
+            "name": "Mira Bell",
+            "age": 30,
+            "gender": "F",
+            "department": "Rehabilitation",
+            "phone": "704"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              },
+              {
+                "id": {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                },
+                "name": "Mira Bell",
+                "age": 30,
+                "gender": "F",
+                "department": "Rehabilitation",
+                "phone": "704"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "operation": "findById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": false
+            },
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+              "operation": "save",
+              "table": "res:table:hospital_db.patients",
+              "writes": true
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            },
+            "name": "Mira Bell",
+            "age": 30,
+            "gender": "F",
+            "department": "Rehabilitation",
+            "phone": "704"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              },
+              {
+                "id": {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                },
+                "name": "Mira Bell",
+                "age": 30,
+                "gender": "F",
+                "department": "Rehabilitation",
+                "phone": "704"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "operation": "findById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": false
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+              "relation": "calls",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.doctors"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "relation": "calls",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "relation": "remote",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "doctor": {
+              "id": 7,
+              "name": "Dr Vale",
+              "specialization": "Cardiology",
+              "experience": 12,
+              "phone": "701"
+            },
+            "patient": {
+              "id": {
+                "$identity": "new_patient",
+                "native_kind": "Long",
+                "fresh": true
+              },
+              "name": "Mira Bell",
+              "age": 30,
+              "gender": "F",
+              "department": "Rehabilitation",
+              "phone": "704"
+            }
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              },
+              {
+                "id": {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                },
+                "name": "Mira Bell",
+                "age": 30,
+                "gender": "F",
+                "department": "Rehabilitation",
+                "phone": "704"
+              }
+            ]
+          },
+          "operations": [],
+          "remote_requests": [
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "deployment": "patient-service",
+              "method": "GET",
+              "path": [
+                "patients",
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "query": {},
+              "status": 200
+            }
+          ],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": null,
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)",
+              "operation": "deleteById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": true
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            }
+          ],
+          "status": 404,
+          "result": {
+            "timestamp": {
+              "$native": "LocalDateTime"
+            },
+            "message": {
+              "$text": [
+                "Patient not found with ID: ",
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ]
+            },
+            "status": 404
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "operation": "findById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": false
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            }
+          ],
+          "status": 404,
+          "result": {
+            "timestamp": {
+              "$native": "LocalDateTime"
+            },
+            "message": {
+              "$text": [
+                "Patient not found with ID: ",
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ]
+            },
+            "status": 404
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "operation": "findById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": false
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleGenericException(Exception)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+              "relation": "calls",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.doctors"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "relation": "calls",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "relation": "remote",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 500,
+          "result": {
+            "timestamp": {
+              "$native": "LocalDateTime"
+            },
+            "message": {
+              "$native": "FeignExceptionMessage",
+              "response": {
+                "timestamp": {
+                  "$native": "LocalDateTime"
+                },
+                "message": {
+                  "$text": [
+                    "Patient not found with ID: ",
+                    {
+                      "$identity": "new_patient",
+                      "native_kind": "Long",
+                      "fresh": true
+                    }
+                  ]
+                },
+                "status": 404
+              }
+            },
+            "status": 500
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [],
+          "remote_requests": [
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "deployment": "patient-service",
+              "method": "GET",
+              "path": [
+                "patients",
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "query": {},
+              "status": 404
+            }
+          ],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": [
+            "Exact Feign exception message spelling is version dependent; assert the source exception-message relationship and String kind, not a guessed literal."
+          ]
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": 11,
+            "name": "Seed Patient",
+            "age": 45,
+            "gender": "F",
+            "department": "General",
+            "phone": "702"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        }
+      ],
+      "environment": "normal",
+      "full_graph_oracle": true,
+      "full_persistent_state_oracle": true
+    },
+    "healthcare-state-chain-nl-ru": {
+      "mode": "nl-ru",
+      "steps": [
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            },
+            "name": "Mira Bell",
+            "age": 29,
+            "gender": "F",
+            "department": "Cardiology",
+            "phone": "703"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              },
+              {
+                "id": {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                },
+                "name": "Mira Bell",
+                "age": 29,
+                "gender": "F",
+                "department": "Cardiology",
+                "phone": "703"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)",
+              "operation": "save",
+              "table": "res:table:hospital_db.patients",
+              "writes": true
+            }
+          ],
+          "remote_requests": [],
+          "producer": {
+            "identity": "new_patient",
+            "response_path": [
+              "id"
+            ],
+            "origin": "ORM generated identifier",
+            "native_kind": "Long"
+          },
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            },
+            "name": "Mira Bell",
+            "age": 29,
+            "gender": "F",
+            "department": "Cardiology",
+            "phone": "703"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              },
+              {
+                "id": {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                },
+                "name": "Mira Bell",
+                "age": 29,
+                "gender": "F",
+                "department": "Cardiology",
+                "phone": "703"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "operation": "findById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": false
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            },
+            "name": "Mira Bell",
+            "age": 30,
+            "gender": "F",
+            "department": "Rehabilitation",
+            "phone": "704"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              },
+              {
+                "id": {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                },
+                "name": "Mira Bell",
+                "age": 30,
+                "gender": "F",
+                "department": "Rehabilitation",
+                "phone": "704"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "operation": "findById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": false
+            },
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+              "operation": "save",
+              "table": "res:table:hospital_db.patients",
+              "writes": true
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": {
+              "$identity": "new_patient",
+              "native_kind": "Long",
+              "fresh": true
+            },
+            "name": "Mira Bell",
+            "age": 30,
+            "gender": "F",
+            "department": "Rehabilitation",
+            "phone": "704"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              },
+              {
+                "id": {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                },
+                "name": "Mira Bell",
+                "age": 30,
+                "gender": "F",
+                "department": "Rehabilitation",
+                "phone": "704"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "operation": "findById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": false
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+              "relation": "calls",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.doctors"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "relation": "calls",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "relation": "remote",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "doctor": {
+              "id": 7,
+              "name": "Dr Vale",
+              "specialization": "Cardiology",
+              "experience": 12,
+              "phone": "701"
+            },
+            "patient": {
+              "id": {
+                "$identity": "new_patient",
+                "native_kind": "Long",
+                "fresh": true
+              },
+              "name": "Mira Bell",
+              "age": 30,
+              "gender": "F",
+              "department": "Rehabilitation",
+              "phone": "704"
+            }
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              },
+              {
+                "id": {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                },
+                "name": "Mira Bell",
+                "age": 30,
+                "gender": "F",
+                "department": "Rehabilitation",
+                "phone": "704"
+              }
+            ]
+          },
+          "operations": [],
+          "remote_requests": [
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "deployment": "patient-service",
+              "method": "GET",
+              "path": [
+                "patients",
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "query": {},
+              "status": 200
+            }
+          ],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": null,
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)",
+              "operation": "deleteById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": true
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            }
+          ],
+          "status": 404,
+          "result": {
+            "timestamp": {
+              "$native": "LocalDateTime"
+            },
+            "message": {
+              "$text": [
+                "Patient not found with ID: ",
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ]
+            },
+            "status": 404
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "operation": "findById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": false
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            }
+          ],
+          "status": 404,
+          "result": {
+            "timestamp": {
+              "$native": "LocalDateTime"
+            },
+            "message": {
+              "$text": [
+                "Patient not found with ID: ",
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ]
+            },
+            "status": 404
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [
+            {
+              "method": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "operation": "findById",
+              "arguments": [
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "table": "res:table:hospital_db.patients",
+              "writes": false
+            }
+          ],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        },
+        {
+          "entry": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleGenericException(Exception)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)",
+              "relation": "calls",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.doctors"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "relation": "calls",
+              "target": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)"
+            },
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "relation": "remote",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 500,
+          "result": {
+            "timestamp": {
+              "$native": "LocalDateTime"
+            },
+            "message": {
+              "$native": "FeignExceptionMessage",
+              "response": {
+                "timestamp": {
+                  "$native": "LocalDateTime"
+                },
+                "message": {
+                  "$text": [
+                    "Patient not found with ID: ",
+                    {
+                      "$identity": "new_patient",
+                      "native_kind": "Long",
+                      "fresh": true
+                    }
+                  ]
+                },
+                "status": 404
+              }
+            },
+            "status": 500
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [],
+          "remote_requests": [
+            {
+              "source": "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "deployment": "patient-service",
+              "method": "GET",
+              "path": [
+                "patients",
+                {
+                  "$identity": "new_patient",
+                  "native_kind": "Long",
+                  "fresh": true
+                }
+              ],
+              "query": {},
+              "status": 404
+            }
+          ],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": [
+            "Exact Feign exception message spelling is version dependent; assert the source exception-message relationship and String kind, not a guessed literal."
+          ]
+        },
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-state-chain-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": 11,
+            "name": "Seed Patient",
+            "age": 45,
+            "gender": "F",
+            "department": "General",
+            "phone": "702"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        }
+      ],
+      "environment": "normal",
+      "full_graph_oracle": true,
+      "full_persistent_state_oracle": true
+    },
+    "healthcare-fresh-state-explicit-script": {
+      "mode": "explicit-script",
+      "steps": [
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-fresh-state-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-fresh-state-explicit-script",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": 11,
+            "name": "Seed Patient",
+            "age": 45,
+            "gender": "F",
+            "department": "General",
+            "phone": "702"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        }
+      ],
+      "environment": "normal",
+      "full_graph_oracle": true,
+      "full_persistent_state_oracle": true
+    },
+    "healthcare-fresh-state-nl-en": {
+      "mode": "nl-en",
+      "steps": [
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-fresh-state-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-fresh-state-nl-en",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": 11,
+            "name": "Seed Patient",
+            "age": 45,
+            "gender": "F",
+            "department": "General",
+            "phone": "702"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        }
+      ],
+      "environment": "normal",
+      "full_graph_oracle": true,
+      "full_persistent_state_oracle": true
+    },
+    "healthcare-fresh-state-nl-ru": {
+      "mode": "nl-ru",
+      "steps": [
+        {
+          "entry": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+          "edges": [
+            {
+              "source": "scenario:healthcare-fresh-state-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)"
+            },
+            {
+              "source": "scenario:healthcare-fresh-state-nl-ru",
+              "relation": "executes",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)",
+              "relation": "calls",
+              "target": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)"
+            },
+            {
+              "source": "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)",
+              "relation": "data",
+              "target": "res:table:hospital_db.patients"
+            }
+          ],
+          "status": 200,
+          "result": {
+            "id": 11,
+            "name": "Seed Patient",
+            "age": 45,
+            "gender": "F",
+            "department": "General",
+            "phone": "702"
+          },
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [],
+          "remote_requests": [],
+          "producer": null,
+          "exploration_complete": true,
+          "graph_complete": true,
+          "persistent_rows_complete": true,
+          "value_limits": []
+        }
+      ],
+      "environment": "normal",
+      "full_graph_oracle": true,
+      "full_persistent_state_oracle": true
+    },
+    "healthcare-ambiguous-en": {
+      "mode": "nl-en",
+      "environment": "normal",
+      "full_graph_oracle": true,
+      "full_persistent_state_oracle": true,
+      "steps": [
+        {
+          "refusal": "ambiguous",
+          "edges": [],
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [],
+          "exploration_complete": false
+        }
+      ]
+    },
+    "healthcare-no-handler-en": {
+      "mode": "nl-en",
+      "environment": "normal",
+      "full_graph_oracle": true,
+      "full_persistent_state_oracle": true,
+      "steps": [
+        {
+          "refusal": "no-handler",
+          "edges": [],
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [],
+          "exploration_complete": false
+        }
+      ]
+    },
+    "healthcare-ambiguous-ru": {
+      "mode": "nl-ru",
+      "environment": "normal",
+      "full_graph_oracle": true,
+      "full_persistent_state_oracle": true,
+      "steps": [
+        {
+          "refusal": "ambiguous",
+          "edges": [],
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [],
+          "exploration_complete": false
+        }
+      ]
+    },
+    "healthcare-no-handler-ru": {
+      "mode": "nl-ru",
+      "environment": "normal",
+      "full_graph_oracle": true,
+      "full_persistent_state_oracle": true,
+      "steps": [
+        {
+          "refusal": "no-handler",
+          "edges": [],
+          "tables": {
+            "hospital_db.doctors": [
+              {
+                "id": 7,
+                "name": "Dr Vale",
+                "specialization": "Cardiology",
+                "experience": 12,
+                "phone": "701"
+              }
+            ],
+            "hospital_db.patients": [
+              {
+                "id": 11,
+                "name": "Seed Patient",
+                "age": 45,
+                "gender": "F",
+                "department": "General",
+                "phone": "702"
+              }
+            ]
+          },
+          "operations": [],
+          "exploration_complete": false
+        }
+      ]
+    }
+  },
+  "source_evidence": {
+    "method:patient-service:com.hospital.patientservice.controller.PatientController#create(Patient)": {
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 20,
+      "end": 23,
+      "sha256": "9c3ae99e92ac3cc081cd45bb7c3c569b2859ed45b944ccdf96925590862ae0f8"
+    },
+    "method:patient-service:com.hospital.patientservice.controller.PatientController#getById(Long)": {
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 31,
+      "end": 34,
+      "sha256": "9c3ae99e92ac3cc081cd45bb7c3c569b2859ed45b944ccdf96925590862ae0f8"
+    },
+    "method:patient-service:com.hospital.patientservice.controller.PatientController#update(Long,Patient)": {
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 36,
+      "end": 40,
+      "sha256": "9c3ae99e92ac3cc081cd45bb7c3c569b2859ed45b944ccdf96925590862ae0f8"
+    },
+    "method:patient-service:com.hospital.patientservice.controller.PatientController#delete(Long)": {
+      "file": "patient-service/src/main/java/com/hospital/patientservice/controller/PatientController.java",
+      "line": 42,
+      "end": 45,
+      "sha256": "9c3ae99e92ac3cc081cd45bb7c3c569b2859ed45b944ccdf96925590862ae0f8"
+    },
+    "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#createPatient(Patient)": {
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 19,
+      "end": 22,
+      "sha256": "ffedd89ffd3f38e6521cd64919426c0a49370eb5ba17b1d95678fdd4be98711a"
+    },
+    "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#getPatientById(Long)": {
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 29,
+      "end": 37,
+      "sha256": "ffedd89ffd3f38e6521cd64919426c0a49370eb5ba17b1d95678fdd4be98711a"
+    },
+    "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#updatePatient(Long,Patient)": {
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 39,
+      "end": 51,
+      "sha256": "ffedd89ffd3f38e6521cd64919426c0a49370eb5ba17b1d95678fdd4be98711a"
+    },
+    "method:patient-service:com.hospital.patientservice.service.PatientServiceImpl#deletePatient(Long)": {
+      "file": "patient-service/src/main/java/com/hospital/patientservice/service/PatientServiceImpl.java",
+      "line": 53,
+      "end": 56,
+      "sha256": "ffedd89ffd3f38e6521cd64919426c0a49370eb5ba17b1d95678fdd4be98711a"
+    },
+    "method:doctor-service:com.hospital.doctorservice.controller.DoctorController#getDoctorWithPatient(Long,Long)": {
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/controller/DoctorController.java",
+      "line": 49,
+      "end": 55,
+      "sha256": "18f10580b0159173360717d5a22334d4d31d4965ec7c6f0ea0b3061716ee14e1"
+    },
+    "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorWithPatient(Long,Long)": {
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 58,
+      "end": 77,
+      "sha256": "bf8a6a53f44401ef59f45442fc873ff90d3da6aff00f473d231cd01e9b134f75"
+    },
+    "method:doctor-service:com.hospital.doctorservice.service.DoctorServiceImpl#getDoctorById(Long)": {
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/service/DoctorServiceImpl.java",
+      "line": 35,
+      "end": 43,
+      "sha256": "bf8a6a53f44401ef59f45442fc873ff90d3da6aff00f473d231cd01e9b134f75"
+    },
+    "method:patient-service:com.hospital.patientservice.exception.PatientNotFoundException#<init>(String)": {
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/PatientNotFoundException.java",
+      "line": 5,
+      "end": 7,
+      "sha256": "79c3ed7c68f8d08cfa861e5c86ffb9e2900f791875b7a62aa901a1663e85dda9"
+    },
+    "method:patient-service:com.hospital.patientservice.exception.GlobalExceptionHandler#handlePatientNotFound(PatientNotFoundException)": {
+      "file": "patient-service/src/main/java/com/hospital/patientservice/exception/GlobalExceptionHandler.java",
+      "line": 15,
+      "end": 25,
+      "sha256": "1a0df26d2ccb5c20a05f9b4ae7359454330f0b3df2afbdc1c8351948cd82e8c4"
+    },
+    "method:doctor-service:com.hospital.doctorservice.exception.GlobalExceptionHandler#handleGenericException(Exception)": {
+      "file": "doctor-service/src/main/java/com/hospital/doctorservice/exception/GlobalExceptionHandler.java",
+      "line": 32,
+      "end": 49,
+      "sha256": "c1519e5fd7acadda52d17f82eaef4520c1980dac163364543d60d7f09a3da157"
+    }
+  }
+}

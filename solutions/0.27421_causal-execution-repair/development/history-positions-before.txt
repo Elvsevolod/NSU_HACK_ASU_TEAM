@@ -1,0 +1,76 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_ordinals_use_original_slots_and_duplicate_positions[values0-first-None] _
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-136/test_ordinals_use_original_slo0')
+values = [<Unknown.VALUE: 'unknown'>, 'C'], ordinal = 'first', expected = None
+
+    @pytest.mark.parametrize('values,ordinal,expected',[
+        ([U,'C'],'first',None),
+        (['A','A','B'],'second','A'),
+        (['A','A','B'],'third','B'),
+    ])
+    def test_ordinals_use_original_slots_and_duplicate_positions(tmp_path,values,ordinal,expected):
+        project,_,ids=build(tmp_path,{'Api.java':SOURCE})
+        history=[{'entry':ids['Api.list'],'result':[{'__type__':'Invoice','id':value} for value in values]}]
+        result=history_value(project,ids['Api.show'],'invoiceId','Open '+ordinal+' invoice',history)
+>       assert result is None if expected is None else result[1]==expected
+E       assert False
+
+solutions/—_causal-execution-repair/code/tests/test_regression_history_positions.py:21: AssertionError
+__ test_ordinals_use_original_slots_and_duplicate_positions[values1-second-A] __
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-136/test_ordinals_use_original_slo1')
+values = ['A', 'A', 'B'], ordinal = 'second', expected = 'A'
+
+    @pytest.mark.parametrize('values,ordinal,expected',[
+        ([U,'C'],'first',None),
+        (['A','A','B'],'second','A'),
+        (['A','A','B'],'third','B'),
+    ])
+    def test_ordinals_use_original_slots_and_duplicate_positions(tmp_path,values,ordinal,expected):
+        project,_,ids=build(tmp_path,{'Api.java':SOURCE})
+        history=[{'entry':ids['Api.list'],'result':[{'__type__':'Invoice','id':value} for value in values]}]
+        result=history_value(project,ids['Api.show'],'invoiceId','Open '+ordinal+' invoice',history)
+>       assert result is None if expected is None else result[1]==expected
+E       assert False
+
+solutions/—_causal-execution-repair/code/tests/test_regression_history_positions.py:21: AssertionError
+__ test_ordinals_use_original_slots_and_duplicate_positions[values2-third-B] ___
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-136/test_ordinals_use_original_slo2')
+values = ['A', 'A', 'B'], ordinal = 'third', expected = 'B'
+
+    @pytest.mark.parametrize('values,ordinal,expected',[
+        ([U,'C'],'first',None),
+        (['A','A','B'],'second','A'),
+        (['A','A','B'],'third','B'),
+    ])
+    def test_ordinals_use_original_slots_and_duplicate_positions(tmp_path,values,ordinal,expected):
+        project,_,ids=build(tmp_path,{'Api.java':SOURCE})
+        history=[{'entry':ids['Api.list'],'result':[{'__type__':'Invoice','id':value} for value in values]}]
+        result=history_value(project,ids['Api.show'],'invoiceId','Open '+ordinal+' invoice',history)
+>       assert result is None if expected is None else result[1]==expected
+                                                       ^^^^^^^^^
+E       TypeError: 'NoneType' object is not subscriptable
+
+solutions/—_causal-execution-repair/code/tests/test_regression_history_positions.py:21: TypeError
+______ test_unknown_unrelated_producer_does_not_erase_known_invoice_order ______
+
+tmp_path = PosixPath('/private/var/folders/ln/cmj3zx5n3b7bk0hqwh3vwsqc0000gn/T/pytest-of-elvsevolod/pytest-136/test_unknown_unrelated_produce0')
+
+    def test_unknown_unrelated_producer_does_not_erase_known_invoice_order(tmp_path):
+        project,_,ids=build(tmp_path,{'Api.java':SOURCE})
+        history=[{'entry':ids['Api.list'],'result':[{'__type__':'Invoice','id':'A'}]},
+            {'entry':ids['Api.weather'],'result':U}]
+>       assert history_value(project,ids['Api.show'],'invoiceId','Open first invoice',history)==('history[0].result[0].id','A')
+E       AssertionError: assert None == ('history[0].result[0].id', 'A')
+E        +  where None = history_value(<analyzer.project.Project object at 0x106773950>, 'method:service:Api#show(String)', 'invoiceId', 'Open first invoice', [{'entry': 'method:service:Api#list()', 'result': [{'__type__': 'Invoice', 'id': 'A'}]}, {'entry': 'method:service:Api#weather()', 'result': <Unknown.VALUE: 'unknown'>}])
+
+solutions/—_causal-execution-repair/code/tests/test_regression_history_positions.py:28: AssertionError
+=========================== short test summary info ============================
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_history_positions.py::test_ordinals_use_original_slots_and_duplicate_positions[values0-first-None]
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_history_positions.py::test_ordinals_use_original_slots_and_duplicate_positions[values1-second-A]
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_history_positions.py::test_ordinals_use_original_slots_and_duplicate_positions[values2-third-B]
+FAILED solutions/—_causal-execution-repair/code/tests/test_regression_history_positions.py::test_unknown_unrelated_producer_does_not_erase_known_invoice_order
+4 failed in 0.07s

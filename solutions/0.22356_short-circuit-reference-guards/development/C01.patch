@@ -1,0 +1,160 @@
+--- parent33-e28/analyzer/constraints.py
++++ variant34/analyzer/constraints.py
+@@ -79,6 +79,8 @@
+             return U
+     if node.type in ('true', 'false'):
+         return node.type == 'true'
++    if node.type == 'null_literal':
++        return None
+     if node.type == 'string_literal':
+         import json
+         try:
+@@ -88,7 +90,7 @@
+     return U
+ 
+ 
+-def assume(node, env, truth, types, symbol):
++def assume(node, env, truth, types, symbol, standard=None):
+     """Refine supported locals in one selected path; assignments replace these values."""
+     node = unparenthesized(node)
+     if node is None:
+@@ -96,7 +98,7 @@
+     if any(n.type in ('assignment_expression', 'update_expression') for n in walk(node)):
+         return False
+     if node.type == 'unary_expression' and text(node).startswith('!'):
+-        return assume(node.named_children[-1], env, not truth, types, symbol)
++        return assume(node.named_children[-1], env, not truth, types, symbol, standard)
+     if node.type == 'identifier':
+         name = text(node)
+         if types.get(name, '').split('.')[-1] in ('boolean', 'Boolean') and env.get(name, U) is U:
+@@ -109,8 +111,8 @@
+     left, right = unparenthesized(node.child_by_field_name('left')), unparenthesized(node.child_by_field_name('right'))
+     if op in ('&&', '||'):
+         if (op == '&&' and truth) or (op == '||' and not truth):
+-            a = assume(left, env, truth, types, symbol)
+-            b = assume(right, env, truth, types, symbol)
++            a = assume(left, env, truth, types, symbol, standard)
++            b = assume(right, env, truth, types, symbol, standard)
+             return a or b
+         return False
+     if op not in INVERSE:
+@@ -123,6 +125,24 @@
+         return False
+     name, current = text(left), env.get(text(left), U)
+     typ = types.get(name, '').split('.')[-1]
++    if value is None and op in ('==', '!='):
++        if typ in ('boolean','byte','short','char','int','long','float','double'):
++            return False
++        is_null = truth == (op == '==')
++        if current is None:
++            if not is_null:raise InfeasiblePath('Null reference contradicts non-null guard')
++        elif current is U:
++            if is_null:
++                env[name] = None
++                return True
++            written = types.get(name, '')
++            native_string = standard(written, 'java.lang.String') if standard else written == 'java.lang.String'
++            if native_string:
++                env[name] = {'__symbol__': symbol(), '__type__': 'String', '__constraints__': ['non_null', 'path_condition']}
++                return True
++        elif isinstance(current, dict) and 'non_null' in current.get('__constraints__', ()) and is_null:
++            raise InfeasiblePath('Non-null reference contradicts null guard')
++        return False
+     constant_node = unparenthesized(right)
+     while constant_node and constant_node.type == 'unary_expression':
+         constant_node = constant_node.named_children[-1]
+--- parent33-e28/analyzer/engine.py
++++ variant34/analyzer/engine.py
+@@ -1447,7 +1447,7 @@
+             if decision is not None:
+                 if self.use_constraints:
+                     refined = assume(node.child_by_field_name('condition'), env, decision,
+-                                     self.variable_types, self.constraint_symbol)
++                                     self.variable_types, self.constraint_symbol,self.standard_type)
+                     self.conditions[-1]['refined'] = refined
+                 with self.event_guard(text(condition), decision, True):
+                     return self.execute(node.child_by_field_name('consequence' if decision else 'alternative'), env)
+@@ -1938,6 +1938,20 @@
+             if a is None and self.binary_unboxes(node,'left'):self.unbox(a,node.child_by_field_name('left'))
+             if (op == '&&' and a is False) or (op == '||' and a is True):
+                 return a
++            if op in ('&&','||') and a is U:
++                left=node.child_by_field_name('left');right=node.child_by_field_name('right')
++                def logical_branch(truth,owned,_):
++                    if self.use_constraints:
++                        assume(left,owned,truth,self.variable_types,self.constraint_symbol,self.standard_type)
++                    with self.event_guard(text(left),truth,True):
++                        if truth == (op=='||'):return truth,None
++                        return self.unbox(self.value(right,owned),right),None
++                decision=self.choose(self.method+':'+str(node.start_point.row+1)+':'+str(node.start_point.column+1)+':short-circuit-'+op,[True,False])
++                if decision is not None:
++                    return logical_branch(decision,env,[])[0]
++                result,control=self.fork_join([True,False],env,[],logical_branch)
++                if control=='throw':raise JavaThrow(result)
++                return result
+             b = self.value(node.child_by_field_name('right'), env)
+             right_kind=self.source_reference_kind(node.child_by_field_name('right'),self.last_reference_kind)
+             if b is None and self.binary_unboxes(node,'right'):self.unbox(b,node.child_by_field_name('right'))
+--- parent33-e28/tests/test_short_circuit_reference34.py
++++ variant34/tests/test_short_circuit_reference34.py
+@@ -0,0 +1,60 @@
++"""Source-derived C01 expectations, recorded before the short-circuit patch."""
++import pytest
++from analyzer.paths import run_paths
++from analyzer.state import ScenarioState, U
++from builders import build
++
++
++@pytest.mark.parametrize('operation,callback_result', [('||', 'true'), ('&&', 'false')])
++def test_unknown_left_has_a_real_skip_path_and_a_separate_callback_path(tmp_path, operation, callback_result):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{static int count=0;
++      boolean touch(){count++;return RESULT;}
++      Object entry(boolean left){boolean result=left OP touch();return Arrays.asList(result,count);}}'''
++      .replace('RESULT',callback_result).replace('OP',operation)})
++    rows=run_paths(p,ScenarioState(db),ids['Api.entry'],{'left':U},limit=4)
++    assert {tuple(r['result']) for r in rows}=={(operation=='||',0),(operation=='||',1)}
++    for row in rows:
++        touched=('', 'executes', ids['Api.touch']) in row['engine'].edges
++        assert touched == (row['result'][1]==1)
++        assert row['engine'].outcome=='returned'
++
++
++@pytest.mark.parametrize('operation', ['&&', '||'])
++def test_unknown_left_does_not_lose_the_normal_path_when_rhs_throws(tmp_path, operation):
++    p,db,ids=build(tmp_path,{'Api.java':'''class Api{
++      boolean fail(){throw new IllegalStateException();}
++      boolean entry(boolean left){return left OP fail();}}'''.replace('OP',operation)})
++    rows=run_paths(p,ScenarioState(db),ids['Api.entry'],{'left':U},limit=4)
++    assert {r['engine'].outcome for r in rows}=={'returned','uncaught application exception'}
++    normal=next(r for r in rows if r['engine'].outcome=='returned')
++    assert normal['result'] is (operation=='||')
++    assert ('','executes',ids['Api.fail']) not in normal['engine'].edges
++
++
++def test_unknown_string_null_guard_has_no_spurious_npe_or_completion_budget(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.Locale;class Api{
++      String normalize(String value){if(value==null || value.isEmpty())return value;
++        return value.replace(" ","").toLowerCase(Locale.ROOT);}
++      String entry(String value){return normalize(value);}}'''})
++    rows=run_paths(p,ScenarioState(db),ids['Api.entry'],{'value':U},limit=4)
++    assert rows and all(r['engine'].outcome=='returned' for r in rows)
++    assert any(r['result'] is None for r in rows)
++    assert not any('NullPointerException' in w for r in rows for w in r['engine'].warnings)
++    assert all(r['exploration']['completion_splits']==0 for r in rows)
++
++
++@pytest.mark.parametrize('value', [None,'','A B'])
++def test_known_string_values_keep_source_behavior(tmp_path, value):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.Locale;class Api{
++      String entry(String value){if(value==null || value.isEmpty())return value;
++        return value.replace(" ","").toLowerCase(Locale.ROOT);}}'''})
++    rows=run_paths(p,ScenarioState(db),ids['Api.entry'],{'value':value},limit=4)
++    assert len(rows)==1 and rows[0]['result']==(value if value is None else value.replace(' ','').lower())
++
++
++def test_rhs_source_effect_is_not_replayed_when_selecting_the_short_circuit_path(tmp_path):
++    p,db,ids=build(tmp_path,{'Api.java':'''import java.util.*;class Api{static int leftCount=0;static int rightCount=0;
++      boolean lhs(boolean value){leftCount++;return value;}boolean rhs(){rightCount++;return true;}
++      Object entry(boolean value){boolean result=lhs(value)||rhs();return Arrays.asList(leftCount,rightCount,result);}}'''})
++    rows=run_paths(p,ScenarioState(db),ids['Api.entry'],{'value':U},limit=4)
++    assert {tuple(r['result']) for r in rows}=={(1,0,True),(1,1,True)}
